@@ -1279,7 +1279,16 @@ msgstr ""
 
 #: src/Content/Conversation.php:393 src/Module/Item/Compose.php:207
 #: src/Module/Post/Edit.php:157
+msgid "Set summary, abstract or spoiler text"
+msgstr ""
+
+#: src/Content/Conversation.php:395 src/Module/Item/Compose.php:211
+#: src/Module/Post/Edit.php:159
 msgid "Categories (comma-separated list)"
+msgstr ""
+
+#: src/Content/Conversation.php:396 src/Module/Item/Compose.php:227
+msgid "Sensitive post"
 msgstr ""
 
 #: src/Content/Conversation.php:398 src/Module/Item/Compose.php:227
@@ -1637,6 +1646,17 @@ msgstr ""
 
 #: src/Content/Feature.php:121
 msgid "Add categories to your posts"
+msgstr ""
+
+#: src/Content/Feature.php:123 src/Model/Profile.php:807
+#: src/Module/Admin/Summary.php:207 src/Module/Item/Compose.php:188
+#: src/Module/Moderation/Report/Create.php:282
+#: src/Module/Moderation/Summary.php:65
+msgid "Summary"
+msgstr ""
+
+#: src/Content/Feature.php:123
+msgid "Add a summary, abstract or spoiler text to your posts"
 msgstr ""
 
 #: src/Content/Feature.php:126
@@ -3502,12 +3522,6 @@ msgstr ""
 
 #: src/Model/Profile.php:806
 msgid "Title/Description:"
-msgstr ""
-
-#: src/Model/Profile.php:807 src/Module/Admin/Summary.php:207
-#: src/Module/Moderation/Report/Create.php:282
-#: src/Module/Moderation/Summary.php:65
-msgid "Summary"
 msgstr ""
 
 #: src/Model/Profile.php:808
