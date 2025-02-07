@@ -81,6 +81,9 @@ class StrategiesFileManager
 			throw new HookConfigException(sprintf('Error loading config file %s.', $configFile));
 		}
 
+		/**
+		 * @deprecated 2025.02 Providing strategies via addons is deprecated and will be removed in 5 months.
+		 */
 		$this->config = array_merge_recursive($config, $this->addonLoader->getActiveAddonConfig(static::CONFIG_NAME));
 	}
 }

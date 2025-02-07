@@ -54,9 +54,15 @@ class AddonLoader implements ICanLoadAddons
 				foreach ($config as $classname => $rule) {
 					if ($classname === LoggerInterface::class) {
 						@trigger_error(sprintf(
-							'Providing a strategy for `%s` is deprecated since 2025.02, please provide an implementation for `%s` via `dependency.config.php` instead in %s addon.',
-							LoggerInterface::class,
+							'Providing a strategy for `%s` is deprecated since 2025.02 and will stop working in 5 months, please provide an implementation for `%s` via `dependency.config.php` and remove the `strategies.config.php` file in the `%s` addon.',
+							$classname,
 							LoggerFactory::class,
+							$addonName,
+						), \E_USER_DEPRECATED);
+					} else {
+						@trigger_error(sprintf(
+							'Providing strategies for `%s` via addons is deprecated since 2025.02 and will stop working in 5 months, please stop using this and remove the `strategies.config.php` file in the `%s` addon.',
+							$classname,
 							$addonName,
 						), \E_USER_DEPRECATED);
 					}
