@@ -30,6 +30,8 @@ final class ArrayFilterEvent extends Event
 
 	public const POST_LOCAL_END = 'friendica.data.post_local_end';
 
+	public const PHOTO_UPLOAD_FORM = 'friendica.data.photo_upload_form';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)
