@@ -7,12 +7,10 @@
 
 namespace Friendica\App;
 
-use Dice\Dice;
 use FastRoute\DataGenerator\GroupCountBased;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std;
-use Friendica\Capabilities\ICanHandleRequests;
 use Friendica\Core\Addon;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Cache\Capability\ICanCache;
@@ -21,6 +19,7 @@ use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Lock\Capability\ICanLock;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Event\CollectRoutesEvent;
 use Friendica\LegacyModule;
 use Friendica\Module\HTTPException\MethodNotAllowed;
 use Friendica\Module\HTTPException\PageNotFound;
@@ -30,6 +29,7 @@ use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Network\HTTPException\MethodNotAllowedException;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Util\Router\FriendicaGroupCountBased;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -86,6 +86,8 @@ class Router
 	/** @var LoggerInterface */
 	private $logger;
 
+	private EventDispatcherInterface $eventDispatcher;
+
 	/** @var bool */
 	private $isLocalUser;
 
@@ -110,7 +112,7 @@ class Router
 	 * @param IHandleUserSessions $userSession
 	 * @param RouteCollector|null $routeCollector
 	 */
-	public function __construct(array $server, string $baseRoutesFilepath, L10n $l10n, ICanCache $cache, ICanLock $lock, IManageConfigValues $config, Arguments $args, LoggerInterface $logger, IHandleUserSessions $userSession, RouteCollector $routeCollector = null)
+	public function __construct(array $server, string $baseRoutesFilepath, L10n $l10n, ICanCache $cache, ICanLock $lock, IManageConfigValues $config, Arguments $args, LoggerInterface $logger, EventDispatcherInterface $eventDispatcher, IHandleUserSessions $userSession, RouteCollector $routeCollector = null)
 	{
 		$this->baseRoutesFilepath      = $baseRoutesFilepath;
 		$this->l10n                    = $l10n;
@@ -120,6 +122,7 @@ class Router
 		$this->config                  = $config;
 		$this->server                  = $server;
 		$this->logger                  = $logger;
+		$this->eventDispatcher         = $eventDispatcher;
 		$this->isLocalUser             = !empty($userSession->getLocalUserId());
 
 		$this->routeCollector = $routeCollector ?? new RouteCollector(new Std(), new GroupCountBased());
@@ -147,10 +150,12 @@ class Router
 
 		$this->addRoutes($routeCollector, $routes);
 
-		$this->routeCollector = $routeCollector;
-
 		// Add routes from addons
-		Hook::callAll('route_collection', $this->routeCollector);
+		$routeCollector = $this->eventDispatcher->dispatch(
+			new CollectRoutesEvent(CollectRoutesEvent::COLLECT_ROUTES, $routeCollector),
+		)->getRouteCollector();
+
+		$this->routeCollector = $routeCollector;
 
 		return $this;
 	}

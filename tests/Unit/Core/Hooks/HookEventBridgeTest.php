@@ -9,9 +9,11 @@ declare(strict_types=1);
 
 namespace Friendica\Test\Unit\Core\Hooks;
 
+use FastRoute\RouteCollector;
 use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Hooks\HookEventBridge;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\Event;
 use Friendica\Event\HtmlFilterEvent;
@@ -25,6 +27,7 @@ class HookEventBridgeTest extends TestCase
 			Event::INIT                         => 'onNamedEvent',
 			Event::HOME_INIT                    => 'onNamedEvent',
 			ConfigLoadedEvent::CONFIG_LOADED    => 'onConfigLoadedEvent',
+			CollectRoutesEvent::COLLECT_ROUTES  => 'onCollectRoutesEvent',
 			ArrayFilterEvent::APP_MENU          => 'onArrayFilterEvent',
 			ArrayFilterEvent::NAV_INFO          => 'onArrayFilterEvent',
 			ArrayFilterEvent::FEATURE_ENABLED   => 'onArrayFilterEvent',
@@ -115,6 +118,36 @@ class HookEventBridgeTest extends TestCase
 		});
 
 		HookEventBridge::onConfigLoadedEvent($event);
+	}
+
+	public static function getCollectRoutesEventData(): array
+	{
+		return [
+			['test', 'test'],
+			[CollectRoutesEvent::COLLECT_ROUTES, 'route_collection'],
+		];
+	}
+
+	/**
+	 * @dataProvider getCollectRoutesEventData
+	 */
+	public function testOnCollectRoutesEventCallsHookWithCorrectValue($name, $expected): void
+	{
+		$routeCollector = $this->createStub(RouteCollector::class);
+
+		$event = new CollectRoutesEvent($name, $routeCollector);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, $data) use ($expected, $routeCollector) {
+			$this->assertSame($expected, $name);
+			$this->assertSame($routeCollector, $data);
+
+			return $data;
+		});
+
+		HookEventBridge::onCollectRoutesEvent($event);
 	}
 
 	public static function getArrayFilterEventData(): array

@@ -11,6 +11,7 @@ namespace Friendica\Core\Hooks;
 
 use Friendica\Core\Hook;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\Event;
 use Friendica\Event\HtmlFilterEvent;
@@ -37,6 +38,7 @@ final class HookEventBridge
 		Event::INIT                         => 'init_1',
 		Event::HOME_INIT                    => 'home_init',
 		ConfigLoadedEvent::CONFIG_LOADED    => 'load_config',
+		CollectRoutesEvent::COLLECT_ROUTES  => 'route_collection',
 		ArrayFilterEvent::APP_MENU          => 'app_menu',
 		ArrayFilterEvent::NAV_INFO          => 'nav_info',
 		ArrayFilterEvent::FEATURE_ENABLED   => 'isEnabled',
@@ -61,6 +63,7 @@ final class HookEventBridge
 			Event::INIT                         => 'onNamedEvent',
 			Event::HOME_INIT                    => 'onNamedEvent',
 			ConfigLoadedEvent::CONFIG_LOADED    => 'onConfigLoadedEvent',
+			CollectRoutesEvent::COLLECT_ROUTES  => 'onCollectRoutesEvent',
 			ArrayFilterEvent::APP_MENU          => 'onArrayFilterEvent',
 			ArrayFilterEvent::NAV_INFO          => 'onArrayFilterEvent',
 			ArrayFilterEvent::FEATURE_ENABLED   => 'onArrayFilterEvent',
@@ -85,6 +88,13 @@ final class HookEventBridge
 	public static function onConfigLoadedEvent(ConfigLoadedEvent $event): void
 	{
 		static::callHook($event->getName(), $event->getConfig());
+	}
+
+	public static function onCollectRoutesEvent(CollectRoutesEvent $event): void
+	{
+		$event->setRouteCollector(
+			static::callHook($event->getName(), $event->getRouteCollector())
+		);
 	}
 
 	public static function onArrayFilterEvent(ArrayFilterEvent $event): void
