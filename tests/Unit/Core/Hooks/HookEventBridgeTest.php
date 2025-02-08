@@ -22,17 +22,20 @@ class HookEventBridgeTest extends TestCase
 	public function testGetStaticSubscribedEventsReturnsStaticMethods(): void
 	{
 		$expected = [
-			Event::INIT                       => 'onNamedEvent',
-			ConfigLoadedEvent::CONFIG_LOADED  => 'onConfigLoadedEvent',
-			ArrayFilterEvent::APP_MENU        => 'onArrayFilterEvent',
-			ArrayFilterEvent::NAV_INFO        => 'onArrayFilterEvent',
-			ArrayFilterEvent::FEATURE_ENABLED => 'onArrayFilterEvent',
-			ArrayFilterEvent::FEATURE_GET     => 'onArrayFilterEvent',
-			HtmlFilterEvent::HEAD             => 'onHtmlFilterEvent',
-			HtmlFilterEvent::FOOTER           => 'onHtmlFilterEvent',
-			HtmlFilterEvent::PAGE_HEADER      => 'onHtmlFilterEvent',
-			HtmlFilterEvent::PAGE_CONTENT_TOP => 'onHtmlFilterEvent',
-			HtmlFilterEvent::PAGE_END         => 'onHtmlFilterEvent',
+			Event::INIT                        => 'onNamedEvent',
+			ConfigLoadedEvent::CONFIG_LOADED   => 'onConfigLoadedEvent',
+			ArrayFilterEvent::APP_MENU         => 'onArrayFilterEvent',
+			ArrayFilterEvent::NAV_INFO         => 'onArrayFilterEvent',
+			ArrayFilterEvent::FEATURE_ENABLED  => 'onArrayFilterEvent',
+			ArrayFilterEvent::FEATURE_GET      => 'onArrayFilterEvent',
+			ArrayFilterEvent::POST_LOCAL_START => 'onArrayFilterEvent',
+			ArrayFilterEvent::POST_LOCAL       => 'onArrayFilterEvent',
+			ArrayFilterEvent::POST_LOCAL_END   => 'onArrayFilterEvent',
+			HtmlFilterEvent::HEAD              => 'onHtmlFilterEvent',
+			HtmlFilterEvent::FOOTER            => 'onHtmlFilterEvent',
+			HtmlFilterEvent::PAGE_HEADER       => 'onHtmlFilterEvent',
+			HtmlFilterEvent::PAGE_CONTENT_TOP  => 'onHtmlFilterEvent',
+			HtmlFilterEvent::PAGE_END          => 'onHtmlFilterEvent',
 		];
 
 		$this->assertSame(
@@ -119,6 +122,9 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::NAV_INFO, 'nav_info'],
 			[ArrayFilterEvent::FEATURE_ENABLED, 'isEnabled'],
 			[ArrayFilterEvent::FEATURE_GET, 'get'],
+			[ArrayFilterEvent::POST_LOCAL_START, 'post_local_start'],
+			[ArrayFilterEvent::POST_LOCAL, 'post_local'],
+			[ArrayFilterEvent::POST_LOCAL_END, 'post_local_end'],
 		];
 	}
 

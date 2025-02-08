@@ -34,17 +34,20 @@ final class HookEventBridge
 	 * This maps the new event names to the legacy Hook names.
 	 */
 	private static array $eventMapper = [
-		Event::INIT                       => 'init_1',
-		ConfigLoadedEvent::CONFIG_LOADED  => 'load_config',
-		ArrayFilterEvent::APP_MENU        => 'app_menu',
-		ArrayFilterEvent::NAV_INFO        => 'nav_info',
-		ArrayFilterEvent::FEATURE_ENABLED => 'isEnabled',
-		ArrayFilterEvent::FEATURE_GET     => 'get',
-		HtmlFilterEvent::HEAD             => 'head',
-		HtmlFilterEvent::FOOTER           => 'footer',
-		HtmlFilterEvent::PAGE_HEADER      => 'page_header',
-		HtmlFilterEvent::PAGE_CONTENT_TOP => 'page_content_top',
-		HtmlFilterEvent::PAGE_END         => 'page_end',
+		Event::INIT                        => 'init_1',
+		ConfigLoadedEvent::CONFIG_LOADED   => 'load_config',
+		ArrayFilterEvent::APP_MENU         => 'app_menu',
+		ArrayFilterEvent::NAV_INFO         => 'nav_info',
+		ArrayFilterEvent::FEATURE_ENABLED  => 'isEnabled',
+		ArrayFilterEvent::FEATURE_GET      => 'get',
+		ArrayFilterEvent::POST_LOCAL_START => 'post_local_start',
+		ArrayFilterEvent::POST_LOCAL       => 'post_local',
+		ArrayFilterEvent::POST_LOCAL_END   => 'post_local_end',
+		HtmlFilterEvent::HEAD              => 'head',
+		HtmlFilterEvent::FOOTER            => 'footer',
+		HtmlFilterEvent::PAGE_HEADER       => 'page_header',
+		HtmlFilterEvent::PAGE_CONTENT_TOP  => 'page_content_top',
+		HtmlFilterEvent::PAGE_END          => 'page_end',
 	];
 
 	/**
@@ -53,17 +56,20 @@ final class HookEventBridge
 	public static function getStaticSubscribedEvents(): array
 	{
 		return [
-			Event::INIT                       => 'onNamedEvent',
-			ConfigLoadedEvent::CONFIG_LOADED  => 'onConfigLoadedEvent',
-			ArrayFilterEvent::APP_MENU        => 'onArrayFilterEvent',
-			ArrayFilterEvent::NAV_INFO        => 'onArrayFilterEvent',
-			ArrayFilterEvent::FEATURE_ENABLED => 'onArrayFilterEvent',
-			ArrayFilterEvent::FEATURE_GET     => 'onArrayFilterEvent',
-			HtmlFilterEvent::HEAD             => 'onHtmlFilterEvent',
-			HtmlFilterEvent::FOOTER           => 'onHtmlFilterEvent',
-			HtmlFilterEvent::PAGE_HEADER      => 'onHtmlFilterEvent',
-			HtmlFilterEvent::PAGE_CONTENT_TOP => 'onHtmlFilterEvent',
-			HtmlFilterEvent::PAGE_END         => 'onHtmlFilterEvent',
+			Event::INIT                        => 'onNamedEvent',
+			ConfigLoadedEvent::CONFIG_LOADED   => 'onConfigLoadedEvent',
+			ArrayFilterEvent::APP_MENU         => 'onArrayFilterEvent',
+			ArrayFilterEvent::NAV_INFO         => 'onArrayFilterEvent',
+			ArrayFilterEvent::FEATURE_ENABLED  => 'onArrayFilterEvent',
+			ArrayFilterEvent::FEATURE_GET      => 'onArrayFilterEvent',
+			ArrayFilterEvent::POST_LOCAL_START => 'onArrayFilterEvent',
+			ArrayFilterEvent::POST_LOCAL       => 'onArrayFilterEvent',
+			ArrayFilterEvent::POST_LOCAL_END   => 'onArrayFilterEvent',
+			HtmlFilterEvent::HEAD              => 'onHtmlFilterEvent',
+			HtmlFilterEvent::FOOTER            => 'onHtmlFilterEvent',
+			HtmlFilterEvent::PAGE_HEADER       => 'onHtmlFilterEvent',
+			HtmlFilterEvent::PAGE_CONTENT_TOP  => 'onHtmlFilterEvent',
+			HtmlFilterEvent::PAGE_END          => 'onHtmlFilterEvent',
 		];
 	}
 

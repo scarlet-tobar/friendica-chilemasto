@@ -24,6 +24,12 @@ final class ArrayFilterEvent extends Event
 
 	public const FEATURE_GET = 'friendica.data.feature_get';
 
+	public const POST_LOCAL_START = 'friendica.data.post_local_start';
+
+	public const POST_LOCAL = 'friendica.data.post_local';
+
+	public const POST_LOCAL_END = 'friendica.data.post_local_end';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)
