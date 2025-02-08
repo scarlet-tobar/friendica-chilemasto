@@ -35,6 +35,7 @@ final class HookEventBridge
 	 */
 	private static array $eventMapper = [
 		Event::INIT                        => 'init_1',
+		Event::HOME_INIT                   => 'home_init',
 		ConfigLoadedEvent::CONFIG_LOADED   => 'load_config',
 		ArrayFilterEvent::APP_MENU         => 'app_menu',
 		ArrayFilterEvent::NAV_INFO         => 'nav_info',
@@ -57,6 +58,7 @@ final class HookEventBridge
 	{
 		return [
 			Event::INIT                        => 'onNamedEvent',
+			Event::HOME_INIT                   => 'onNamedEvent',
 			ConfigLoadedEvent::CONFIG_LOADED   => 'onConfigLoadedEvent',
 			ArrayFilterEvent::APP_MENU         => 'onArrayFilterEvent',
 			ArrayFilterEvent::NAV_INFO         => 'onArrayFilterEvent',

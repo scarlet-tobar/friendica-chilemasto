@@ -11,6 +11,7 @@ use Friendica\BaseModule;
 use Friendica\Core\Hook;
 use Friendica\Core\Renderer;
 use Friendica\DI;
+use Friendica\Event\Event;
 use Friendica\Model\User;
 use Friendica\Module\Security\Login;
 use Friendica\Protocol\ActivityPub;
@@ -34,11 +35,11 @@ class Home extends BaseModule
 	{
 		$basePath = DI::appHelper()->getBasePath();
 		$config = DI::config();
+		$eventDispatcher = DI::eventDispatcher();
 
-		// currently no returned data is used
-		$ret = [];
-
-		Hook::callAll('home_init', $ret);
+		$eventDispatcher->dispatch(
+			new Event(Event::HOME_INIT)
+		);
 
 		if (DI::userSession()->getLocalUserId() && (DI::userSession()->getLocalUserNickname())) {
 			DI::baseUrl()->redirect('network');

@@ -23,6 +23,7 @@ class HookEventBridgeTest extends TestCase
 	{
 		$expected = [
 			Event::INIT                        => 'onNamedEvent',
+			Event::HOME_INIT                   => 'onNamedEvent',
 			ConfigLoadedEvent::CONFIG_LOADED   => 'onConfigLoadedEvent',
 			ArrayFilterEvent::APP_MENU         => 'onArrayFilterEvent',
 			ArrayFilterEvent::NAV_INFO         => 'onArrayFilterEvent',
@@ -61,6 +62,7 @@ class HookEventBridgeTest extends TestCase
 		return [
 			['test', 'test'],
 			[Event::INIT, 'init_1'],
+			[Event::HOME_INIT, 'home_init'],
 		];
 	}
 
