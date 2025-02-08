@@ -33,8 +33,8 @@ class Home extends BaseModule
 
 	protected function content(array $request = []): string
 	{
-		$basePath = DI::appHelper()->getBasePath();
-		$config = DI::config();
+		$basePath        = DI::appHelper()->getBasePath();
+		$config          = DI::config();
 		$eventDispatcher = DI::eventDispatcher();
 
 		$eventDispatcher->dispatch(
@@ -49,11 +49,11 @@ class Home extends BaseModule
 			DI::baseUrl()->redirect('/profile/' . $config->get('system', 'singleuser'));
 		}
 
-		$customHome = '';
+		$customHome    = '';
 		$defaultHeader = ($config->get('config', 'sitename') ? DI::l10n()->t('Welcome to %s', $config->get('config', 'sitename')) : '');
 
 		$homeFilePath = $basePath . '/home.html';
-		$cssFilePath = $basePath . '/home.css';
+		$cssFilePath  = $basePath . '/home.css';
 
 		if (file_exists($homeFilePath)) {
 			$customHome = $homeFilePath;

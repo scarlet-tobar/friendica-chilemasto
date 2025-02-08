@@ -53,13 +53,13 @@ class Delegation extends BaseModule
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->session        = $session;
-		$this->db             = $db;
-		$this->auth           = $auth;
-		$this->systemMessages = $systemMessages;
-		$this->notify         = $notify;
-		$this->intro          = $intro;
-		$this->appHelper      = $appHelper;
+		$this->session         = $session;
+		$this->db              = $db;
+		$this->auth            = $auth;
+		$this->systemMessages  = $systemMessages;
+		$this->notify          = $notify;
+		$this->intro           = $intro;
+		$this->appHelper       = $appHelper;
 		$this->eventDispatcher = $eventDispatcher;
 	}
 

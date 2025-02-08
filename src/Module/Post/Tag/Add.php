@@ -8,7 +8,6 @@
 namespace Friendica\Module\Post\Tag;
 
 use Friendica\App;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
