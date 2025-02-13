@@ -11,6 +11,7 @@ use Friendica\Core\Hook;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Util\Strings;
 
 /**
@@ -113,6 +114,8 @@ class ContactSelector
 	 */
 	public static function networkToName(string $network, string $protocol = '', int $gsid = null): string
 	{
+		$eventDispatcher = DI::eventDispatcher();
+
 		$nets = [
 			Protocol::DFRN      =>   DI::l10n()->t('DFRN'),
 			Protocol::OSTATUS   =>   DI::l10n()->t('OStatus'),
@@ -135,7 +138,9 @@ class ContactSelector
 			Protocol::BLUESKY   =>   DI::l10n()->t('Bluesky'),
 		];
 
-		Hook::callAll('network_to_name', $nets);
+		$nets = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_TO_NAME, $nets),
+		)->getArray();
 
 		$search  = array_keys($nets);
 		$replace = array_values($nets);

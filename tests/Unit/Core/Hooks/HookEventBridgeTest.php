@@ -36,6 +36,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::POST_LOCAL        => 'onArrayFilterEvent',
 			ArrayFilterEvent::POST_LOCAL_END    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_FORM => 'onArrayFilterEvent',
+			ArrayFilterEvent::NETWORK_TO_NAME   => 'onArrayFilterEvent',
 			HtmlFilterEvent::HEAD               => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER             => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER        => 'onHtmlFilterEvent',
@@ -162,6 +163,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::POST_LOCAL, 'post_local'],
 			[ArrayFilterEvent::POST_LOCAL_END, 'post_local_end'],
 			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'photo_upload_form'],
+			[ArrayFilterEvent::NETWORK_TO_NAME, 'network_to_name'],
 		];
 	}
 
