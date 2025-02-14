@@ -41,6 +41,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::DISPLAY_ITEM       => 'onArrayFilterEvent',
 			ArrayFilterEvent::RENDER_LOCATION    => 'onArrayFilterEvent',
 			ArrayFilterEvent::ITEM_PHOTO_MENU    => 'onArrayFilterEvent',
+			ArrayFilterEvent::OEMBED_FETCH_END   => 'onOembedFetchEndEvent',
 			HtmlFilterEvent::HEAD                => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER              => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER         => 'onHtmlFilterEvent',
@@ -154,6 +155,28 @@ class HookEventBridgeTest extends TestCase
 		});
 
 		HookEventBridge::onCollectRoutesEvent($event);
+	}
+
+	public function testOnOembedFetchEndEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ArrayFilterEvent(ArrayFilterEvent::OEMBED_FETCH_END, ['url' => 'original_url']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, $data): string  {
+			$this->assertSame('oembed_fetch_url', $name);
+			$this->assertSame('original_url', $data);
+
+			return 'changed_url';
+		});
+
+		HookEventBridge::onOembedFetchEndEvent($event);
+
+		$this->assertSame(
+			['url' => 'changed_url'],
+			$event->getArray(),
+		);
 	}
 
 	public static function getArrayFilterEventData(): array

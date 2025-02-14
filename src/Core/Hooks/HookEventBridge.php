@@ -52,6 +52,7 @@ final class HookEventBridge
 		ArrayFilterEvent::DISPLAY_ITEM       => 'display_item',
 		ArrayFilterEvent::RENDER_LOCATION    => 'render_location',
 		ArrayFilterEvent::ITEM_PHOTO_MENU    => 'item_photo_menu',
+		ArrayFilterEvent::OEMBED_FETCH_END   => 'oembed_fetch_url',
 		HtmlFilterEvent::HEAD                => 'head',
 		HtmlFilterEvent::FOOTER              => 'footer',
 		HtmlFilterEvent::PAGE_HEADER         => 'page_header',
@@ -83,6 +84,7 @@ final class HookEventBridge
 			ArrayFilterEvent::DISPLAY_ITEM       => 'onArrayFilterEvent',
 			ArrayFilterEvent::RENDER_LOCATION    => 'onArrayFilterEvent',
 			ArrayFilterEvent::ITEM_PHOTO_MENU    => 'onArrayFilterEvent',
+			ArrayFilterEvent::OEMBED_FETCH_END   => 'onOembedFetchEndEvent',
 			HtmlFilterEvent::HEAD                => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER              => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER         => 'onHtmlFilterEvent',
@@ -107,6 +109,20 @@ final class HookEventBridge
 		$event->setRouteCollector(
 			static::callHook($event->getName(), $event->getRouteCollector())
 		);
+	}
+
+	/**
+	 * Map the OEMBED_FETCH_END event to `oembed_fetch_url` hook
+	 */
+	public static function onOembedFetchEndEvent(ArrayFilterEvent $event): void
+	{
+		$data = $event->getArray();
+
+		$url = (string) $data['url'] ?? '';
+
+		$data['url'] = static::callHook($event->getName(), $url);
+
+		$event->setArray($data);
 	}
 
 	public static function onArrayFilterEvent(ArrayFilterEvent $event): void

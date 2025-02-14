@@ -13,11 +13,11 @@ use DOMXPath;
 use Exception;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Cache\Enum\Duration;
-use Friendica\Core\Hook;
 use Friendica\Core\Renderer;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
@@ -180,9 +180,15 @@ class OEmbed
 			$oembed->thumbnail_height = $data['images'][0]['height'];
 		}
 
-		Hook::callAll('oembed_fetch_url', $embedurl);
+		$eventDispatcher = DI::eventDispatcher();
 
-		return $oembed;
+		$oembed_data = ['url' => $embedurl];
+
+		$oembed_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::OEMBED_FETCH_END, $oembed_data),
+		)->getArray();
+
+		return $oembed_data['url'] ?? $embedurl;
 	}
 
 	/**
