@@ -22,6 +22,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
 use Friendica\Database\DBA;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item as ItemModel;
@@ -564,7 +565,10 @@ class Conversation
 		}
 
 		$cb = ['items' => $items, 'mode' => $mode, 'update' => $update, 'preview' => $preview];
-		Hook::callAll('conversation_start', $cb);
+
+		$cb = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::CONVERSATION_START, $cb),
+		)->getArray();
 
 		$items = $cb['items'];
 
