@@ -88,20 +88,20 @@ class Conversation
 
 	public function __construct(UserGServerRepository $userGServer, LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, Item $item, Arguments $args, BaseURL $baseURL, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Page $page, Mode $mode, EventDispatcherInterface $eventDispatcher, IHandleUserSessions $session)
 	{
-		$this->activity    = $activity;
-		$this->item        = $item;
-		$this->config      = $config;
-		$this->mode        = $mode;
-		$this->baseURL     = $baseURL;
-		$this->profiler    = $profiler;
-		$this->logger      = $logger;
-		$this->l10n        = $l10n;
-		$this->args        = $args;
-		$this->pConfig     = $pConfig;
-		$this->page        = $page;
+		$this->activity        = $activity;
+		$this->item            = $item;
+		$this->config          = $config;
+		$this->mode            = $mode;
+		$this->baseURL         = $baseURL;
+		$this->profiler        = $profiler;
+		$this->logger          = $logger;
+		$this->l10n            = $l10n;
+		$this->args            = $args;
+		$this->pConfig         = $pConfig;
+		$this->page            = $page;
 		$this->eventDispatcher = $eventDispatcher;
-		$this->session     = $session;
-		$this->userGServer = $userGServer;
+		$this->session         = $session;
+		$this->userGServer     = $userGServer;
 	}
 
 	/**

@@ -55,11 +55,11 @@ class Edit extends BaseModule
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->session     = $session;
-		$this->sysMessages = $sysMessages;
-		$this->page        = $page;
-		$this->mode        = $mode;
-		$this->appHelper   = $appHelper;
+		$this->session         = $session;
+		$this->sysMessages     = $sysMessages;
+		$this->page            = $page;
+		$this->mode            = $mode;
+		$this->appHelper       = $appHelper;
 		$this->eventDispatcher = $eventDispatcher;
 	}
 
@@ -112,7 +112,7 @@ class Edit extends BaseModule
 		}
 
 		$item['body'] = Post\Media::addAttachmentsToBody($item['uri-id'], $item['body']);
-		$item = Post\Media::addHTMLAttachmentToItem($item);
+		$item         = Post\Media::addHTMLAttachmentToItem($item);
 
 		$jotplugins = $this->eventDispatcher->dispatch(
 			new HtmlFilterEvent(HtmlFilterEvent::JOT_TOOL, ''),
