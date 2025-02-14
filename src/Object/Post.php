@@ -10,7 +10,6 @@ namespace Friendica\Object;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
 use Friendica\Core\Addon;
-use Friendica\Core\Hook;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\DI;
@@ -315,8 +314,14 @@ class Post
 			$sparkle = ' sparkle';
 		}
 
+		$eventDispatcher = DI::eventDispatcher();
+
 		$locate = ['location' => $item['location'], 'coord' => $item['coord'], 'html' => ''];
-		Hook::callAll('render_location', $locate);
+
+		$locate = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::RENDER_LOCATION, $locate),
+		)->getArray();
+
 		$location_html = $locate['html'] ?: Strings::escapeHtml($locate['location'] ?: $locate['coord'] ?: '');
 
 		// process action responses - e.g. like/dislike/attend/agree/whatever
@@ -630,8 +635,6 @@ class Post
 				'delivery_done'     => DI::l10n()->t('Delivery to remote servers is done'),
 			],
 		];
-
-		$eventDispatcher = DI::eventDispatcher();
 
 		$arr = ['item' => $item, 'output' => $tmp_item];
 

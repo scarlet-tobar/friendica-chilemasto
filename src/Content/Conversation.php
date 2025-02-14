@@ -14,7 +14,6 @@ use Friendica\App\Page;
 use Friendica\BaseModule;
 use Friendica\Core\ACL;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
@@ -1472,7 +1471,11 @@ class Conversation
 			}
 
 			$locate = ['location' => $item['location'], 'coord' => $item['coord'], 'html' => ''];
-			Hook::callAll('render_location', $locate);
+
+			$locate = $this->eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::RENDER_LOCATION, $locate),
+			)->getArray();
+
 			$location_html = $locate['html'] ?: Strings::escapeHtml($locate['location'] ?: $locate['coord'] ?: '');
 
 			$this->item->localize($item);
