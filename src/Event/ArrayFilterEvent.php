@@ -36,6 +36,8 @@ final class ArrayFilterEvent extends Event
 
 	public const CONVERSATION_START = 'friendica.data.conversation_start';
 
+	public const DISPLAY_ITEM = 'friendica.data.display_item';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)

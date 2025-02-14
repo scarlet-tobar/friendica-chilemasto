@@ -1572,7 +1572,10 @@ class Conversation
 			];
 
 			$arr = ['item' => $item, 'output' => $tmp_item];
-			Hook::callAll('display_item', $arr);
+
+			$arr = $this->eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::DISPLAY_ITEM, $arr),
+			)->getArray();
 
 			$threads[] = [
 				'id'      => $item['id'],

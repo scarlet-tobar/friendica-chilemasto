@@ -14,6 +14,7 @@ use Friendica\Core\Hook;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
 use Friendica\Model\Item;
@@ -630,8 +631,13 @@ class Post
 			],
 		];
 
+		$eventDispatcher = DI::eventDispatcher();
+
 		$arr = ['item' => $item, 'output' => $tmp_item];
-		Hook::callAll('display_item', $arr);
+
+		$arr = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::DISPLAY_ITEM, $arr),
+		)->getArray();
 
 		$result = $arr['output'];
 
