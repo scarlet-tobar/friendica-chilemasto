@@ -164,7 +164,7 @@ class HookEventBridgeTest extends TestCase
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 		$reflectionProperty->setAccessible(true);
 
-		$reflectionProperty->setValue(null, function (string $name, $data): string  {
+		$reflectionProperty->setValue(null, function (string $name, string $data): string {
 			$this->assertSame('oembed_fetch_url', $name);
 			$this->assertSame('original_url', $data);
 
