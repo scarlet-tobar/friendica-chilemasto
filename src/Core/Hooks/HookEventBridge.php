@@ -55,6 +55,8 @@ final class HookEventBridge
 		ArrayFilterEvent::OEMBED_FETCH_END   => 'oembed_fetch_url',
 		ArrayFilterEvent::PAGE_INFO          => 'page_info_data',
 		ArrayFilterEvent::SMILEY_LIST        => 'smilie',
+		ArrayFilterEvent::BBCODE_TO_HTML_START => 'bbcode',
+		ArrayFilterEvent::BBCODE_TO_MARKDOWN_END => 'bb2diaspora',
 		HtmlFilterEvent::HEAD                => 'head',
 		HtmlFilterEvent::FOOTER              => 'footer',
 		HtmlFilterEvent::PAGE_HEADER         => 'page_header',
@@ -89,6 +91,8 @@ final class HookEventBridge
 			ArrayFilterEvent::OEMBED_FETCH_END   => 'onOembedFetchEndEvent',
 			ArrayFilterEvent::PAGE_INFO          => 'onArrayFilterEvent',
 			ArrayFilterEvent::SMILEY_LIST        => 'onArrayFilterEvent',
+			ArrayFilterEvent::BBCODE_TO_HTML_START => 'onBbcodeToHtmlEvent',
+			ArrayFilterEvent::BBCODE_TO_MARKDOWN_END => 'onBbcodeToMarkdownEvent',
 			HtmlFilterEvent::HEAD                => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER              => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER         => 'onHtmlFilterEvent',
@@ -125,6 +129,34 @@ final class HookEventBridge
 		$url = (string) $data['url'] ?? '';
 
 		$data['url'] = static::callHook($event->getName(), $url);
+
+		$event->setArray($data);
+	}
+
+	/**
+	 * Map the BBCODE_TO_HTML_START event to `bbcode` hook
+	 */
+	public static function onBbcodeToHtmlEvent(ArrayFilterEvent $event): void
+	{
+		$data = $event->getArray();
+
+		$bbcode2html = (string) $data['bbcode2html'] ?? '';
+
+		$data['bbcode2html'] = static::callHook($event->getName(), $bbcode2html);
+
+		$event->setArray($data);
+	}
+
+	/**
+	 * Map the BBCODE_TO_MARKDOWN_END event to `bb2diaspora` hook
+	 */
+	public static function onBbcodeToMarkdownEvent(ArrayFilterEvent $event): void
+	{
+		$data = $event->getArray();
+
+		$bbcode2markdown = (string) $data['bbcode2markdown'] ?? '';
+
+		$data['bbcode2markdown'] = static::callHook($event->getName(), $bbcode2markdown);
 
 		$event->setArray($data);
 	}

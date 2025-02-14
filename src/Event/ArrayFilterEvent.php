@@ -48,6 +48,10 @@ final class ArrayFilterEvent extends Event
 
 	public const SMILEY_LIST = 'friendica.data.smiley_list';
 
+	public const BBCODE_TO_HTML_START = 'friendica.data.bbcode_to_html_start';
+
+	public const BBCODE_TO_MARKDOWN_END = 'friendica.data.bbcode_to_markdown_end';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)

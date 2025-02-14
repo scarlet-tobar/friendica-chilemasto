@@ -44,6 +44,8 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::OEMBED_FETCH_END   => 'onOembedFetchEndEvent',
 			ArrayFilterEvent::PAGE_INFO          => 'onArrayFilterEvent',
 			ArrayFilterEvent::SMILEY_LIST        => 'onArrayFilterEvent',
+			ArrayFilterEvent::BBCODE_TO_HTML_START => 'onBbcodeToHtmlEvent',
+			ArrayFilterEvent::BBCODE_TO_MARKDOWN_END => 'onBbcodeToMarkdownEvent',
 			HtmlFilterEvent::HEAD                => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER              => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER         => 'onHtmlFilterEvent',
@@ -177,6 +179,50 @@ class HookEventBridgeTest extends TestCase
 
 		$this->assertSame(
 			['url' => 'changed_url'],
+			$event->getArray(),
+		);
+	}
+
+	public function testOnBbcodeToHtmlEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ArrayFilterEvent(ArrayFilterEvent::BBCODE_TO_HTML_START, ['bbcode2html' => '[b]original[/b]']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, string $data): string {
+			$this->assertSame('bbcode', $name);
+			$this->assertSame('[b]original[/b]', $data);
+
+			return '<b>changed</b>';
+		});
+
+		HookEventBridge::onBbcodeToHtmlEvent($event);
+
+		$this->assertSame(
+			['bbcode2html' => '<b>changed</b>'],
+			$event->getArray(),
+		);
+	}
+
+	public function testOnBbcodeToMarkdownEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ArrayFilterEvent(ArrayFilterEvent::BBCODE_TO_MARKDOWN_END, ['bbcode2markdown' => '[b]original[/b]']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, string $data): string {
+			$this->assertSame('bb2diaspora', $name);
+			$this->assertSame('[b]original[/b]', $data);
+
+			return '**changed**';
+		});
+
+		HookEventBridge::onBbcodeToMarkdownEvent($event);
+
+		$this->assertSame(
+			['bbcode2markdown' => '**changed**'],
 			$event->getArray(),
 		);
 	}
