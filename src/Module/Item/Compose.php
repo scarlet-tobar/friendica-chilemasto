@@ -16,13 +16,13 @@ use Friendica\BaseModule;
 use Friendica\Content\Feature;
 use Friendica\Core\ACL;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Model\UserSession;
 use Friendica\Core\Theme;
 use Friendica\Database\DBA;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\User;
@@ -34,6 +34,7 @@ use Friendica\Util\ACLFormatter;
 use Friendica\Util\Crypto;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Compose extends BaseModule
@@ -59,8 +60,9 @@ class Compose extends BaseModule
 	/** @var AppHelper */
 	private $appHelper;
 
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(AppHelper $appHelper, UserSession $session, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Page $page, ACLFormatter $ACLFormatter, SystemMessages $systemMessages, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(EventDispatcherInterface $eventDispatcher, AppHelper $appHelper, UserSession $session, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Page $page, ACLFormatter $ACLFormatter, SystemMessages $systemMessages, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -71,6 +73,7 @@ class Compose extends BaseModule
 		$this->config         = $config;
 		$this->session        = $session;
 		$this->appHelper      = $appHelper;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	protected function post(array $request = [])
@@ -153,8 +156,9 @@ class Compose extends BaseModule
 		$location      = $_REQUEST['location']      ?? $user['default-location'];
 		$wall          = $_REQUEST['wall']          ?? $type == 'post';
 
-		$jotplugins = '';
-		Hook::callAll('jot_tool', $jotplugins);
+		$jotplugins = $this->eventDispatcher->dispatch(
+			new HtmlFilterEvent(HtmlFilterEvent::JOT_TOOL, ''),
+		)->getHtml();
 
 		// Output
 		$this->page->registerFooterScript(Theme::getPathForFile('js/ajaxupload.js'));

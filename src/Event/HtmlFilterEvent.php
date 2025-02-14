@@ -26,6 +26,8 @@ final class HtmlFilterEvent extends Event
 
 	public const PAGE_END = 'friendica.html.page_end';
 
+	public const JOT_TOOL = 'friendica.html.jot_tool';
+
 	private string $html;
 
 	public function __construct(string $name, string $html)

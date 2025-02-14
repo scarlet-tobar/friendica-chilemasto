@@ -11,7 +11,6 @@ use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\App\Mode;
 use Friendica\App\Page;
-use Friendica\AppHelper;
 use Friendica\BaseModule;
 use Friendica\Core\ACL;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -23,6 +22,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
 use Friendica\Database\DBA;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item as ItemModel;
 use Friendica\Model\Post;
@@ -42,6 +42,7 @@ use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
 use Friendica\Util\Temporal;
 use ImagickException;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Conversation
@@ -75,8 +76,6 @@ class Conversation
 	private $baseURL;
 	/** @var IManageConfigValues */
 	private $config;
-	/** @var AppHelper */
-	private $appHelper;
 	/** @var Page */
 	private $page;
 	/** @var Mode */
@@ -85,8 +84,9 @@ class Conversation
 	private $session;
 	/** @var UserGServerRepository */
 	private $userGServer;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(UserGServerRepository $userGServer, LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, Item $item, Arguments $args, BaseURL $baseURL, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Page $page, Mode $mode, AppHelper $appHelper, IHandleUserSessions $session)
+	public function __construct(UserGServerRepository $userGServer, LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, Item $item, Arguments $args, BaseURL $baseURL, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Page $page, Mode $mode, EventDispatcherInterface $eventDispatcher, IHandleUserSessions $session)
 	{
 		$this->activity    = $activity;
 		$this->item        = $item;
@@ -99,7 +99,7 @@ class Conversation
 		$this->args        = $args;
 		$this->pConfig     = $pConfig;
 		$this->page        = $page;
-		$this->appHelper   = $appHelper;
+		$this->eventDispatcher = $eventDispatcher;
 		$this->session     = $session;
 		$this->userGServer = $userGServer;
 	}
@@ -332,8 +332,9 @@ class Conversation
 			'$is_mobile' => $this->mode->isMobile(),
 		]);
 
-		$jotplugins = '';
-		Hook::callAll('jot_tool', $jotplugins);
+		$jotplugins = $this->eventDispatcher->dispatch(
+			new HtmlFilterEvent(HtmlFilterEvent::JOT_TOOL, ''),
+		)->getHtml();
 
 		if ($this->config->get('system', 'set_creation_date')) {
 			$created_at = Temporal::getDateTimeField(
