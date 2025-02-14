@@ -12,7 +12,6 @@ use Friendica\AppHelper;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\BBCode\Video;
 use Friendica\Content\Text\HTML;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
@@ -449,7 +448,9 @@ class Item
 
 		$args = ['item' => $item, 'menu' => $menu];
 
-		Hook::callAll('item_photo_menu', $args);
+		$args = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::ITEM_PHOTO_MENU, $args),
+		)->getArray();
 
 		$menu = $args['menu'];
 

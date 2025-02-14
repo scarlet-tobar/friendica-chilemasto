@@ -26,6 +26,18 @@ class ArrayFilterEventTest extends TestCase
 	{
 		return [
 			[ArrayFilterEvent::APP_MENU, 'friendica.data.app_menu'],
+			[ArrayFilterEvent::NAV_INFO, 'friendica.data.nav_info'],
+			[ArrayFilterEvent::FEATURE_ENABLED, 'friendica.data.feature_enabled'],
+			[ArrayFilterEvent::FEATURE_GET, 'friendica.data.feature_get'],
+			[ArrayFilterEvent::POST_LOCAL_START, 'friendica.data.post_local_start'],
+			[ArrayFilterEvent::POST_LOCAL, 'friendica.data.post_local'],
+			[ArrayFilterEvent::POST_LOCAL_END, 'friendica.data.post_local_end'],
+			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'friendica.data.photo_upload_form'],
+			[ArrayFilterEvent::NETWORK_TO_NAME, 'friendica.data.network_to_name'],
+			[ArrayFilterEvent::CONVERSATION_START, 'friendica.data.conversation_start'],
+			[ArrayFilterEvent::DISPLAY_ITEM, 'friendica.data.display_item'],
+			[ArrayFilterEvent::RENDER_LOCATION, 'friendica.data.render_location'],
+			[ArrayFilterEvent::ITEM_PHOTO_MENU, 'friendica.data.item_photo_menu'],
 		];
 	}
 

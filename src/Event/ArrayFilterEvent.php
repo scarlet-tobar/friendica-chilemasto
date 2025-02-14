@@ -40,6 +40,8 @@ final class ArrayFilterEvent extends Event
 
 	public const RENDER_LOCATION = 'friendica.data.render_location';
 
+	public const ITEM_PHOTO_MENU = 'friendica.data.item_photo_menu';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)

@@ -40,6 +40,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::CONVERSATION_START => 'onArrayFilterEvent',
 			ArrayFilterEvent::DISPLAY_ITEM       => 'onArrayFilterEvent',
 			ArrayFilterEvent::RENDER_LOCATION    => 'onArrayFilterEvent',
+			ArrayFilterEvent::ITEM_PHOTO_MENU    => 'onArrayFilterEvent',
 			HtmlFilterEvent::HEAD                => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER              => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER         => 'onHtmlFilterEvent',
@@ -171,6 +172,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::CONVERSATION_START, 'conversation_start'],
 			[ArrayFilterEvent::DISPLAY_ITEM, 'display_item'],
 			[ArrayFilterEvent::RENDER_LOCATION, 'render_location'],
+			[ArrayFilterEvent::ITEM_PHOTO_MENU, 'item_photo_menu'],
 		];
 	}
 
