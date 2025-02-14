@@ -659,10 +659,6 @@ class Conversation
 					continue;
 				}
 
-				/// @todo Check if this call is needed or not
-				$arr = ['item' => $item];
-				Hook::callAll('display_item', $arr);
-
 				$item['pagedrop'] = $pagedrop;
 
 				if ($item['gravity'] == ItemModel::GRAVITY_PARENT) {
