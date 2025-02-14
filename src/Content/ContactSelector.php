@@ -7,7 +7,6 @@
 
 namespace Friendica\Content;
 
-use Friendica\Core\Hook;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -25,8 +24,8 @@ class ContactSelector
 	const SVG_COLOR_WHITE = 2;
 	const SVG_WHITE       = 3;
 
-	static $serverdata = [];
-	static $server_id  = [];
+	public static $serverdata = [];
+	public static $server_id  = [];
 
 	/**
 	 * @param string  $current  current
@@ -36,7 +35,7 @@ class ContactSelector
 	public static function pollInterval(string $current, bool $disabled = false): string
 	{
 		$dis = (($disabled) ? ' disabled="disabled" ' : '');
-		$o = '';
+		$o   = '';
 		$o .= "<select id=\"contact-poll-interval\" name=\"poll\" $dis />" . "\r\n";
 
 		$rep = [
@@ -117,25 +116,25 @@ class ContactSelector
 		$eventDispatcher = DI::eventDispatcher();
 
 		$nets = [
-			Protocol::DFRN      =>   DI::l10n()->t('DFRN'),
-			Protocol::OSTATUS   =>   DI::l10n()->t('OStatus'),
-			Protocol::FEED      =>   DI::l10n()->t('RSS/Atom'),
-			Protocol::MAIL      =>   DI::l10n()->t('Email'),
-			Protocol::DIASPORA  =>   DI::l10n()->t('Diaspora'),
-			Protocol::ZOT       =>   DI::l10n()->t('Zot!'),
-			Protocol::LINKEDIN  =>   DI::l10n()->t('LinkedIn'),
-			Protocol::XMPP      =>   DI::l10n()->t('XMPP/IM'),
-			Protocol::MYSPACE   =>   DI::l10n()->t('MySpace'),
-			Protocol::GPLUS     =>   DI::l10n()->t('Google+'),
-			Protocol::PUMPIO    =>   DI::l10n()->t('pump.io'),
-			Protocol::TWITTER   =>   DI::l10n()->t('Twitter'),
-			Protocol::DISCOURSE =>   DI::l10n()->t('Discourse'),
-			Protocol::DIASPORA2 =>   DI::l10n()->t('Diaspora Connector'),
-			Protocol::STATUSNET =>   DI::l10n()->t('GNU Social Connector'),
+			Protocol::DFRN        => DI::l10n()->t('DFRN'),
+			Protocol::OSTATUS     => DI::l10n()->t('OStatus'),
+			Protocol::FEED        => DI::l10n()->t('RSS/Atom'),
+			Protocol::MAIL        => DI::l10n()->t('Email'),
+			Protocol::DIASPORA    => DI::l10n()->t('Diaspora'),
+			Protocol::ZOT         => DI::l10n()->t('Zot!'),
+			Protocol::LINKEDIN    => DI::l10n()->t('LinkedIn'),
+			Protocol::XMPP        => DI::l10n()->t('XMPP/IM'),
+			Protocol::MYSPACE     => DI::l10n()->t('MySpace'),
+			Protocol::GPLUS       => DI::l10n()->t('Google+'),
+			Protocol::PUMPIO      => DI::l10n()->t('pump.io'),
+			Protocol::TWITTER     => DI::l10n()->t('Twitter'),
+			Protocol::DISCOURSE   => DI::l10n()->t('Discourse'),
+			Protocol::DIASPORA2   => DI::l10n()->t('Diaspora Connector'),
+			Protocol::STATUSNET   => DI::l10n()->t('GNU Social Connector'),
 			Protocol::ACTIVITYPUB => DI::l10n()->t('ActivityPub'),
-			Protocol::PNUT      =>   DI::l10n()->t('pnut'),
-			Protocol::TUMBLR    =>   DI::l10n()->t('Tumblr'),
-			Protocol::BLUESKY   =>   DI::l10n()->t('Bluesky'),
+			Protocol::PNUT        => DI::l10n()->t('pnut'),
+			Protocol::TUMBLR      => DI::l10n()->t('Tumblr'),
+			Protocol::BLUESKY     => DI::l10n()->t('Bluesky'),
 		];
 
 		$nets = $eventDispatcher->dispatch(
@@ -217,7 +216,7 @@ class ContactSelector
 		$network_svg = str_replace($search, $replace, $network);
 
 		if (in_array($network, Protocol::FEDERATED) && !empty($gsid)) {
-			$gserver = self::getServerForId($gsid);
+			$gserver  = self::getServerForId($gsid);
 			$platform = $gserver['platform'];
 		}
 
@@ -238,7 +237,7 @@ class ContactSelector
 			'takahē', 'takesama', 'threads', 'tumblr', 'vernissage', 'vervis', 'vidzy', 'vocata', 'wafrn',
 			'wildebeest', 'wordpress', 'write.as', 'writefreely', 'wxwclub', 'xwiki', 'zap'];
 
-		if (in_array($platform_icon_style,[self::SVG_WHITE, self::SVG_COLOR_WHITE])) {
+		if (in_array($platform_icon_style, [self::SVG_WHITE, self::SVG_COLOR_WHITE])) {
 			$svg = ['activitypub', 'akkoma', 'andstatus', 'bluesky', 'bonfire', 'bookwyrm', 'bridgy_fed',
 				'calckey', 'castopod', 'diaspora', 'discourse', 'dolphin', 'drupal', 'email', 'firefish',
 				'flipboard', 'flohmarkt', 'forgejo', 'friendica', 'funkwhale', 'ghost', 'gitlab',
