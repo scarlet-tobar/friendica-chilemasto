@@ -44,6 +44,8 @@ final class ArrayFilterEvent extends Event
 
 	public const OEMBED_FETCH_END = 'friendica.data.oembed_fetch_end';
 
+	public const PAGE_INFO = 'friendica.data.page_info';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)
