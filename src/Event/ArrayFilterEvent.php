@@ -46,6 +46,8 @@ final class ArrayFilterEvent extends Event
 
 	public const PAGE_INFO = 'friendica.data.page_info';
 
+	public const SMILEY_LIST = 'friendica.data.smiley_list';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)

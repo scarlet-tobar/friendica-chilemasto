@@ -8,8 +8,8 @@
 namespace Friendica\Content;
 
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\Hook;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Util\Strings;
 
 /**
@@ -133,8 +133,13 @@ class Smilies
 		'<a href="http://redmatrix.me/">red<img class="smiley" src="' . $baseUrl . '/images/rm-16.png" alt="red#matrix" title="red#matrix" />matrix</a>'
 		];
 
+		$eventDispatcher = DI::eventDispatcher();
+
 		$params = ['texts' => $texts, 'icons' => $icons];
-		Hook::callAll('smilie', $params);
+
+		$params = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::SMILEY_LIST, $params),
+		)->getArray();
 
 		return $params;
 	}

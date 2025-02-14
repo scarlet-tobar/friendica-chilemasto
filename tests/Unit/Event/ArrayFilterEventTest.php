@@ -40,6 +40,7 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::ITEM_PHOTO_MENU, 'friendica.data.item_photo_menu'],
 			[ArrayFilterEvent::OEMBED_FETCH_END, 'friendica.data.oembed_fetch_end'],
 			[ArrayFilterEvent::PAGE_INFO, 'friendica.data.page_info'],
+			[ArrayFilterEvent::SMILEY_LIST, 'friendica.data.smiley_list'],
 		];
 	}
 
