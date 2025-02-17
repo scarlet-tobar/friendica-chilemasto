@@ -51,7 +51,7 @@ class HTML
 	private static function tagToBBCodeSub(DOMDocument $doc, string $tag, array $attributes, string $startbb, string $endbb, bool $ignoreChildren = false): bool
 	{
 		$savestart = str_replace('$', '\x01', $startbb);
-		$replace = false;
+		$replace   = false;
 
 		$xpath = new DOMXPath($doc);
 
@@ -93,7 +93,7 @@ class HTML
 
 			if ($replace) {
 				$StartCode = $doc->createTextNode($startbb);
-				$EndCode = $doc->createTextNode($endbb);
+				$EndCode   = $doc->createTextNode($endbb);
 
 				$node->parentNode->insertBefore($StartCode, $node);
 
@@ -143,7 +143,7 @@ class HTML
 
 		$eventDispatcher = DI::eventDispatcher();
 
-		$message = Strings::performWithEscapedBlocks($message, '#<pre><code.*</code></pre>#iUs', function ($message) use($eventDispatcher) {
+		$message = Strings::performWithEscapedBlocks($message, '#<pre><code.*</code></pre>#iUs', function ($message) use ($eventDispatcher) {
 			$message = str_replace(
 				[
 					"<li><p>",
@@ -160,7 +160,7 @@ class HTML
 			$message = preg_replace('=<(\w+):(.+?)>=', '<removeme>', $message);
 			$message = preg_replace('=</(\w+):(.+?)>=', '</removeme>', $message);
 
-			$doc = new DOMDocument();
+			$doc                     = new DOMDocument();
 			$doc->preserveWhiteSpace = false;
 
 			$message = mb_convert_encoding($message, 'HTML-ENTITIES', "UTF-8");
@@ -179,10 +179,10 @@ class HTML
 			XML::deleteNode($doc, 'removeme');
 
 			$xpath = new DomXPath($doc);
-			$list = $xpath->query("//pre");
+			$list  = $xpath->query("//pre");
 			foreach ($list as $node) {
 				// Ensure to escape unescaped & - they will otherwise raise a warning
-				$safe_value = preg_replace('/&(?!\w+;)/', '&amp;', $node->nodeValue);
+				$safe_value      = preg_replace('/&(?!\w+;)/', '&amp;', $node->nodeValue);
 				$node->nodeValue = str_replace("\n", "\r", $safe_value);
 			}
 
@@ -336,12 +336,12 @@ class HTML
 
 			do {
 				$oldmessage = $message;
-				$message = str_replace("\n \n", "\n\n", $message);
+				$message    = str_replace("\n \n", "\n\n", $message);
 			} while ($oldmessage != $message);
 
 			do {
 				$oldmessage = $message;
-				$message = str_replace("\n\n\n", "\n\n", $message);
+				$message    = str_replace("\n\n\n", "\n\n", $message);
 			} while ($oldmessage != $message);
 
 			$message = str_replace(
@@ -394,14 +394,14 @@ class HTML
 		unset($base['fragment']);
 
 		$link = $matches[0];
-		$url = $matches[1];
+		$url  = $matches[1];
 
 		if (empty($url) || empty(parse_url($url))) {
 			return $matches[0];
 		}
 
 		$parts = array_merge($base, parse_url($url));
-		$url2 = (string)Uri::fromParts((array)$parts);
+		$url2  = (string)Uri::fromParts((array)$parts);
 
 		return str_replace($url, $url2, $link);
 	}
@@ -469,7 +469,7 @@ class HTML
 				}
 
 				$newlines[] = $newline . " ";
-				$line = substr($line, $pos + 1);
+				$line       = substr($line, $pos + 1);
 			}
 		} while ((strlen($line) > $wraplen) && !($oldline == $line));
 
@@ -487,14 +487,14 @@ class HTML
 		$lines = explode("\n", $message);
 
 		$newlines = [];
-		$level = 0;
+		$level    = 0;
 		foreach ($lines as $line) {
-			$line = trim($line);
+			$line       = trim($line);
 			$startquote = false;
 			while (strpos("*" . $line, '[quote]') > 0) {
 				$level++;
-				$pos = strpos($line, '[quote]');
-				$line = substr($line, 0, $pos) . substr($line, $pos + 7);
+				$pos        = strpos($line, '[quote]');
+				$line       = substr($line, 0, $pos) . substr($line, $pos + 7);
 				$startquote = true;
 			}
 
@@ -506,7 +506,7 @@ class HTML
 					$level = 0;
 				}
 
-				$pos = strpos($line, '[/quote]');
+				$pos  = strpos($line, '[/quote]');
 				$line = substr($line, 0, $pos) . substr($line, $pos + 8);
 			}
 
@@ -571,7 +571,7 @@ class HTML
 		DI::profiler()->startRecording('rendering');
 		$message = str_replace("\r", "", $html);
 
-		$doc = new DOMDocument();
+		$doc                     = new DOMDocument();
 		$doc->preserveWhiteSpace = false;
 
 		$message = mb_convert_encoding($message, 'HTML-ENTITIES', "UTF-8");
@@ -670,7 +670,7 @@ class HTML
 
 		do {
 			$oldmessage = $message;
-			$message = str_replace("\n\n\n", "\n\n", $message);
+			$message    = str_replace("\n\n\n", "\n\n", $message);
 		} while ($oldmessage != $message);
 
 		$message = self::quoteLevel(trim($message), $wraplength);
@@ -690,7 +690,7 @@ class HTML
 	{
 		DI::profiler()->startRecording('rendering');
 		$converter = new HtmlConverter(['hard_break' => true]);
-		$markdown = $converter->convert($html);
+		$markdown  = $converter->convert($html);
 
 		DI::profiler()->stopRecording();
 		return $markdown;
@@ -745,20 +745,20 @@ class HTML
 		// Replace links
 		$pattern = "/<a([^>]*) href=\"(?!http|https|\/)([^\"]*)\"/";
 		$replace = "<a\${1} href=\"" . $base2 . "\${2}\"";
-		$text = preg_replace($pattern, $replace, $text);
+		$text    = preg_replace($pattern, $replace, $text);
 
 		$pattern = "/<a([^>]*) href=\"(?!http|https)([^\"]*)\"/";
 		$replace = "<a\${1} href=\"" . $base . "\${2}\"";
-		$text = preg_replace($pattern, $replace, $text);
+		$text    = preg_replace($pattern, $replace, $text);
 
 		// Replace images
 		$pattern = "/<img([^>]*) src=\"(?!http|https|\/)([^\"]*)\"/";
 		$replace = "<img\${1} src=\"" . $base2 . "\${2}\"";
-		$text = preg_replace($pattern, $replace, $text);
+		$text    = preg_replace($pattern, $replace, $text);
 
 		$pattern = "/<img([^>]*) src=\"(?!http|https)([^\"]*)\"/";
 		$replace = "<img\${1} src=\"" . $base . "\${2}\"";
-		$text = preg_replace($pattern, $replace, $text);
+		$text    = preg_replace($pattern, $replace, $text);
 
 
 		// Done
@@ -776,7 +776,7 @@ class HTML
 		$tpl = Renderer::getMarkupTemplate("scroll_loader.tpl");
 		return Renderer::replaceMacros($tpl, [
 			'wait' => DI::l10n()->t('Loading more entries...'),
-			'end' => DI::l10n()->t('The end')
+			'end'  => DI::l10n()->t('The end')
 		]);
 	}
 
@@ -807,9 +807,9 @@ class HTML
 			$contact["addr"] = $contact["url"];
 		}
 
-		$url = $contact['url'];
+		$url     = $contact['url'];
 		$sparkle = '';
-		$redir = false;
+		$redir   = false;
 
 		if ($redirect) {
 			$url = Contact::magicLinkByContact($contact);
@@ -824,14 +824,14 @@ class HTML
 		}
 
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate($textmode ? 'micropro_txt.tpl' : 'micropro_img.tpl'), [
-			'$click' => $contact['click'] ?? '',
-			'$class' => $class,
-			'$url' => $url,
-			'$photo' => Contact::getThumb($contact),
-			'$name' => $contact['name'],
-			'title' => $contact['name'] . ' [' . $contact['addr'] . ']',
+			'$click'  => $contact['click'] ?? '',
+			'$class'  => $class,
+			'$url'    => $url,
+			'$photo'  => Contact::getThumb($contact),
+			'$name'   => $contact['name'],
+			'title'   => $contact['name'] . ' [' . $contact['addr'] . ']',
 			'$parkle' => $sparkle,
-			'$redir' => $redir
+			'$redir'  => $redir
 		]);
 	}
 
@@ -893,7 +893,7 @@ class HTML
 	public static function applyContentFilter(string $html, array $reasons): string
 	{
 		if (count($reasons)) {
-			$tpl = Renderer::getMarkupTemplate('wall/content_filter.tpl');
+			$tpl  = Renderer::getMarkupTemplate('wall/content_filter.tpl');
 			$html = Renderer::replaceMacros($tpl, [
 				'$reasons'   => $reasons,
 				'$rnd'       => Strings::getRandomHex(8),
@@ -951,8 +951,8 @@ class HTML
 
 		$config->set('Attr.AllowedRel', [
 			'noreferrer' => true,
-			'noopener' => true,
-			'tag' => true,
+			'noopener'   => true,
+			'tag'        => true,
 		]);
 		$config->set('Attr.AllowedFrameTargets', [
 			'_blank' => true,
@@ -1046,7 +1046,7 @@ class HTML
 			// This expression looks for a meta tag with the http-equiv attribute set to "content-type" ignoring case
 			// whose content attribute contains a "charset" string and returns its value
 			$expression = "string(//meta[@http-equiv][translate(@http-equiv, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'content-type'][contains(translate(@content, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'charset')]/@content)";
-			$mediaType = MediaType::fromContentType($xpath->evaluate($expression));
+			$mediaType  = MediaType::fromContentType($xpath->evaluate($expression));
 			if (isset($mediaType->parameters['charset'])) {
 				return strtolower($mediaType->parameters['charset']);
 			}
