@@ -9,6 +9,7 @@ namespace Friendica\Test\src\Content;
 
 use Friendica\Content\Smilies;
 use Friendica\Core\Hook;
+use Friendica\Core\Hooks\HookEventBridge;
 use Friendica\DI;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Test\FixtureTestCase;
@@ -21,11 +22,18 @@ class SmiliesTest extends FixtureTestCase
 
 		DI::config()->set('system', 'no_smilies', false);
 
+		/** @var \Friendica\Event\EventDispatcher */
+		$eventDispatcher = DI::eventDispatcher();
+
+		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {
+			$eventDispatcher->addListener($eventName, [HookEventBridge::class, $methodName]);
+		}
+
 		Hook::register('smilie', 'tests/Util/SmileyWhitespaceAddon.php', 'add_test_unicode_smilies');
 		Hook::loadHooks();
 	}
 
-	public function dataLinks()
+	public function dataLinks(): array
 	{
 		return [
 			/** @see https://github.com/friendica/friendica/pull/6933 */
@@ -53,7 +61,7 @@ class SmiliesTest extends FixtureTestCase
 	 *
 	 * @throws InternalServerErrorException
 	 */
-	public function testReplaceFromArray(string $text, array $smilies, string $expected)
+	public function testReplaceFromArray(string $text, array $smilies, string $expected): void
 	{
 		$output = Smilies::replaceFromArray($text, $smilies);
 		self::assertEquals($expected, $output);
@@ -120,16 +128,11 @@ class SmiliesTest extends FixtureTestCase
 
 	/**
 	 * @dataProvider dataIsEmojiPost
-	 *
-	 * @param bool   $expected
-	 * @param string $body
-	 * @return void
 	 */
-	public function testIsEmojiPost(bool $expected, string $body)
+	public function testIsEmojiPost(bool $expected, string $body): void
 	{
 		$this->assertEquals($expected, Smilies::isEmojiPost($body));
 	}
-
 
 	public function dataReplace(): array
 	{
@@ -138,7 +141,7 @@ class SmiliesTest extends FixtureTestCase
 				'expected' => 'alt=":-p"',
 				'body' => ':-p',
 			],
-			'simple-1' => [
+			'simple-2' => [
 				'expected' => 'alt=":-p"',
 				'body' => ' :-p ',
 			],
@@ -191,6 +194,7 @@ class SmiliesTest extends FixtureTestCase
 				'body' => '⽕ :face with hand over mouth: invalid:hugging face: :hugging face:',
 			],
 		];
+
 		foreach ([':-[', ':-D', 'o.O'] as $emoji) {
 			foreach (['A', '_', ':', '-'] as $prefix) {
 				foreach (['', ' ', 'A', ':', '-'] as $suffix) {
@@ -208,11 +212,8 @@ class SmiliesTest extends FixtureTestCase
 
 	/**
 	 * @dataProvider dataReplace
-	 *
-	 * @param string $expected
-	 * @param string $body
 	 */
-	public function testReplace(string $expected, string $body)
+	public function testReplace(string $expected, string $body): void
 	{
 		$result = Smilies::replace($body);
 		$this->assertStringContainsString($expected, $result);
@@ -281,12 +282,8 @@ class SmiliesTest extends FixtureTestCase
 
 	/**
 	 * @dataProvider dataExtractUsedSmilies
-	 *
-	 * @param array  $expected
-	 * @param string $body
-	 * @param stirng $normalized
 	 */
-	public function testExtractUsedSmilies(array $expected, string $body, string $normalized)
+	public function testExtractUsedSmilies(array $expected, string $body, string $normalized): void
 	{
 		$extracted = Smilies::extractUsedSmilies($body, $converted);
 		$expected = array_fill_keys($expected, true);
