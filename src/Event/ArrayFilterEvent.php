@@ -50,6 +50,8 @@ final class ArrayFilterEvent extends Event
 
 	public const BBCODE_TO_HTML_START = 'friendica.data.bbcode_to_html_start';
 
+	public const HTML_TO_BBCODE_END = 'friendica.data.html_to_bbcode_end';
+
 	public const BBCODE_TO_MARKDOWN_END = 'friendica.data.bbcode_to_markdown_end';
 
 	private array $array;

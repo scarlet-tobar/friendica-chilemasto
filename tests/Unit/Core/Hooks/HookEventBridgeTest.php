@@ -45,6 +45,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PAGE_INFO              => 'onArrayFilterEvent',
 			ArrayFilterEvent::SMILEY_LIST            => 'onArrayFilterEvent',
 			ArrayFilterEvent::BBCODE_TO_HTML_START   => 'onBbcodeToHtmlEvent',
+			ArrayFilterEvent::HTML_TO_BBCODE_END     => 'onHtmlToBbcodeEvent',
 			ArrayFilterEvent::BBCODE_TO_MARKDOWN_END => 'onBbcodeToMarkdownEvent',
 			HtmlFilterEvent::HEAD                    => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER                  => 'onHtmlFilterEvent',
@@ -201,6 +202,28 @@ class HookEventBridgeTest extends TestCase
 
 		$this->assertSame(
 			['bbcode2html' => '<b>changed</b>'],
+			$event->getArray(),
+		);
+	}
+
+	public function testOnHtmlToBbcodeEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ArrayFilterEvent(ArrayFilterEvent::HTML_TO_BBCODE_END, ['html2bbcode' => '<b>original</b>']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, string $data): string {
+			$this->assertSame('html2bbcode', $name);
+			$this->assertSame('<b>original</b>', $data);
+
+			return '[b]changed[/b]';
+		});
+
+		HookEventBridge::onHtmlToBbcodeEvent($event);
+
+		$this->assertSame(
+			['html2bbcode' => '[b]changed[/b]'],
 			$event->getArray(),
 		);
 	}

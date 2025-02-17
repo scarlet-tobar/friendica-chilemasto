@@ -10,10 +10,10 @@ namespace Friendica\Content\Text;
 use DOMDocument;
 use DOMXPath;
 use Friendica\Protocol\HTTP\MediaType;
-use Friendica\Core\Hook;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
@@ -141,7 +141,9 @@ class HTML
 		DI::profiler()->startRecording('rendering');
 		$message = str_replace("\r", "", $message);
 
-		$message = Strings::performWithEscapedBlocks($message, '#<pre><code.*</code></pre>#iUs', function ($message) {
+		$eventDispatcher = DI::eventDispatcher();
+
+		$message = Strings::performWithEscapedBlocks($message, '#<pre><code.*</code></pre>#iUs', function ($message) use($eventDispatcher) {
 			$message = str_replace(
 				[
 					"<li><p>",
@@ -314,7 +316,13 @@ class HTML
 			$message = preg_replace('=\r *\r=i', "\n", $message);
 			$message = str_replace("\r", "\n", $message);
 
-			Hook::callAll('html2bbcode', $message);
+			$message_data = ['html2bbcode' => $message];
+
+			$message_data = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::HTML_TO_BBCODE_END, $message_data),
+			)->getArray();
+
+			$message = $message_data['html2bbcode'] ?? $message;
 
 			$message = strip_tags($message);
 

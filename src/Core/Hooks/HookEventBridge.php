@@ -56,6 +56,7 @@ final class HookEventBridge
 		ArrayFilterEvent::PAGE_INFO              => 'page_info_data',
 		ArrayFilterEvent::SMILEY_LIST            => 'smilie',
 		ArrayFilterEvent::BBCODE_TO_HTML_START   => 'bbcode',
+		ArrayFilterEvent::HTML_TO_BBCODE_END     => 'html2bbcode',
 		ArrayFilterEvent::BBCODE_TO_MARKDOWN_END => 'bb2diaspora',
 		HtmlFilterEvent::HEAD                    => 'head',
 		HtmlFilterEvent::FOOTER                  => 'footer',
@@ -92,6 +93,7 @@ final class HookEventBridge
 			ArrayFilterEvent::PAGE_INFO              => 'onArrayFilterEvent',
 			ArrayFilterEvent::SMILEY_LIST            => 'onArrayFilterEvent',
 			ArrayFilterEvent::BBCODE_TO_HTML_START   => 'onBbcodeToHtmlEvent',
+			ArrayFilterEvent::HTML_TO_BBCODE_END     => 'onHtmlToBbcodeEvent',
 			ArrayFilterEvent::BBCODE_TO_MARKDOWN_END => 'onBbcodeToMarkdownEvent',
 			HtmlFilterEvent::HEAD                    => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER                  => 'onHtmlFilterEvent',
@@ -143,6 +145,20 @@ final class HookEventBridge
 		$bbcode2html = (string) $data['bbcode2html'] ?? '';
 
 		$data['bbcode2html'] = static::callHook($event->getName(), $bbcode2html);
+
+		$event->setArray($data);
+	}
+
+	/**
+	 * Map the HTML_TO_BBCODE_END event to `html2bbcode` hook
+	 */
+	public static function onHtmlToBbcodeEvent(ArrayFilterEvent $event): void
+	{
+		$data = $event->getArray();
+
+		$html2bbcode = (string) $data['html2bbcode'] ?? '';
+
+		$data['html2bbcode'] = static::callHook($event->getName(), $html2bbcode);
 
 		$event->setArray($data);
 	}

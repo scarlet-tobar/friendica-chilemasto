@@ -282,11 +282,13 @@ class OEmbed
 				}
 			}
 		} elseif (!strpos($oembed->html, $oembed->embed_url)) {
-			// add <a> for html2bbcode conversion
+			// add <a> for html to bbcode conversion
 			$ret .= '<a href="' . $oembed->embed_url . '" rel="oembed">' . $oembed->title . '</a>';
 		}
 
 		$ret .= '</div>';
+
+		// FIXME: Why is $test unused?
 		$test = Proxy::proxifyHtml($ret, $uriid);
 
 		return str_replace("\n", "", $ret);
