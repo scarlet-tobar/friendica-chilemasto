@@ -54,6 +54,8 @@ final class ArrayFilterEvent extends Event
 
 	public const BBCODE_TO_MARKDOWN_END = 'friendica.data.bbcode_to_markdown_end';
 
+	public const JOT_NETWORKS = 'friendica.data.jot_networks';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)

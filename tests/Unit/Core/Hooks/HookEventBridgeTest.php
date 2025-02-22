@@ -47,6 +47,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::BBCODE_TO_HTML_START   => 'onBbcodeToHtmlEvent',
 			ArrayFilterEvent::HTML_TO_BBCODE_END     => 'onHtmlToBbcodeEvent',
 			ArrayFilterEvent::BBCODE_TO_MARKDOWN_END => 'onBbcodeToMarkdownEvent',
+			ArrayFilterEvent::JOT_NETWORKS           => 'onArrayFilterEvent',
 			HtmlFilterEvent::HEAD                    => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER                  => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER             => 'onHtmlFilterEvent',
@@ -270,6 +271,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::ITEM_PHOTO_MENU, 'item_photo_menu'],
 			[ArrayFilterEvent::PAGE_INFO, 'page_info_data'],
 			[ArrayFilterEvent::SMILEY_LIST, 'smilie'],
+			[ArrayFilterEvent::JOT_NETWORKS, 'jot_networks'],
 		];
 	}
 

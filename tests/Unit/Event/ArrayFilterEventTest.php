@@ -43,6 +43,7 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::SMILEY_LIST, 'friendica.data.smiley_list'],
 			[ArrayFilterEvent::BBCODE_TO_HTML_START, 'friendica.data.bbcode_to_html_start'],
 			[ArrayFilterEvent::BBCODE_TO_MARKDOWN_END, 'friendica.data.bbcode_to_markdown_end'],
+			[ArrayFilterEvent::JOT_NETWORKS, 'friendica.data.jot_networks'],
 		];
 	}
 

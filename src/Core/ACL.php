@@ -11,6 +11,7 @@ use Exception;
 use Friendica\App\Page;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Circle;
 use Friendica\Model\User;
@@ -285,7 +286,12 @@ class ACL
 
 				}
 			}
-			Hook::callAll('jot_networks', $jotnets_fields);
+
+			$eventDispatcher = DI::eventDispatcher();
+
+			$jotnets_fields = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::JOT_NETWORKS, $jotnets_fields),
+			)->getArray();
 		}
 
 		$acl_contacts = self::getContactListByUserId($user['uid'], $condition);
