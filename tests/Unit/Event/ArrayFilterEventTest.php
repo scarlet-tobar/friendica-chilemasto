@@ -44,6 +44,9 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::BBCODE_TO_HTML_START, 'friendica.data.bbcode_to_html_start'],
 			[ArrayFilterEvent::BBCODE_TO_MARKDOWN_END, 'friendica.data.bbcode_to_markdown_end'],
 			[ArrayFilterEvent::JOT_NETWORKS, 'friendica.data.jot_networks'],
+			[ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, 'friendica.data.protocol_supports_follow'],
+			[ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW, 'friendica.data.protocol_supports_revoke_follow'],
+			[ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE, 'friendica.data.protocol_supports_probe'],
 		];
 	}
 

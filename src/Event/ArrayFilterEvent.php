@@ -56,6 +56,12 @@ final class ArrayFilterEvent extends Event
 
 	public const JOT_NETWORKS = 'friendica.data.jot_networks';
 
+	public const PROTOCOL_SUPPORTS_FOLLOW = 'friendica.data.protocol_supports_follow';
+
+	public const PROTOCOL_SUPPORTS_REVOKE_FOLLOW = 'friendica.data.protocol_supports_revoke_follow';
+
+	public const PROTOCOL_SUPPORTS_PROBE = 'friendica.data.protocol_supports_probe';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)

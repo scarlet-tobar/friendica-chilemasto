@@ -48,6 +48,9 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::HTML_TO_BBCODE_END     => 'onHtmlToBbcodeEvent',
 			ArrayFilterEvent::BBCODE_TO_MARKDOWN_END => 'onBbcodeToMarkdownEvent',
 			ArrayFilterEvent::JOT_NETWORKS           => 'onArrayFilterEvent',
+			ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW => 'onArrayFilterEvent',
+			ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'onArrayFilterEvent',
+			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE => 'onArrayFilterEvent',
 			HtmlFilterEvent::HEAD                    => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER                  => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER             => 'onHtmlFilterEvent',
@@ -272,6 +275,9 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::PAGE_INFO, 'page_info_data'],
 			[ArrayFilterEvent::SMILEY_LIST, 'smilie'],
 			[ArrayFilterEvent::JOT_NETWORKS, 'jot_networks'],
+			[ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, 'support_follow'],
+			[ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW, 'support_revoke_follow'],
+			[ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE, 'support_probe'],
 		];
 	}
 
