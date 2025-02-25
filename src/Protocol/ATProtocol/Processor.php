@@ -279,7 +279,7 @@ class Processor
 		$uri = $this->getUri($post);
 
 		if ($uri_id = $this->fetchUriId($uri, $uid)) {
-			return $uri_id;
+			return (int) $uri_id;
 		}
 
 		if (empty($post->record)) {
@@ -322,7 +322,7 @@ class Processor
 			$this->logger->warning('Fetched post was not inserted', ['guid' => $item['guid'], 'uri' => $item['uri']]);
 		}
 
-		return $this->fetchUriId($uri, $uid);
+		return (int) $this->fetchUriId($uri, $uid);
 	}
 
 	private function getHeaderFromJetstream(stdClass $data, int $uid, int $protocol = Conversation::PARCEL_JETSTREAM): array
@@ -860,7 +860,7 @@ class Processor
 			$this->logger->debug('Post with extid exists', ['uri' => $uri]);
 			return $reply['uri-id'];
 		}
-		return 0;
+		return '0';
 	}
 
 	private function getPostUids(string $uri, bool $with_public_user): array
