@@ -49,7 +49,7 @@ class Post
 	private $parent   = null;
 
 	/**
-	 * @var Thread
+	 * @var Thread|null
 	 */
 	private $thread       = null;
 	private $redirect_url = null;
@@ -816,7 +816,7 @@ class Post
 	 * Get a child by its ID
 	 *
 	 * @param integer $id The child id
-	 * @return Thread|null Thread or NULL if not found
+	 * @return Post|null Post or NULL if not found
 	 */
 	public function getChild(int $id)
 	{
