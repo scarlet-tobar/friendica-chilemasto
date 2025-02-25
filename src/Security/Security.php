@@ -45,25 +45,25 @@ class Security
 				return true;
 			} elseif ($verified === 1) {
 				return false;
+			}
+
+			$user = User::getById($owner);
+			if (!$user || $user['blockwall']) {
+				$verified = 1;
+				return false;
+			}
+
+			$contact = Contact::getById($cid);
+			if (!is_array($contact) || $contact['blocked'] || $contact['readonly'] || $contact['pending']) {
+				$verified = 1;
+				return false;
+			}
+
+			if (in_array($contact['rel'], [Contact::SHARING, Contact::FRIEND]) || ($user['page-flags'] == User::PAGE_FLAGS_COMMUNITY)) {
+				$verified = 2;
+				return true;
 			} else {
-				$user = User::getById($owner);
-				if (!$user || $user['blockwall']) {
-					$verified = 1;
-					return false;
-				}
-
-				$contact = Contact::getById($cid);
-				if ($contact || $contact['blocked'] || $contact['readonly'] || $contact['pending']) {
-					$verified = 1;
-					return false;
-				}
-
-				if (in_array($contact['rel'], [Contact::SHARING, Contact::FRIEND]) || ($user['page-flags'] == User::PAGE_FLAGS_COMMUNITY)) {
-					$verified = 2;
-					return true;
-				} else {
-					$verified = 1;
-				}
+				$verified = 1;
 			}
 		}
 
