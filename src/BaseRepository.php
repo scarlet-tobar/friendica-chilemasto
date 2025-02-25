@@ -148,18 +148,13 @@ abstract class BaseRepository
 	}
 
 	/**
-	 * @param array $condition
-	 * @param array $params
-	 * @return BaseEntity
+	 * @deprecated 2025.05 Use `\Friendica\BaseRepository::_selectFirstRowAsArray()` instead
+	 *
 	 * @throws NotFoundException
 	 */
 	protected function _selectOne(array $condition, array $params = []): BaseEntity
 	{
-		$fields = $this->db->selectFirst(static::$table_name, [], $condition, $params);
-
-		if (!$this->db->isResult($fields)) {
-			throw new NotFoundException();
-		}
+		$fields = $this->_selectFirstRowAsArray( $condition, $params);
 
 		return $this->factory->createFromTableRow($fields);
 	}
