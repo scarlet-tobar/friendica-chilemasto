@@ -68,7 +68,7 @@ class Status extends BaseDataTransferObject
 	protected $reblog = null;
 	/** @var Status[]|null - Akkoma extension, see issue https://github.com/friendica/friendica/issues/12603 */
 	protected $quote = null;
-	/** @var Application */
+	/** @var array */
 	protected $application = null;
 	/** @var array */
 	protected $account;

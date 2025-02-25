@@ -14,7 +14,7 @@ use Friendica\Core\Renderer;
 use Psr\Http\Message\UriInterface;
 
 /**
- * @property-read string $type
+ * @property-read int $type
  * @property-read string $name
  * @property-read UriInterface $url
  * @property-read UriInterface $photo
