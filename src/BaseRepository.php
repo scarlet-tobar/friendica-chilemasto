@@ -130,6 +130,24 @@ abstract class BaseRepository
 	}
 
 	/**
+	 * Selects the fields of the first row as array
+	 *
+	 * @throws NotFoundException
+	 *
+	 * @return array The resulted fields as array
+	 */
+	protected function _selectFirstRowAsArray(array $condition, array $params = []): array
+	{
+		$fields = $this->db->selectFirst(static::$table_name, [], $condition, $params);
+
+		if (!$this->db->isResult($fields)) {
+			throw new NotFoundException();
+		}
+
+		return $fields;
+	}
+
+	/**
 	 * @param array $condition
 	 * @param array $params
 	 * @return BaseEntity
@@ -138,6 +156,7 @@ abstract class BaseRepository
 	protected function _selectOne(array $condition, array $params = []): BaseEntity
 	{
 		$fields = $this->db->selectFirst(static::$table_name, [], $condition, $params);
+
 		if (!$this->db->isResult($fields)) {
 			throw new NotFoundException();
 		}
