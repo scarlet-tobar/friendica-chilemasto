@@ -246,7 +246,7 @@ class CurlResult implements ICanHandleHttpResponses
 	/** {@inheritDoc} */
 	public function getReturnCode(): string
 	{
-		return $this->returnCode;
+		return (string) $this->returnCode;
 	}
 
 	/** {@inheritDoc} */
