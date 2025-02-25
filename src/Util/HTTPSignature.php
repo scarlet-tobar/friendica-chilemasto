@@ -248,7 +248,7 @@ class HTTPSignature
 	private static function decryptSigheader(array $headers, string $prvkey): string
 	{
 		if (!empty($headers['iv']) && !empty($headers['key']) && !empty($headers['data'])) {
-			return Crypto::unencapsulate($headers, $prvkey);
+			return (string) Crypto::unencapsulate($headers, $prvkey);
 		}
 
 		return '';
