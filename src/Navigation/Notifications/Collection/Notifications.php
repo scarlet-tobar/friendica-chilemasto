@@ -8,36 +8,50 @@
 namespace Friendica\Navigation\Notifications\Collection;
 
 use Friendica\BaseCollection;
-use Friendica\Navigation\Notifications\Entity;
+use Friendica\Navigation\Notifications\Entity\Notification as NotificationEntity;
 
 class Notifications extends BaseCollection
 {
-	/**
-	 * @return Entity\Notification
-	 */
-	public function current(): Entity\Notification
+	public function current(): NotificationEntity
 	{
 		return parent::current();
 	}
 
 	public function setSeen(): Notifications
 	{
-		return $this->map(function (Entity\Notification $Notification) {
-			$Notification->setSeen();
-		});
+		$class = get_class($this);
+
+		return new $class(
+			array_map(
+				function (NotificationEntity $notification) {
+					$notification->setSeen();
+				},
+				$this->getArrayCopy()
+			),
+			$this->getTotalCount(),
+		);
 	}
 
 	public function setDismissed(): Notifications
 	{
-		return $this->map(function (Entity\Notification $Notification) {
-			$Notification->setDismissed();
-		});
+		$class = get_class($this);
+
+		return new $class(
+			array_map(
+				function (NotificationEntity $notification) {
+					$notification->setDismissed();
+				},
+				$this->getArrayCopy(),
+			),
+			$this->getTotalCount(),
+		);
+
 	}
 
 	public function countUnseen(): int
 	{
-		return array_reduce($this->getArrayCopy(), function (int $carry, Entity\Notification $Notification) {
-			return $carry + ($Notification->seen ? 0 : 1);
+		return array_reduce($this->getArrayCopy(), function (int $carry, NotificationEntity $notification) {
+			return $carry + ($notification->seen ? 0 : 1);
 		}, 0);
 	}
 }

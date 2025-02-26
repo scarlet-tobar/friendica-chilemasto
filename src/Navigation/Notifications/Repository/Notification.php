@@ -162,12 +162,17 @@ class Notification extends BaseRepository
 		LIMIT 50
 		", ...$values);
 
-		$Entities = new NotificationsCollection();
-		foreach ($rows as $fields) {
-			$Entities[] = $this->factory->createFromTableRow($fields);
+		$entities = new NotificationsCollection();
+
+		if (!is_iterable($rows)) {
+			return $entities;
 		}
 
-		return $Entities;
+		foreach ($rows as $fields) {
+			$entities[] = $this->factory->createFromTableRow($fields);
+		}
+
+		return $entities;
 	}
 
 	public function selectAllForUser(int $uid): NotificationsCollection

@@ -474,7 +474,7 @@ class Database
 	 *
 	 * @param string $sql SQL statement
 	 *
-	 * @return bool|object statement object or result object
+	 * @return bool|mysqli_result|mysqli_stmt|object|PDOStatement statement object or result object
 	 * @throws \Exception
 	 */
 	public function p(string $sql)
