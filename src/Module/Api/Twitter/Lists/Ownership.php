@@ -48,8 +48,11 @@ class Ownership extends BaseApi
 
 		// loop through all circles
 		$lists = [];
-		foreach ($circles as $circle) {
-			$lists[] = $this->friendicaCircle->createFromId($circle['id']);
+
+		if (is_iterable($circles)) {
+			foreach ($circles as $circle) {
+				$lists[] = $this->friendicaCircle->createFromId($circle['id']);
+			}
 		}
 
 		$this->response->addFormattedContent('statuses', ['lists' => ['lists' => $lists]], $this->parameters['extension'] ?? null, Contact::getPublicIdByUserId($uid));

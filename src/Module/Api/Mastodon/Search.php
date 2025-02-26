@@ -196,6 +196,11 @@ class Search extends BaseApi
 		$tags = DBA::select('tag', ['name'], $condition, $params);
 
 		$hashtags = [];
+
+		if (!is_iterable($tags)) {
+			return $hashtags;
+		}
+
 		foreach ($tags as $tag) {
 			if ($version == 1) {
 				$hashtags[] = $tag['name'];
