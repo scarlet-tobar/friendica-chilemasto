@@ -288,9 +288,6 @@ class OEmbed
 
 		$ret .= '</div>';
 
-		// FIXME: Why is $test unused?
-		$test = Proxy::proxifyHtml($ret, $uriid);
-
 		return str_replace("\n", "", $ret);
 	}
 
