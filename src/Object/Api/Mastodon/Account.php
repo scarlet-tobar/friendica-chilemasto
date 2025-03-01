@@ -38,6 +38,8 @@ class Account extends BaseDataTransferObject
 	/** @var bool */
 	protected $discoverable;
 	/** @var bool */
+	protected $indexable;
+	/** @var bool */
 	protected $group;
 	/** @var string|null (Datetime) */
 	protected $created_at;
@@ -45,6 +47,8 @@ class Account extends BaseDataTransferObject
 	protected $note;
 	/** @var string (URL)*/
 	protected $url;
+	/** @var string (URL)*/
+	protected $uri;
 	/** @var string (URL) */
 	protected $avatar;
 	/** @var string (URL) */
@@ -61,6 +65,8 @@ class Account extends BaseDataTransferObject
 	protected $statuses_count;
 	/** @var string|null (Datetime) */
 	protected $last_status_at = null;
+	/** @var bool */
+	protected $hide_collections = false;
 	/** @var Emoji[] */
 	protected $emojis;
 	/** @var Account|null */
@@ -88,12 +94,14 @@ class Account extends BaseDataTransferObject
 		$this->locked          = (bool)$account['manually-approve'];
 		$this->bot             = ($account['contact-type'] == Contact::TYPE_NEWS);
 		$this->discoverable    = !$account['unsearchable'];
+		$this->indexable       = $this->discoverable;
 		$this->group           = ($account['contact-type'] == Contact::TYPE_COMMUNITY);
 
 		$this->created_at      = DateTimeFormat::utc($account['created'] ?: DBA::NULL_DATETIME, DateTimeFormat::JSON);
 
 		$this->note            = BBCode::convertForUriId($account['uri-id'], $account['about'], BBCode::EXTERNAL);
-		$this->url             = $account['url'];
+		$this->url             = $account['alias'] ?: $account['url'];
+		$this->uri             = $account['url'];
 		$this->avatar          = Contact::getAvatarUrlForId($account['id'] ?? 0 ?: $account['pid'], Proxy::SIZE_SMALL, $account['updated'], $account['guid'] ?? '');
 		$this->avatar_static   = Contact::getAvatarUrlForId($account['id'] ?? 0 ?: $account['pid'], Proxy::SIZE_SMALL, $account['updated'], $account['guid'] ?? '', true);
 		$this->header          = Contact::getHeaderUrlForId($account['id'] ?? 0 ?: $account['pid'], '', $account['updated'], $account['guid'] ?? '');

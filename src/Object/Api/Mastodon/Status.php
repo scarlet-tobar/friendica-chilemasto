@@ -64,6 +64,8 @@ class Status extends BaseDataTransferObject
 	protected $pinned = false;
 	/** @var string */
 	protected $content;
+	/** @var array */
+	protected $filtered = [];
 	/** @var Status|null */
 	protected $reblog = null;
 	/** @var Status|null - Akkoma extension, see issue https://github.com/friendica/friendica/issues/12603 */

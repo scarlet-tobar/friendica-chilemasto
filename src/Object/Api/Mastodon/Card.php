@@ -41,9 +41,15 @@ class Card extends BaseDataTransferObject
 	/** @var string */
 	protected $image;
 	/** @var string */
+	protected $image_description = '';
+	/** @var string */
 	protected $embed_url;
 	/** @var string */
 	protected $blurhash;
+	/** @var string|null (Datetime) */
+	protected $published_at;
+	/** @var array */
+	protected $authors = [];
 	/** @var array */
 	protected $history;
 
@@ -81,6 +87,10 @@ class Card extends BaseDataTransferObject
 	{
 		if (empty($this->url)) {
 			return [];
+		}
+
+		if (empty($this->history)) {
+			unset($this->history);
 		}
 
 		return parent::toArray();
