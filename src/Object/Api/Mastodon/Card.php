@@ -8,6 +8,7 @@
 namespace Friendica\Object\Api\Mastodon;
 
 use Friendica\BaseDataTransferObject;
+use Friendica\Util\DateTimeFormat;
 
 /**
  * Class Card
@@ -22,6 +23,8 @@ class Card extends BaseDataTransferObject
 	protected $title;
 	/** @var string */
 	protected $description;
+	/** @var string */
+	protected $language;
 	/** @var string */
 	protected $type;
 	/** @var string */
@@ -64,6 +67,7 @@ class Card extends BaseDataTransferObject
 		$this->url           = $attachment['url']           ?? '';
 		$this->title         = $attachment['title']         ?? '';
 		$this->description   = $attachment['description']   ?? '';
+		$this->language      = $attachment['language']      ?? '';
 		$this->type          = $attachment['type']          ?? '';
 		$this->author_name   = $attachment['author_name']   ?? '';
 		$this->author_url    = $attachment['author_url']    ?? '';
@@ -75,6 +79,7 @@ class Card extends BaseDataTransferObject
 		$this->image         = $attachment['image']  ?? '';
 		$this->embed_url     = '';
 		$this->blurhash      = $attachment['blurhash'] ?? '';
+		$this->published_at  = !empty($attachment['published']) ? DateTimeFormat::utc($attachment['published'], DateTimeFormat::JSON) : null;
 		$this->history       = $history;
 	}
 
