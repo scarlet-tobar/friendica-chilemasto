@@ -184,13 +184,16 @@ class OEmbed
 
 		$eventDispatcher = DI::eventDispatcher();
 
-		$oembed_data = ['url' => $embedurl];
+		$oembed_data = [
+			'url'  => $embedurl,
+			'data' => $oembed,
+		];
 
 		$oembed_data = $eventDispatcher->dispatch(
 			new ArrayFilterEvent(ArrayFilterEvent::OEMBED_FETCH_END, $oembed_data),
 		)->getArray();
 
-		return $oembed_data['url'] ?? $embedurl;
+		return $oembed_data['data'];
 	}
 
 	/**
