@@ -39,7 +39,7 @@ class Status extends BaseFactory
 	private $mention;
 	/** @var Activities entity */
 	private $activities;
-	/** @var Activities entity */
+	/** @var Attachment entity */
 	private $attachment;
 	/** @var ContentItem */
 	private $contentItem;

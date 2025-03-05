@@ -11,7 +11,7 @@ use Friendica\App\BaseURL;
 use Friendica\BaseFactory;
 use Friendica\Model\Attach;
 use Friendica\Model\Photo;
-use Friendica\Network\HTTPException;
+use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Model\Post;
 use Friendica\Util\Images;
 use Friendica\Util\Proxy;
@@ -32,7 +32,7 @@ class Attachment extends BaseFactory
 	/**
 	 * @param int $uriId Uri-ID of the attachments
 	 * @return array
-	 * @throws HTTPException\InternalServerErrorException
+	 * @throws InternalServerErrorException
 	 */
 	public function createFromUriId(int $uriId): array
 	{
@@ -47,21 +47,30 @@ class Attachment extends BaseFactory
 	/**
 	 * @param int $id id of the media
 	 * @return \Friendica\Object\Api\Mastodon\Attachment
-	 * @throws HTTPException\InternalServerErrorException
+	 * @throws InternalServerErrorException
 	 */
 	public function createFromId(int $id): \Friendica\Object\Api\Mastodon\Attachment
 	{
 		$attachment = Post\Media::getById($id);
+
 		if (empty($attachment)) {
-			return [];
+			$attachment = [
+				'id' => '',
+				'description' => '',
+				'url' => '',
+				'mimetype' => '',
+				'blurhash' => '',
+				'type' => Post\Media::UNKNOWN,
+			];
 		}
+
 		return $this->createFromMediaArray($attachment);
 	}
 
 	/**
 	 * @param array $attachment
 	 * @return \Friendica\Object\Api\Mastodon\Attachment
-	 * @throws HTTPException\InternalServerErrorException
+	 * @throws InternalServerErrorException
 	 */
 	private function createFromMediaArray(array $attachment):  \Friendica\Object\Api\Mastodon\Attachment
 	{
@@ -100,7 +109,7 @@ class Attachment extends BaseFactory
 	 * @param int $id id of the photo
 	 *
 	 * @return array
-	 * @throws HTTPException\InternalServerErrorException
+	 * @throws InternalServerErrorException
 	 */
 	public function createFromPhoto(int $id): array
 	{
@@ -136,7 +145,7 @@ class Attachment extends BaseFactory
 	 * @param int $id id of the attachment
 	 *
 	 * @return array
-	 * @throws HTTPException\InternalServerErrorException
+	 * @throws InternalServerErrorException
 	 */
 	public function createFromAttach(int $id): array
 	{

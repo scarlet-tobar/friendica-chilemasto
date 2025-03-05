@@ -28,6 +28,8 @@ class GServer extends \Friendica\BaseRepository
 	 */
 	public function selectOneById(int $gsid): Entity\GServer
 	{
-		return $this->_selectOne(['id' => $gsid]);
+		$fields = $this->_selectFirstRowAsArray( ['id' => $gsid]);
+
+		return $this->factory->createFromTableRow($fields);
 	}
 }
