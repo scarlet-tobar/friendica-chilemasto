@@ -172,7 +172,7 @@ class Hook
 	 * the provided data.
 	 *
 	 * @param string        $name of the hook to call
-	 * @param string|array &$data to transmit to the callback handler
+	 * @param string|array|null $data to transmit to the callback handler
 	 * @return void
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */

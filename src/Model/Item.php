@@ -672,7 +672,7 @@ class Item
 	/**
 	 * Inserts item record
 	 *
-	 * @param array $item Item array to be inserted
+	 * @param array<string,mixed> $item Item array to be inserted
 	 * @param int   $notify Notification (type?)
 	 * @param bool  $post_local (???)
 	 * @return int Zero means error, otherwise primary key (id) is being returned
@@ -695,6 +695,7 @@ class Item
 
 		// If it is a posting where users should get notifications, then define it as wall posting
 		if ($notify) {
+			/** @var array<string,mixed> */
 			$item = $itemHelper->prepareOriginPost($item);
 
 			if (is_int($notify) && in_array($notify, Worker::PRIORITIES)) {
@@ -708,6 +709,7 @@ class Item
 			$item['network'] = trim(($item['network'] ?? '') ?: Protocol::PHANTOM);
 		}
 
+		/** @var array<string,mixed> */
 		$item = $itemHelper->prepareItemData($item, (bool) $notify);
 
 		// Store conversation data
@@ -749,6 +751,7 @@ class Item
 			}
 		}
 
+		/** @var array<string,mixed> */
 		$item = $itemHelper->validateItemData($item);
 
 		// Ensure that there is an avatar cache
@@ -846,6 +849,7 @@ class Item
 				$dummy_session = false;
 			}
 
+			/** @var array<string,mixed> */
 			$item = $eventDispatcher->dispatch(
 				new ArrayFilterEvent(ArrayFilterEvent::POST_LOCAL, $item)
 			)->getArray();
@@ -3061,7 +3065,14 @@ class Item
 	{
 		$appHelper = DI::appHelper();
 		$uid       = DI::userSession()->getLocalUserId();
-		Hook::callAll('prepare_body_init', $item);
+
+		$item_copy = $item;
+
+		Hook::callAll('prepare_body_init', $item_copy);
+
+		if (is_array($item_copy)) {
+			$item = $item_copy;
+		}
 
 		// In order to provide theme developers more possibilities, event items
 		// are treated differently.
