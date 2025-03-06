@@ -54,14 +54,7 @@ class Attachment extends BaseFactory
 		$attachment = Post\Media::getById($id);
 
 		if (empty($attachment)) {
-			$attachment = [
-				'id' => '',
-				'description' => '',
-				'url' => '',
-				'mimetype' => '',
-				'blurhash' => '',
-				'type' => Post\Media::UNKNOWN,
-			];
+			throw new InternalServerErrorException();
 		}
 
 		return $this->createFromMediaArray($attachment);
