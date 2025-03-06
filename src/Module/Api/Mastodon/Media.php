@@ -44,12 +44,13 @@ class Media extends BaseApi
 
 		if (in_array($type, [Post\Media::IMAGE, Post\Media::UNKNOWN, Post\Media::APPLICATION])) {
 			$media = Photo::upload($uid, $request['file'], '', null, null, '', '', $request['description']);
-			if (!empty($media)) {
-				$this->logger->info('Uploaded photo', ['media' => $media]);
-				$this->jsonExit(DI::mstdnAttachment()->createFromPhoto($media['id']));
-			} elseif ($type == Post\Media::IMAGE) {
-				$this->jsonExit(DI::mstdnAttachment()->createFromPhoto($media['id']));
+
+			if (empty($media)) {
+				$this->logAndJsonError(500, $this->errorFactory->InternalError('Error while uploading media.'));
 			}
+
+			$this->logger->info('Uploaded photo', ['media' => $media]);
+			$this->jsonExit(DI::mstdnAttachment()->createFromPhoto($media['id']));
 		}
 
 		$tempFileName = $request['file']['tmp_name'];
