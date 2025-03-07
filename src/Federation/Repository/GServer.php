@@ -8,27 +8,40 @@
 namespace Friendica\Federation\Repository;
 
 use Friendica\Database\Database;
-use Friendica\Federation\Factory;
-use Friendica\Federation\Entity;
+use Friendica\Federation\Entity\GServer as GServerEntity;
+use Friendica\Federation\Factory\GServer as GServerFactory;
+use Friendica\Network\HTTPException\NotFoundException;
 use Psr\Log\LoggerInterface;
 
-class GServer extends \Friendica\BaseRepository
+final class GServer
 {
 	protected static $table_name = 'gserver';
 
-	public function __construct(Database $database, LoggerInterface $logger, Factory\GServer $factory)
+	protected Database $db;
+
+	protected LoggerInterface $logger;
+
+	protected GServerFactory $factory;
+
+	public function __construct(Database $database, LoggerInterface $logger, GServerFactory $factory)
 	{
-		parent::__construct($database, $logger, $factory);
+		$this->db      = $database;
+		$this->logger  = $logger;
+		$this->factory = $factory;
 	}
 
 	/**
 	 * @param int $gsid
-	 * @return Entity\GServer
+	 *
 	 * @throws \Friendica\Network\HTTPException\NotFoundException
 	 */
-	public function selectOneById(int $gsid): Entity\GServer
+	public function selectOneById(int $gsid): GServerEntity
 	{
-		$fields = $this->_selectFirstRowAsArray( ['id' => $gsid]);
+		$fields = $this->db->selectFirst(static::$table_name, [], ['id' => $gsid], []);
+
+		if (!$this->db->isResult($fields)) {
+			throw new NotFoundException();
+		}
 
 		return $this->factory->createFromTableRow($fields);
 	}
