@@ -46,7 +46,7 @@ class Media extends BaseApi
 			$media = Photo::upload($uid, $request['file'], '', null, null, '', '', $request['description']);
 
 			if (empty($media)) {
-				$this->logAndJsonError(500, $this->errorFactory->InternalError('Error while uploading media.'));
+				$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity('Error while uploading media.'));
 			}
 
 			$this->logger->info('Uploaded photo', ['media' => $media]);
