@@ -60,7 +60,7 @@ class Database
 	protected $syslock = null;
 
 	protected $server_info = '';
-	/** @var PDO|mysqli */
+	/** @var PDO|mysqli|null */
 	protected $connection;
 	protected $driver = '';
 	protected $pdo_emulate_prepares = false;
@@ -253,7 +253,7 @@ class Database
 	/**
 	 * Return the database object.
 	 *
-	 * @return PDO|mysqli
+	 * @return PDO|mysqli|null
 	 */
 	public function getConnection()
 	{
