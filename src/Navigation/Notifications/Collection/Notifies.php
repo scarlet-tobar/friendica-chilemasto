@@ -19,13 +19,19 @@ class Notifies extends BaseCollection
 
 	public function setSeen(): Notifies
 	{
-		$class = get_class($this);
+		$notifies = $this->map(function (NotifyEntity $notify) {
+			$notify->setSeen();
+		});
 
-		return new $class(array_map(
-			function (NotifyEntity $notify) {
-				$notify->setSeen();
-			},
-			$this->getArrayCopy()), $this->getTotalCount(),
-		);
+		if (!$notifies instanceof Notifies) {
+			// Show the possible error explicitly
+			throw new \Exception(sprintf(
+				'BaseCollection::map() should return instance of %s, but returns %s instead.',
+				Notifies::class,
+				get_class($notifies),
+			));
+		}
+
+		return $notifies;
 	}
 }

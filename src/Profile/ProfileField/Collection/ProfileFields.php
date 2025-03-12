@@ -19,15 +19,22 @@ class ProfileFields extends BaseCollection
 
 	public function map(callable $callback): ProfileFields
 	{
-		$class = get_class($this);
+		$profileFields = parent::map($callback);
 
-		return new $class(array_map($callback, $this->getArrayCopy()), $this->getTotalCount());
+		if (!$profileFields instanceof ProfileFields) {
+			// Show the possible error explicitly
+			throw new \Exception(sprintf(
+				'BaseCollection::map() should return instance of %s, but returns %s instead.',
+				ProfileFields::class,
+				get_class($profileFields),
+			));
+		}
+
+		return $profileFields;
 	}
 
 	public function filter(?callable $callback = null, int $flag = 0): ProfileFields
 	{
-		$class = get_class($this);
-
-		return new $class(array_filter($this->getArrayCopy(), $callback, $flag));
+		return new self(array_filter($this->getArrayCopy(), $callback, $flag));
 	}
 }

@@ -83,16 +83,12 @@ class BaseCollection extends \ArrayIterator
 	/**
 	 * Apply a callback function on all elements in the collection and returns a new collection with the updated elements
 	 *
-	 * @deprecated 2025.05 Use `array_map()` instead
-	 *
 	 * @param callable $callback
 	 * @return BaseCollection
 	 * @see array_map()
 	 */
 	public function map(callable $callback): BaseCollection
 	{
-		@trigger_error('`' . __METHOD__ . '()` is deprecated since 2025.05 and will be removed after 5 months, use `array_map()` instead.', E_USER_DEPRECATED);
-
 		$class = get_class($this);
 
 		return new $class(array_map($callback, $this->getArrayCopy()), $this->getTotalCount());

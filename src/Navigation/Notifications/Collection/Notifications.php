@@ -19,33 +19,38 @@ class Notifications extends BaseCollection
 
 	public function setSeen(): Notifications
 	{
-		$class = get_class($this);
+		$notifications = $this->map(function (NotificationEntity $notification) {
+			$notification->setSeen();
+		});
 
-		return new $class(
-			array_map(
-				function (NotificationEntity $notification) {
-					$notification->setSeen();
-				},
-				$this->getArrayCopy()
-			),
-			$this->getTotalCount(),
-		);
+		if (!$notifications instanceof Notifications) {
+			// Show the possible error explicitly
+			throw new \Exception(sprintf(
+				'BaseCollection::map() should return instance of %s, but returns %s instead.',
+				Notifications::class,
+				get_class($notifications),
+			));
+		}
+
+		return $notifications;
 	}
 
 	public function setDismissed(): Notifications
 	{
-		$class = get_class($this);
+		$notifications = $this->map(function (NotificationEntity $notification) {
+			$notification->setDismissed();
+		});
 
-		return new $class(
-			array_map(
-				function (NotificationEntity $notification) {
-					$notification->setDismissed();
-				},
-				$this->getArrayCopy(),
-			),
-			$this->getTotalCount(),
-		);
+		if (!$notifications instanceof Notifications) {
+			// Show the possible error explicitly
+			throw new \Exception(sprintf(
+				'BaseCollection::map() should return instance of %s, but returns %s instead.',
+				Notifications::class,
+				get_class($notifications),
+			));
+		}
 
+		return $notifications;
 	}
 
 	public function countUnseen(): int
