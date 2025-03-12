@@ -165,7 +165,7 @@ class Status extends BaseFactory
 			$urls     = $this->url->createFromUriId($item['uri-id']);
 			$mentions = $this->mention->createFromUriId($item['uri-id']);
 		} else {
-			$attachments = $this->attachment->createFromUriId($item['uri-id'], $text);
+			$attachments = $this->attachment->createFromUriId($item['uri-id']);
 		}
 
 		$friendica_activities = $this->activities->createFromUriId($item['uri-id'], $uid);
@@ -180,7 +180,7 @@ class Status extends BaseFactory
 				$urls     = array_merge($urls, $this->url->createFromUriId($shared_uri_id));
 				$mentions = array_merge($mentions, $this->mention->createFromUriId($shared_uri_id));
 			} else {
-				$attachments = array_merge($attachments, $this->attachment->createFromUriId($shared_uri_id, $text));
+				$attachments = array_merge($attachments, $this->attachment->createFromUriId($shared_uri_id));
 			}
 		}
 
