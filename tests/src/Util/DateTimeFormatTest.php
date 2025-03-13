@@ -125,6 +125,10 @@ class DateTimeFormatTest extends MockedTestCase
 				'expectedDate' => '2023-04-02T17:22:42+05:30',
 				'dateString' => '2023-04-02\T17:22:42+05:30'
 			],
+			'2025-03-07T08:54:14.341+01:00[Europe/Berlin]' => [
+				'expectedDate' => '2025-03-07T08:54:14+01:00',
+				'dateString' => '2025-03-07T08:54:14.341+01:00[Europe/Berlin]'
+			],
 		];
 	}
 
@@ -156,4 +160,81 @@ class DateTimeFormatTest extends MockedTestCase
 
 		$this->assertEquals(259200, $now - $date);
 	}
+
+	public function dataConvert() {
+		return [
+			'unix timestamp' => [
+				'expected' => '2025-03-12 16:18:27',
+				's' => '1741796307',
+			],
+			'ATOM' => [
+				'expected' => '2022-06-02 15:58:35',
+				's' => '2022-06-02T16:58:35+01:00',
+			],
+			'COOKIE' => [
+				'expected' => '2022-06-02 14:58:35',
+				's' => 'Thursday, 02-Jun-2022 16:58:35 Africa/Cairo',
+			],
+			'ISO 8601/RFC 3339' => [
+				'expected' => '2022-06-02 13:58:35',
+				's' => '2022-06-02T16:58:35+0300',
+			],
+			'RFC 822/RFC 1036' => [
+				'expected' => '2022-06-02 12:58:35',
+				's' => 'Thu, 02 Jun 22 16:58:35 +0400',
+			],
+			'RFC 850' => [
+				'expected' => '2022-06-02 11:58:35',
+				's' => 'Thursday, 02-Jun-22 16:58:35 Indian/Kerguelen',
+			],
+			'RFC 1123/RFC 2822/RSS' => [
+				'expected' => '2022-06-02 10:58:35',
+				's' => 'Thu, 02 Jun 2022 16:58:35 +0600',
+			],
+			'RFC 3339/W3C' => [
+				'expected' => '2025-03-07 01:54:14',
+				's' => '2025-03-07T08:54:14+07:00',
+			],
+			'RFC 3339 extended' => [
+				'expected' => '2025-03-07 00:54:14',
+				's' => '2025-03-07T08:54:14.341+08:00',
+			],
+			'RFC 7231' => [
+				'expected' => '2022-06-02 07:58:35',
+				's' => 'Thu, 02 Jun 2022 16:58:35 Asia/Tokyo',
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataConvert
+	 */
+	public function testConvert($expected, string $s = 'now', string $tz_to = 'UTC', string $tz_from = 'UTC', string $format = DateTimeFormat::MYSQL)
+	{
+		$this->assertSame($expected, DateTimeFormat::convert($s, $tz_to, $tz_from, $format));
+	}
+
+	public function dataConvertNow()
+	{
+		return [
+			'now missing' => [
+			],
+			'now empty' => [
+				's' => '',
+			],
+			'now now' => [
+				's' => 'now',
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataConvertNow
+	 */
+	public function testConvertNow(string $s = 'now', string $tz_to = 'UTC', string $tz_from = 'UTC', string $format = DateTimeFormat::MYSQL)
+	{
+		$this->assertSame(date(DateTimeFormat::MYSQL), DateTimeFormat::convert($s, $tz_to, $tz_from, $format));
+	}
+
+
 }
