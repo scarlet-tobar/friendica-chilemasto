@@ -22,6 +22,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPException\NotFoundException;
@@ -3144,7 +3145,11 @@ class Contact
 
 		$arr = ['url' => $url, 'uid' => $uid, 'contact' => []];
 
-		Hook::callAll('follow', $arr);
+		$eventDispatcher = DI::eventDispatcher();
+
+		$arr = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::FOLLOW_CONTACT, $arr),
+		)->getArray();
 
 		if (empty($arr)) {
 			$result['message'] = DI::l10n()->t('The contact could not be added. Please check the relevant network credentials in your Settings -> Social Networks page.');

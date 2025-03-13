@@ -62,7 +62,15 @@ final class ArrayFilterEvent extends Event
 
 	public const PROTOCOL_SUPPORTS_PROBE = 'friendica.data.protocol_supports_probe';
 
-	public const UNFOLLOW = 'friendica.data.unfollow';
+	public const FOLLOW_CONTACT = 'friendica.data.follow_contact';
+
+	public const UNFOLLOW_CONTACT = 'friendica.data.unfollow_contact';
+
+	public const REVOKE_FOLLOW_CONTACT = 'friendica.data.revoke_follow_contact';
+
+	public const BLOCK_CONTACT = 'friendica.data.block_contact';
+
+	public const UNBLOCK_CONTACT = 'friendica.data.unblock_contact';
 
 	private array $array;
 

@@ -51,7 +51,11 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'onArrayFilterEvent',
-			ArrayFilterEvent::UNFOLLOW                        => 'onArrayFilterEvent',
+			ArrayFilterEvent::FOLLOW_CONTACT                  => 'onArrayFilterEvent',
+			ArrayFilterEvent::UNFOLLOW_CONTACT                => 'onArrayFilterEvent',
+			ArrayFilterEvent::REVOKE_FOLLOW_CONTACT           => 'onArrayFilterEvent',
+			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
+			ArrayFilterEvent::UNBLOCK_CONTACT                 => 'onArrayFilterEvent',
 			HtmlFilterEvent::HEAD                             => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER                           => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER                      => 'onHtmlFilterEvent',
@@ -279,7 +283,11 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, 'support_follow'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW, 'support_revoke_follow'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE, 'support_probe'],
-			[ArrayFilterEvent::UNFOLLOW, 'unfollow'],
+			[ArrayFilterEvent::FOLLOW_CONTACT, 'follow'],
+			[ArrayFilterEvent::UNFOLLOW_CONTACT, 'unfollow'],
+			[ArrayFilterEvent::REVOKE_FOLLOW_CONTACT, 'revoke_follow'],
+			[ArrayFilterEvent::BLOCK_CONTACT, 'block'],
+			[ArrayFilterEvent::UNBLOCK_CONTACT, 'unblock'],
 		];
 	}
 
