@@ -175,11 +175,11 @@ HELP;
 	 * @param string $string
 	 * @param array|string $node
 	 */
-	private static function parse(string $string, &$node = [])
+	private static function parse(string $string, &$node)
 	{
 		// Removes extra outward parentheses
 		if (strpos($string, '(') === 0 && strrpos($string, ')') === strlen($string) - 1) {
-			$string = substr($string, 1, -1);
+			$string = (string) substr($string, 1, -1);
 		}
 
 		$q = strpos($string, '?');
