@@ -33,7 +33,7 @@ class LocalRelationship extends BaseRepository
 	 */
 	public function selectForUserContact(int $uid, int $cid): LocalRelationshipEntity
 	{
-		$fields = $this->_selectFirstRowAsArray( ['uid' => $uid, 'cid' => $cid]);
+		$fields = $this->_selectFirstRowAsArray(['uid' => $uid, 'cid' => $cid]);
 
 		return $this->factory->createFromTableRow($fields);
 	}
