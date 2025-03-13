@@ -59,7 +59,7 @@ class Process extends BaseRepository
 				}
 			}
 
-			$fields = $this->_selectFirstRowAsArray( ['pid' => $pid, 'hostname' => $this->currentHost]);
+			$fields = $this->_selectFirstRowAsArray(['pid' => $pid, 'hostname' => $this->currentHost]);
 
 			$result = $this->factory->createFromTableRow($fields);
 
