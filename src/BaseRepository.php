@@ -136,7 +136,7 @@ abstract class BaseRepository
 	 *
 	 * @return array The resulted fields as array
 	 */
-	protected function _selectFirstRowAsArray(array $condition, array $params = []): array
+	final protected function _selectFirstRowAsArray(array $condition, array $params = []): array
 	{
 		$fields = $this->db->selectFirst(static::$table_name, [], $condition, $params);
 
@@ -154,6 +154,8 @@ abstract class BaseRepository
 	 */
 	protected function _selectOne(array $condition, array $params = []): BaseEntity
 	{
+		@trigger_error('`' . __METHOD__ . '()` is deprecated since 2025.05 and will be removed after 5 months, use `\Friendica\BaseRepository::_selectFirstRowAsArray()` instead.', E_USER_DEPRECATED);
+
 		$fields = $this->_selectFirstRowAsArray( $condition, $params);
 
 		return $this->factory->createFromTableRow($fields);
