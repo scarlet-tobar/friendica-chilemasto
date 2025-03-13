@@ -46,7 +46,7 @@ class PostMedia extends BaseRepository
 
 	public function selectOneById(int $postMediaId): PostMediaEntity
 	{
-		$fields = $this->_selectFirstRowAsArray( ['id' => $postMediaId]);
+		$fields = $this->_selectFirstRowAsArray(['id' => $postMediaId]);
 
 		return $this->factory->createFromTableRow($fields);
 	}
