@@ -13,7 +13,6 @@ use Friendica\Util\Images;
 use Friendica\Util\Proxy;
 use Psr\Http\Message\UriInterface;
 
-
 /**
  * @property-read int $id
  * @property-read int $uriId
@@ -210,7 +209,7 @@ class PostMedia extends BaseEntity
 	 *
 	 * @param \GuzzleHttp\Psr7\Uri $preview
 	 * @param string               $size
-	 * @return $this
+	 * @return self
 	 */
 	public function withPreview(\GuzzleHttp\Psr7\Uri $preview, string $size = ''): self
 	{
