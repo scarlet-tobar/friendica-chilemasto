@@ -56,6 +56,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::REVOKE_FOLLOW_CONTACT           => 'onArrayFilterEvent',
 			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
 			ArrayFilterEvent::UNBLOCK_CONTACT                 => 'onArrayFilterEvent',
+			ArrayFilterEvent::ADD_WORKER_TASK                 => 'onArrayFilterEvent',
 			HtmlFilterEvent::HEAD                             => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER                           => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER                      => 'onHtmlFilterEvent',
@@ -288,6 +289,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::REVOKE_FOLLOW_CONTACT, 'revoke_follow'],
 			[ArrayFilterEvent::BLOCK_CONTACT, 'block'],
 			[ArrayFilterEvent::UNBLOCK_CONTACT, 'unblock'],
+			[ArrayFilterEvent::ADD_WORKER_TASK, 'proc_run'],
 		];
 	}
 

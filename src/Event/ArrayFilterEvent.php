@@ -72,6 +72,8 @@ final class ArrayFilterEvent extends Event
 
 	public const UNBLOCK_CONTACT = 'friendica.data.unblock_contact';
 
+	public const ADD_WORKER_TASK = 'friendica.data.add_worker_task';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)
