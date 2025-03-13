@@ -71,7 +71,7 @@ class Post
 		$this->setTemplate('wall');
 		$this->toplevel = $this->getId() == $this->getDataValue('parent');
 
-		if (!empty(DI::userSession()->getUserIDForVisitorContactID($this->getDataValue('contact-id')))) {
+		if (DI::userSession()->getUserIDForVisitorContactID($this->getDataValue('contact-id')) !== 0) {
 			$this->visiting = true;
 		}
 
