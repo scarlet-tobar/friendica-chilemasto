@@ -183,7 +183,12 @@ class Protocol
 			'uid'     => $owner['uid'],
 			'result'  => null,
 		];
-		Hook::callAll('unfollow', $hook_data);
+
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, $hook_data),
+		)->getArray();
 
 		return $hook_data['result'];
 	}

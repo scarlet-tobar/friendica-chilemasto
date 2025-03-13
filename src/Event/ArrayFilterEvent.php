@@ -62,6 +62,8 @@ final class ArrayFilterEvent extends Event
 
 	public const PROTOCOL_SUPPORTS_PROBE = 'friendica.data.protocol_supports_probe';
 
+	public const UNFOLLOW = 'friendica.data.unfollow';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)

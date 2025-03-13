@@ -51,6 +51,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'onArrayFilterEvent',
+			ArrayFilterEvent::UNFOLLOW                        => 'onArrayFilterEvent',
 			HtmlFilterEvent::HEAD                             => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER                           => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER                      => 'onHtmlFilterEvent',
@@ -278,6 +279,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, 'support_follow'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW, 'support_revoke_follow'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE, 'support_probe'],
+			[ArrayFilterEvent::UNFOLLOW, 'unfollow'],
 		];
 	}
 
