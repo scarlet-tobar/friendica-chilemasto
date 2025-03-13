@@ -69,7 +69,7 @@ class UserDefinedChannel extends BaseRepository
 	 */
 	public function selectById(int $id, int $uid): UserDefinedChannelEntity
 	{
-		$fields = $this->_selectFirstRowAsArray( ['id' => $id, 'uid' => $uid]);
+		$fields = $this->_selectFirstRowAsArray(['id' => $id, 'uid' => $uid]);
 
 		return $this->factory->createFromTableRow($fields);
 	}
