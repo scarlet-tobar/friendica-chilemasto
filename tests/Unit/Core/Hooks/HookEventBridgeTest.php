@@ -59,6 +59,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::ADD_WORKER_TASK                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_CONFIG                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_INSTANCE                => 'onArrayFilterEvent',
+			ArrayFilterEvent::DB_STRUCTURE_DEFINITION         => 'onArrayFilterEvent',
 			HtmlFilterEvent::HEAD                             => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER                           => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER                      => 'onHtmlFilterEvent',
@@ -294,6 +295,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::ADD_WORKER_TASK, 'proc_run'],
 			[ArrayFilterEvent::STORAGE_CONFIG, 'storage_config'],
 			[ArrayFilterEvent::STORAGE_INSTANCE, 'storage_instance'],
+			[ArrayFilterEvent::DB_STRUCTURE_DEFINITION, 'dbstructure_definition'],
 		];
 	}
 

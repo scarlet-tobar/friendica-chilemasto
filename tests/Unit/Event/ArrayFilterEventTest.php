@@ -42,6 +42,7 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::PAGE_INFO, 'friendica.data.page_info'],
 			[ArrayFilterEvent::SMILEY_LIST, 'friendica.data.smiley_list'],
 			[ArrayFilterEvent::BBCODE_TO_HTML_START, 'friendica.data.bbcode_to_html_start'],
+			[ArrayFilterEvent::HTML_TO_BBCODE_END, 'friendica.data.html_to_bbcode_end'],
 			[ArrayFilterEvent::BBCODE_TO_MARKDOWN_END, 'friendica.data.bbcode_to_markdown_end'],
 			[ArrayFilterEvent::JOT_NETWORKS, 'friendica.data.jot_networks'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, 'friendica.data.protocol_supports_follow'],
@@ -55,6 +56,7 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::ADD_WORKER_TASK, 'friendica.data.add_worker_task'],
 			[ArrayFilterEvent::STORAGE_CONFIG, 'friendica.data.storage_config'],
 			[ArrayFilterEvent::STORAGE_INSTANCE, 'friendica.data.storage_instance'],
+			[ArrayFilterEvent::DB_STRUCTURE_DEFINITION, 'friendica.data.db_structure_definition'],
 		];
 	}
 

@@ -78,6 +78,8 @@ final class ArrayFilterEvent extends Event
 
 	public const STORAGE_INSTANCE = 'friendica.data.storage_instance';
 
+	public const DB_STRUCTURE_DEFINITION = 'friendica.data.db_structure_definition';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)
