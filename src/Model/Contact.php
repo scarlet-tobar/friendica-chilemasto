@@ -1312,9 +1312,17 @@ class Contact
 			}
 		}
 
-		$args = ['contact' => $contact, 'menu' => &$menu];
+		$args = ['contact' => $contact, 'menu' => $menu];
 
-		Hook::callAll('contact_photo_menu', $args);
+		$eventDispatcher = DI::eventDispatcher();
+
+		$args = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::CONTACT_PHOTO_MENU, $args),
+		)->getArray();
+
+		if (is_array($args['menu'])) {
+			$menu = $args['menu'];
+		}
 
 		$menucondensed = [];
 
