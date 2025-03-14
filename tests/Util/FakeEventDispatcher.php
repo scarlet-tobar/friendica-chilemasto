@@ -16,15 +16,15 @@ use Psr\EventDispatcher\EventDispatcherInterface;
  */
 final class FakeEventDispatcher implements EventDispatcherInterface
 {
-    /**
-     * Provide all relevant listeners with an event to process.
-     *
-     * @template T of object
+	/**
+	 * Provide all relevant listeners with an event to process.
+	 *
+	 * @template T of object
 	 * @param T $event
 	 *
 	 * @return T The passed $event MUST be returned
-     */
-    public function dispatch(object $event): object
+	 */
+	public function dispatch(object $event): object
 	{
 		return $event;
 	}
