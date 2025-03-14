@@ -46,7 +46,7 @@ function item_post()
 	$eventDispatcher = DI::eventDispatcher();
 
 	$_REQUEST = $eventDispatcher->dispatch(
-		new ArrayFilterEvent(ArrayFilterEvent::POST_LOCAL_START, $_REQUEST)
+		new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_START, $_REQUEST)
 	)->getArray();
 
 	$return_path = $_REQUEST['return'] ?? '';
@@ -282,7 +282,7 @@ function item_process(array $post, array $request, bool $preview, string $return
 	$eventDispatcher = DI::eventDispatcher();
 
 	$post = $eventDispatcher->dispatch(
-		new ArrayFilterEvent(ArrayFilterEvent::POST_LOCAL, $post)
+		new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, $post)
 	)->getArray();
 
 	unset($post['edit']);

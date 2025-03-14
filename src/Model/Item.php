@@ -847,7 +847,7 @@ class Item
 			}
 
 			$item = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::POST_LOCAL, $item)
+				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, $item)
 			)->getArray();
 
 			if ($dummy_session) {

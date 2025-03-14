@@ -1012,7 +1012,7 @@ class Item
 		}
 
 		$post = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::POST_LOCAL_END, $post)
+			new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, $post)
 		)->getArray();
 
 		$author = DBA::selectFirst('contact', ['thumb'], ['uid' => $post['uid'], 'self' => true]);

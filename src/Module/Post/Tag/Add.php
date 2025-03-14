@@ -154,7 +154,7 @@ EOT;
 		$post['id'] = $post_id;
 
 		$post = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::POST_LOCAL_END, $post)
+			new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, $post)
 		)->getArray();
 
 		$post = Post::selectFirst(['uri-id', 'uid'], ['id' => $post_id]);
