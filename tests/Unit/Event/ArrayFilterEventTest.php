@@ -32,6 +32,8 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::POST_LOCAL_START, 'friendica.data.post_local_start'],
 			[ArrayFilterEvent::POST_LOCAL, 'friendica.data.post_local'],
 			[ArrayFilterEvent::POST_LOCAL_END, 'friendica.data.post_local_end'],
+			[ArrayFilterEvent::INSERT_POST_REMOTE, 'friendica.data.insert_post_remote'],
+			[ArrayFilterEvent::INSERT_POST_REMOTE_END, 'friendica.data.insert_post_remote_end'],
 			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'friendica.data.photo_upload_form'],
 			[ArrayFilterEvent::NETWORK_TO_NAME, 'friendica.data.network_to_name'],
 			[ArrayFilterEvent::CONVERSATION_START, 'friendica.data.conversation_start'],

@@ -30,6 +30,10 @@ final class ArrayFilterEvent extends Event
 
 	public const POST_LOCAL_END = 'friendica.data.post_local_end';
 
+	public const INSERT_POST_REMOTE = 'friendica.data.insert_post_remote';
+
+	public const INSERT_POST_REMOTE_END = 'friendica.data.insert_post_remote_end';
+
 	public const PHOTO_UPLOAD_FORM = 'friendica.data.photo_upload_form';
 
 	public const NETWORK_TO_NAME = 'friendica.data.network_to_name';

@@ -855,7 +855,9 @@ class Item
 				unset($_SESSION['uid']);
 			}
 		} elseif (!$notify) {
-			Hook::callAll('post_remote', $item);
+			$item = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_REMOTE, $item)
+			)->getArray();
 		}
 
 		if (!empty($item['cancel'])) {
@@ -1112,7 +1114,11 @@ class Item
 				DI::contentItem()->copyPermissions($posted_item['thr-parent-id'], $posted_item['uri-id'], $posted_item['parent-uri-id']);
 			}
 		} else {
-			Hook::callAll('post_remote_end', $posted_item);
+			$eventDispatcher = DI::eventDispatcher();
+
+			$posted_item = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_REMOTE_END, $posted_item)
+			)->getArray();
 		}
 
 		if ($posted_item['gravity'] === self::GRAVITY_PARENT) {
