@@ -74,6 +74,8 @@ final class ArrayFilterEvent extends Event
 
 	public const UNBLOCK_CONTACT = 'friendica.data.unblock_contact';
 
+	public const AVATAR_LOOKUP = 'friendica.data.avatar_lookup';
+
 	public const ADD_WORKER_TASK = 'friendica.data.add_worker_task';
 
 	public const STORAGE_CONFIG = 'friendica.data.storage_config';

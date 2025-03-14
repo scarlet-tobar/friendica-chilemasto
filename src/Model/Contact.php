@@ -14,7 +14,6 @@ use Friendica\Contact\Introduction\Exception\IntroductionNotFoundException;
 use Friendica\Content\Conversation as ConversationContent;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\HTML;
-use Friendica\Core\Hook;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
@@ -2205,7 +2204,11 @@ class Contact
 		$avatar['url']     = '';
 		$avatar['success'] = false;
 
-		Hook::callAll('avatar_lookup', $avatar);
+		$eventDispatcher = DI::eventDispatcher();
+
+		$avatar = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::AVATAR_LOOKUP, $avatar),
+		)->getArray();
 
 		if ($avatar['success'] && !empty($avatar['url'])) {
 			return $avatar['url'];

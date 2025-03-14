@@ -54,6 +54,7 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::REVOKE_FOLLOW_CONTACT, 'friendica.data.revoke_follow_contact'],
 			[ArrayFilterEvent::BLOCK_CONTACT, 'friendica.data.block_contact'],
 			[ArrayFilterEvent::UNBLOCK_CONTACT, 'friendica.data.unblock_contact'],
+			[ArrayFilterEvent::AVATAR_LOOKUP, 'friendica.data.avatar_lookup'],
 			[ArrayFilterEvent::ADD_WORKER_TASK, 'friendica.data.add_worker_task'],
 			[ArrayFilterEvent::STORAGE_CONFIG, 'friendica.data.storage_config'],
 			[ArrayFilterEvent::STORAGE_INSTANCE, 'friendica.data.storage_instance'],
