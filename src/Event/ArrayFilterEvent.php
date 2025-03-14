@@ -74,6 +74,10 @@ final class ArrayFilterEvent extends Event
 
 	public const ADD_WORKER_TASK = 'friendica.data.add_worker_task';
 
+	public const STORAGE_CONFIG = 'friendica.data.storage_config';
+
+	public const STORAGE_INSTANCE = 'friendica.data.storage_instance';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)

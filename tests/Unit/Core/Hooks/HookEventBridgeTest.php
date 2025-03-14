@@ -57,6 +57,8 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
 			ArrayFilterEvent::UNBLOCK_CONTACT                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::ADD_WORKER_TASK                 => 'onArrayFilterEvent',
+			ArrayFilterEvent::STORAGE_CONFIG                  => 'onArrayFilterEvent',
+			ArrayFilterEvent::STORAGE_INSTANCE                => 'onArrayFilterEvent',
 			HtmlFilterEvent::HEAD                             => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER                           => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER                      => 'onHtmlFilterEvent',
@@ -290,6 +292,8 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::BLOCK_CONTACT, 'block'],
 			[ArrayFilterEvent::UNBLOCK_CONTACT, 'unblock'],
 			[ArrayFilterEvent::ADD_WORKER_TASK, 'proc_run'],
+			[ArrayFilterEvent::STORAGE_CONFIG, 'storage_config'],
+			[ArrayFilterEvent::STORAGE_INSTANCE, 'storage_instance'],
 		];
 	}
 
