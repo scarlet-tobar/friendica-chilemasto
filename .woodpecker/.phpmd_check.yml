@@ -8,6 +8,10 @@ when:
     exclude: [ stable ]
   event: [ pull_request, push ]
 
+# This forces PHP Unit executions at the "opensocial" labeled location (because of access issues with git.friendi.ca)
+labels:
+  location: opensocial
+
 steps:
   restore_cache:
     image: meltwater/drone-cache:dev
