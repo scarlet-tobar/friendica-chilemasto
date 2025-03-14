@@ -14,6 +14,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Network\HTTPException\UnauthorizedException;
@@ -255,6 +256,7 @@ class Event
 			'finish'    => DateTimeFormat::utc(($arr['finish'] ?? '') ?: DBA::NULL_DATETIME),
 		];
 
+		$eventDispatcher = DI::eventDispatcher();
 
 		if ($event['finish'] < DBA::NULL_DATETIME) {
 			$event['finish'] = DBA::NULL_DATETIME;
@@ -295,14 +297,18 @@ class Event
 				Item::update($fields, ['id' => $item['id']]);
 			}
 
-			Hook::callAll('event_updated', $event['id']);
+			$eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::EVENT_UPDATED, ['event' => $event]),
+			);
 		} else {
 			// New event. Store it.
 			DBA::insert('event', $event);
 
 			$event['id'] = DBA::lastInsertId();
 
-			Hook::callAll("event_created", $event['id']);
+			$eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::EVENT_CREATED, ['event' => $event]),
+			);
 		}
 
 		return $event['id'];

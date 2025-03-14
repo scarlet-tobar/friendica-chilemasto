@@ -69,6 +69,8 @@ final class HookEventBridge
 		ArrayFilterEvent::BLOCK_CONTACT                   => 'block',
 		ArrayFilterEvent::UNBLOCK_CONTACT                 => 'unblock',
 		ArrayFilterEvent::AVATAR_LOOKUP                   => 'avatar_lookup',
+		ArrayFilterEvent::EVENT_CREATED                   => 'event_created',
+		ArrayFilterEvent::EVENT_UPDATED                   => 'event_updated',
 		ArrayFilterEvent::ADD_WORKER_TASK                 => 'proc_run',
 		ArrayFilterEvent::STORAGE_CONFIG                  => 'storage_config',
 		ArrayFilterEvent::STORAGE_INSTANCE                => 'storage_instance',
@@ -123,6 +125,8 @@ final class HookEventBridge
 			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
 			ArrayFilterEvent::UNBLOCK_CONTACT                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::AVATAR_LOOKUP                   => 'onArrayFilterEvent',
+			ArrayFilterEvent::EVENT_CREATED                   => 'onEventCreatedEvent',
+			ArrayFilterEvent::EVENT_UPDATED                   => 'onEventUpdatedEvent',
 			ArrayFilterEvent::ADD_WORKER_TASK                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_CONFIG                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_INSTANCE                => 'onArrayFilterEvent',
@@ -211,6 +215,32 @@ final class HookEventBridge
 		$event->setArray($data);
 	}
 
+	/**
+	 * Map the EVENT_CREATED event to `event_created` hook
+	 */
+	public static function onEventCreatedEvent(ArrayFilterEvent $event): void
+	{
+		$data = $event->getArray();
+
+		$id = (int) $data['event']['id'] ?? 0;
+
+		// one-way-event: we don't care about the returned value
+		static::callHook($event->getName(), $id);
+	}
+
+	/**
+	 * Map the EVENT_UPDATED event to `event_updated` hook
+	 */
+	public static function onEventUpdatedEvent(ArrayFilterEvent $event): void
+	{
+		$data = $event->getArray();
+
+		$id = (int) $data['event']['id'] ?? 0;
+
+		// one-way-event: we don't care about the returned value
+		static::callHook($event->getName(), $id);
+	}
+
 	public static function onArrayFilterEvent(ArrayFilterEvent $event): void
 	{
 		$event->setArray(
@@ -226,9 +256,9 @@ final class HookEventBridge
 	}
 
 	/**
-	 * @param string|array|object $data
+	 * @param int|string|array|object $data
 	 *
-	 * @return string|array|object
+	 * @return int|string|array|object
 	 */
 	private static function callHook(string $name, $data)
 	{

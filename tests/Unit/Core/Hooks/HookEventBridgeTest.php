@@ -58,6 +58,8 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
 			ArrayFilterEvent::UNBLOCK_CONTACT                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::AVATAR_LOOKUP                   => 'onArrayFilterEvent',
+			ArrayFilterEvent::EVENT_CREATED                   => 'onEventCreatedEvent',
+			ArrayFilterEvent::EVENT_UPDATED                   => 'onEventUpdatedEvent',
 			ArrayFilterEvent::ADD_WORKER_TASK                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_CONFIG                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_INSTANCE                => 'onArrayFilterEvent',
@@ -267,6 +269,40 @@ class HookEventBridgeTest extends TestCase
 		);
 	}
 
+	public function testOnEventCreatedEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ArrayFilterEvent(ArrayFilterEvent::EVENT_CREATED, ['event' => ['id' => 123]]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, int $data): int {
+			$this->assertSame('event_created', $name);
+			$this->assertSame(123, $data);
+
+			return 123;
+		});
+
+		HookEventBridge::onEventCreatedEvent($event);
+	}
+
+	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ArrayFilterEvent(ArrayFilterEvent::EVENT_UPDATED, ['event' => ['id' => 123]]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, int $data): int {
+			$this->assertSame('event_updated', $name);
+			$this->assertSame(123, $data);
+
+			return 123;
+		});
+
+		HookEventBridge::onEventUpdatedEvent($event);
+	}
+
 	public static function getArrayFilterEventData(): array
 	{
 		return [
@@ -297,6 +333,8 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::BLOCK_CONTACT, 'block'],
 			[ArrayFilterEvent::UNBLOCK_CONTACT, 'unblock'],
 			[ArrayFilterEvent::AVATAR_LOOKUP, 'avatar_lookup'],
+			[ArrayFilterEvent::EVENT_CREATED, 'event_created'],
+			[ArrayFilterEvent::EVENT_UPDATED, 'event_updated'],
 			[ArrayFilterEvent::ADD_WORKER_TASK, 'proc_run'],
 			[ArrayFilterEvent::STORAGE_CONFIG, 'storage_config'],
 			[ArrayFilterEvent::STORAGE_INSTANCE, 'storage_instance'],

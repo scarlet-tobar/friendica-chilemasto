@@ -76,6 +76,10 @@ final class ArrayFilterEvent extends Event
 
 	public const AVATAR_LOOKUP = 'friendica.data.avatar_lookup';
 
+	public const EVENT_CREATED = 'friendica.data.event_created';
+
+	public const EVENT_UPDATED = 'friendica.data.event_updated';
+
 	public const ADD_WORKER_TASK = 'friendica.data.add_worker_task';
 
 	public const STORAGE_CONFIG = 'friendica.data.storage_config';
