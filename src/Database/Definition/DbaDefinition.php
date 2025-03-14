@@ -8,7 +8,6 @@
 namespace Friendica\Database\Definition;
 
 use Exception;
-use Friendica\Core\Hook;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 

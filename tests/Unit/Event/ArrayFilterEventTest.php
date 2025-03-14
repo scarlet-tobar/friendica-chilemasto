@@ -57,6 +57,7 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::STORAGE_CONFIG, 'friendica.data.storage_config'],
 			[ArrayFilterEvent::STORAGE_INSTANCE, 'friendica.data.storage_instance'],
 			[ArrayFilterEvent::DB_STRUCTURE_DEFINITION, 'friendica.data.db_structure_definition'],
+			[ArrayFilterEvent::DB_VIEW_DEFINITION, 'friendica.data.db_view_definition'],
 		];
 	}
 

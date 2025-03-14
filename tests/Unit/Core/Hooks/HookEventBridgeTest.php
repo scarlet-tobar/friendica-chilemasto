@@ -60,6 +60,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::STORAGE_CONFIG                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_INSTANCE                => 'onArrayFilterEvent',
 			ArrayFilterEvent::DB_STRUCTURE_DEFINITION         => 'onArrayFilterEvent',
+			ArrayFilterEvent::DB_VIEW_DEFINITION              => 'onArrayFilterEvent',
 			HtmlFilterEvent::HEAD                             => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER                           => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER                      => 'onHtmlFilterEvent',
@@ -296,6 +297,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::STORAGE_CONFIG, 'storage_config'],
 			[ArrayFilterEvent::STORAGE_INSTANCE, 'storage_instance'],
 			[ArrayFilterEvent::DB_STRUCTURE_DEFINITION, 'dbstructure_definition'],
+			[ArrayFilterEvent::DB_VIEW_DEFINITION, 'dbview_definition'],
 		];
 	}
 

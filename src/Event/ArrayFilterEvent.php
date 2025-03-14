@@ -80,6 +80,8 @@ final class ArrayFilterEvent extends Event
 
 	public const DB_STRUCTURE_DEFINITION = 'friendica.data.db_structure_definition';
 
+	public const DB_VIEW_DEFINITION = 'friendica.data.db_view_definition';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)
