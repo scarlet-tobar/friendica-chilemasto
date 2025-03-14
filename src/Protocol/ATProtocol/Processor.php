@@ -279,7 +279,7 @@ class Processor
 		$uri = $this->getUri($post);
 
 		if ($uri_id = $this->fetchUriId($uri, $uid)) {
-			return (int) $uri_id;
+			return $uri_id;
 		}
 
 		if (empty($post->record)) {
@@ -322,7 +322,7 @@ class Processor
 			$this->logger->warning('Fetched post was not inserted', ['guid' => $item['guid'], 'uri' => $item['uri']]);
 		}
 
-		return (int) $this->fetchUriId($uri, $uid);
+		return $this->fetchUriId($uri, $uid);
 	}
 
 	private function getHeaderFromJetstream(stdClass $data, int $uid, int $protocol = Conversation::PARCEL_JETSTREAM): array
@@ -848,19 +848,19 @@ class Processor
 		return $class;
 	}
 
-	public function fetchUriId(string $uri, int $uid): string
+	public function fetchUriId(string $uri, int $uid): int
 	{
 		$reply = Post::selectFirst(['uri-id'], ['uri' => $uri, 'uid' => [$uid, 0]]);
 		if (!empty($reply['uri-id'])) {
 			$this->logger->debug('Post exists', ['uri' => $uri]);
-			return $reply['uri-id'];
+			return (int) $reply['uri-id'];
 		}
 		$reply = Post::selectFirst(['uri-id'], ['extid' => $uri, 'uid' => [$uid, 0]]);
 		if (!empty($reply['uri-id'])) {
 			$this->logger->debug('Post with extid exists', ['uri' => $uri]);
-			return $reply['uri-id'];
+			return (int) $reply['uri-id'];
 		}
-		return '0';
+		return 0;
 	}
 
 	private function getPostUids(string $uri, bool $with_public_user): array
