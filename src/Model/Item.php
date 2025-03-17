@@ -2285,9 +2285,16 @@ class Item
 				return true;
 			}
 
-			$arr = ['item' => $item, 'user' => $owner];
+			$eventDispatcher = DI::eventDispatcher();
 
-			Hook::callAll('tagged', $arr);
+			$arr = [
+				'item' => $item,
+				'user' => $owner,
+			];
+
+			$eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::ITEM_TAGGED, $arr),
+			);
 		} else {
 			if (Tag::isMentioned($item['parent-uri-id'], $owner['url'])) {
 				DI::logger()->info('Mention found in parent tag.', ['uri' => $item['uri'], 'uid' => $uid, 'id' => $item_id, 'uri-id' => $item['uri-id'], 'guid' => $item['guid']]);
