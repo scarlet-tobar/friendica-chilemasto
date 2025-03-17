@@ -52,6 +52,8 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::RENDER_LOCATION                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::ITEM_PHOTO_MENU                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::CONTACT_PHOTO_MENU              => 'onArrayFilterEvent',
+			ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY           => 'onProfileSidebarEntryEvent',
+			ArrayFilterEvent::PROFILE_SIDEBAR                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::OEMBED_FETCH_END                => 'onOembedFetchEndEvent',
 			ArrayFilterEvent::PAGE_INFO                       => 'onArrayFilterEvent',
 			ArrayFilterEvent::SMILEY_LIST                     => 'onArrayFilterEvent',
@@ -213,6 +215,28 @@ class HookEventBridgeTest extends TestCase
 		);
 	}
 
+	public function testOnProfileSidebarEntryEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY, ['profile' => ['uid' => 0, 'name' => 'original']]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('profile_sidebar_enter', $name);
+			$this->assertSame(['uid' => 0, 'name' => 'original'], $data);
+
+			return ['uid' => 0, 'name' => 'changed'];
+		});
+
+		HookEventBridge::onProfileSidebarEntryEvent($event);
+
+		$this->assertSame(
+			['profile' => ['uid' => 0, 'name' => 'changed']],
+			$event->getArray(),
+		);
+	}
+
 	public function testOnOembedFetchEndEventCallsHookWithCorrectValue(): void
 	{
 		$event = new ArrayFilterEvent(ArrayFilterEvent::OEMBED_FETCH_END, ['url' => 'original_url']);
@@ -362,6 +386,8 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::RENDER_LOCATION, 'render_location'],
 			[ArrayFilterEvent::ITEM_PHOTO_MENU, 'item_photo_menu'],
 			[ArrayFilterEvent::CONTACT_PHOTO_MENU, 'contact_photo_menu'],
+			[ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY, 'profile_sidebar_enter'],
+			[ArrayFilterEvent::PROFILE_SIDEBAR, 'profile_sidebar'],
 			[ArrayFilterEvent::PAGE_INFO, 'page_info_data'],
 			[ArrayFilterEvent::SMILEY_LIST, 'smilie'],
 			[ArrayFilterEvent::JOT_NETWORKS, 'jot_networks'],

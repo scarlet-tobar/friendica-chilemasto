@@ -76,6 +76,10 @@ final class ArrayFilterEvent extends Event
 
 	public const CONTACT_PHOTO_MENU = 'friendica.data.contact_photo_menu';
 
+	public const PROFILE_SIDEBAR_ENTRY = 'friendica.data.profile_sidebar_entry';
+
+	public const PROFILE_SIDEBAR = 'friendica.data.profile_sidebar';
+
 	public const OEMBED_FETCH_END = 'friendica.data.oembed_fetch_end';
 
 	public const PAGE_INFO = 'friendica.data.page_info';

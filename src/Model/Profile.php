@@ -19,6 +19,7 @@ use Friendica\Core\Search;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\Diaspora;
@@ -258,11 +259,6 @@ class Profile
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 * @note  Returns empty string if passed $profile is wrong type or not populated
-	 *
-	 * @hooks 'profile_sidebar_enter'
-	 *      array $profile - profile data
-	 * @hooks 'profile_sidebar'
-	 *      array $arr
 	 */
 	public static function getVCardHtml(array $profile, bool $block, bool $show_contacts): string
 	{
@@ -282,7 +278,17 @@ class Profile
 
 		$profile['network_link'] = '';
 
-		Hook::callAll('profile_sidebar_enter', $profile);
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = [
+			'profile' => $profile,
+		];
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY, $hook_data),
+		)->getArray();
+
+		$profile = $hook_data['profile'] ?? $profile;
 
 		$profile_url = $profile['url'];
 
@@ -473,9 +479,17 @@ class Profile
 			'$network_url'         => $network_url,
 		]);
 
-		$arr = ['profile' => &$profile, 'entry' => &$o];
+		$hook_data = [
+			'profile' => &$profile,
+			'entry' => &$o,
+		];
 
-		Hook::callAll('profile_sidebar', $arr);
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SIDEBAR, $hook_data),
+		)->getArray();
+
+		$profile = $hook_data['profile'] ?? $profile;
+		$o = $hook_data['entry'] ?? $o;
 
 		return $o;
 	}

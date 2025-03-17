@@ -49,6 +49,8 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::RENDER_LOCATION, 'friendica.data.render_location'],
 			[ArrayFilterEvent::ITEM_PHOTO_MENU, 'friendica.data.item_photo_menu'],
 			[ArrayFilterEvent::CONTACT_PHOTO_MENU, 'friendica.data.contact_photo_menu'],
+			[ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY, 'friendica.data.profile_sidebar_entry'],
+			[ArrayFilterEvent::PROFILE_SIDEBAR, 'friendica.data.profile_sidebar'],
 			[ArrayFilterEvent::OEMBED_FETCH_END, 'friendica.data.oembed_fetch_end'],
 			[ArrayFilterEvent::PAGE_INFO, 'friendica.data.page_info'],
 			[ArrayFilterEvent::SMILEY_LIST, 'friendica.data.smiley_list'],

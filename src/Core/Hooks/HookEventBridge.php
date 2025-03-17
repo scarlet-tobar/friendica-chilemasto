@@ -63,6 +63,8 @@ final class HookEventBridge
 		ArrayFilterEvent::RENDER_LOCATION                 => 'render_location',
 		ArrayFilterEvent::ITEM_PHOTO_MENU                 => 'item_photo_menu',
 		ArrayFilterEvent::CONTACT_PHOTO_MENU              => 'contact_photo_menu',
+		ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY           => 'profile_sidebar_enter',
+		ArrayFilterEvent::PROFILE_SIDEBAR                 => 'profile_sidebar',
 		ArrayFilterEvent::OEMBED_FETCH_END                => 'oembed_fetch_url',
 		ArrayFilterEvent::PAGE_INFO                       => 'page_info_data',
 		ArrayFilterEvent::SMILEY_LIST                     => 'smilie',
@@ -129,6 +131,8 @@ final class HookEventBridge
 			ArrayFilterEvent::RENDER_LOCATION                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::ITEM_PHOTO_MENU                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::CONTACT_PHOTO_MENU              => 'onArrayFilterEvent',
+			ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY           => 'onProfileSidebarEntryEvent',
+			ArrayFilterEvent::PROFILE_SIDEBAR                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::OEMBED_FETCH_END                => 'onOembedFetchEndEvent',
 			ArrayFilterEvent::PAGE_INFO                       => 'onArrayFilterEvent',
 			ArrayFilterEvent::SMILEY_LIST                     => 'onArrayFilterEvent',
@@ -189,6 +193,20 @@ final class HookEventBridge
 		$item = (array) $data['item'] ?? [];
 
 		$data['item'] = static::callHook($event->getName(), $item);
+
+		$event->setArray($data);
+	}
+
+	/**
+	 * Map the PROFILE_SIDEBAR_ENTRY event to `profile_sidebar_enter` hook
+	 */
+	public static function onProfileSidebarEntryEvent(ArrayFilterEvent $event): void
+	{
+		$data = $event->getArray();
+
+		$profile = (array) $data['profile'] ?? [];
+
+		$data['profile'] = static::callHook($event->getName(), $profile);
 
 		$event->setArray($data);
 	}
