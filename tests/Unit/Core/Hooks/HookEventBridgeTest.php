@@ -37,6 +37,10 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::INSERT_POST_LOCAL_END           => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_REMOTE              => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_REMOTE_END          => 'onArrayFilterEvent',
+			ArrayFilterEvent::PREPARE_POST_START              => 'onPreparePostStartEvent',
+			ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT     => 'onArrayFilterEvent',
+			ArrayFilterEvent::PREPARE_POST                    => 'onArrayFilterEvent',
+			ArrayFilterEvent::PREPARE_POST_END                => 'onArrayFilterEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_TO_NAME                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::CONVERSATION_START              => 'onArrayFilterEvent',
@@ -183,6 +187,28 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onCollectRoutesEvent($event);
 	}
 
+	public function testOnPreparePostStartEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_START, ['item' => ['id' => -1]]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('prepare_body_init', $name);
+			$this->assertSame(['id' => -1], $data);
+
+			return ['id' => 123];
+		});
+
+		HookEventBridge::onPreparePostStartEvent($event);
+
+		$this->assertSame(
+			['item' => ['id' => 123]],
+			$event->getArray(),
+		);
+	}
+
 	public function testOnOembedFetchEndEventCallsHookWithCorrectValue(): void
 	{
 		$event = new ArrayFilterEvent(ArrayFilterEvent::OEMBED_FETCH_END, ['url' => 'original_url']);
@@ -318,6 +344,9 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::INSERT_POST_LOCAL_END, 'post_local_end'],
 			[ArrayFilterEvent::INSERT_POST_REMOTE, 'post_remote'],
 			[ArrayFilterEvent::INSERT_POST_REMOTE_END, 'post_remote_end'],
+			[ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT, 'prepare_body_content_filter'],
+			[ArrayFilterEvent::PREPARE_POST, 'prepare_body'],
+			[ArrayFilterEvent::PREPARE_POST_END, 'prepare_body_final'],
 			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'photo_upload_form'],
 			[ArrayFilterEvent::NETWORK_TO_NAME, 'network_to_name'],
 			[ArrayFilterEvent::CONVERSATION_START, 'conversation_start'],

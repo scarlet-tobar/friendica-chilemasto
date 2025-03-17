@@ -3058,16 +3058,22 @@ class Item
 	 * @return string item body html
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
-	 * @hook  prepare_body_init item array before any work
-	 * @hook  prepare_body_content_filter ('item'=>item array, 'filter_reasons'=>string array) before first bbcode to html
-	 * @hook  prepare_body ('item'=>item array, 'html'=>body string, 'is_preview'=>boolean, 'filter_reasons'=>string array) after first bbcode to html
-	 * @hook  prepare_body_final ('item'=>item array, 'html'=>body string) after attach icons and blockquote special case handling (spoiler, author)
 	 */
 	public static function prepareBody(array &$item, bool $attach = false, bool $is_preview = false, bool $only_cache = false): string
 	{
-		$appHelper = DI::appHelper();
-		$uid       = DI::userSession()->getLocalUserId();
-		Hook::callAll('prepare_body_init', $item);
+		$appHelper       = DI::appHelper();
+		$uid             = DI::userSession()->getLocalUserId();
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = [
+			'item' => $item,
+		];
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_START, $hook_data),
+		)->getArray();
+
+		$item = $hook_data['item'] ?? $item;
 
 		// In order to provide theme developers more possibilities, event items
 		// are treated differently.
@@ -3186,7 +3192,11 @@ class Item
 				'item'           => $item,
 				'filter_reasons' => $filter_reasons
 			];
-			Hook::callAll('prepare_body_content_filter', $hook_data);
+
+			$hook_data = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT, $hook_data),
+			)->getArray();
+
 			$filter_reasons = $hook_data['filter_reasons'];
 			unset($hook_data);
 		}
@@ -3205,7 +3215,11 @@ class Item
 			'preview'        => $is_preview,
 			'filter_reasons' => $filter_reasons
 		];
-		Hook::callAll('prepare_body', $hook_data);
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST, $hook_data),
+		)->getArray();
+
 		$s = $hook_data['html'];
 
 		unset($hook_data);
@@ -3257,9 +3271,16 @@ class Item
 
 		$s = HTML::applyContentFilter($s, $filter_reasons);
 
-		$hook_data = ['item' => $item, 'html' => $s];
-		Hook::callAll('prepare_body_final', $hook_data);
-		return $hook_data['html'];
+		$hook_data = [
+			'item' => $item,
+			'html' => $s,
+		];
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_END, $hook_data),
+		)->getArray();
+
+		return (string) $hook_data['html'] ?? $s;
 	}
 
 	/**

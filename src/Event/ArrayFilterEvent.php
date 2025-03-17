@@ -34,6 +34,26 @@ final class ArrayFilterEvent extends Event
 
 	public const INSERT_POST_REMOTE_END = 'friendica.data.insert_post_remote_end';
 
+	/**
+	 * item array before any work
+	 */
+	public const PREPARE_POST_START = 'friendica.data.prepare_post_start';
+
+	/**
+	 * before first bbcode to html
+	 */
+	public const PREPARE_POST_FILTER_CONTENT = 'friendica.data.prepare_post_filter_content';
+
+	/**
+	 * after first bbcode to html
+	 */
+	public const PREPARE_POST = 'friendica.data.prepare_post';
+
+	/**
+	 * after attach icons and blockquote special case handling (spoiler, author)
+	 */
+	public const PREPARE_POST_END = 'friendica.data.prepare_post_end';
+
 	public const PHOTO_UPLOAD_FORM = 'friendica.data.photo_upload_form';
 
 	public const NETWORK_TO_NAME = 'friendica.data.network_to_name';

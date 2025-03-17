@@ -48,6 +48,10 @@ final class HookEventBridge
 		ArrayFilterEvent::INSERT_POST_LOCAL_END           => 'post_local_end',
 		ArrayFilterEvent::INSERT_POST_REMOTE              => 'post_remote',
 		ArrayFilterEvent::INSERT_POST_REMOTE_END          => 'post_remote_end',
+		ArrayFilterEvent::PREPARE_POST_START              => 'prepare_body_init',
+		ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT     => 'prepare_body_content_filter',
+		ArrayFilterEvent::PREPARE_POST                    => 'prepare_body',
+		ArrayFilterEvent::PREPARE_POST_END                => 'prepare_body_final',
 		ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'photo_upload_form',
 		ArrayFilterEvent::NETWORK_TO_NAME                 => 'network_to_name',
 		ArrayFilterEvent::CONVERSATION_START              => 'conversation_start',
@@ -106,6 +110,10 @@ final class HookEventBridge
 			ArrayFilterEvent::INSERT_POST_LOCAL_END           => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_REMOTE              => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_REMOTE_END          => 'onArrayFilterEvent',
+			ArrayFilterEvent::PREPARE_POST_START              => 'onPreparePostStartEvent',
+			ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT     => 'onArrayFilterEvent',
+			ArrayFilterEvent::PREPARE_POST                    => 'onArrayFilterEvent',
+			ArrayFilterEvent::PREPARE_POST_END                => 'onArrayFilterEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_TO_NAME                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::CONVERSATION_START              => 'onArrayFilterEvent',
@@ -161,6 +169,20 @@ final class HookEventBridge
 		$event->setRouteCollector(
 			static::callHook($event->getName(), $event->getRouteCollector())
 		);
+	}
+
+	/**
+	 * Map the PREPARE_POST_START event to `prepare_body_init` hook
+	 */
+	public static function onPreparePostStartEvent(ArrayFilterEvent $event): void
+	{
+		$data = $event->getArray();
+
+		$item = (array) $data['item'] ?? [];
+
+		$data['item'] = static::callHook($event->getName(), $item);
+
+		$event->setArray($data);
 	}
 
 	/**
