@@ -14,7 +14,6 @@ use Friendica\Content\Post\Collection\PostMedias;
 use Friendica\Content\Post\Entity\PostMedia;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
@@ -3951,17 +3950,21 @@ class Item
 			return 0;
 		}
 
-		$hookData = [
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = [
 			'uri'     => $uri,
 			'uid'     => $uid,
 			'item_id' => null,
 		];
 
-		Hook::callAll('item_by_link', $hookData);
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::FETCH_ITEM_BY_LINK, $hook_data)
+		)->getArray();
 
-		if (isset($hookData['item_id'])) {
-			DI::logger()->info('Hook link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $hookData['item_id']]);
-			return is_numeric($hookData['item_id']) ? $hookData['item_id'] : 0;
+		if (isset($hook_data['item_id'])) {
+			DI::logger()->info('Hook link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $hook_data['item_id']]);
+			return is_numeric($hook_data['item_id']) ? $hook_data['item_id'] : 0;
 		}
 
 		if (!$mimetype) {

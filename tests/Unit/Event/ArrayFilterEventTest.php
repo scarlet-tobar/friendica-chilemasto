@@ -41,6 +41,7 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'friendica.data.photo_upload_form'],
 			[ArrayFilterEvent::NETWORK_TO_NAME, 'friendica.data.network_to_name'],
 			[ArrayFilterEvent::CONVERSATION_START, 'friendica.data.conversation_start'],
+			[ArrayFilterEvent::FETCH_ITEM_BY_LINK, 'friendica.data.fetch_item_by_link'],
 			[ArrayFilterEvent::ITEM_TAGGED, 'friendica.data.item_tagged'],
 			[ArrayFilterEvent::DISPLAY_ITEM, 'friendica.data.display_item'],
 			[ArrayFilterEvent::CACHE_ITEM, 'friendica.data.cache_item'],

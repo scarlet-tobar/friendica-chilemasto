@@ -60,6 +60,8 @@ final class ArrayFilterEvent extends Event
 
 	public const CONVERSATION_START = 'friendica.data.conversation_start';
 
+	public const FETCH_ITEM_BY_LINK = 'friendica.data.fetch_item_by_link';
+
 	public const ITEM_TAGGED = 'friendica.data.item_tagged';
 
 	public const DISPLAY_ITEM = 'friendica.data.display_item';
