@@ -121,8 +121,7 @@ class PostMedia extends BaseEntity
 		?UriInterface $publisherImage = null,
 		?string $blurhash = null,
 		int $id = null
-	)
-	{
+	) {
 		$this->uriId          = $uriId;
 		$this->url            = $url;
 		$this->type           = $type;
@@ -223,8 +222,8 @@ class PostMedia extends BaseEntity
 
 		if ($newWidth && $newHeight && $size) {
 			$dimensionts = Images::getScalingDimensions($newWidth, $newHeight, Proxy::getPixelsFromSize($size));
-			$newWidth = $dimensionts['width'];
-			$newHeight = $dimensionts['height'];
+			$newWidth    = $dimensionts['width'];
+			$newHeight   = $dimensionts['height'];
 		}
 
 		return new self(

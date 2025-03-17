@@ -71,7 +71,7 @@ class RemoveTag extends BaseModule
 		$item_id = $this->parameters['id'] ?? 0;
 
 		$term = trim($request['term'] ?? '');
-		$cat = trim($request['cat'] ?? '');
+		$cat  = trim($request['cat'] ?? '');
 
 		if (!empty($cat)) {
 			$type = Post\Category::CATEGORY;
