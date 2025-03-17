@@ -12,7 +12,6 @@ use Friendica\AppHelper;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Widget\ContactBlock;
 use Friendica\Core\Cache\Enum\Duration;
-use Friendica\Core\Hook;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;

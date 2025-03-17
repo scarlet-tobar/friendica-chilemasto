@@ -281,9 +281,15 @@ function item_process(array $post, array $request, bool $preview, string $return
 
 	$eventDispatcher = DI::eventDispatcher();
 
-	$post = $eventDispatcher->dispatch(
-		new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, $post)
+	$hook_data = [
+		'item' => $post,
+	];
+
+	$hook_data = $eventDispatcher->dispatch(
+		new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, $hook_data)
 	)->getArray();
+
+	$post = $hook_data['item'] ?? $post;
 
 	unset($post['edit']);
 	unset($post['self']);

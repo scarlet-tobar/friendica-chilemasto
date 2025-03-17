@@ -112,7 +112,7 @@ final class HookEventBridge
 			ArrayFilterEvent::FEATURE_ENABLED                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::FEATURE_GET                     => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
-			ArrayFilterEvent::INSERT_POST_LOCAL               => 'onArrayFilterEvent',
+			ArrayFilterEvent::INSERT_POST_LOCAL               => 'onInsertPostLocalEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_END           => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_REMOTE              => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_REMOTE_END          => 'onArrayFilterEvent',
@@ -181,6 +181,20 @@ final class HookEventBridge
 		$event->setRouteCollector(
 			static::callHook($event->getName(), $event->getRouteCollector())
 		);
+	}
+
+	/**
+	 * Map the INSERT_POST_LOCAL event to `post_local` hook
+	 */
+	public static function onInsertPostLocalEvent(ArrayFilterEvent $event): void
+	{
+		$data = $event->getArray();
+
+		$item = (array) $data['item'] ?? [];
+
+		$data['item'] = static::callHook($event->getName(), $item);
+
+		$event->setArray($data);
 	}
 
 	/**

@@ -33,7 +33,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::FEATURE_ENABLED                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::FEATURE_GET                     => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
-			ArrayFilterEvent::INSERT_POST_LOCAL               => 'onArrayFilterEvent',
+			ArrayFilterEvent::INSERT_POST_LOCAL               => 'onInsertPostLocalEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_END           => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_REMOTE              => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_REMOTE_END          => 'onArrayFilterEvent',
@@ -191,6 +191,28 @@ class HookEventBridgeTest extends TestCase
 		});
 
 		HookEventBridge::onCollectRoutesEvent($event);
+	}
+
+	public function testOnInsertPostLocalEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, ['item' => ['id' => -1]]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('post_local', $name);
+			$this->assertSame(['id' => -1], $data);
+
+			return ['id' => 123];
+		});
+
+		HookEventBridge::onInsertPostLocalEvent($event);
+
+		$this->assertSame(
+			['item' => ['id' => 123]],
+			$event->getArray(),
+		);
 	}
 
 	public function testOnPreparePostStartEventCallsHookWithCorrectValue(): void

@@ -845,9 +845,15 @@ class Item
 				$dummy_session = false;
 			}
 
-			$item = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, $item)
+			$hook_data = [
+				'item' => $item,
+			];
+
+			$hook_data = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, $hook_data)
 			)->getArray();
+
+			$item = $hook_data['item'] ?? $item;
 
 			if ($dummy_session) {
 				unset($_SESSION['authenticated']);
