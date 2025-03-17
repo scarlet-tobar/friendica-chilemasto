@@ -62,6 +62,8 @@ final class ArrayFilterEvent extends Event
 
 	public const DISPLAY_ITEM = 'friendica.data.display_item';
 
+	public const DETECT_LANGUAGES = 'friendica.data.detect_languages';
+
 	public const RENDER_LOCATION = 'friendica.data.render_location';
 
 	public const ITEM_PHOTO_MENU = 'friendica.data.item_photo_menu';

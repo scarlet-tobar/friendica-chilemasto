@@ -1903,18 +1903,23 @@ class Item
 
 		$result = [];
 
+		$eventDispatcher = DI::eventDispatcher();
+
 		foreach (self::splitByBlocks($searchtext) as $block) {
 			$languages = $ld->detect($block)->close() ?: [];
 
-			$data = [
+			$hook_data = [
 				'text'      => $block,
 				'detected'  => $languages,
 				'uri-id'    => $uri_id,
 				'author-id' => $author_id,
 			];
-			Hook::callAll('detect_languages', $data);
 
-			foreach ($data['detected'] as $language => $quality) {
+			$hook_data = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::DETECT_LANGUAGES, $hook_data),
+			)->getArray();
+
+			foreach ($hook_data['detected'] as $language => $quality) {
 				$result[$language] = max($result[$language] ?? 0, $quality * (strlen($block) / strlen($searchtext)));
 			}
 		}
