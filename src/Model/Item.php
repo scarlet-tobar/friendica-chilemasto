@@ -3038,8 +3038,18 @@ class Item
 			$item['rendered-html'] = BBCode::convertForUriId($item['uri-id'], $item['body']);
 			$item['rendered-hash'] = hash('md5', BBCode::VERSION . '::' . $body);
 
-			$hook_data = ['item' => $item, 'rendered-html' => $item['rendered-html'], 'rendered-hash' => $item['rendered-hash']];
-			Hook::callAll('put_item_in_cache', $hook_data);
+			$hook_data = [
+				'rendered-html' => $item['rendered-html'],
+				'rendered-hash' => $item['rendered-hash'],
+				'item' => $item,
+			];
+
+			$eventDispatcher = DI::eventDispatcher();
+
+			$hook_data = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::CACHE_ITEM, $hook_data),
+			)->getArray();
+
 			$item['rendered-html'] = $hook_data['rendered-html'];
 			$item['rendered-hash'] = $hook_data['rendered-hash'];
 			unset($hook_data);
