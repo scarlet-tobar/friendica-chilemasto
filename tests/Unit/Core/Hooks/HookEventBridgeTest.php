@@ -34,7 +34,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::FEATURE_GET                     => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL               => 'onInsertPostLocalEvent',
-			ArrayFilterEvent::INSERT_POST_LOCAL_END           => 'onArrayFilterEvent',
+			ArrayFilterEvent::INSERT_POST_LOCAL_END           => 'onInsertPostLocalEndEvent',
 			ArrayFilterEvent::INSERT_POST_REMOTE              => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_REMOTE_END          => 'onArrayFilterEvent',
 			ArrayFilterEvent::PREPARE_POST_START              => 'onPreparePostStartEvent',
@@ -208,6 +208,27 @@ class HookEventBridgeTest extends TestCase
 		});
 
 		HookEventBridge::onInsertPostLocalEvent($event);
+
+		$this->assertSame(
+			['item' => ['id' => 123]],
+			$event->getArray(),
+		);
+	}
+	public function testOnInsertPostLocalEndEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, ['item' => ['id' => -1]]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('post_local_end', $name);
+			$this->assertSame(['id' => -1], $data);
+
+			return ['id' => 123];
+		});
+
+		HookEventBridge::onInsertPostLocalEndEvent($event);
 
 		$this->assertSame(
 			['item' => ['id' => 123]],
@@ -390,8 +411,6 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::FEATURE_ENABLED, 'isEnabled'],
 			[ArrayFilterEvent::FEATURE_GET, 'get'],
 			[ArrayFilterEvent::INSERT_POST_LOCAL_START, 'post_local_start'],
-			[ArrayFilterEvent::INSERT_POST_LOCAL, 'post_local'],
-			[ArrayFilterEvent::INSERT_POST_LOCAL_END, 'post_local_end'],
 			[ArrayFilterEvent::INSERT_POST_REMOTE, 'post_remote'],
 			[ArrayFilterEvent::INSERT_POST_REMOTE_END, 'post_remote_end'],
 			[ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT, 'prepare_body_content_filter'],
