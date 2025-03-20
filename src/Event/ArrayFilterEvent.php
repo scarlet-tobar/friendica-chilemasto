@@ -112,6 +112,12 @@ final class ArrayFilterEvent extends Event
 
 	public const AVATAR_LOOKUP = 'friendica.data.avatar_lookup';
 
+	public const ACCOUNT_AUTHENTICATE = 'friendica.data.account_authenticate';
+
+	public const ACCOUNT_REGISTER = 'friendica.data.account_register';
+
+	public const ACCOUNT_REMOVE = 'friendica.data.account_remove';
+
 	public const EVENT_CREATED = 'friendica.data.event_created';
 
 	public const EVENT_UPDATED = 'friendica.data.event_updated';

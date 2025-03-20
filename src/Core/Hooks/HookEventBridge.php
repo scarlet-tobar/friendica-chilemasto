@@ -81,6 +81,9 @@ final class HookEventBridge
 		ArrayFilterEvent::BLOCK_CONTACT                   => 'block',
 		ArrayFilterEvent::UNBLOCK_CONTACT                 => 'unblock',
 		ArrayFilterEvent::AVATAR_LOOKUP                   => 'avatar_lookup',
+		ArrayFilterEvent::ACCOUNT_AUTHENTICATE            => 'authenticate',
+		ArrayFilterEvent::ACCOUNT_REGISTER                => 'register_account',
+		ArrayFilterEvent::ACCOUNT_REMOVE                  => 'remove_user',
 		ArrayFilterEvent::EVENT_CREATED                   => 'event_created',
 		ArrayFilterEvent::EVENT_UPDATED                   => 'event_updated',
 		ArrayFilterEvent::ADD_WORKER_TASK                 => 'proc_run',
@@ -149,6 +152,9 @@ final class HookEventBridge
 			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
 			ArrayFilterEvent::UNBLOCK_CONTACT                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::AVATAR_LOOKUP                   => 'onArrayFilterEvent',
+			ArrayFilterEvent::ACCOUNT_AUTHENTICATE            => 'onArrayFilterEvent',
+			ArrayFilterEvent::ACCOUNT_REGISTER                => 'onAccountRegisterEvent',
+			ArrayFilterEvent::ACCOUNT_REMOVE                  => 'onAccountRemoveEvent',
 			ArrayFilterEvent::EVENT_CREATED                   => 'onEventCreatedEvent',
 			ArrayFilterEvent::EVENT_UPDATED                   => 'onEventUpdatedEvent',
 			ArrayFilterEvent::ADD_WORKER_TASK                 => 'onArrayFilterEvent',
@@ -291,6 +297,34 @@ final class HookEventBridge
 		$bbcode2markdown = (string) $data['bbcode2markdown'] ?? '';
 
 		$data['bbcode2markdown'] = static::callHook($event->getName(), $bbcode2markdown);
+
+		$event->setArray($data);
+	}
+
+	/**
+	 * Map the ACCOUNT_REGISTER event to `register_account` hook
+	 */
+	public static function onAccountRegisterEvent(ArrayFilterEvent $event): void
+	{
+		$data = $event->getArray();
+
+		$uid = (int) $data['uid'] ?? 0;
+
+		$data['uid'] = static::callHook($event->getName(), $uid);
+
+		$event->setArray($data);
+	}
+
+	/**
+	 * Map the ACCOUNT_REMOVE event to `remove_account` hook
+	 */
+	public static function onAccountRemoveEvent(ArrayFilterEvent $event): void
+	{
+		$data = $event->getArray();
+
+		$user = (array) $data['user'] ?? [];
+
+		$data['user'] = static::callHook($event->getName(), $user);
 
 		$event->setArray($data);
 	}

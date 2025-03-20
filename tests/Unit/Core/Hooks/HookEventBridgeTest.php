@@ -70,6 +70,9 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
 			ArrayFilterEvent::UNBLOCK_CONTACT                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::AVATAR_LOOKUP                   => 'onArrayFilterEvent',
+			ArrayFilterEvent::ACCOUNT_AUTHENTICATE            => 'onArrayFilterEvent',
+			ArrayFilterEvent::ACCOUNT_REGISTER                => 'onAccountRegisterEvent',
+			ArrayFilterEvent::ACCOUNT_REMOVE                  => 'onAccountRemoveEvent',
 			ArrayFilterEvent::EVENT_CREATED                   => 'onEventCreatedEvent',
 			ArrayFilterEvent::EVENT_UPDATED                   => 'onEventUpdatedEvent',
 			ArrayFilterEvent::ADD_WORKER_TASK                 => 'onArrayFilterEvent',
@@ -385,6 +388,40 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onEventCreatedEvent($event);
 	}
 
+	public function testOnAccountRegisterEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REGISTER, ['uid' => 123]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, int $data): int {
+			$this->assertSame('register_account', $name);
+			$this->assertSame(123, $data);
+
+			return $data;
+		});
+
+		HookEventBridge::onAccountRegisterEvent($event);
+	}
+
+	public function testOnAccountRemoveEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REMOVE, ['user' => ['uid' => 123]]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('remove_user', $name);
+			$this->assertSame(['uid' => 123], $data);
+
+			return $data;
+		});
+
+		HookEventBridge::onAccountRemoveEvent($event);
+	}
+
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void
 	{
 		$event = new ArrayFilterEvent(ArrayFilterEvent::EVENT_UPDATED, ['event' => ['id' => 123]]);
@@ -427,7 +464,6 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::RENDER_LOCATION, 'render_location'],
 			[ArrayFilterEvent::ITEM_PHOTO_MENU, 'item_photo_menu'],
 			[ArrayFilterEvent::CONTACT_PHOTO_MENU, 'contact_photo_menu'],
-			[ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY, 'profile_sidebar_enter'],
 			[ArrayFilterEvent::PROFILE_SIDEBAR, 'profile_sidebar'],
 			[ArrayFilterEvent::PAGE_INFO, 'page_info_data'],
 			[ArrayFilterEvent::SMILEY_LIST, 'smilie'],
@@ -441,6 +477,9 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::BLOCK_CONTACT, 'block'],
 			[ArrayFilterEvent::UNBLOCK_CONTACT, 'unblock'],
 			[ArrayFilterEvent::AVATAR_LOOKUP, 'avatar_lookup'],
+			[ArrayFilterEvent::ACCOUNT_AUTHENTICATE, 'authenticate'],
+			[ArrayFilterEvent::ACCOUNT_REGISTER, 'register_account'],
+			[ArrayFilterEvent::ACCOUNT_REMOVE, 'remove_user'],
 			[ArrayFilterEvent::EVENT_CREATED, 'event_created'],
 			[ArrayFilterEvent::EVENT_UPDATED, 'event_updated'],
 			[ArrayFilterEvent::ADD_WORKER_TASK, 'proc_run'],
