@@ -45,6 +45,7 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::ITEM_TAGGED, 'friendica.data.item_tagged'],
 			[ArrayFilterEvent::DISPLAY_ITEM, 'friendica.data.display_item'],
 			[ArrayFilterEvent::CACHE_ITEM, 'friendica.data.cache_item'],
+			[ArrayFilterEvent::CHECK_ITEM_NOTIFICATION, 'friendica.data.check_item_notification'],
 			[ArrayFilterEvent::DETECT_LANGUAGES, 'friendica.data.detect_languages'],
 			[ArrayFilterEvent::RENDER_LOCATION, 'friendica.data.render_location'],
 			[ArrayFilterEvent::ITEM_PHOTO_MENU, 'friendica.data.item_photo_menu'],
