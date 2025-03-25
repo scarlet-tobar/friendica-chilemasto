@@ -99,7 +99,8 @@ final class HookEventBridge
 		HtmlFilterEvent::PAGE_HEADER                      => 'page_header',
 		HtmlFilterEvent::PAGE_CONTENT_TOP                 => 'page_content_top',
 		HtmlFilterEvent::PAGE_END                         => 'page_end',
-		HtmlFilterEvent::ABOUT_CONTENT                    => 'about_hook',
+		HtmlFilterEvent::MOD_HOME_CONTENT                 => 'home_content',
+		HtmlFilterEvent::MOD_ABOUT_CONTENT                => 'about_hook',
 		HtmlFilterEvent::JOT_TOOL                         => 'jot_tool',
 		HtmlFilterEvent::CONTACT_BLOCK_END                => 'contact_block_end',
 	];
@@ -174,7 +175,8 @@ final class HookEventBridge
 			HtmlFilterEvent::PAGE_HEADER                      => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_CONTENT_TOP                 => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_END                         => 'onHtmlFilterEvent',
-			HtmlFilterEvent::ABOUT_CONTENT                    => 'onHtmlFilterEvent',
+			HtmlFilterEvent::MOD_HOME_CONTENT                 => 'onHtmlFilterEvent',
+			HtmlFilterEvent::MOD_ABOUT_CONTENT                => 'onHtmlFilterEvent',
 			HtmlFilterEvent::JOT_TOOL                         => 'onHtmlFilterEvent',
 			HtmlFilterEvent::CONTACT_BLOCK_END                => 'onHtmlFilterEvent',
 		];

@@ -26,7 +26,9 @@ final class HtmlFilterEvent extends Event
 
 	public const PAGE_END = 'friendica.html.page_end';
 
-	public const ABOUT_CONTENT = 'friendica.html.about_content';
+	public const MOD_HOME_CONTENT = 'friendica.html.mod_home_content';
+
+	public const MOD_ABOUT_CONTENT = 'friendica.html.mod_about_content';
 
 	public const JOT_TOOL = 'friendica.html.jot_tool';
 

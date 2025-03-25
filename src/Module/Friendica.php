@@ -116,7 +116,7 @@ class Friendica extends BaseModule
 		$hooked = '';
 
 		$hooked = $this->eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::ABOUT_CONTENT, $hooked),
+			new HtmlFilterEvent(HtmlFilterEvent::MOD_ABOUT_CONTENT, $hooked),
 		)->getHtml();
 
 		$tpl = Renderer::getMarkupTemplate('friendica.tpl');
