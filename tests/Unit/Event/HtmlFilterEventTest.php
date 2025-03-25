@@ -27,8 +27,12 @@ class HtmlFilterEventTest extends TestCase
 		return [
 			[HtmlFilterEvent::HEAD, 'friendica.html.head'],
 			[HtmlFilterEvent::FOOTER, 'friendica.html.footer'],
+			[HtmlFilterEvent::PAGE_HEADER, 'friendica.html.page_header'],
 			[HtmlFilterEvent::PAGE_CONTENT_TOP, 'friendica.html.page_content_top'],
 			[HtmlFilterEvent::PAGE_END, 'friendica.html.page_end'],
+			[HtmlFilterEvent::ABOUT_CONTENT, 'friendica.html.about_content'],
+			[HtmlFilterEvent::JOT_TOOL, 'friendica.html.jot_tool'],
+			[HtmlFilterEvent::CONTACT_BLOCK_END, 'friendica.html.contact_block_end'],
 		];
 	}
 
