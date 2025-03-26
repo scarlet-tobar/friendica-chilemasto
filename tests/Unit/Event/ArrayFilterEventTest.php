@@ -72,6 +72,8 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::UNBLOCK_CONTACT, 'friendica.data.unblock_contact'],
 			[ArrayFilterEvent::AVATAR_LOOKUP, 'friendica.data.avatar_lookup'],
 			[ArrayFilterEvent::ACCOUNT_AUTHENTICATE, 'friendica.data.account_authenticate'],
+			[ArrayFilterEvent::ACCOUNT_REGISTER_FORM, 'friendica.data.account_register_form'],
+			[ArrayFilterEvent::ACCOUNT_REGISTER_POST, 'friendica.data.account_register_post'],
 			[ArrayFilterEvent::ACCOUNT_REGISTER, 'friendica.data.account_register'],
 			[ArrayFilterEvent::ACCOUNT_REMOVE, 'friendica.data.account_remove'],
 			[ArrayFilterEvent::EVENT_CREATED, 'friendica.data.event_created'],

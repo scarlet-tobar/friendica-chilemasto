@@ -122,6 +122,10 @@ final class ArrayFilterEvent extends Event
 
 	public const ACCOUNT_AUTHENTICATE = 'friendica.data.account_authenticate';
 
+	public const ACCOUNT_REGISTER_FORM = 'friendica.data.account_register_form';
+
+	public const ACCOUNT_REGISTER_POST = 'friendica.data.account_register_post';
+
 	public const ACCOUNT_REGISTER = 'friendica.data.account_register';
 
 	public const ACCOUNT_REMOVE = 'friendica.data.account_remove';
