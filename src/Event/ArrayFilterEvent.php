@@ -118,6 +118,10 @@ final class ArrayFilterEvent extends Event
 
 	public const UNBLOCK_CONTACT = 'friendica.data.unblock_contact';
 
+	public const EDIT_CONTACT_FORM = 'friendica.data.edit_contact_form';
+
+	public const EDIT_CONTACT_POST = 'friendica.data.edit_contact_post';
+
 	public const AVATAR_LOOKUP = 'friendica.data.avatar_lookup';
 
 	public const ACCOUNT_AUTHENTICATE = 'friendica.data.account_authenticate';
