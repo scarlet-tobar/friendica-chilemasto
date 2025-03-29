@@ -17,8 +17,7 @@ use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * A class which checks and contains the basic
- * environment for the BaseURL (url, urlpath, ssl_policy, hostname, scheme)
+ * A class which checks and contains the basic environment for the BaseURL (url)
  */
 class BaseURL extends Uri implements UriInterface
 {
