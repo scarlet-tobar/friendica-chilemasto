@@ -348,6 +348,8 @@ class Photo extends BaseApi
 					}
 				} elseif (!empty($contact['avatar'])) {
 					$url = $contact['avatar'];
+				} else {
+					$url = '';
 				}
 
 				// If it is a local link, we save resources by just redirecting to it.
@@ -388,8 +390,6 @@ class Photo extends BaseApi
 						$this->logger->debug('Expected Content-Type', ['mime' => $mimetext, 'url' => $url]);
 					}
 				}
-
-				$url = '';
 
 				if (empty($mimetext) && !empty($contact['blurhash'])) {
 					$image = new Image('', image_type_to_mime_type(IMAGETYPE_WEBP));
