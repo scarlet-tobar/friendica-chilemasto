@@ -58,6 +58,10 @@ final class ArrayFilterEvent extends Event
 
 	public const NETWORK_TO_NAME = 'friendica.data.network_to_name';
 
+	public const NETWORK_CONTENT_START = 'friendica.data.network_content_start';
+
+	public const NETWORK_CONTENT_TABS = 'friendica.data.network_content_tabs';
+
 	public const PARSE_LINK = 'friendica.data.parse_link';
 
 	public const CONVERSATION_START = 'friendica.data.conversation_start';
