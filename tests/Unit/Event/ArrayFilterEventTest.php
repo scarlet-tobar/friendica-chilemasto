@@ -57,6 +57,7 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY, 'friendica.data.profile_sidebar_entry'],
 			[ArrayFilterEvent::PROFILE_SIDEBAR, 'friendica.data.profile_sidebar'],
 			[ArrayFilterEvent::PROFILE_TABS, 'friendica.data.profile_tabs'],
+			[ArrayFilterEvent::MODERATION_USERS_TABS, 'friendica.data.moderation_users_tabs'],
 			[ArrayFilterEvent::OEMBED_FETCH_END, 'friendica.data.oembed_fetch_end'],
 			[ArrayFilterEvent::PAGE_INFO, 'friendica.data.page_info'],
 			[ArrayFilterEvent::SMILEY_LIST, 'friendica.data.smiley_list'],

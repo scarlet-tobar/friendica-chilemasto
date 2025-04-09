@@ -92,6 +92,8 @@ final class ArrayFilterEvent extends Event
 
 	public const PROFILE_TABS = 'friendica.data.profile_tabs';
 
+	public const MODERATION_USERS_TABS = 'friendica.data.moderation_users_tabs';
+
 	public const OEMBED_FETCH_END = 'friendica.data.oembed_fetch_end';
 
 	public const PAGE_INFO = 'friendica.data.page_info';

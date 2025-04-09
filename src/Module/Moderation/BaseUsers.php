@@ -16,6 +16,8 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
+use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Register;
 use Friendica\Model\User;
 use Friendica\Module\BaseModeration;
@@ -95,11 +97,23 @@ abstract class BaseUsers extends BaseModeration
 				'accesskey' => 'd',
 			],
 		];
-		$tabs_arr = ['tabs' => $tabs, 'selectedTab' => $selectedTab];
-		Hook::callAll('moderation_users_tabs', $tabs_arr);
+
+		$hook_data = [
+			'tabs' => $tabs,
+			'selectedTab' => $selectedTab,
+		];
+
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::MODERATION_USERS_TABS, $hook_data),
+		)->getArray();
+
+		$tabs = $hook_data['tabs'] ?? $tabs;
 
 		$tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
-		return Renderer::replaceMacros($tpl, ['$tabs' => $tabs_arr['tabs'], '$more' => $this->t('More')]);
+
+		return Renderer::replaceMacros($tpl, ['$tabs' => $tabs, '$more' => $this->t('More')]);
 	}
 
 	protected function setupUserCallback(): \Closure
