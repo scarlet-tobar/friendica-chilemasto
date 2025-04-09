@@ -11,12 +11,10 @@ use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\App\Page;
 use Friendica\AppHelper;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
-use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Register;
 use Friendica\Model\User;
@@ -26,6 +24,7 @@ use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException\ServiceUnavailableException;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 abstract class BaseUsers extends BaseModeration
@@ -33,11 +32,28 @@ abstract class BaseUsers extends BaseModeration
 	/** @var Database */
 	protected $database;
 
-	public function __construct(Database $database, Page $page, AppHelper $appHelper, SystemMessages $systemMessages, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	private EventDispatcherInterface $eventDispatcher;
+
+	public function __construct(
+		Database $database,
+		EventDispatcherInterface $eventDispatcher,
+		Page $page,
+		AppHelper $appHelper,
+		SystemMessages $systemMessages,
+		IHandleUserSessions $session,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($page, $appHelper, $systemMessages, $session, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->database = $database;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -103,9 +119,7 @@ abstract class BaseUsers extends BaseModeration
 			'selectedTab' => $selectedTab,
 		];
 
-		$eventDispatcher = DI::eventDispatcher();
-
-		$hook_data = $eventDispatcher->dispatch(
+		$hook_data = $this->eventDispatcher->dispatch(
 			new ArrayFilterEvent(ArrayFilterEvent::MODERATION_USERS_TABS, $hook_data),
 		)->getArray();
 
