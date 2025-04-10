@@ -102,6 +102,7 @@ class HookEventBridgeTest extends TestCase
 			HtmlFilterEvent::PAGE_END                         => 'onHtmlFilterEvent',
 			HtmlFilterEvent::MOD_HOME_CONTENT                 => 'onHtmlFilterEvent',
 			HtmlFilterEvent::MOD_ABOUT_CONTENT                => 'onHtmlFilterEvent',
+			HtmlFilterEvent::MOD_PROFILE_CONTENT              => 'onHtmlFilterEvent',
 			HtmlFilterEvent::JOT_TOOL                         => 'onHtmlFilterEvent',
 			HtmlFilterEvent::CONTACT_BLOCK_END                => 'onHtmlFilterEvent',
 		];
@@ -612,6 +613,7 @@ class HookEventBridgeTest extends TestCase
 			[HtmlFilterEvent::PAGE_END, 'page_end'],
 			[HtmlFilterEvent::MOD_HOME_CONTENT, 'home_content'],
 			[HtmlFilterEvent::MOD_ABOUT_CONTENT, 'about_hook'],
+			[HtmlFilterEvent::MOD_PROFILE_CONTENT, 'profile_advanced'],
 			[HtmlFilterEvent::JOT_TOOL, 'jot_tool'],
 			[HtmlFilterEvent::CONTACT_BLOCK_END, 'contact_block_end'],
 		];

@@ -17,13 +17,13 @@ use Friendica\Content\Nav;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile as ProfileModel;
 use Friendica\Model\Tag;
@@ -40,6 +40,7 @@ use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
 use GuzzleHttp\Psr7\Uri;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Profile extends BaseProfile
@@ -56,9 +57,25 @@ class Profile extends BaseProfile
 	private $page;
 	/** @var ProfileField */
 	private $profileField;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(ProfileField $profileField, Page $page, IManageConfigValues $config, IHandleUserSessions $session, AppHelper $appHelper, Database $database, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		ProfileField $profileField,
+		Page $page,
+		IManageConfigValues $config,
+		IHandleUserSessions $session,
+		AppHelper $appHelper,
+		Database $database,
+		EventDispatcherInterface $eventDispatcher,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->database     = $database;
@@ -67,6 +84,7 @@ class Profile extends BaseProfile
 		$this->config       = $config;
 		$this->page         = $page;
 		$this->profileField = $profileField;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	protected function rawContent(array $request = [])
@@ -282,7 +300,9 @@ class Profile extends BaseProfile
 			],
 		]);
 
-		Hook::callAll('profile_advanced', $o);
+		$o = $this->eventDispatcher->dispatch(
+			new HTmlFilterEvent(HtmlFilterEvent::MOD_PROFILE_CONTENT, $o),
+		)->getHtml();
 
 		return $o;
 	}
