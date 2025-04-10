@@ -43,6 +43,7 @@ final class HookEventBridge
 		ArrayFilterEvent::NAV_INFO                        => 'nav_info',
 		ArrayFilterEvent::FEATURE_ENABLED                 => 'isEnabled',
 		ArrayFilterEvent::FEATURE_GET                     => 'get',
+		ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'lockview_content',
 		ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'post_local_start',
 		ArrayFilterEvent::INSERT_POST_LOCAL               => 'post_local',
 		ArrayFilterEvent::INSERT_POST_LOCAL_END           => 'post_local_end',
@@ -127,6 +128,7 @@ final class HookEventBridge
 			ArrayFilterEvent::NAV_INFO                        => 'onArrayFilterEvent',
 			ArrayFilterEvent::FEATURE_ENABLED                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::FEATURE_GET                     => 'onArrayFilterEvent',
+			ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'onPermissionTooltipContentEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL               => 'onInsertPostLocalEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_END           => 'onInsertPostLocalEndEvent',
@@ -213,6 +215,20 @@ final class HookEventBridge
 		$event->setRouteCollector(
 			static::callHook($event->getName(), $event->getRouteCollector())
 		);
+	}
+
+	/**
+	 * Map the PERMISSION_TOOLTIP_CONTENT event to `lockview_content` hook
+	 */
+	public static function onPermissionTooltipContentEvent(ArrayFilterEvent $event): void
+	{
+		$data = $event->getArray();
+
+		$model = (array) $data['model'] ?? [];
+
+		$data['model'] = static::callHook($event->getName(), $model);
+
+		$event->setArray($data);
 	}
 
 	/**

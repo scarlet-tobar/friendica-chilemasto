@@ -29,6 +29,7 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::NAV_INFO, 'friendica.data.nav_info'],
 			[ArrayFilterEvent::FEATURE_ENABLED, 'friendica.data.feature_enabled'],
 			[ArrayFilterEvent::FEATURE_GET, 'friendica.data.feature_get'],
+			[ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT, 'friendica.data.permission_tooltip_content'],
 			[ArrayFilterEvent::INSERT_POST_LOCAL_START, 'friendica.data.insert_post_local_start'],
 			[ArrayFilterEvent::INSERT_POST_LOCAL, 'friendica.data.insert_post_local'],
 			[ArrayFilterEvent::INSERT_POST_LOCAL_END, 'friendica.data.insert_post_local_end'],

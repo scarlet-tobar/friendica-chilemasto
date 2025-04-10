@@ -7,14 +7,16 @@
 
 namespace Friendica\Module\Privacy;
 
-use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\BaseModule;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model;
 use Friendica\Module\Response;
 use Friendica\Network\HTTPException;
@@ -23,21 +25,37 @@ use Friendica\Privacy\Entity;
 use Friendica\Security\PermissionSet\Repository\PermissionSet;
 use Friendica\Util\ACLFormatter;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
  * Outputs the permission tooltip HTML content for the provided item, photo or event id.
  */
-class PermissionTooltip extends \Friendica\BaseModule
+class PermissionTooltip extends BaseModule
 {
 	private Database $dba;
 	private ACLFormatter $aclFormatter;
 	private IHandleUserSessions $session;
 	private IManageConfigValues $config;
 	private PermissionSet $permissionSet;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(PermissionSet $permissionSet, IManageConfigValues $config, IHandleUserSessions $session, ACLFormatter $aclFormatter, Database $dba, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		PermissionSet $permissionSet,
+		IManageConfigValues $config,
+		IHandleUserSessions $session,
+		ACLFormatter $aclFormatter,
+		Database $dba,
+		EventDispatcherInterface $eventDispatcher,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->dba = $dba;
@@ -45,6 +63,7 @@ class PermissionTooltip extends \Friendica\BaseModule
 		$this->session = $session;
 		$this->config = $config;
 		$this->permissionSet = $permissionSet;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	protected function rawContent(array $request = [])
@@ -87,8 +106,15 @@ class PermissionTooltip extends \Friendica\BaseModule
 			throw new HttpException\NotFoundException($this->t('Model not found'));
 		}
 
-		// Kept for backwards compatibility
-		Hook::callAll('lockview_content', $model);
+		$hook_data = [
+			'model' => $model,
+		];
+
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT, $hook_data),
+		)->getArray();
+
+		$model = $hook_data['model'] ?? $model;
 
 		$aclReceivers = new Entity\AclReceivers();
 		$addressedReceivers = new Entity\AddressedReceivers();

@@ -32,6 +32,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::NAV_INFO                        => 'onArrayFilterEvent',
 			ArrayFilterEvent::FEATURE_ENABLED                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::FEATURE_GET                     => 'onArrayFilterEvent',
+			ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'onPermissionTooltipContentEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL               => 'onInsertPostLocalEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_END           => 'onInsertPostLocalEndEvent',
@@ -209,6 +210,28 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onCollectRoutesEvent($event);
 	}
 
+	public function testOnPermissionTooltipContentEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ArrayFilterEvent(ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT, ['model' => ['uid' => -1]]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('lockview_content', $name);
+			$this->assertSame(['uid' => -1], $data);
+
+			return ['uid' => 123];
+		});
+
+		HookEventBridge::onPermissionTooltipContentEvent($event);
+
+		$this->assertSame(
+			['model' => ['uid' => 123]],
+			$event->getArray(),
+		);
+	}
+
 	public function testOnInsertPostLocalEventCallsHookWithCorrectValue(): void
 	{
 		$event = new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, ['item' => ['id' => -1]]);
@@ -230,6 +253,7 @@ class HookEventBridgeTest extends TestCase
 			$event->getArray(),
 		);
 	}
+
 	public function testOnInsertPostLocalEndEventCallsHookWithCorrectValue(): void
 	{
 		$event = new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, ['item' => ['id' => -1]]);

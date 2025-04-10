@@ -24,6 +24,8 @@ final class ArrayFilterEvent extends Event
 
 	public const FEATURE_GET = 'friendica.data.feature_get';
 
+	public const PERMISSION_TOOLTIP_CONTENT = 'friendica.data.permission_tooltip_content';
+
 	public const INSERT_POST_LOCAL_START = 'friendica.data.insert_post_local_start';
 
 	public const INSERT_POST_LOCAL = 'friendica.data.insert_post_local';
