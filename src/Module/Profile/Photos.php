@@ -14,12 +14,12 @@ use Friendica\AppHelper;
 use Friendica\Content\Feature;
 use Friendica\Content\Pager;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Database\Database;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Photo;
@@ -34,6 +34,7 @@ use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
 use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Photos extends \Friendica\Module\BaseProfile
@@ -52,11 +53,28 @@ class Photos extends \Friendica\Module\BaseProfile
 	private $systemMessages;
 	/** @var ACLFormatter */
 	private $aclFormatter;
+	private EventDispatcherInterface $eventDispatcher;
 	/** @var array owner-view record */
 	private $owner;
 
-	public function __construct(ACLFormatter $aclFormatter, SystemMessages $systemMessages, Database $database, AppHelper $appHelper, IManageConfigValues $config, Page $page, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		ACLFormatter $aclFormatter,
+		SystemMessages $systemMessages,
+		Database $database,
+		AppHelper $appHelper,
+		IManageConfigValues $config,
+		Page $page,
+		IHandleUserSessions $session,
+		EventDispatcherInterface $eventDispatcher,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->session        = $session;
@@ -66,6 +84,7 @@ class Photos extends \Friendica\Module\BaseProfile
 		$this->database       = $database;
 		$this->systemMessages = $systemMessages;
 		$this->aclFormatter   = $aclFormatter;
+		$this->eventDispatcher = $eventDispatcher;
 
 		$owner = Profile::load($this->appHelper, $this->parameters['nickname'] ?? '', false);
 		if (!$owner || $owner['account_removed'] || $owner['account_expired']) {
@@ -97,8 +116,16 @@ class Photos extends \Friendica\Module\BaseProfile
 			$str_contact_allow .= $this->aclFormatter->toString(Contact::getPublicIdByUserId($this->owner['uid']));
 		}
 
+		$hook_data = [
+			'request' => $request,
+		];
+
 		// default post action - upload a photo
-		Hook::callAll('photo_post_init', $request);
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_START, $hook_data),
+		)->getArray();
+
+		$request = $hook_data['request'] ?? $request;
 
 		// Determine the album to use
 		$album    = trim($request['album'] ?? '');
@@ -127,19 +154,27 @@ class Photos extends \Friendica\Module\BaseProfile
 			$visible = 0;
 		}
 
-		$ret      = ['src' => '', 'filename' => '', 'filesize' => 0, 'type' => ''];
+		$hook_data = [
+			'src' => '',
+			'filename' => '',
+			'filesize' => 0,
+			'type' => '',
+		];
+
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD, $hook_data),
+		)->getArray();
+
 		$src      = null;
 		$filename = '';
 		$filesize = 0;
 		$type     = '';
 
-		Hook::callAll('photo_post_file', $ret);
-
-		if (!empty($ret['src']) && !empty($ret['filesize'])) {
-			$src      = $ret['src'];
-			$filename = $ret['filename'];
-			$filesize = $ret['filesize'];
-			$type     = $ret['type'];
+		if (!empty($hook_data['src']) && !empty($hook_data['filesize'])) {
+			$src      = $hook_data['src'];
+			$filename = $hook_data['filename'];
+			$filesize = $hook_data['filesize'];
+			$type     = $hook_data['type'];
 			$error    = UPLOAD_ERR_OK;
 		} elseif (!empty($_FILES['userfile'])) {
 			$src      = $_FILES['userfile']['tmp_name'];
@@ -176,8 +211,10 @@ class Photos extends \Friendica\Module\BaseProfile
 				@unlink($src);
 			}
 
-			$foo = 0;
-			Hook::callAll('photo_post_end', $foo);
+			$this->eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => 0]),
+			);
+
 			return;
 		}
 
@@ -188,16 +225,22 @@ class Photos extends \Friendica\Module\BaseProfile
 		if ($maximagesize && ($filesize > $maximagesize)) {
 			$this->systemMessages->addNotice($this->t('Image exceeds size limit of %s', Strings::formatBytes($maximagesize)));
 			@unlink($src);
-			$foo = 0;
-			Hook::callAll('photo_post_end', $foo);
+
+			$this->eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => 0]),
+			);
+
 			return;
 		}
 
 		if (!$filesize) {
 			$this->systemMessages->addNotice($this->t('Image file is empty.'));
 			@unlink($src);
-			$foo = 0;
-			Hook::callAll('photo_post_end', $foo);
+
+			$this->eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => 0]),
+			);
+
 			return;
 		}
 
@@ -211,8 +254,11 @@ class Photos extends \Friendica\Module\BaseProfile
 			$this->logger->notice('unable to process image');
 			$this->systemMessages->addNotice($this->t('Unable to process image.'));
 			@unlink($src);
-			$foo = 0;
-			Hook::callAll('photo_post_end',$foo);
+
+			$this->eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => 0]),
+			);
+
 			return;
 		}
 
@@ -274,10 +320,11 @@ class Photos extends \Friendica\Module\BaseProfile
 		// Update the photo albums cache
 		Photo::clearAlbumCache($this->owner['uid']);
 
-		Hook::callAll('photo_post_end', $item_id);
-
-		// addon uploaders should call "exit()" within the photo_post_end hook
+		// addon uploaders should call "exit()" within the PHOTO_UPLOAD_END event
 		// if they do not wish to be redirected
+		$this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => $item_id]),
+		);
 
 		$this->baseUrl->redirect($this->session->get('photo_return') ?? 'profile/' . $this->owner['nickname'] . '/photos');
 	}

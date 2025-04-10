@@ -54,6 +54,9 @@ final class HookEventBridge
 		ArrayFilterEvent::PREPARE_POST                    => 'prepare_body',
 		ArrayFilterEvent::PREPARE_POST_END                => 'prepare_body_final',
 		ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'photo_upload_form',
+		ArrayFilterEvent::PHOTO_UPLOAD_START              => 'photo_post_init',
+		ArrayFilterEvent::PHOTO_UPLOAD                    => 'photo_post_file',
+		ArrayFilterEvent::PHOTO_UPLOAD_END                => 'photo_post_end',
 		ArrayFilterEvent::NETWORK_TO_NAME                 => 'network_to_name',
 		ArrayFilterEvent::NETWORK_CONTENT_START           => 'network_content_init',
 		ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'network_tabs',
@@ -139,6 +142,9 @@ final class HookEventBridge
 			ArrayFilterEvent::PREPARE_POST                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PREPARE_POST_END                => 'onArrayFilterEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
+			ArrayFilterEvent::PHOTO_UPLOAD_START              => 'onPhotoUploadStartEvent',
+			ArrayFilterEvent::PHOTO_UPLOAD                    => 'onArrayFilterEvent',
+			ArrayFilterEvent::PHOTO_UPLOAD_END                => 'onPhotoUploadEndEvent',
 			ArrayFilterEvent::NETWORK_TO_NAME                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_CONTENT_START           => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'onArrayFilterEvent',
@@ -271,6 +277,33 @@ final class HookEventBridge
 		$data['item'] = static::callHook($event->getName(), $item);
 
 		$event->setArray($data);
+	}
+
+	/**
+	 * Map the PHOTO_UPLOAD_START event to `photo_post_init` hook
+	 */
+	public static function onPhotoUploadStartEvent(ArrayFilterEvent $event): void
+	{
+		$data = $event->getArray();
+
+		$request = (array) $data['request'] ?? [];
+
+		$data['request'] = static::callHook($event->getName(), $request);
+
+		$event->setArray($data);
+	}
+
+	/**
+	 * Map the PHOTO_UPLOAD_END event to `photo_post_end` hook
+	 */
+	public static function onPhotoUploadEndEvent(ArrayFilterEvent $event): void
+	{
+		$data = $event->getArray();
+
+		$id = (int) $data['id'] ?? 0;
+
+		// one-way-event: we don't care about the returned value
+		static::callHook($event->getName(), $id);
 	}
 
 	/**

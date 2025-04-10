@@ -43,6 +43,9 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PREPARE_POST                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PREPARE_POST_END                => 'onArrayFilterEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
+			ArrayFilterEvent::PHOTO_UPLOAD_START              => 'onPhotoUploadStartEvent',
+			ArrayFilterEvent::PHOTO_UPLOAD                    => 'onArrayFilterEvent',
+			ArrayFilterEvent::PHOTO_UPLOAD_END                => 'onPhotoUploadEndEvent',
 			ArrayFilterEvent::NETWORK_TO_NAME                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_CONTENT_START           => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'onArrayFilterEvent',
@@ -298,6 +301,45 @@ class HookEventBridgeTest extends TestCase
 		);
 	}
 
+	public function testOnPhotoUploadStartEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_START, ['request' => ['album' => -1]]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('photo_post_init', $name);
+			$this->assertSame(['album' => -1], $data);
+
+			return ['album' => 123];
+		});
+
+		HookEventBridge::onPhotoUploadStartEvent($event);
+
+		$this->assertSame(
+			['request' => ['album' => 123]],
+			$event->getArray(),
+		);
+	}
+
+	public function testOnPhotoUploadEndEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => -1]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, int $data): int {
+			$this->assertSame('photo_post_end', $name);
+			$this->assertSame(-1, $data);
+
+			return 123;
+		});
+
+		HookEventBridge::onPhotoUploadEndEvent($event);
+	}
+
 	public function testOnProfileSidebarEntryEventCallsHookWithCorrectValue(): void
 	{
 		$event = new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY, ['profile' => ['uid' => 0, 'name' => 'original']]);
@@ -491,6 +533,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::PREPARE_POST, 'prepare_body'],
 			[ArrayFilterEvent::PREPARE_POST_END, 'prepare_body_final'],
 			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'photo_upload_form'],
+			[ArrayFilterEvent::PHOTO_UPLOAD, 'photo_post_file'],
 			[ArrayFilterEvent::NETWORK_TO_NAME, 'network_to_name'],
 			[ArrayFilterEvent::NETWORK_CONTENT_START, 'network_content_init'],
 			[ArrayFilterEvent::NETWORK_CONTENT_TABS, 'network_tabs'],
