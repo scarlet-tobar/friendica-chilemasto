@@ -106,6 +106,10 @@ final class ArrayFilterEvent extends Event
 
 	public const PROFILE_TABS = 'friendica.data.profile_tabs';
 
+	public const PROFILE_SETTINGS_FORM = 'friendica.data.profile_settings_form';
+
+	public const PROFILE_SETTINGS_POST = 'friendica.data.profile_settings_post';
+
 	public const MODERATION_USERS_TABS = 'friendica.data.moderation_users_tabs';
 
 	public const ACL_LOOKUP_END = 'friendica.data.acl_lookup_end';
