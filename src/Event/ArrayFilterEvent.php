@@ -102,6 +102,8 @@ final class ArrayFilterEvent extends Event
 
 	public const MODERATION_USERS_TABS = 'friendica.data.moderation_users_tabs';
 
+	public const ACL_LOOKUP_END = 'friendica.data.acl_lookup_end';
+
 	public const OEMBED_FETCH_END = 'friendica.data.oembed_fetch_end';
 
 	public const PAGE_INFO = 'friendica.data.page_info';

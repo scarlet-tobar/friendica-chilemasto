@@ -7,22 +7,23 @@
 
 namespace Friendica\Module\Search;
 
-use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
 use Friendica\BaseModule;
 use Friendica\Content\Widget;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Search;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Core\System;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Module\Response;
-use Friendica\Network\HTTPException;
+use Friendica\Network\HTTPException\UnauthorizedException;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -44,13 +45,26 @@ class Acl extends BaseModule
 	private $session;
 	/** @var Database */
 	private $database;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(Database $database, IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		Database $database,
+		IHandleUserSessions $session,
+		EventDispatcherInterface $eventDispatcher,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->session  = $session;
 		$this->database = $database;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	protected function post(array $request = [])
@@ -61,7 +75,7 @@ class Acl extends BaseModule
 	protected function rawContent(array $request = [])
 	{
 		if (!$this->session->getLocalUserId()) {
-			throw new HTTPException\UnauthorizedException($this->t('You must be logged in to use this module.'));
+			throw new UnauthorizedException($this->t('You must be logged in to use this module.'));
 		}
 
 		$type = $request['type'] ?? self::TYPE_MENTION_CONTACT_CIRCLE;
@@ -280,7 +294,7 @@ class Acl extends BaseModule
 			$resultTotal += count($unknown_contacts);
 		}
 
-		$results = [
+		$hook_data = [
 			'tot'      => $resultTotal,
 			'start'    => $start,
 			'count'    => $count,
@@ -291,13 +305,15 @@ class Acl extends BaseModule
 			'search'   => $search,
 		];
 
-		Hook::callAll('acl_lookup_end', $results);
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::ACL_LOOKUP_END, $hook_data),
+		)->getArray();
 
 		$o = [
-			'tot'   => $results['tot'],
-			'start' => $results['start'],
-			'count' => $results['count'],
-			'items' => $results['items'],
+			'tot'   => $hook_data['tot'],
+			'start' => $hook_data['start'],
+			'count' => $hook_data['count'],
+			'items' => $hook_data['items'],
 		];
 
 		$this->logger->info('ACL {action} - {subaction} - done', ['module' => 'acl', 'action' => 'content', 'subaction' => 'search', 'search' => $search, 'type' => $type, 'conversation' => $conv_id]);
