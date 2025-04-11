@@ -84,6 +84,12 @@ final class ArrayFilterEvent extends Event
 
 	public const CHECK_ITEM_NOTIFICATION = 'friendica.data.check_item_notification';
 
+	public const ENOTIFY = 'friendica.data.enotify';
+
+	public const ENOTIFY_STORE = 'friendica.data.enotify_store';
+
+	public const ENOTIFY_MAIL = 'friendica.data.enotify_mail';
+
 	public const DETECT_LANGUAGES = 'friendica.data.detect_languages';
 
 	public const RENDER_LOCATION = 'friendica.data.render_location';
