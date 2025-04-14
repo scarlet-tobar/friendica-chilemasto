@@ -20,6 +20,8 @@ use Psr\Log\NullLogger;
 /**
  * The logger factory for the StreamLogger instance
  *
+ * @deprecated 2025.02 Use `Friendica\Core\Logger\Factory\StreamLoggerFactory` instead
+ * @see StreamLoggerFactory
  * @see StreamLoggerClass
  */
 class StreamLogger extends AbstractLoggerTypeFactory

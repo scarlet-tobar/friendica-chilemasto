@@ -9,22 +9,18 @@ namespace Friendica\Core\Logger\Factory;
 
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Logger\Capability\IHaveCallIntrospections;
-use Friendica\Core\Logger\Capability\LogChannel;
 use Friendica\Core\Logger\Exception\LoggerArgumentException;
-use Friendica\Core\Logger\Exception\LoggerException;
 use Friendica\Core\Logger\Exception\LogLevelException;
 use Friendica\Core\Logger\Type\StreamLogger;
-use Friendica\Core\Logger\Util\FileSystem;
 use Friendica\Core\Logger\Util\FileSystemUtil;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
 /**
  * The logger factory for the StreamLogger instance
  *
  * @see StreamLogger
  */
-class StreamLoggerFactory implements LoggerFactory
+final class StreamLoggerFactory implements LoggerFactory
 {
 	private IManageConfigValues $config;
 
