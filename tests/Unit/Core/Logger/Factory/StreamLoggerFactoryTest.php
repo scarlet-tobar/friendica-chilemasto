@@ -24,12 +24,10 @@ class StreamLoggerFactoryTest extends TestCase
 {
 	public function testCreateLoggerReturnsPsrLogger(): void
 	{
-		$config = $this->createConfiguredMock(
-			IManageConfigValues::class,
-			[
-				'get' => dirname(__DIR__, 4) . '/datasets/log/empty.friendica.log.txt',
-			]
-		);
+		$config = $this->createStub(IManageConfigValues::class);
+		$config->method('get')->willReturnMap([
+			['system', 'logfile', null, dirname(__DIR__, 4) . '/datasets/log/empty.friendica.log.txt'],
+		]);
 
 		$factory = new StreamLoggerFactory(
 			$config,
@@ -45,12 +43,10 @@ class StreamLoggerFactoryTest extends TestCase
 
 	public function testCreateLoggerWithInvalidLogfileThrowsException(): void
 	{
-		$config = $this->createConfiguredMock(
-			IManageConfigValues::class,
-			[
-				'get' => dirname(__DIR__, 1) . '/not-existing-logfile.txt',
-			]
-		);
+		$config = $this->createStub(IManageConfigValues::class);
+		$config->method('get')->willReturnMap([
+			['system', 'logfile', null, dirname(__DIR__, 1) . '/not-existing-logfile.txt'],
+		]);
 
 		$factory = new StreamLoggerFactory(
 			$config,
@@ -66,12 +62,10 @@ class StreamLoggerFactoryTest extends TestCase
 
 	public function testCreateLoggerWithInvalidLoglevelThrowsException(): void
 	{
-		$config = $this->createConfiguredMock(
-			IManageConfigValues::class,
-			[
-				'get' => dirname(__DIR__, 4) . '/datasets/log/empty.friendica.log.txt',
-			]
-		);
+		$config = $this->createStub(IManageConfigValues::class);
+		$config->method('get')->willReturnMap([
+			['system', 'logfile', null, dirname(__DIR__, 4) . '/datasets/log/empty.friendica.log.txt'],
+		]);
 
 		$factory = new StreamLoggerFactory(
 			$config,
