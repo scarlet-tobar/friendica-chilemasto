@@ -19,6 +19,8 @@ use Psr\Log\LoggerInterface;
  * The logger factory for the SyslogLogger instance
  *
  * @see SyslogLogger
+ *
+ * @internal
  */
 final class SyslogLoggerFactory implements LoggerFactory
 {

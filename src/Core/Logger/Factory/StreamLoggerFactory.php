@@ -21,6 +21,8 @@ use Psr\Log\LoggerInterface;
  * The logger factory for the StreamLogger instance
  *
  * @see StreamLogger
+ *
+ * @internal
  */
 final class StreamLoggerFactory implements LoggerFactory
 {
