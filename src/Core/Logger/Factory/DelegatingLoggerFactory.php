@@ -15,6 +15,8 @@ use Psr\Log\NullLogger;
 
 /**
  * Delegates the creation of a logger based on config to other factories
+ *
+ * @internal
  */
 final class DelegatingLoggerFactory implements LoggerFactory
 {

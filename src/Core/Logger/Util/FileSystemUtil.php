@@ -11,6 +11,8 @@ use Friendica\Core\Logger\Exception\LoggerUnusableException;
 
 /**
  * interface for Util class for filesystem manipulation for Logger classes
+ *
+ * @internal
  */
 interface FileSystemUtil
 {
