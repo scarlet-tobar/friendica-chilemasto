@@ -16,6 +16,8 @@ use Psr\Log\LoggerInterface;
 /**
  * The logger factory for the SyslogLogger instance
  *
+ * @deprecated 2025.02 Use `Friendica\Core\Logger\Factory\SyslogLoggerFactory` instead
+ * @see SyslogLoggerFactory
  * @see SyslogLoggerClass
  */
 class SyslogLogger extends AbstractLoggerTypeFactory
