@@ -12,7 +12,7 @@ use Friendica\Core\Logger\Exception\LoggerUnusableException;
 /**
  * Util class for filesystem manipulation for Logger classes
  */
-class FileSystem
+class FileSystem implements FileSystemUtil
 {
 	/**
 	 * @var string a error message
