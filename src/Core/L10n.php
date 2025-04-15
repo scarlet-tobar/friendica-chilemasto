@@ -51,6 +51,11 @@ class L10n
 		'zh-cn' => '简体中文',
 	];
 
+	CONST LANG_PARENTS = [
+		'en-gb' => 'en', 'da-dk' => 'da', 'fi-fi' => 'fi',
+		'nb-no' => 'nb', 'pt-br' => 'pt', 'zh-cn' => 'zh'
+	];
+
 	/** @var string Undetermined language */
 	const UNDETERMINED_LANGUAGE = 'un';
 
@@ -150,6 +155,11 @@ class L10n
 		$a          = new \stdClass();
 		$a->strings = [];
 
+		$child = array_search($lang, $this::LANG_PARENTS);
+		if ($child) {
+			$lang = $child;
+		}
+
 		// load enabled addons strings
 		$addons = array_keys($this->config->get('addons') ?? []);
 		foreach ($addons as $addon) {
@@ -203,6 +213,8 @@ class L10n
 		// start with quality zero (every guessed language is more acceptable ..)
 		$current_q = 0;
 
+		$supported = self::getSupportedLanguages();
+
 		foreach ($acceptedLanguages as $acceptedLanguage) {
 			$res = preg_match(
 				'/^([a-z]{1,8}(?:-[a-z]{1,8})*)(?:;\s*q=(0(?:\.[0-9]{1,3})?|1(?:\.0{1,3})?))?$/i',
@@ -230,8 +242,7 @@ class L10n
 			while (count($lang_code)) {
 				// try to mix them so we can get double-code parts too
 				$match_lang = strtolower(join('-', $lang_code));
-				if (file_exists(__DIR__ . "/../../view/lang/$match_lang") &&
-				    is_dir(__DIR__ . "/../../view/lang/$match_lang")) {
+				if (in_array($match_lang, $supported)) {
 					if ($lang_quality > $current_q) {
 						$current_lang = $match_lang;
 						$current_q    = $lang_quality;
@@ -245,6 +256,20 @@ class L10n
 		}
 
 		return $current_lang;
+	}
+
+	private static function getSupportedLanguages(): array
+	{
+		$languages = [];
+		foreach (glob('view/lang/*/strings.php') as $language) {
+			$code = str_replace(['view/lang/', '/strings.php'], [], $language);
+			if (!empty(self::LANG_PARENTS[$code])) {
+				$languages[] = self::LANG_PARENTS[$code];
+			}
+			$languages[] = $code;
+		}
+
+		return $languages;
 	}
 
 	/**
