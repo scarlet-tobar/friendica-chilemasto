@@ -67,7 +67,7 @@ class Network extends NetworkModule
 		Profiler $profiler,
 		Response $response,
 		array $server,
-		array $parameters = [],
+		array $parameters = []
 	) {
 		parent::__construct(
 			$userDefinedChannel,
