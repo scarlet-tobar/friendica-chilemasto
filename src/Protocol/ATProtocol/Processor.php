@@ -506,13 +506,10 @@ class Processor
 						break;
 
 					case 'app.bsky.richtext.facet#mention':
-						$contact = Contact::getByURL($feature->did, null, ['id']);
-						if (!empty($contact['id'])) {
-							$url = $this->baseURL . '/contact/' . $contact['id'];
-							if (substr($linktext, 0, 1) == '@') {
-								$prefix .= '@';
-								$linktext = substr($linktext, 1);
-							}
+						$url = $feature->did;
+						if (substr($linktext, 0, 1) == '@') {
+							$prefix .= '@';
+							$linktext = substr($linktext, 1);
 						}
 						break;
 
