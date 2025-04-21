@@ -172,4 +172,27 @@ class MemcachedCache extends AbstractCache implements ICanCacheInMemory
 		$cacheKey = $this->getCacheKey($key);
 		return $this->memcached->add($cacheKey, $value, $ttl);
 	}
+
+	/** {@inheritDoc} */
+	public function getStats(): array
+	{
+		$stats = $this->memcached->getStats();
+
+		// get statistics of the first instance
+		foreach ($stats as $value) {
+			$stats = $value;
+			break;
+		}
+
+		return [
+			'version'           => $stats['version'] ?? null,
+			'entries'     =>       $stats['curr_items'] ?? null,
+			'used_memory'       => $stats['bytes'] ?? null,
+			'uptime'            => $stats['uptime'] ?? null,
+			'connected_clients' => $stats['curr_connections'] ?? null,
+			'hits'              => $stats['get_hits'] ?? null,
+			'misses'            => $stats['get_misses'] ?? null,
+			'evictions'         => $stats['evictions'] ?? null,
+		];
+	}
 }

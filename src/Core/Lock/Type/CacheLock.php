@@ -157,6 +157,16 @@ class CacheLock extends AbstractLock
 	}
 
 	/**
+	 * Returns stats about the cache provider
+	 *
+	 * @return array
+	 */
+	public function getCacheStats(): array
+	{
+		return $this->cache->getStats();
+	}
+
+	/**
 	 * @param string $key The original key
 	 *
 	 * @return string        The cache key used for the cache

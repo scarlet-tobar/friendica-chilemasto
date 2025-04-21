@@ -96,4 +96,10 @@ class ArrayCache extends AbstractCache implements ICanCacheInMemory
 			return false;
 		}
 	}
+
+	/** {@inheritDoc} */
+	public function getStats(): array
+	{
+		return [];
+	}
 }
