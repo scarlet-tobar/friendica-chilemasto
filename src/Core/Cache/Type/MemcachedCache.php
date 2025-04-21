@@ -20,11 +20,10 @@ use Psr\Log\LoggerInterface;
  */
 class MemcachedCache extends AbstractCache implements ICanCacheInMemory
 {
-	const NAME = 'memcached';
-
 	use CompareSetTrait;
 	use CompareDeleteTrait;
 	use MemcacheCommandTrait;
+	const NAME = 'memcached';
 
 	/**
 	 * @var \Memcached
@@ -185,14 +184,14 @@ class MemcachedCache extends AbstractCache implements ICanCacheInMemory
 		}
 
 		return [
-			'version'           => $stats['version'] ?? null,
-			'entries'     =>       $stats['curr_items'] ?? null,
-			'used_memory'       => $stats['bytes'] ?? null,
-			'uptime'            => $stats['uptime'] ?? null,
+			'version'           => $stats['version']          ?? null,
+			'entries'           => $stats['curr_items']       ?? null,
+			'used_memory'       => $stats['bytes']            ?? null,
+			'uptime'            => $stats['uptime']           ?? null,
 			'connected_clients' => $stats['curr_connections'] ?? null,
-			'hits'              => $stats['get_hits'] ?? null,
-			'misses'            => $stats['get_misses'] ?? null,
-			'evictions'         => $stats['evictions'] ?? null,
+			'hits'              => $stats['get_hits']         ?? null,
+			'misses'            => $stats['get_misses']       ?? null,
+			'evictions'         => $stats['evictions']        ?? null,
 		];
 	}
 }

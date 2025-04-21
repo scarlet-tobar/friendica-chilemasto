@@ -59,10 +59,10 @@ class StatsCaching extends BaseModule
 		if (function_exists('opcache_get_status')) {
 			$status          = opcache_get_status(false);
 			$data['opcache'] = [
-				'enabled'            => $status['opcache_enabled'] ?? false,
-				'hit_rate'           => $status['opcache_statistics']['opcache_hit_rate'] ?? null,
-				'used_memory'        => $status['memory_usage']['used_memory'] ?? null,
-				'free_memory'        => $status['memory_usage']['free_memory'] ?? null,
+				'enabled'            => $status['opcache_enabled']                          ?? false,
+				'hit_rate'           => $status['opcache_statistics']['opcache_hit_rate']   ?? null,
+				'used_memory'        => $status['memory_usage']['used_memory']              ?? null,
+				'free_memory'        => $status['memory_usage']['free_memory']              ?? null,
 				'num_cached_scripts' => $status['opcache_statistics']['num_cached_scripts'] ?? null,
 			];
 		} else {
@@ -73,7 +73,7 @@ class StatsCaching extends BaseModule
 
 		if ($this->cache instanceof ICanCacheInMemory) {
 			$data['cache'] = [
-				'type' => $this->cache->getName(),
+				'type'  => $this->cache->getName(),
 				'stats' => $this->cache->getStats(),
 			];
 		} else {
@@ -84,7 +84,7 @@ class StatsCaching extends BaseModule
 
 		if ($this->lock instanceof CacheLock) {
 			$data['lock'] = [
-				'type' => $this->lock->getName(),
+				'type'  => $this->lock->getName(),
 				'stats' => $this->lock->getCacheStats(),
 			];
 		} else {

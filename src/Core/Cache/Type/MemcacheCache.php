@@ -19,11 +19,10 @@ use Memcache;
  */
 class MemcacheCache extends AbstractCache implements ICanCacheInMemory
 {
-	const NAME = 'memcache';
-
 	use CompareSetTrait;
 	use CompareDeleteTrait;
 	use MemcacheCommandTrait;
+	const NAME = 'memcache';
 
 	/**
 	 * @var Memcache
@@ -163,14 +162,14 @@ class MemcacheCache extends AbstractCache implements ICanCacheInMemory
 		$stats = $this->memcache->getStats();
 
 		return [
-			'version'           => $stats['version'] ?? null,
-			'entries'           => $stats['curr_items'] ?? null,
-			'used_memory'       => $stats['bytes'] ?? null,
-			'uptime'            => $stats['uptime'] ?? null,
+			'version'           => $stats['version']          ?? null,
+			'entries'           => $stats['curr_items']       ?? null,
+			'used_memory'       => $stats['bytes']            ?? null,
+			'uptime'            => $stats['uptime']           ?? null,
 			'connected_clients' => $stats['curr_connections'] ?? null,
-			'hits'              => $stats['get_hits'] ?? null,
-			'misses'            => $stats['get_misses'] ?? null,
-			'evictions'         => $stats['evictions'] ?? null,
+			'hits'              => $stats['get_hits']         ?? null,
+			'misses'            => $stats['get_misses']       ?? null,
+			'evictions'         => $stats['evictions']        ?? null,
 		];
 	}
 }
