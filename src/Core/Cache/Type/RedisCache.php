@@ -214,14 +214,14 @@ class RedisCache extends AbstractCache implements ICanCacheInMemory
 		$info = $this->redis->info();
 
 		return [
-			'version'           => $info['redis_version'] ?? null,
-			'entries'           => $this->redis->dbSize() ?? null,
-			'used_memory'       => $info['used_memory'] ?? null,
+			'version'           => $info['redis_version']     ?? null,
+			'entries'           => $this->redis->dbSize()     ?? null,
+			'used_memory'       => $info['used_memory']       ?? null,
 			'connected_clients' => $info['connected_clients'] ?? null,
 			'uptime'            => $info['uptime_in_seconds'] ?? null,
-			'hits'              => $info['keyspace_hits'] ?? null,
-			'misses'            => $info['keyspace_misses'] ?? null,
-			'evictions'         => $info['evicted_keys'] ?? null,
+			'hits'              => $info['keyspace_hits']     ?? null,
+			'misses'            => $info['keyspace_misses']   ?? null,
+			'evictions'         => $info['evicted_keys']      ?? null,
 		];
 	}
 }
