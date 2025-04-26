@@ -15,6 +15,7 @@ use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\Lock\Capability\ICanLock;
 use Friendica\Core\Lock\Type\CacheLock;
+use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 use Friendica\Network\HTTPException;
@@ -41,9 +42,12 @@ class StatsCaching extends BaseModule
 
 	private function isAllowed(array $request): bool
 	{
-		return empty(!$request['key']) && $request['key'] == $this->config->get('system', 'stats_key');
+		return !empty($request['key']) && $request['key'] == $this->config->get('system', 'stats_key');
 	}
 
+	/**
+	 * @throws NotFoundException In case the rquest isn't allowed
+	 */
 	protected function content(array $request = []): string
 	{
 		if (!$this->isAllowed($request)) {
@@ -98,6 +102,7 @@ class StatsCaching extends BaseModule
 			];
 		}
 
-		$this->jsonExit($data);
+		$this->response->setType('json', 'application/json; charset=utf-8');
+		$this->response->addContent(json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 	}
 }

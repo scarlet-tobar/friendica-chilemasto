@@ -12,6 +12,7 @@ use Friendica\App;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Config\Model\ReadOnlyFileConfig;
 use Friendica\Core\Config\ValueObject\Cache;
+use Friendica\Core\Lock\Capability\ICanLock;
 use Friendica\Core\Lock\Type\SemaphoreLock;
 use Friendica\Core\System;
 use Friendica\DI;
@@ -40,7 +41,7 @@ class SemaphoreLockTest extends LockTestCase
 		parent::setUp();
 	}
 
-	protected function getInstance()
+	protected function getInstance(): ICanLock
 	{
 		return new SemaphoreLock();
 	}
