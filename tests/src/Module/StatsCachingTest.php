@@ -149,8 +149,6 @@ class StatsCachingTest extends FixtureTestCase
 
 		$json = json_decode($response->getBody(), true);
 
-		print_r($json);
-
 		self::assertEquals([
 			'enabled' => false,
 			'hit_rate' => null,
