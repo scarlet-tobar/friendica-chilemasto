@@ -7,10 +7,7 @@
 
 namespace Friendica\Test;
 
-use Friendica\Core\Cache\Capability\ICanCache;
-use Friendica\Core\Cache\Capability\ICanCacheInMemory;
 use Friendica\Core\Lock\Capability\ICanLock;
-use Friendica\Core\Lock\Type\CacheLock;
 
 abstract class LockTestCase extends MockedTestCase
 {

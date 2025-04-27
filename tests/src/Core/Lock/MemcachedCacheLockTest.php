@@ -13,7 +13,6 @@ use Friendica\Core\Cache\Type\MemcachedCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Lock\Type\CacheLock;
 use Friendica\Test\CacheLockTestCase;
-use Friendica\Test\LockTestCase;
 use Mockery;
 use Psr\Log\NullLogger;
 
@@ -42,7 +41,7 @@ class MemcachedCacheLockTest extends CacheLockTestCase
 
 		try {
 			$this->cache = new MemcachedCache($host, $configMock, $logger);
-			$this->lock = new CacheLock($this->cache);
+			$this->lock  = new CacheLock($this->cache);
 		} catch (Exception $e) {
 			static::markTestSkipped('Memcached is not available');
 		}

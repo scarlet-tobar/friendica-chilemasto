@@ -28,7 +28,7 @@ class APCuCacheLockTest extends CacheLockTestCase
 		}
 
 		$this->cache = new APCuCache('localhost');
-		$this->lock = new CacheLock($this->cache);
+		$this->lock  = new CacheLock($this->cache);
 
 		parent::setUp();
 	}

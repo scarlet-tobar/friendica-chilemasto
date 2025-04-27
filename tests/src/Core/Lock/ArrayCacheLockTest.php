@@ -20,7 +20,7 @@ class ArrayCacheLockTest extends CacheLockTestCase
 	protected function setUp(): void
 	{
 		$this->cache = new ArrayCache('localhost');
-		$this->lock = new CacheLock($this->cache);
+		$this->lock  = new CacheLock($this->cache);
 
 		parent::setUp();
 	}

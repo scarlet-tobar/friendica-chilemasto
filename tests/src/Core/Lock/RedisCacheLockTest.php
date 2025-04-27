@@ -13,7 +13,6 @@ use Friendica\Core\Cache\Type\RedisCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Lock\Type\CacheLock;
 use Friendica\Test\CacheLockTestCase;
-use Friendica\Test\LockTestCase;
 use Mockery;
 
 /**
@@ -49,7 +48,7 @@ class RedisCacheLockTest extends CacheLockTestCase
 
 		try {
 			$this->cache = new RedisCache($host, $configMock);
-			$this->lock = new CacheLock($this->cache);
+			$this->lock  = new CacheLock($this->cache);
 		} catch (Exception $e) {
 			static::markTestSkipped('Redis is not available. Error: ' . $e->getMessage());
 		}
