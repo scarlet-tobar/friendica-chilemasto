@@ -7,7 +7,6 @@
 
 namespace Friendica\Model;
 
-use Friendica\Core\Addon;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -26,13 +25,14 @@ class Nodeinfo
 	 */
 	public static function update()
 	{
-		$config = DI::config();
-		$logger = DI::logger();
+		$config      = DI::config();
+		$logger      = DI::logger();
+		$addonHelper = DI::addonHelper();
 
 		// If the addon 'statistics_json' is enabled then disable it and activate nodeinfo.
-		if (Addon::isEnabled('statistics_json')) {
+		if ($addonHelper->isAddonEnabled('statistics_json')) {
 			$config->set('system', 'nodeinfo', true);
-			Addon::uninstall('statistics_json');
+			$addonHelper->uninstallAddon('statistics_json');
 		}
 
 		if (empty($config->get('system', 'nodeinfo'))) {
@@ -66,14 +66,14 @@ class Nodeinfo
 	/**
 	 * Return the supported services
 	 *
-	 * @return Object with supported services
+	 * @return stdClass with supported services
 	 */
-	public static function getUsage(bool $version2 = false)
+	public static function getUsage(bool $version2 = false): stdClass
 	{
 		$config = DI::config();
 
 		$usage = new stdClass();
-		$usage->users = new \stdClass;
+		$usage->users = new stdClass;
 
 		if (!empty($config->get('system', 'nodeinfo'))) {
 			$usage->users->total = intval(DI::keyValue()->get('nodeinfo_total_users'));
@@ -97,45 +97,47 @@ class Nodeinfo
 	 */
 	public static function getServices(): array
 	{
+		$addonHelper = DI::addonHelper();
+
 		$services = [
 			'inbound'  => [],
 			'outbound' => [],
 		];
 
-		if (Addon::isEnabled('bluesky')) {
+		if ($addonHelper->isAddonEnabled('bluesky')) {
 			$services['inbound'][] = 'bluesky';
 			$services['outbound'][] = 'bluesky';
 		}
-		if (Addon::isEnabled('dwpost')) {
+		if ($addonHelper->isAddonEnabled('dwpost')) {
 			$services['outbound'][] = 'dreamwidth';
 		}
-		if (Addon::isEnabled('statusnet')) {
+		if ($addonHelper->isAddonEnabled('statusnet')) {
 			$services['inbound'][] = 'gnusocial';
 			$services['outbound'][] = 'gnusocial';
 		}
-		if (Addon::isEnabled('ijpost')) {
+		if ($addonHelper->isAddonEnabled('ijpost')) {
 			$services['outbound'][] = 'insanejournal';
 		}
-		if (Addon::isEnabled('libertree')) {
+		if ($addonHelper->isAddonEnabled('libertree')) {
 			$services['outbound'][] = 'libertree';
 		}
-		if (Addon::isEnabled('ljpost')) {
+		if ($addonHelper->isAddonEnabled('ljpost')) {
 			$services['outbound'][] = 'livejournal';
 		}
-		if (Addon::isEnabled('pumpio')) {
+		if ($addonHelper->isAddonEnabled('pumpio')) {
 			$services['inbound'][] = 'pumpio';
 			$services['outbound'][] = 'pumpio';
 		}
 
 		$services['outbound'][] = 'smtp';
 
-		if (Addon::isEnabled('tumblr')) {
+		if ($addonHelper->isAddonEnabled('tumblr')) {
 			$services['outbound'][] = 'tumblr';
 		}
-		if (Addon::isEnabled('twitter')) {
+		if ($addonHelper->isAddonEnabled('twitter')) {
 			$services['outbound'][] = 'twitter';
 		}
-		if (Addon::isEnabled('wppost')) {
+		if ($addonHelper->isAddonEnabled('wppost')) {
 			$services['outbound'][] = 'wordpress';
 		}
 
