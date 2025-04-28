@@ -10,7 +10,6 @@ namespace Friendica\Model;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Model\Item;
 use stdClass;
 
 /**
@@ -50,12 +49,12 @@ class Nodeinfo
 
 		$logger->info('user statistics - done', $userStats);
 
-		$posts = DBA::count('post-thread', ["`uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE NOT `deleted` AND `origin`)"]);
+		$posts    = DBA::count('post-thread', ["`uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE NOT `deleted` AND `origin`)"]);
 		$comments = DBA::count('post', ["NOT `deleted` AND `gravity` = ? AND `uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE `origin`)", Item::GRAVITY_COMMENT]);
 		DI::keyValue()->set('nodeinfo_local_posts', $posts);
 		DI::keyValue()->set('nodeinfo_local_comments', $comments);
 
-		$posts = DBA::count('post', ['deleted' => false, 'gravity' => Item::GRAVITY_COMMENT]);
+		$posts    = DBA::count('post', ['deleted' => false, 'gravity' => Item::GRAVITY_COMMENT]);
 		$comments = DBA::count('post', ['deleted' => false, 'gravity' => Item::GRAVITY_COMMENT]);
 		DI::keyValue()->set('nodeinfo_total_posts', $posts);
 		DI::keyValue()->set('nodeinfo_total_comments', $comments);
@@ -72,15 +71,15 @@ class Nodeinfo
 	{
 		$config = DI::config();
 
-		$usage = new stdClass();
-		$usage->users = new stdClass;
+		$usage        = new stdClass();
+		$usage->users = new stdClass();
 
 		if (!empty($config->get('system', 'nodeinfo'))) {
-			$usage->users->total = intval(DI::keyValue()->get('nodeinfo_total_users'));
+			$usage->users->total          = intval(DI::keyValue()->get('nodeinfo_total_users'));
 			$usage->users->activeHalfyear = intval(DI::keyValue()->get('nodeinfo_active_users_halfyear'));
-			$usage->users->activeMonth = intval(DI::keyValue()->get('nodeinfo_active_users_monthly'));
-			$usage->localPosts = intval(DI::keyValue()->get('nodeinfo_local_posts'));
-			$usage->localComments = intval(DI::keyValue()->get('nodeinfo_local_comments'));
+			$usage->users->activeMonth    = intval(DI::keyValue()->get('nodeinfo_active_users_monthly'));
+			$usage->localPosts            = intval(DI::keyValue()->get('nodeinfo_local_posts'));
+			$usage->localComments         = intval(DI::keyValue()->get('nodeinfo_local_comments'));
 
 			if ($version2) {
 				$usage->users->activeWeek = intval(DI::keyValue()->get('nodeinfo_active_users_weekly'));
@@ -105,14 +104,14 @@ class Nodeinfo
 		];
 
 		if ($addonHelper->isAddonEnabled('bluesky')) {
-			$services['inbound'][] = 'bluesky';
+			$services['inbound'][]  = 'bluesky';
 			$services['outbound'][] = 'bluesky';
 		}
 		if ($addonHelper->isAddonEnabled('dwpost')) {
 			$services['outbound'][] = 'dreamwidth';
 		}
 		if ($addonHelper->isAddonEnabled('statusnet')) {
-			$services['inbound'][] = 'gnusocial';
+			$services['inbound'][]  = 'gnusocial';
 			$services['outbound'][] = 'gnusocial';
 		}
 		if ($addonHelper->isAddonEnabled('ijpost')) {
@@ -125,7 +124,7 @@ class Nodeinfo
 			$services['outbound'][] = 'livejournal';
 		}
 		if ($addonHelper->isAddonEnabled('pumpio')) {
-			$services['inbound'][] = 'pumpio';
+			$services['inbound'][]  = 'pumpio';
 			$services['outbound'][] = 'pumpio';
 		}
 
