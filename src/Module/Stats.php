@@ -8,8 +8,10 @@
 namespace Friendica\Module;
 
 use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
 use Friendica\BaseModule;
-use Friendica\Core\Addon;
+use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\KeyValueStorage\Capability\IManageKeyValuePairs;
 use Friendica\Core\L10n;
@@ -40,14 +42,28 @@ class Stats extends BaseModule
 	protected $logger;
 	/** @var IManageKeyValuePairs */
 	protected $keyValue;
+	private AddonHelper $addonHelper;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, IManageConfigValues $config, IManageKeyValuePairs $keyValue, Database $dba, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		IManageConfigValues $config,
+		IManageKeyValuePairs $keyValue,
+		Database $dba,
+		AddonHelper $addonHelper,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->config   = $config;
-		$this->keyValue = $keyValue;
-		$this->dba      = $dba;
+		$this->config      = $config;
+		$this->keyValue    = $keyValue;
+		$this->dba         = $dba;
+		$this->addonHelper = $addonHelper;
 	}
 
 	protected function content(array $request = []): string
@@ -164,11 +180,11 @@ class Stats extends BaseModule
 			],
 		];
 
-		if (Addon::isEnabled('bluesky')) {
+		if ($this->addonHelper->isAddonEnabled('bluesky')) {
 			$statistics['packets']['inbound'][Protocol::BLUESKY] = intval($this->keyValue->get('stats_packets_inbound_' . Protocol::BLUESKY) ?? 0);
 			$statistics['packets']['outbound'][Protocol::BLUESKY] = intval($this->keyValue->get('stats_packets_outbound_' . Protocol::BLUESKY) ?? 0);
 		}
-		if (Addon::isEnabled('tumblr')) {
+		if ($this->addonHelper->isAddonEnabled('tumblr')) {
 			$statistics['packets']['inbound'][Protocol::TUMBLR] = intval($this->keyValue->get('stats_packets_inbound_' . Protocol::TUMBLR) ?? 0);
 			$statistics['packets']['outbound'][Protocol::TUMBLR] = intval($this->keyValue->get('stats_packets_outbound_' . Protocol::TUMBLR) ?? 0);
 		}
