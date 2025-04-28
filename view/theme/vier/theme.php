@@ -14,9 +14,8 @@
  * Description: "Vier" is a very compact and modern theme. It uses the font awesome font library: http://fortawesome.github.com/Font-Awesome/
  */
 
-use Friendica\App;
+use Friendica\App\Mode;
 use Friendica\Content\GroupManager;
-use Friendica\Core\Addon;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\Database\DBA;
@@ -35,7 +34,7 @@ function vier_init()
 	$args = DI::args();
 
 	if (
-		DI::mode()->has(App\Mode::MAINTENANCEDISABLED)
+		DI::mode()->has(Mode::MAINTENANCEDISABLED)
 		&& (
 			$args->get(0) === 'profile' && $args->get(1) === (DI::userSession()->getLocalUserNickname() ?? '')
 			|| $args->get(0) === 'network' && DI::userSession()->getLocalUserId()
@@ -244,55 +243,57 @@ function vier_community_info()
 
 	// connectable services
 	if ($show_services) {
+		$addonHelper = DI::addonHelper();
+
 		/// @TODO This whole thing is hard-coded, better rewrite to Intercepting Filter Pattern (future-todo)
 		$r = [];
 
-		if (Addon::isEnabled("buffer")) {
+		if ($addonHelper->isAddonEnabled("buffer")) {
 			$r[] = ["photo" => "images/buffer.png", "name" => "Buffer"];
 		}
 
-		if (Addon::isEnabled("blogger")) {
+		if ($addonHelper->isAddonEnabled("blogger")) {
 			$r[] = ["photo" => "images/blogger.png", "name" => "Blogger"];
 		}
 
-		if (Addon::isEnabled("dwpost")) {
+		if ($addonHelper->isAddonEnabled("dwpost")) {
 			$r[] = ["photo" => "images/dreamwidth.png", "name" => "Dreamwidth"];
 		}
 
-		if (Addon::isEnabled("ifttt")) {
+		if ($addonHelper->isAddonEnabled("ifttt")) {
 			$r[] = ["photo" => "addon/ifttt/ifttt.png", "name" => "IFTTT"];
 		}
 
-		if (Addon::isEnabled("statusnet")) {
+		if ($addonHelper->isAddonEnabled("statusnet")) {
 			$r[] = ["photo" => "images/gnusocial.png", "name" => "GNU Social"];
 		}
 
 		/// @TODO old-lost code (and below)?
-		//if (Addon::isEnabled("ijpost")) {
+		//if ($addonHelper->isAddonEnabled("ijpost")) {
 		//	$r[] = array("photo" => "images/", "name" => "");
 		//}
 
-		if (Addon::isEnabled("libertree")) {
+		if ($addonHelper->isAddonEnabled("libertree")) {
 			$r[] = ["photo" => "images/libertree.png", "name" => "Libertree"];
 		}
 
-		//if (Addon::isEnabled("ljpost")) {
+		//if ($addonHelper->isAddonEnabled("ljpost")) {
 		//	$r[] = array("photo" => "images/", "name" => "");
 		//}
 
-		if (Addon::isEnabled("pumpio")) {
+		if ($addonHelper->isAddonEnabled("pumpio")) {
 			$r[] = ["photo" => "images/pumpio.png", "name" => "pump.io"];
 		}
 
-		if (Addon::isEnabled("tumblr")) {
+		if ($addonHelper->isAddonEnabled("tumblr")) {
 			$r[] = ["photo" => "images/tumblr.png", "name" => "Tumblr"];
 		}
 
-		if (Addon::isEnabled("twitter")) {
+		if ($addonHelper->isAddonEnabled("twitter")) {
 			$r[] = ["photo" => "images/twitter.png", "name" => "Twitter"];
 		}
 
-		if (Addon::isEnabled("wppost")) {
+		if ($addonHelper->isAddonEnabled("wppost")) {
 			$r[] = ["photo" => "images/wordpress.png", "name" => "Wordpress"];
 		}
 
