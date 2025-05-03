@@ -72,7 +72,7 @@ class Processor
 	public function processIdentity(stdClass $data)
 	{
 		$fields = [
-			'alias'   => ATProtocol::WEB . '/profile/' . $data->identity->handle,
+			'alias'   => ATProtocol::WEB . '/profile/' . $data->identity->did,
 			'nick'    => $data->identity->handle,
 			'addr'    => $data->identity->handle,
 			'updated' => DateTimeFormat::utc($data->identity->time, DateTimeFormat::MYSQL),
@@ -327,7 +327,7 @@ class Processor
 
 	private function getHeaderFromJetstream(stdClass $data, int $uid, int $protocol = Conversation::PARCEL_JETSTREAM): array
 	{
-		$contact = $this->actor->getContactByDID($data->did, $uid, 0);
+		$contact = $this->actor->getContactByDID($data->did, $uid, 0, true);
 		if (empty($contact)) {
 			$this->logger->info('Contact not found for user', ['did' => $data->did, 'uid' => $uid]);
 			return [];
@@ -392,7 +392,7 @@ class Processor
 		if (empty($post->author) || empty($post->cid) || empty($parts->rkey)) {
 			return [];
 		}
-		$contact = $this->actor->getContactByDID($post->author->did, $uid, 0);
+		$contact = $this->actor->getContactByDID($post->author->did, $uid, 0, true);
 		if (empty($contact)) {
 			$this->logger->info('Contact not found for user', ['did' => $post->author->did, 'uid' => $uid]);
 			return [];
