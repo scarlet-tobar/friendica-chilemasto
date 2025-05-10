@@ -20,7 +20,8 @@ use Friendica\Database\DBA;
 use Friendica\Factory\Api\Mastodon\Notification as NotificationFactory;
 use Friendica\Model;
 use Friendica\Navigation\Notifications\Collection;
-use Friendica\Navigation\Notifications\Entity;
+use Friendica\Navigation\Notifications\Entity\Notification as NotificationEntity;
+use Friendica\Navigation\Notifications\Entity\Notify as NotifyEntity;
 use Friendica\Navigation\Notifications\Exception;
 use Friendica\Navigation\Notifications\Factory;
 use Friendica\Network\HTTPException;
@@ -31,7 +32,7 @@ use Friendica\Util\Emailer;
 use Psr\Log\LoggerInterface;
 
 /**
- * @deprecated since 2022.05 Use \Friendica\Navigation\Notifications\Repository\Notification instead
+ * @deprecated 2022.05 Use `\Friendica\Navigation\Notifications\Repository\Notification` instead
  */
 class Notify extends BaseRepository
 {
@@ -71,15 +72,13 @@ class Notify extends BaseRepository
 	}
 
 	/**
-	 * @param array $condition
-	 * @param array $params
-	 *
-	 * @return Entity\Notify
 	 * @throws HTTPException\NotFoundException
 	 */
-	private function selectOne(array $condition, array $params = []): Entity\Notify
+	private function selectOne(array $condition, array $params = []): NotifyEntity
 	{
-		return parent::_selectOne($condition, $params);
+		$fields = $this->_selectFirstRowAsArray( $condition, $params);
+
+		return $this->factory->createFromTableRow($fields);
 	}
 
 	private function select(array $condition, array $params = []): Collection\Notifies
@@ -104,10 +103,9 @@ class Notify extends BaseRepository
 	/**
 	 * @param int $id
 	 *
-	 * @return Entity\Notify
 	 * @throws HTTPException\NotFoundException
 	 */
-	public function selectOneById(int $id): Entity\Notify
+	public function selectOneById(int $id): NotifyEntity
 	{
 		return $this->selectOne(['id' => $id]);
 	}
@@ -139,14 +137,11 @@ class Notify extends BaseRepository
 	}
 
 	/**
-	 * @param Entity\Notify $Notify
-	 *
-	 * @return Entity\Notify
 	 * @throws HTTPException\NotFoundException
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws Exception\NotificationCreationInterceptedException
 	 */
-	public function save(Entity\Notify $Notify): Entity\Notify
+	public function save(NotifyEntity $Notify): NotifyEntity
 	{
 		$fields = [
 			'type'          => $Notify->type,
@@ -181,7 +176,7 @@ class Notify extends BaseRepository
 		return $Notify;
 	}
 
-	public function setAllSeenForRelatedNotify(Entity\Notify $Notify): bool
+	public function setAllSeenForRelatedNotify(NotifyEntity $Notify): bool
 	{
 		$condition = [
 			'(`link` = ? OR (`parent` != 0 AND `parent` = ? AND `otype` = ?)) AND `uid` = ?',
@@ -670,7 +665,7 @@ class Notify extends BaseRepository
 		return false;
 	}
 
-	public function shouldShowOnDesktop(Entity\Notification $Notification, string $type = null): bool
+	public function shouldShowOnDesktop(NotificationEntity $Notification, string $type = null): bool
 	{
 		if (is_null($type)) {
 			$type = NotificationFactory::getType($Notification);
@@ -702,7 +697,7 @@ class Notify extends BaseRepository
 		return false;
 	}
 
-	public function createFromNotification(Entity\Notification $Notification): bool
+	public function createFromNotification(NotificationEntity $Notification): bool
 	{
 		$this->logger->info('Start', ['uid' => $Notification->uid, 'id' => $Notification->id, 'type' => $Notification->type]);
 
