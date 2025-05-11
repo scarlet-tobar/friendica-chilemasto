@@ -3282,7 +3282,7 @@ class Item
 		}
 
 		$dom = new \DOMDocument();
-		if (empty ($html) || !@$dom->loadHTML($html)) {
+		if (empty($html) || !@$dom->loadHTML($html)) {
 			return $html;
 		}
 
