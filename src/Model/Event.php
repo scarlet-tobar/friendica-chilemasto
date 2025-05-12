@@ -310,7 +310,7 @@ class Event
 			);
 		}
 
-		return $event['id'];
+		return (int) $event['id'];
 	}
 
 	public static function getItemArrayForId(int $event_id, array $item = []): array

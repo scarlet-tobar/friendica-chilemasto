@@ -272,12 +272,13 @@ class Worker
 	 *
 	 * @param integer $priority The priority that should be checked
 	 *
-	 * @return integer Is there a process running with that priority?
+	 * @return bool Is there a process running with that priority?
 	 * @throws \Exception
 	 */
-	private static function processWithPriorityActive(int $priority): int
+	private static function processWithPriorityActive(int $priority): bool
 	{
 		$condition = ["`priority` <= ? AND `pid` != 0 AND NOT `done`", $priority];
+
 		return DBA::exists('workerqueue', $condition);
 	}
 
@@ -956,7 +957,7 @@ class Worker
 	/**
 	 * Returns the priority of the next workerqueue job
 	 *
-	 * @return string|bool priority or FALSE on failure
+	 * @return int|false priority or FALSE on failure
 	 * @throws \Exception
 	 */
 	private static function nextPriority()

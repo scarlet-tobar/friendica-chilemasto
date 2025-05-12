@@ -61,9 +61,9 @@ class Network extends Timeline
 	protected $dateFrom;
 	/** @var string */
 	protected $dateTo;
-	/** @var int */
+	/** @var bool */
 	protected $star;
-	/** @var int */
+	/** @var bool */
 	protected $mention;
 
 	/** @var AppHelper */
