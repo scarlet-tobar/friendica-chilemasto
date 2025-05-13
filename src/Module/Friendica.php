@@ -58,11 +58,11 @@ class Friendica extends BaseModule
 	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->config      = $config;
-		$this->keyValue    = $keyValue;
-		$this->session     = $session;
+		$this->config          = $config;
+		$this->keyValue        = $keyValue;
+		$this->session         = $session;
 		$this->eventDispatcher = $eventDispatcher;
-		$this->addonHelper = $addonHelper;
+		$this->addonHelper     = $addonHelper;
 	}
 
 	protected function content(array $request = []): string

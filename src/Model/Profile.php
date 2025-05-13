@@ -480,7 +480,7 @@ class Profile
 
 		$hook_data = [
 			'profile' => &$profile,
-			'entry' => &$o,
+			'entry'   => &$o,
 		];
 
 		$hook_data = $eventDispatcher->dispatch(
@@ -488,7 +488,7 @@ class Profile
 		)->getArray();
 
 		$profile = $hook_data['profile'] ?? $profile;
-		$o = $hook_data['entry'] ?? $o;
+		$o       = $hook_data['entry']   ?? $o;
 
 		return $o;
 	}

@@ -52,7 +52,7 @@ abstract class BaseUsers extends BaseModeration
 	) {
 		parent::__construct($page, $appHelper, $systemMessages, $session, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->database = $database;
+		$this->database        = $database;
 		$this->eventDispatcher = $eventDispatcher;
 	}
 
@@ -115,7 +115,7 @@ abstract class BaseUsers extends BaseModeration
 		];
 
 		$hook_data = [
-			'tabs' => $tabs,
+			'tabs'        => $tabs,
 			'selectedTab' => $selectedTab,
 		];
 

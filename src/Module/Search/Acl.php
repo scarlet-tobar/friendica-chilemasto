@@ -62,8 +62,8 @@ class Acl extends BaseModule
 	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->session  = $session;
-		$this->database = $database;
+		$this->session         = $session;
+		$this->database        = $database;
 		$this->eventDispatcher = $eventDispatcher;
 	}
 
@@ -118,9 +118,9 @@ class Acl extends BaseModule
 
 	private function regularContactSearch(array $request, string $type): array
 	{
-		$start   = $request['start'] ?? 0;
-		$count   = $request['count'] ?? 100;
-		$search  = $request['search'] ?? '';
+		$start   = $request['start']        ?? 0;
+		$count   = $request['count']        ?? 100;
+		$search  = $request['search']       ?? '';
 		$conv_id = $request['conversation'] ?? null;
 
 		// For use with jquery.textcomplete for private mail completion
@@ -138,9 +138,9 @@ class Acl extends BaseModule
 		$condition_circle = ["`uid` = ? AND NOT `deleted`", $this->session->getLocalUserId()];
 
 		if ($search != '') {
-			$sql_extra        = "AND `name` LIKE '%%" . $this->database->escape($search) . "%%'";
-			$condition        = DBA::mergeConditions($condition, ["(`attag` LIKE ? OR `name` LIKE ? OR `nick` LIKE ?)",
-			                                                     '%' . $search . '%', '%' . $search . '%', '%' . $search . '%']);
+			$sql_extra = "AND `name` LIKE '%%" . $this->database->escape($search) . "%%'";
+			$condition = DBA::mergeConditions($condition, ["(`attag` LIKE ? OR `name` LIKE ? OR `nick` LIKE ?)",
+				'%' . $search . '%', '%' . $search . '%', '%' . $search . '%']);
 			$condition_circle = DBA::mergeConditions($condition_circle, ["`name` LIKE ?", '%' . $search . '%']);
 		}
 
@@ -156,21 +156,27 @@ class Acl extends BaseModule
 		switch ($type) {
 			case self::TYPE_MENTION_CONTACT_CIRCLE:
 			case self::TYPE_MENTION_CONTACT:
-				$condition = DBA::mergeConditions($condition,
+				$condition = DBA::mergeConditions(
+					$condition,
 					["NOT `self` AND NOT `blocked`",
-					]);
+					]
+				);
 				break;
 
 			case self::TYPE_MENTION_GROUP:
-				$condition = DBA::mergeConditions($condition,
+				$condition = DBA::mergeConditions(
+					$condition,
 					["NOT `self` AND NOT `blocked` AND (NOT `ap-posting-restricted` OR `ap-posting-restricted` IS NULL) AND `contact-type` = ?", Contact::TYPE_COMMUNITY
-					]);
+					]
+				);
 				break;
 
 			case self::TYPE_PRIVATE_MESSAGE:
-				$condition = DBA::mergeConditions($condition,
+				$condition = DBA::mergeConditions(
+					$condition,
 					["NOT `self` AND NOT `blocked` AND `network` IN (?, ?, ?)", Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA
-					]);
+					]
+				);
 				break;
 		}
 
@@ -184,7 +190,8 @@ class Acl extends BaseModule
 		if ($type == self::TYPE_MENTION_CONTACT_CIRCLE || $type == self::TYPE_MENTION_CIRCLE) {
 			/// @todo We should cache this query.
 			// This can be done when we can delete cache entries via wildcard
-			$circles = $this->database->toArray($this->database->p("SELECT `circle`.`id`, `circle`.`name`, GROUP_CONCAT(DISTINCT `circle_member`.`contact-id` SEPARATOR ',') AS uids
+			$circles = $this->database->toArray($this->database->p(
+				"SELECT `circle`.`id`, `circle`.`name`, GROUP_CONCAT(DISTINCT `circle_member`.`contact-id` SEPARATOR ',') AS uids
 				FROM `group` AS `circle`
 				INNER JOIN `group_member` AS `circle_member` ON `circle_member`.`gid` = `circle`.`id`
 				WHERE NOT `circle`.`deleted` AND `circle`.`uid` = ?

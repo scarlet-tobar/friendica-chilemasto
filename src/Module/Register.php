@@ -50,7 +50,7 @@ class Register extends BaseModule
 
 		$this->tos = new Tos($l10n, $baseUrl, $args, $logger, $profiler, $response, $config, $server, $parameters);
 
-		$this->session = $session;
+		$this->session         = $session;
 		$this->eventDispatcher = $eventDispatcher;
 	}
 

@@ -76,12 +76,12 @@ class StorageManager
 	 */
 	public function __construct(Database $dba, IManageConfigValues $config, LoggerInterface $logger, EventDispatcherInterface $eventDispatcher, L10n $l10n, bool $includeAddon = true)
 	{
-		$this->dba           = $dba;
-		$this->config        = $config;
-		$this->logger        = $logger;
+		$this->dba             = $dba;
+		$this->config          = $config;
+		$this->logger          = $logger;
 		$this->eventDispatcher = $eventDispatcher;
-		$this->l10n          = $l10n;
-		$this->validBackends = $config->get('storage', 'backends', self::DEFAULT_BACKENDS);
+		$this->l10n            = $l10n;
+		$this->validBackends   = $config->get('storage', 'backends', self::DEFAULT_BACKENDS);
 
 		$currentName = $this->config->get('storage', 'name');
 

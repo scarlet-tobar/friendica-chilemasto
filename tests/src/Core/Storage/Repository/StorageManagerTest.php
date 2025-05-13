@@ -376,7 +376,7 @@ class StorageManagerTest extends DatabaseTestCase
 			$this->l10n,
 			false
 		);
-		$storage        = $storageManager->getWritableStorageByName($name);
+		$storage = $storageManager->getWritableStorageByName($name);
 		$storageManager->move($storage);
 
 		$photos = $this->database->select('photo', ['backend-ref', 'backend-class', 'id', 'data']);
@@ -407,7 +407,7 @@ class StorageManagerTest extends DatabaseTestCase
 			$this->l10n,
 			false
 		);
-		$storage        = $storageManager->getWritableStorageByName(SystemResource::getName());
+		$storage = $storageManager->getWritableStorageByName(SystemResource::getName());
 		$storageManager->move($storage);
 	}
 }

@@ -31,7 +31,6 @@ use Friendica\Content\Widget\TrendingTags;
 use Friendica\Core\ACL;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;

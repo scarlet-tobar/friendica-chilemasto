@@ -3051,7 +3051,7 @@ class Item
 			$hook_data = [
 				'rendered-html' => $item['rendered-html'],
 				'rendered-hash' => $item['rendered-hash'],
-				'item' => $item,
+				'item'          => $item,
 			];
 
 			$eventDispatcher = DI::eventDispatcher();
