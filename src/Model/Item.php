@@ -864,6 +864,7 @@ class Item
 				unset($_SESSION['uid']);
 			}
 		} elseif (!$notify) {
+			/** @var array<string,mixed> */
 			$item = $eventDispatcher->dispatch(
 				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_REMOTE, $item)
 			)->getArray();
