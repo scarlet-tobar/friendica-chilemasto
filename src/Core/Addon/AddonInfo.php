@@ -74,12 +74,16 @@ final class AddonInfo
 		}
 
 		// rename author to authors
-		$data['authors'] = $data['author'];
-		unset($data['author']);
+		if (array_key_exists('author', $data)) {
+			$data['authors'] = $data['author'];
+			unset($data['author']);
+		}
 
 		// rename maintainer to maintainers
-		$data['maintainers'] = $data['maintainer'];
-		unset($data['maintainer']);
+		if (array_key_exists('maintainer', $data)) {
+			$data['maintainers'] = $data['maintainer'];
+			unset($data['maintainer']);
+		}
 
 		return self::fromArray($data);
 	}

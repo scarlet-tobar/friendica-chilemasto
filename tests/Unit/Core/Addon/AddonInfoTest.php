@@ -27,6 +27,55 @@ class AddonInfoTest extends TestCase
 				'',
 				['id' => 'test'],
 			],
+			'without-author' => [
+				'test',
+				<<<TEXT
+				<?php
+				/*
+				 * Name: Test Addon
+				 * Description: adds awesome features to friendica
+				 * Version: 100.4.50-beta.5
+				 * Maintainer: Robin
+				 * Status: beta
+				 * Ignore: The "ignore" key is unsupported and will be ignored
+				 */
+				TEXT,
+				[
+					'id' => 'test',
+					'name' => 'Test Addon',
+					'description' => 'adds awesome features to friendica',
+
+					'maintainers' => [
+						['name' => 'Robin'],
+					],
+					'version' => '100.4.50-beta.5',
+					'status' => 'beta',
+				],
+			],
+			'without-maintainer' => [
+				'test',
+				<<<TEXT
+				<?php
+				/*
+				 * Name: Test Addon
+				 * Description: adds awesome features to friendica
+				 * Version: 100.4.50-beta.5
+				 * Author: Sam
+				 * Status: beta
+				 * Ignore: The "ignore" key is unsupported and will be ignored
+				 */
+				TEXT,
+				[
+					'id' => 'test',
+					'name' => 'Test Addon',
+					'description' => 'adds awesome features to friendica',
+					'authors' => [
+						['name' => 'Sam'],
+					],
+					'version' => '100.4.50-beta.5',
+					'status' => 'beta',
+				],
+			],
 			'complete' => [
 				'test',
 				<<<TEXT
