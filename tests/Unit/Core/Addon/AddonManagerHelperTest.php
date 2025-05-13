@@ -56,4 +56,46 @@ class AddonManagerHelperTest extends TestCase
 		$this->assertSame(['helloaddon'], $addonManagerHelper->getEnabledAddons());
 		$this->assertTrue($addonManagerHelper->isAddonEnabled('helloaddon'));
 	}
+
+	public function testGetVisibleEnabledAddons(): void
+	{
+		$config = $this->createStub(IManageConfigValues::class);
+		$config->method('get')->willReturn([
+			'helloaddon' => [
+				'last_update' => 1738760499,
+				'admin' => false,
+			],
+		]);
+
+		$addonManagerHelper = new AddonManagerHelper(
+			__DIR__ . '/../../../Util/addons',
+			$config,
+			$this->createStub(Profiler::class)
+		);
+
+		$this->assertSame(['helloaddon'], $addonManagerHelper->getVisibleEnabledAddons());
+	}
+
+	public function testGetEnabledAddonsWithAdminSettings(): void
+	{
+		$config = $this->createStub(IManageConfigValues::class);
+		$config->method('get')->willReturn([
+			'helloaddon' => [
+				'last_update' => 1738760499,
+				'admin' => false,
+			],
+			'addonwithadminsettings' => [
+				'last_update' => 1738760499,
+				'admin' => true,
+			],
+		]);
+
+		$addonManagerHelper = new AddonManagerHelper(
+			__DIR__ . '/../../../Util/addons',
+			$config,
+			$this->createStub(Profiler::class)
+		);
+
+		$this->assertSame(['addonwithadminsettings'], $addonManagerHelper->getEnabledAddonsWithAdminSettings());
+	}
 }

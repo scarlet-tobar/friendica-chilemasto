@@ -153,7 +153,14 @@ final class AddonManagerHelper implements AddonHelper
 	 */
 	public function getVisibleEnabledAddons(): array
 	{
-		return $this->proxy->getVisibleEnabledAddons();
+		$visible_addons = [];
+		$addons         = array_filter($this->config->get('addons') ?? []);
+
+		foreach ($addons as $name => $data) {
+			$visible_addons[] = $name;
+		}
+
+		return $visible_addons;
 	}
 
 	/**
@@ -163,6 +170,17 @@ final class AddonManagerHelper implements AddonHelper
 	 */
 	public function getEnabledAddonsWithAdminSettings(): array
 	{
-		return $this->proxy->getEnabledAddonsWithAdminSettings();
+		$addons_admin = [];
+		$addons       = array_filter($this->config->get('addons') ?? []);
+
+		ksort($addons);
+
+		foreach ($addons as $name => $data) {
+			if (array_key_exists('admin', $data) && $data['admin'] === true) {
+				$addons_admin[] = $name;
+			}
+		}
+
+		return $addons_admin;
 	}
 }
