@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Friendica\Core\Addon;
 
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Util\Profiler;
 
 /**
@@ -20,16 +21,23 @@ final class AddonManagerHelper implements AddonHelper
 {
 	private string $addonPath;
 
+	private IManageConfigValues $config;
+
 	private Profiler $profiler;
+
+	/** @var string[] */
+	private array $addons = [];
 
 	/** @deprecated */
 	private AddonHelper $proxy;
 
 	public function __construct(
 		string $addonPath,
+		IManageConfigValues $config,
 		Profiler $profiler
 	) {
 		$this->addonPath = $addonPath;
+		$this->config    = $config;
 		$this->profiler  = $profiler;
 
 		$this->proxy = new AddonProxy($addonPath);
@@ -86,7 +94,7 @@ final class AddonManagerHelper implements AddonHelper
 	 */
 	public function loadAddons(): void
 	{
-		$this->proxy->loadAddons();
+		$this->addons = array_keys(array_filter($this->config->get('addons') ?? []));
 	}
 
 	/**
@@ -125,7 +133,7 @@ final class AddonManagerHelper implements AddonHelper
 	 */
 	public function isAddonEnabled(string $addonId): bool
 	{
-		return $this->proxy->isAddonEnabled($addonId);
+		return in_array($addonId, $this->addons);
 	}
 
 	/**
@@ -135,7 +143,7 @@ final class AddonManagerHelper implements AddonHelper
 	 */
 	public function getEnabledAddons(): array
 	{
-		return $this->proxy->getEnabledAddons();
+		return $this->addons;
 	}
 
 	/**
