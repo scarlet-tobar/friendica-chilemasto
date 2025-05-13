@@ -14,7 +14,6 @@ use Friendica\Content\Post\Collection\PostMedias;
 use Friendica\Content\Post\Entity\PostMedia;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
@@ -849,17 +848,26 @@ class Item
 				$dummy_session = false;
 			}
 
-			/** @var array<string,mixed> */
-			$item = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::POST_LOCAL, $item)
+			$hook_data = [
+				'item' => $item,
+			];
+
+			$hook_data = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, $hook_data)
 			)->getArray();
+
+			/** @var array<string,mixed> */
+			$item = $hook_data['item'] ?? $item;
 
 			if ($dummy_session) {
 				unset($_SESSION['authenticated']);
 				unset($_SESSION['uid']);
 			}
 		} elseif (!$notify) {
-			Hook::callAll('post_remote', $item);
+			/** @var array<string,mixed> */
+			$item = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_REMOTE, $item)
+			)->getArray();
 		}
 
 		if (!empty($item['cancel'])) {
@@ -1116,7 +1124,11 @@ class Item
 				DI::contentItem()->copyPermissions($posted_item['thr-parent-id'], $posted_item['uri-id'], $posted_item['parent-uri-id']);
 			}
 		} else {
-			Hook::callAll('post_remote_end', $posted_item);
+			$eventDispatcher = DI::eventDispatcher();
+
+			$posted_item = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_REMOTE_END, $posted_item)
+			)->getArray();
 		}
 
 		if ($posted_item['gravity'] === self::GRAVITY_PARENT) {
@@ -1901,18 +1913,23 @@ class Item
 
 		$result = [];
 
+		$eventDispatcher = DI::eventDispatcher();
+
 		foreach (self::splitByBlocks($searchtext) as $block) {
 			$languages = $ld->detect($block)->close() ?: [];
 
-			$data = [
+			$hook_data = [
 				'text'      => $block,
 				'detected'  => $languages,
 				'uri-id'    => $uri_id,
 				'author-id' => $author_id,
 			];
-			Hook::callAll('detect_languages', $data);
 
-			foreach ($data['detected'] as $language => $quality) {
+			$hook_data = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::DETECT_LANGUAGES, $hook_data),
+			)->getArray();
+
+			foreach ($hook_data['detected'] as $language => $quality) {
 				$result[$language] = max($result[$language] ?? 0, $quality * (strlen($block) / strlen($searchtext)));
 			}
 		}
@@ -2278,9 +2295,16 @@ class Item
 				return true;
 			}
 
-			$arr = ['item' => $item, 'user' => $owner];
+			$eventDispatcher = DI::eventDispatcher();
 
-			Hook::callAll('tagged', $arr);
+			$arr = [
+				'item' => $item,
+				'user' => $owner,
+			];
+
+			$eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::ITEM_TAGGED, $arr),
+			);
 		} else {
 			if (Tag::isMentioned($item['parent-uri-id'], $owner['url'])) {
 				DI::logger()->info('Mention found in parent tag.', ['uri' => $item['uri'], 'uid' => $uid, 'id' => $item_id, 'uri-id' => $item['uri-id'], 'guid' => $item['guid']]);
@@ -3024,8 +3048,18 @@ class Item
 			$item['rendered-html'] = BBCode::convertForUriId($item['uri-id'], $item['body']);
 			$item['rendered-hash'] = hash('md5', BBCode::VERSION . '::' . $body);
 
-			$hook_data = ['item' => $item, 'rendered-html' => $item['rendered-html'], 'rendered-hash' => $item['rendered-hash']];
-			Hook::callAll('put_item_in_cache', $hook_data);
+			$hook_data = [
+				'rendered-html' => $item['rendered-html'],
+				'rendered-hash' => $item['rendered-hash'],
+				'item'          => $item,
+			];
+
+			$eventDispatcher = DI::eventDispatcher();
+
+			$hook_data = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::CACHE_ITEM, $hook_data),
+			)->getArray();
+
 			$item['rendered-html'] = $hook_data['rendered-html'];
 			$item['rendered-hash'] = $hook_data['rendered-hash'];
 			unset($hook_data);
@@ -3056,23 +3090,22 @@ class Item
 	 * @return string item body html
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
-	 * @hook  prepare_body_init item array before any work
-	 * @hook  prepare_body_content_filter ('item'=>item array, 'filter_reasons'=>string array) before first bbcode to html
-	 * @hook  prepare_body ('item'=>item array, 'html'=>body string, 'is_preview'=>boolean, 'filter_reasons'=>string array) after first bbcode to html
-	 * @hook  prepare_body_final ('item'=>item array, 'html'=>body string) after attach icons and blockquote special case handling (spoiler, author)
 	 */
 	public static function prepareBody(array &$item, bool $attach = false, bool $is_preview = false, bool $only_cache = false): string
 	{
-		$appHelper = DI::appHelper();
-		$uid       = DI::userSession()->getLocalUserId();
+		$appHelper       = DI::appHelper();
+		$uid             = DI::userSession()->getLocalUserId();
+		$eventDispatcher = DI::eventDispatcher();
 
-		$item_copy = $item;
+		$hook_data = [
+			'item' => $item,
+		];
 
-		Hook::callAll('prepare_body_init', $item_copy);
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_START, $hook_data),
+		)->getArray();
 
-		if (is_array($item_copy)) {
-			$item = $item_copy;
-		}
+		$item = $hook_data['item'] ?? $item;
 
 		// In order to provide theme developers more possibilities, event items
 		// are treated differently.
@@ -3191,7 +3224,11 @@ class Item
 				'item'           => $item,
 				'filter_reasons' => $filter_reasons
 			];
-			Hook::callAll('prepare_body_content_filter', $hook_data);
+
+			$hook_data = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT, $hook_data),
+			)->getArray();
+
 			$filter_reasons = $hook_data['filter_reasons'];
 			unset($hook_data);
 		}
@@ -3210,7 +3247,11 @@ class Item
 			'preview'        => $is_preview,
 			'filter_reasons' => $filter_reasons
 		];
-		Hook::callAll('prepare_body', $hook_data);
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST, $hook_data),
+		)->getArray();
+
 		$s = $hook_data['html'];
 
 		unset($hook_data);
@@ -3262,9 +3303,16 @@ class Item
 
 		$s = HTML::applyContentFilter($s, $filter_reasons);
 
-		$hook_data = ['item' => $item, 'html' => $s];
-		Hook::callAll('prepare_body_final', $hook_data);
-		return $hook_data['html'];
+		$hook_data = [
+			'item' => $item,
+			'html' => $s,
+		];
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_END, $hook_data),
+		)->getArray();
+
+		return (string) $hook_data['html'] ?? $s;
 	}
 
 	/**
@@ -3913,17 +3961,21 @@ class Item
 			return 0;
 		}
 
-		$hookData = [
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = [
 			'uri'     => $uri,
 			'uid'     => $uid,
 			'item_id' => null,
 		];
 
-		Hook::callAll('item_by_link', $hookData);
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::FETCH_ITEM_BY_LINK, $hook_data)
+		)->getArray();
 
-		if (isset($hookData['item_id'])) {
-			DI::logger()->info('Hook link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $hookData['item_id']]);
-			return is_numeric($hookData['item_id']) ? $hookData['item_id'] : 0;
+		if (isset($hook_data['item_id'])) {
+			DI::logger()->info('Hook link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $hook_data['item_id']]);
+			return is_numeric($hook_data['item_id']) ? $hook_data['item_id'] : 0;
 		}
 
 		if (!$mimetype) {
