@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 namespace Friendica\Core\Addon;
 
+use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Database\Database;
 use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
@@ -23,7 +25,11 @@ final class AddonManagerHelper implements AddonHelper
 {
 	private string $addonPath;
 
+	private Database $database;
+
 	private IManageConfigValues $config;
+
+	private ICanCache $cache;
 
 	private LoggerInterface $logger;
 
@@ -37,12 +43,16 @@ final class AddonManagerHelper implements AddonHelper
 
 	public function __construct(
 		string $addonPath,
+		Database $database,
 		IManageConfigValues $config,
+		ICanCache $cache,
 		LoggerInterface $logger,
 		Profiler $profiler
 	) {
 		$this->addonPath = $addonPath;
+		$this->database  = $database;
 		$this->config    = $config;
+		$this->cache     = $cache;
 		$this->logger    = $logger;
 		$this->profiler  = $profiler;
 
@@ -153,7 +163,31 @@ final class AddonManagerHelper implements AddonHelper
 	 */
 	public function uninstallAddon(string $addonId): void
 	{
-		$this->proxy->uninstallAddon($addonId);
+		$addonId = Strings::sanitizeFilePathItem($addonId);
+
+		$this->logger->debug("Addon {addon}: {action}", ['action' => 'uninstall', 'addon' => $addonId]);
+		$this->config->delete('addons', $addonId);
+
+		$addon_file_path = $this->getAddonPath() . '/' . $addonId . '/' . $addonId . '.php';
+
+		@include_once($addon_file_path);
+
+		if (function_exists($addonId . '_uninstall')) {
+			$func = $addonId . '_uninstall';
+			$func();
+		}
+
+		// Remove registered hooks for the addon
+		// Handles both relative and absolute file paths
+		$condition = ['`file` LIKE ?', "%/$addonId/$addonId.php"];
+
+		$result = $this->database->delete('hook', $condition);
+
+		if ($result) {
+			$this->cache->delete('routerDispatchData');
+		}
+
+		unset($this->addons[array_search($addonId, $this->addons)]);
 	}
 
 	/**

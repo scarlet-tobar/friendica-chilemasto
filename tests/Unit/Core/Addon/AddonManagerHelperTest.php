@@ -12,7 +12,9 @@ namespace Friendica\Test\Unit\Core\Addon;
 use Exception;
 use Friendica\Core\Addon\AddonInfo;
 use Friendica\Core\Addon\AddonManagerHelper;
+use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Database\Database;
 use Friendica\Util\Profiler;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
@@ -24,7 +26,9 @@ class AddonManagerHelperTest extends TestCase
 	{
 		$addonManagerHelper = new AddonManagerHelper(
 			__DIR__ . '/../../../Util/addons',
+			$this->createStub(Database::class),
 			$this->createStub(IManageConfigValues::class),
+			$this->createStub(ICanCache::class),
 			$this->createStub(LoggerInterface::class),
 			$this->createStub(Profiler::class)
 		);
@@ -48,7 +52,9 @@ class AddonManagerHelperTest extends TestCase
 
 		$addonManagerHelper = new AddonManagerHelper(
 			__DIR__ . '/../../../Util/addons',
+			$this->createStub(Database::class),
 			$config,
+			$this->createStub(ICanCache::class),
 			$this->createStub(LoggerInterface::class),
 			$this->createStub(Profiler::class)
 		);
@@ -74,7 +80,9 @@ class AddonManagerHelperTest extends TestCase
 
 		$addonManagerHelper = new AddonManagerHelper(
 			__DIR__ . '/../../../Util/addons',
+			$this->createStub(Database::class),
 			$config,
+			$this->createStub(ICanCache::class),
 			$this->createStub(LoggerInterface::class),
 			$this->createStub(Profiler::class)
 		);
@@ -98,7 +106,9 @@ class AddonManagerHelperTest extends TestCase
 
 		$addonManagerHelper = new AddonManagerHelper(
 			__DIR__ . '/../../../Util/addons',
+			$this->createStub(Database::class),
 			$config,
+			$this->createStub(ICanCache::class),
 			$this->createStub(LoggerInterface::class),
 			$this->createStub(Profiler::class)
 		);
@@ -110,7 +120,9 @@ class AddonManagerHelperTest extends TestCase
 	{
 		$addonManagerHelper = new AddonManagerHelper(
 			__DIR__ . '/../../../Util/addons',
+			$this->createStub(Database::class),
 			$this->createStub(IManageConfigValues::class),
+			$this->createStub(ICanCache::class),
 			$this->createStub(LoggerInterface::class),
 			$this->createStub(Profiler::class)
 		);
@@ -128,7 +140,9 @@ class AddonManagerHelperTest extends TestCase
 
 		$addonManagerHelper = new AddonManagerHelper(
 			$root->url(),
+			$this->createStub(Database::class),
 			$this->createStub(IManageConfigValues::class),
+			$this->createStub(ICanCache::class),
 			$this->createStub(LoggerInterface::class),
 			$this->createStub(Profiler::class)
 		);
@@ -159,7 +173,9 @@ class AddonManagerHelperTest extends TestCase
 
 		$addonManagerHelper = new AddonManagerHelper(
 			$root->url(),
+			$this->createStub(Database::class),
 			$this->createStub(IManageConfigValues::class),
+			$this->createStub(ICanCache::class),
 			$this->createStub(LoggerInterface::class),
 			$this->createStub(Profiler::class)
 		);
@@ -189,7 +205,9 @@ class AddonManagerHelperTest extends TestCase
 
 		$addonManagerHelper = new AddonManagerHelper(
 			$root->url(),
+			$this->createStub(Database::class),
 			$config,
+			$this->createStub(ICanCache::class),
 			$this->createStub(LoggerInterface::class),
 			$this->createStub(Profiler::class)
 		);
@@ -207,7 +225,9 @@ class AddonManagerHelperTest extends TestCase
 
 		$addonManagerHelper = new AddonManagerHelper(
 			$root->url(),
+			$this->createStub(Database::class),
 			$this->createStub(IManageConfigValues::class),
+			$this->createStub(ICanCache::class),
 			$this->createStub(LoggerInterface::class),
 			$this->createStub(Profiler::class)
 		);
@@ -217,5 +237,122 @@ class AddonManagerHelperTest extends TestCase
 		$this->assertTrue($addonManagerHelper->installAddon('helloaddon'));
 
 		$this->assertSame(['helloaddon'], $addonManagerHelper->getEnabledAddons());
+	}
+	public function testUninstallAddonIncludesAddonFile(): void
+	{
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
+			'helloaddon' => [
+				'helloaddon.php' => '<?php throw new \Exception("Addon file loaded");',
+			]
+		]);
+
+		$addonManagerHelper = new AddonManagerHelper(
+			$root->url(),
+			$this->createStub(Database::class),
+			$this->createStub(IManageConfigValues::class),
+			$this->createStub(ICanCache::class),
+			$this->createStub(LoggerInterface::class),
+			$this->createStub(Profiler::class)
+		);
+
+		$this->expectException(Exception::class);
+		$this->expectExceptionMessage('Addon file loaded');
+
+		$addonManagerHelper->uninstallAddon('helloaddon');
+	}
+
+	public function testUninstallAddonCallsUninstallFunction(): void
+	{
+		// We need a unique name for the addon to avoid conflicts
+		// with other tests that may define the same install function.
+		$addonName = __FUNCTION__;
+
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
+			$addonName => [
+				$addonName . '.php' => <<<PHP
+									<?php
+									function {$addonName}_uninstall()
+									{
+										throw new \Exception("Addon uninstalled");
+									}
+									PHP,
+			]
+		]);
+
+		$addonManagerHelper = new AddonManagerHelper(
+			$root->url(),
+			$this->createStub(Database::class),
+			$this->createStub(IManageConfigValues::class),
+			$this->createStub(ICanCache::class),
+			$this->createStub(LoggerInterface::class),
+			$this->createStub(Profiler::class)
+		);
+
+		$this->expectException(Exception::class);
+		$this->expectExceptionMessage('Addon uninstalled');
+
+		$addonManagerHelper->uninstallAddon($addonName);
+	}
+
+	public function testUninstallAddonRemovesHooksFromDatabase(): void
+	{
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
+			'helloaddon' => [
+				'helloaddon.php' => '<?php',
+			]
+		]);
+
+		$database = $this->createMock(Database::class);
+		$database->expects($this->once())
+			->method('delete')
+			->with(
+				'hook',
+				['`file` LIKE ?', '%/helloaddon/helloaddon.php']
+			);
+
+		$addonManagerHelper = new AddonManagerHelper(
+			$root->url(),
+			$database,
+			$this->createStub(IManageConfigValues::class),
+			$this->createStub(ICanCache::class),
+			$this->createStub(LoggerInterface::class),
+			$this->createStub(Profiler::class)
+		);
+
+		$addonManagerHelper->uninstallAddon('helloaddon');
+	}
+
+	public function testUninstallAddonDisablesAddon(): void
+	{
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
+			'helloaddon' => [
+				'helloaddon.php' => '<?php',
+			]
+		]);
+
+		$config = $this->createStub(IManageConfigValues::class);
+		$config->method('get')->willReturn([
+			'helloaddon' => [
+				'last_update' => 1234567890,
+				'admin' => false,
+			],
+		]);
+
+		$addonManagerHelper = new AddonManagerHelper(
+			$root->url(),
+			$this->createStub(Database::class),
+			$config,
+			$this->createStub(ICanCache::class),
+			$this->createStub(LoggerInterface::class),
+			$this->createStub(Profiler::class)
+		);
+
+		$addonManagerHelper->loadAddons();
+
+		$this->assertSame(['helloaddon'], $addonManagerHelper->getEnabledAddons());
+
+		$addonManagerHelper->uninstallAddon('helloaddon');
+
+		$this->assertSame([], $addonManagerHelper->getEnabledAddons());
 	}
 }
