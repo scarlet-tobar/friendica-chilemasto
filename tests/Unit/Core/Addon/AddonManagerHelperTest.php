@@ -98,4 +98,15 @@ class AddonManagerHelperTest extends TestCase
 
 		$this->assertSame(['addonwithadminsettings'], $addonManagerHelper->getEnabledAddonsWithAdminSettings());
 	}
+
+	public function testGetAvailableAddons(): void
+	{
+		$addonManagerHelper = new AddonManagerHelper(
+			__DIR__ . '/../../../Util/addons',
+			$this->createStub(originalClassName: IManageConfigValues::class),
+			$this->createStub(Profiler::class)
+		);
+
+		$this->assertSame(['helloaddon'], $addonManagerHelper->getAvailableAddons());
+	}
 }

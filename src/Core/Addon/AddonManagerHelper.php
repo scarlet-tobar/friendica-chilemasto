@@ -62,7 +62,33 @@ final class AddonManagerHelper implements AddonHelper
 	 */
 	public function getAvailableAddons(): array
 	{
-		return $this->proxy->getAvailableAddons();
+		$files = glob($this->getAddonPath() . '/*/');
+
+		if (!is_array($files)) {
+			return [];
+		}
+
+		$addons = [];
+
+		foreach ($files as $file) {
+			if (!is_dir($file)) {
+				continue;
+			}
+
+			$addonId = basename($file);
+
+			$addonInfo = $this->getAddonInfo($addonId);
+
+			if (
+				$this->config->get('system', 'show_unsupported_addons')
+				|| strtolower($addonInfo->getStatus()) !== 'unsupported'
+				|| $this->isAddonEnabled($addonId)
+			) {
+				$addons[] = $addonId;
+			}
+		}
+
+		return $addons;
 	}
 
 	/**
