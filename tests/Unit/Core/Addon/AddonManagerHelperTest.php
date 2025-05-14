@@ -9,11 +9,14 @@ declare(strict_types=1);
 
 namespace Friendica\Test\Unit\Core\Addon;
 
+use Exception;
 use Friendica\Core\Addon\AddonInfo;
 use Friendica\Core\Addon\AddonManagerHelper;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Util\Profiler;
+use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class AddonManagerHelperTest extends TestCase
 {
@@ -22,6 +25,7 @@ class AddonManagerHelperTest extends TestCase
 		$addonManagerHelper = new AddonManagerHelper(
 			__DIR__ . '/../../../Util/addons',
 			$this->createStub(IManageConfigValues::class),
+			$this->createStub(LoggerInterface::class),
 			$this->createStub(Profiler::class)
 		);
 
@@ -45,6 +49,7 @@ class AddonManagerHelperTest extends TestCase
 		$addonManagerHelper = new AddonManagerHelper(
 			__DIR__ . '/../../../Util/addons',
 			$config,
+			$this->createStub(LoggerInterface::class),
 			$this->createStub(Profiler::class)
 		);
 
@@ -70,6 +75,7 @@ class AddonManagerHelperTest extends TestCase
 		$addonManagerHelper = new AddonManagerHelper(
 			__DIR__ . '/../../../Util/addons',
 			$config,
+			$this->createStub(LoggerInterface::class),
 			$this->createStub(Profiler::class)
 		);
 
@@ -93,6 +99,7 @@ class AddonManagerHelperTest extends TestCase
 		$addonManagerHelper = new AddonManagerHelper(
 			__DIR__ . '/../../../Util/addons',
 			$config,
+			$this->createStub(LoggerInterface::class),
 			$this->createStub(Profiler::class)
 		);
 
@@ -104,9 +111,111 @@ class AddonManagerHelperTest extends TestCase
 		$addonManagerHelper = new AddonManagerHelper(
 			__DIR__ . '/../../../Util/addons',
 			$this->createStub(IManageConfigValues::class),
+			$this->createStub(LoggerInterface::class),
 			$this->createStub(Profiler::class)
 		);
 
 		$this->assertSame(['helloaddon'], $addonManagerHelper->getAvailableAddons());
+	}
+
+	public function testInstallAddonIncludesAddonFile(): void
+	{
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
+			'helloaddon' => [
+				'helloaddon.php' => '<?php throw new \Exception("Addon file loaded");',
+			]
+		]);
+
+		$addonManagerHelper = new AddonManagerHelper(
+			$root->url(),
+			$this->createStub(IManageConfigValues::class),
+			$this->createStub(LoggerInterface::class),
+			$this->createStub(Profiler::class)
+		);
+
+		$this->expectException(Exception::class);
+		$this->expectExceptionMessage('Addon file loaded');
+
+		$addonManagerHelper->installAddon('helloaddon');
+	}
+
+	public function testInstallAddonCallsInstallFunction(): void
+	{
+		// We need a unique name for the addon to avoid conflicts
+		// with other tests that may define the same install function.
+		$addonName = __FUNCTION__;
+
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
+			$addonName => [
+				$addonName . '.php' => <<<PHP
+									<?php
+									function {$addonName}_install()
+									{
+										throw new \Exception("Addon installed");
+									}
+									PHP,
+			]
+		]);
+
+		$addonManagerHelper = new AddonManagerHelper(
+			$root->url(),
+			$this->createStub(IManageConfigValues::class),
+			$this->createStub(LoggerInterface::class),
+			$this->createStub(Profiler::class)
+		);
+
+		$this->expectException(Exception::class);
+		$this->expectExceptionMessage('Addon installed');
+
+		$addonManagerHelper->installAddon($addonName);
+	}
+
+	public function testInstallAddonUpdatesConfig(): void
+	{
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
+			'helloaddon' => [
+				'helloaddon.php' => '<?php',
+			]
+		]);
+
+		$root->getChild('helloaddon/helloaddon.php')->lastModified(1234567890);
+
+		$config = $this->createMock(IManageConfigValues::class);
+		$config->expects($this->once())->method('set')->with(
+			'addons',
+			'helloaddon',
+			['last_update' => 1234567890, 'admin' => false]
+		);
+
+		$addonManagerHelper = new AddonManagerHelper(
+			$root->url(),
+			$config,
+			$this->createStub(LoggerInterface::class),
+			$this->createStub(Profiler::class)
+		);
+
+		$addonManagerHelper->installAddon('helloaddon');
+	}
+
+	public function testInstallAddonEnablesAddon(): void
+	{
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
+			'helloaddon' => [
+				'helloaddon.php' => '<?php',
+			]
+		]);
+
+		$addonManagerHelper = new AddonManagerHelper(
+			$root->url(),
+			$this->createStub(IManageConfigValues::class),
+			$this->createStub(LoggerInterface::class),
+			$this->createStub(Profiler::class)
+		);
+
+		$this->assertSame([], $addonManagerHelper->getEnabledAddons());
+
+		$this->assertTrue($addonManagerHelper->installAddon('helloaddon'));
+
+		$this->assertSame(['helloaddon'], $addonManagerHelper->getEnabledAddons());
 	}
 }

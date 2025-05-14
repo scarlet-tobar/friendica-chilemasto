@@ -11,6 +11,8 @@ namespace Friendica\Core\Addon;
 
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Util\Profiler;
+use Friendica\Util\Strings;
+use Psr\Log\LoggerInterface;
 
 /**
  * helper functions to handle addons
@@ -23,6 +25,8 @@ final class AddonManagerHelper implements AddonHelper
 
 	private IManageConfigValues $config;
 
+	private LoggerInterface $logger;
+
 	private Profiler $profiler;
 
 	/** @var string[] */
@@ -34,10 +38,12 @@ final class AddonManagerHelper implements AddonHelper
 	public function __construct(
 		string $addonPath,
 		IManageConfigValues $config,
+		LoggerInterface $logger,
 		Profiler $profiler
 	) {
 		$this->addonPath = $addonPath;
 		$this->config    = $config;
+		$this->logger    = $logger;
 		$this->profiler  = $profiler;
 
 		$this->proxy = new AddonProxy($addonPath);
@@ -108,7 +114,36 @@ final class AddonManagerHelper implements AddonHelper
 	 */
 	public function installAddon(string $addonId): bool
 	{
-		return $this->proxy->installAddon($addonId);
+		$addonId = Strings::sanitizeFilePathItem($addonId);
+
+		$addon_file_path = $this->getAddonPath() . '/' . $addonId . '/' . $addonId . '.php';
+
+		// silently fail if addon was removed or if $addonId is funky
+		if (!file_exists($addon_file_path)) {
+			return false;
+		}
+
+		$this->logger->debug("Addon {addon}: {action}", ['action' => 'install', 'addon' => $addonId]);
+
+		$timestamp = @filemtime($addon_file_path);
+
+		@include_once($addon_file_path);
+
+		if (function_exists($addonId . '_install')) {
+			$func = $addonId . '_install';
+			$func();
+		}
+
+		$this->config->set('addons', $addonId, [
+			'last_update' => $timestamp,
+			'admin'       => function_exists($addonId . '_addon_admin'),
+		]);
+
+		if (!$this->isAddonEnabled($addonId)) {
+			$this->addons[] = $addonId;
+		}
+
+		return true;
 	}
 
 	/**
