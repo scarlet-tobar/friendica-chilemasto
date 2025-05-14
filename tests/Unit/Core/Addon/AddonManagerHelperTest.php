@@ -103,7 +103,7 @@ class AddonManagerHelperTest extends TestCase
 	{
 		$addonManagerHelper = new AddonManagerHelper(
 			__DIR__ . '/../../../Util/addons',
-			$this->createStub(originalClassName: IManageConfigValues::class),
+			$this->createStub(IManageConfigValues::class),
 			$this->createStub(Profiler::class)
 		);
 
