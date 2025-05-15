@@ -60,7 +60,7 @@ class AddonManagerHelperTest extends TestCase
 		$config->method('get')->willReturn([
 			'helloaddon' => [
 				'last_update' => 1738760499,
-				'admin' => false,
+				'admin'       => false,
 			],
 		]);
 
@@ -90,7 +90,7 @@ class AddonManagerHelperTest extends TestCase
 		$config->method('get')->willReturn([
 			'helloaddon' => [
 				'last_update' => 1738760499,
-				'admin' => false,
+				'admin'       => false,
 			],
 		]);
 
@@ -114,11 +114,11 @@ class AddonManagerHelperTest extends TestCase
 		$config->method('get')->willReturn([
 			'helloaddon' => [
 				'last_update' => 1738760499,
-				'admin' => false,
+				'admin'       => false,
 			],
 			'addonwithadminsettings' => [
 				'last_update' => 1738760499,
-				'admin' => true,
+				'admin'       => true,
 			],
 		]);
 
@@ -360,7 +360,7 @@ class AddonManagerHelperTest extends TestCase
 		$config->method('get')->willReturn([
 			'helloaddon' => [
 				'last_update' => 1234567890,
-				'admin' => false,
+				'admin'       => false,
 			],
 		]);
 
@@ -406,7 +406,7 @@ class AddonManagerHelperTest extends TestCase
 		$config->method('get')->willReturn([
 			$addonName => [
 				'last_update' => 0,
-				'admin' => false,
+				'admin'       => false,
 			],
 		]);
 

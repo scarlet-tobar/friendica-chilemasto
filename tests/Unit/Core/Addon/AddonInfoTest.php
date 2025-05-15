@@ -41,15 +41,15 @@ class AddonInfoTest extends TestCase
 				 */
 				TEXT,
 				[
-					'id' => 'test',
-					'name' => 'Test Addon',
+					'id'          => 'test',
+					'name'        => 'Test Addon',
 					'description' => 'adds awesome features to friendica',
 
 					'maintainers' => [
 						['name' => 'Robin'],
 					],
 					'version' => '100.4.50-beta.5',
-					'status' => 'beta',
+					'status'  => 'beta',
 				],
 			],
 			'without-maintainer' => [
@@ -66,14 +66,14 @@ class AddonInfoTest extends TestCase
 				 */
 				TEXT,
 				[
-					'id' => 'test',
-					'name' => 'Test Addon',
+					'id'          => 'test',
+					'name'        => 'Test Addon',
 					'description' => 'adds awesome features to friendica',
-					'authors' => [
+					'authors'     => [
 						['name' => 'Sam'],
 					],
 					'version' => '100.4.50-beta.5',
-					'status' => 'beta',
+					'status'  => 'beta',
 				],
 			],
 			'complete' => [
@@ -93,10 +93,10 @@ class AddonInfoTest extends TestCase
 				 */
 				TEXT,
 				[
-					'id' => 'test',
-					'name' => 'Test Addon',
+					'id'          => 'test',
+					'name'        => 'Test Addon',
 					'description' => 'adds awesome features to friendica',
-					'authors' => [
+					'authors'     => [
 						['name' => 'Sam'],
 						['name' => 'Sam With Mail', 'link' => 'mail@example.org'],
 					],
@@ -105,7 +105,7 @@ class AddonInfoTest extends TestCase
 						['name' => 'Robin With Profile', 'link' => 'https://example.org/profile/robin'],
 					],
 					'version' => '100.4.50-beta.5',
-					'status' => 'beta',
+					'status'  => 'beta',
 				],
 			],
 		];
@@ -155,13 +155,13 @@ class AddonInfoTest extends TestCase
 		);
 
 		$data = [
-			'id' => $info->getId(),
-			'name' => $info->getName(),
+			'id'          => $info->getId(),
+			'name'        => $info->getName(),
 			'description' => $info->getDescription(),
-			'authors' => $info->getAuthors(),
+			'authors'     => $info->getAuthors(),
 			'maintainers' => $info->getMaintainers(),
-			'version' => $info->getVersion(),
-			'status' => $info->getStatus(),
+			'version'     => $info->getVersion(),
+			'status'      => $info->getStatus(),
 		];
 
 		$this->assertSame($expected, $data);
