@@ -7,8 +7,6 @@
 
 namespace Friendica\Core\Hooks\Util;
 
-use Friendica\Core\Addon\AddonHelper;
-use Friendica\Core\Addon\Capability\ICanLoadAddons;
 use Friendica\Core\Addon\Exception\AddonInvalidConfigFileException;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hooks\Capability\ICanRegisterStrategies;
