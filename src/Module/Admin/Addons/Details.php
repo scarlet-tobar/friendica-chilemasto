@@ -96,7 +96,6 @@ class Details extends BaseAdmin
 		$addonAuthors = [];
 
 		foreach ($addonInfo->getAuthors() as $addonAuthor) {
-			$addonAuthor['link'] = 'foo@bar.com';
 			if (array_key_exists('link', $addonAuthor) && empty(parse_url($addonAuthor['link'], PHP_URL_SCHEME))) {
 				$contact = Contact::getByURL($addonAuthor['link'], false);
 
