@@ -120,7 +120,7 @@ class AddonManagerHelperTest extends TestCase
 		);
 
 		$this->expectException(AddonInvalidConfigFileException::class);
-		$this->expectExceptionMessageMatches('^#Error loading config file .+/helloaddon/static/dependencies\.config\.php#$');
+		$this->expectExceptionMessageMatches('#Error loading config file .+/helloaddon/static/dependencies\.config\.php#');
 
 		$addonManagerHelper->getAddonDependencyConfig('helloaddon');
 	}
