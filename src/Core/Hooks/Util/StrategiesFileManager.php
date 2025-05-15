@@ -73,7 +73,7 @@ class StrategiesFileManager
 	public function loadConfig()
 	{
 		// load core hook config
-		$configFile = $this->addonHelper->getAddonPath() . '/' . static::STATIC_DIR . '/' . static::CONFIG_NAME . '.config.php';
+		$configFile = $this->basePath . '/' . static::STATIC_DIR . '/' . static::CONFIG_NAME . '.config.php';
 
 		if (!file_exists($configFile)) {
 			throw new HookConfigException(sprintf('config file %s does not exist.', $configFile));
