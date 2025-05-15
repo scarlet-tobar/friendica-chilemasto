@@ -55,7 +55,7 @@ interface AddonHelper
 	public function loadAddons(): void;
 
 	/**
-	 * Reload (uninstall and install) all updated addons.
+	 * Reload (uninstall and install) all installed and modified addons.
 	 */
 	public function reloadAddons(): void;
 

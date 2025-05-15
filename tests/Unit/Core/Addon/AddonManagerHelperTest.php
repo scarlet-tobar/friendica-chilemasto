@@ -162,12 +162,12 @@ class AddonManagerHelperTest extends TestCase
 		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
 			$addonName => [
 				$addonName . '.php' => <<<PHP
-									<?php
-									function {$addonName}_install()
-									{
-										throw new \Exception("Addon installed");
-									}
-									PHP,
+					<?php
+					function {$addonName}_install()
+					{
+						throw new \Exception("Addon installed");
+					}
+					PHP,
 			]
 		]);
 
@@ -270,12 +270,12 @@ class AddonManagerHelperTest extends TestCase
 		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
 			$addonName => [
 				$addonName . '.php' => <<<PHP
-									<?php
-									function {$addonName}_uninstall()
-									{
-										throw new \Exception("Addon uninstalled");
-									}
-									PHP,
+					<?php
+					function {$addonName}_uninstall()
+					{
+						throw new \Exception("Addon uninstalled");
+					}
+					PHP,
 			]
 		]);
 
@@ -354,5 +354,52 @@ class AddonManagerHelperTest extends TestCase
 		$addonManagerHelper->uninstallAddon('helloaddon');
 
 		$this->assertSame([], $addonManagerHelper->getEnabledAddons());
+	}
+
+	public function testReloadAddonsInstallsAddon(): void
+	{
+		// We need a unique name for the addon to avoid conflicts
+		// with other tests that may define the same install function.
+		$addonName = __FUNCTION__;
+
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
+			$addonName => [
+				$addonName . '.php' => <<<PHP
+					<?php
+					function {$addonName}_install()
+					{
+						throw new \Exception("Addon reinstalled");
+					}
+					PHP,
+			]
+		]);
+
+		$root->getChild($addonName . '/' . $addonName . '.php')->lastModified(1234567890);
+
+		$config = $this->createStub(IManageConfigValues::class);
+		$config->method('get')->willReturn([
+			$addonName => [
+				'last_update' => 0,
+				'admin' => false,
+			],
+		]);
+
+		$addonManagerHelper = new AddonManagerHelper(
+			$root->url(),
+			$this->createStub(Database::class),
+			$config,
+			$this->createStub(ICanCache::class),
+			$this->createStub(LoggerInterface::class),
+			$this->createStub(Profiler::class)
+		);
+
+		$addonManagerHelper->loadAddons();
+
+		$this->assertSame([$addonName], $addonManagerHelper->getEnabledAddons());
+
+		$this->expectException(Exception::class);
+		$this->expectExceptionMessage('Addon reinstalled');
+
+		$addonManagerHelper->reloadAddons();
 	}
 }

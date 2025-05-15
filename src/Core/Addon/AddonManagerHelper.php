@@ -201,11 +201,31 @@ final class AddonManagerHelper implements AddonHelper
 	}
 
 	/**
-	 * Reload (uninstall and install) all updated addons.
+	 * Reload (uninstall and install) all installed and modified addons.
 	 */
 	public function reloadAddons(): void
 	{
-		$this->proxy->reloadAddons();
+		$addons = array_filter($this->config->get('addons') ?? []);
+
+		foreach ($addons as $addonName => $data) {
+			$addonId = Strings::sanitizeFilePathItem(trim($addonName));
+
+			$addon_file_path = $this->getAddonPath() . '/' . $addonId . '/' . $addonId . '.php';
+
+			if (!file_exists($addon_file_path)) {
+				continue;
+			}
+
+			if (array_key_exists('last_update', $data) && intval($data['last_update']) === filemtime($addon_file_path)) {
+				// Addon unmodified, skipping
+				continue;
+			}
+
+			$this->logger->debug("Addon {addon}: {action}", ['action' => 'reload', 'addon' => $addonId]);
+
+			$this->uninstallAddon($addonId);
+			$this->installAddon($addonId);
+		}
 	}
 
 	/**
