@@ -38,9 +38,6 @@ final class AddonManagerHelper implements AddonHelper
 	/** @var string[] */
 	private array $addons = [];
 
-	/** @deprecated */
-	private AddonHelper $proxy;
-
 	public function __construct(
 		string $addonPath,
 		Database $database,
@@ -55,8 +52,6 @@ final class AddonManagerHelper implements AddonHelper
 		$this->cache     = $cache;
 		$this->logger    = $logger;
 		$this->profiler  = $profiler;
-
-		$this->proxy = new AddonProxy($addonPath);
 	}
 	/**
 	 * Returns the absolute path to the addon folder
