@@ -30,15 +30,15 @@ class StrategiesFileManager
 	const STATIC_DIR           = 'static';
 	const CONFIG_NAME          = 'strategies';
 
-	private AddonHelper $addonHelper;
+	private IManageConfigValues $configuration;
 	protected array $config = [];
 	/** @var string */
 	protected $basePath;
 
-	public function __construct(string $basePath, AddonHelper $addonHelper)
+	public function __construct(string $basePath, IManageConfigValues $configuration)
 	{
-		$this->basePath    = $basePath;
-		$this->addonHelper = $addonHelper;
+		$this->basePath      = $basePath;
+		$this->configuration = $configuration;
 	}
 
 	/**
@@ -96,15 +96,13 @@ class StrategiesFileManager
 	 */
 	private function getActiveAddonConfig(string $configName): array
 	{
-		$this->addonHelper->loadAddons();
-
-		$addons       = $this->addonHelper->getEnabledAddons();
+		$addons       = array_keys(array_filter($this->configuration->get('addons') ?? []));
 		$returnConfig = [];
 
 		foreach ($addons as $addon) {
 			$addonName = Strings::sanitizeFilePathItem(trim($addon));
 
-			$configFile = $this->addonHelper->getAddonPath() . '/' . $addonName . '/' . static::STATIC_DIR . '/' . $configName . '.config.php';
+			$configFile = $this->basePath . '/addon/' . $addonName . '/' . static::STATIC_DIR . '/' . $configName . '.config.php';
 
 			if (!file_exists($configFile)) {
 				// Addon unmodified, skipping
