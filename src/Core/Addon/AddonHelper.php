@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Friendica\Core\Addon;
 
+use Friendica\Core\Addon\Exception\AddonInvalidConfigFileException;
+
 /**
  * Some functions to handle addons
  */
@@ -63,6 +65,17 @@ interface AddonHelper
 	 * Get the comment block of an addon as value object.
 	 */
 	public function getAddonInfo(string $addonId): AddonInfo;
+
+	/**
+	 * Returns a dependency config array for a given addon
+	 *
+	 * This will load a potential config-file from the static directory, like `addon/{addonId}/static/dependencies.config.php`
+	 *
+	 * @throws AddonInvalidConfigFileException If the config file doesn't return an array
+	 *
+	 * @return array the config as array or empty array if no config file was found
+	 */
+	public function getAddonDependencyConfig(string $addonId): array;
 
 	/**
 	 * Checks if the provided addon is enabled
