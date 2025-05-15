@@ -24,8 +24,22 @@ class AddonManagerHelperTest extends TestCase
 {
 	public function testGetAddonInfoReturnsAddonInfo(): void
 	{
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
+			'helloaddon' => [
+				'helloaddon.php' => <<<PHP
+					<?php
+					/**
+					 * Name: Hello Addon
+					 * Description: For testing purpose only
+					 * Version: 1.0
+					 * Author: Artur Weigandt <dont-mail-me@example.com>
+					 */
+					PHP,
+			]
+		]);
+
 		$addonManagerHelper = new AddonManagerHelper(
-			__DIR__ . '/../../../Util/addons',
+			$root->url(),
 			$this->createStub(Database::class),
 			$this->createStub(IManageConfigValues::class),
 			$this->createStub(ICanCache::class),
@@ -50,8 +64,10 @@ class AddonManagerHelperTest extends TestCase
 			],
 		]);
 
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, []);
+
 		$addonManagerHelper = new AddonManagerHelper(
-			__DIR__ . '/../../../Util/addons',
+			$root->url(),
 			$this->createStub(Database::class),
 			$config,
 			$this->createStub(ICanCache::class),
@@ -78,8 +94,10 @@ class AddonManagerHelperTest extends TestCase
 			],
 		]);
 
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, []);
+
 		$addonManagerHelper = new AddonManagerHelper(
-			__DIR__ . '/../../../Util/addons',
+			$root->url(),
 			$this->createStub(Database::class),
 			$config,
 			$this->createStub(ICanCache::class),
@@ -104,8 +122,10 @@ class AddonManagerHelperTest extends TestCase
 			],
 		]);
 
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, []);
+
 		$addonManagerHelper = new AddonManagerHelper(
-			__DIR__ . '/../../../Util/addons',
+			$root->url(),
 			$this->createStub(Database::class),
 			$config,
 			$this->createStub(ICanCache::class),
@@ -118,8 +138,14 @@ class AddonManagerHelperTest extends TestCase
 
 	public function testGetAvailableAddons(): void
 	{
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
+			'helloaddon' => [
+				'helloaddon.php' => '<?php',
+			]
+		]);
+
 		$addonManagerHelper = new AddonManagerHelper(
-			__DIR__ . '/../../../Util/addons',
+			$root->url(),
 			$this->createStub(Database::class),
 			$this->createStub(IManageConfigValues::class),
 			$this->createStub(ICanCache::class),
