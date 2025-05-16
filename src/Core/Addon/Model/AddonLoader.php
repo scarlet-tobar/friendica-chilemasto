@@ -27,6 +27,8 @@ class AddonLoader implements ICanLoadAddons
 
 	public function __construct(string $basePath, IManageConfigValues $config)
 	{
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
+
 		$this->basePath = $basePath;
 		$this->config   = $config;
 	}
@@ -36,6 +38,8 @@ class AddonLoader implements ICanLoadAddons
 	 */
 	public function getActiveAddonConfig(string $configName): array
 	{
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use `\Friendica\Core\Addon\AddonHelper::getAddonDependencyConfig()` instead.', E_USER_DEPRECATED);
+
 		$addons       = array_keys(array_filter($this->config->get('addons') ?? []));
 		$returnConfig = [];
 
