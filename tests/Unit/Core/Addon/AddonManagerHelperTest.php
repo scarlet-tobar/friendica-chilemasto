@@ -212,6 +212,9 @@ class AddonManagerHelperTest extends TestCase
 		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
 			'helloaddon' => [
 				'helloaddon.php' => '<?php',
+			],
+			'.hidden' => [
+				'.hidden.php' => 'This folder should be ignored',
 			]
 		]);
 

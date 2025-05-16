@@ -83,7 +83,9 @@ final class AddonManagerHelper implements AddonHelper
 		$files = [];
 
 		foreach ($dirs as $dirname) {
-			if (in_array($dirname, ['.', '..'])) {
+			// ignore hidden files and folders
+			// @TODO: Replace with str_starts_with() when PHP 8.0 is the minimum version
+			if (\strncmp($dirname, '.', 1) === 0) {
 				continue;
 			}
 
