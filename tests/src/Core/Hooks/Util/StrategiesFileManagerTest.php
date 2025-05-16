@@ -7,7 +7,6 @@
 
 namespace Friendica\Test\src\Core\Hooks\Util;
 
-use Friendica\Core\Addon\Capability\ICanLoadAddons;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hooks\Capability\ICanRegisterStrategies;
 use Friendica\Core\Hooks\Exceptions\HookConfigException;
