@@ -615,4 +615,27 @@ Lucas: For the right price, yes.[/share]',
 
 		self::assertEquals($expected, $actual);
 	}
+
+	public function dataProfileLink(): array
+	{
+		return [
+			'mention' => [
+				'expected' => 'Test 1: <bdi>@<a href="https://domain.tld/~remotecontact" class="userinfo mention" title="Remote contact">Remote contact</a></bdi>',
+				'text'     => 'Test 1: @[url=https://domain.tld/profile/remotecontact]Remote contact[/url]',
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataProfileLink
+	 *
+	 * @param string $expected Expected BBCode output
+	 * @param string $text     Input text
+	 */
+	public function testProfileLink(string $expected, string $text)
+	{
+		$actual = BBCode::convertForUriId(0, $text);
+
+		self::assertEquals($expected, $actual);
+	}
 }

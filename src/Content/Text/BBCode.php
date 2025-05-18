@@ -913,13 +913,18 @@ class BBCode
 			default:
 				$text = ($is_quote_share ? "\n" : '');
 
-				$contact = Contact::getByURL($attributes['profile'], false, ['network']);
+				$contact = Contact::getByURL($attributes['profile'], false, ['network', 'url', 'alias']);
 				$network = $contact['network'] ?? Protocol::PHANTOM;
+				if (!empty($contact)) {
+					$profile = Contact::getProfileLink($contact);
+				} else {
+					$profile = $attributes['profile'];
+				}
 
 				$gsid = ContactSelector::getServerIdForProfile($attributes['profile']);
 				$tpl  = Renderer::getMarkupTemplate('shared_content.tpl');
 				$text .= self::SHARED_ANCHOR . Renderer::replaceMacros($tpl, [
-					'$profile'      => $attributes['profile'],
+					'$profile'      => $profile,
 					'$avatar'       => $attributes['avatar'],
 					'$author'       => $attributes['author'],
 					'$link'         => $attributes['link'],
@@ -1984,12 +1989,25 @@ class BBCode
 				'<a href="$2" class="mention hashtag" rel="tag">$1<span>$3</span></a>',
 				$text
 			);
-		} elseif (in_array($simple_html, [self::INTERNAL, self::EXTERNAL, self::TWITTER_API])) {
+		} elseif (in_array($simple_html, [self::EXTERNAL, self::TWITTER_API])) {
 			$text = preg_replace(
 				"/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
 				'<bdi>$1<a href="$2" class="userinfo mention" title="$3">$3</a></bdi>',
 				$text
 			);
+		} elseif ($simple_html == self::INTERNAL) {
+			if (preg_match_all("/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism", $text, $matches, PREG_SET_ORDER)) {
+				foreach ($matches as $match) {
+					$contact = Contact::getByURL($match[2], false, ['network', 'url', 'alias']);
+					if (!empty($contact)) {
+						$url = Contact::getProfileLink($contact);
+					} else {
+						$url = $match[2];
+					}
+					$text = str_replace($match[0], '<bdi>' . $match[1] . '<a href="' . $url . '" class="userinfo mention" title="' . $match[3] . '">' . $match[3] . '</a></bdi>', $text);
+				}
+
+			}
 		} elseif ($simple_html == self::MASTODON_API) {
 			$text = preg_replace(
 				"/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
