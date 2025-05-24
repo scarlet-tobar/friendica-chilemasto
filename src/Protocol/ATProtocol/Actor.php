@@ -145,9 +145,11 @@ class Actor
 				$fields['gsid'] = GServer::getRealID($fields['baseurl'], true);
 			}
 
-			foreach ($directory->verificationMethod as $method) {
-				if (!empty($method->publicKeyMultibase)) {
-					$fields['pubkey'] = $method->publicKeyMultibase;
+			if (!empty($directory->verificationMethod)) {
+				foreach ($directory->verificationMethod as $method) {
+					if (!empty($method->publicKeyMultibase)) {
+						$fields['pubkey'] = $method->publicKeyMultibase;
+					}
 				}
 			}
 		}
