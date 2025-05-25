@@ -128,8 +128,8 @@ class Photos extends \Friendica\Module\BaseProfile
 		$request = $hook_data['request'] ?? $request;
 
 		// Determine the album to use
-		$album    = trim($request['album'] ?? '');
-		$newalbum = trim($request['newalbum'] ?? '');
+		$album    = strip_tags(trim($request['album'] ?? ''));
+		$newalbum = strip_tags(trim($request['newalbum'] ?? ''));
 
 		$this->logger->debug('album= ' . $album . ' newalbum= ' . $newalbum);
 
