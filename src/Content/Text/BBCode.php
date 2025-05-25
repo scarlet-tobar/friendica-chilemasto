@@ -1210,13 +1210,13 @@ class BBCode
 	 */
 	private static function normalizeVideoLinks(string $text): string
 	{
-		$text = preg_replace("/\[youtube\]https?:\/\/www.youtube.com\/watch\?v\=(.*?)\[\/youtube\]/ism", '[youtube]$1[/youtube]', $text);
-		$text = preg_replace("/\[youtube\]https?:\/\/www.youtube.com\/embed\/(.*?)\[\/youtube\]/ism", '[youtube]$1[/youtube]', $text);
-		$text = preg_replace("/\[youtube\]https?:\/\/www.youtube.com\/shorts\/(.*?)\[\/youtube\]/ism", '[youtube]$1[/youtube]', $text);
-		$text = preg_replace("/\[youtube\]https?:\/\/youtu.be\/(.*?)\[\/youtube\]/ism", '[youtube]$1[/youtube]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/watch\?v\=(.*?)\[\/youtube\]/ism", '[youtube]$2[/youtube]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/embed\/(.*?)\[\/youtube\]/ism", '[youtube]$2[/youtube]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/shorts\/(.*?)\[\/youtube\]/ism", '[youtube]$2[/youtube]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/youtu\.be\/(.*?)\[\/youtube\]/ism", '[youtube]$1[/youtube]', $text);
 
-		$text = preg_replace("/\[vimeo\]https?:\/\/player.vimeo.com\/video\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[vimeo]$1[/vimeo]', $text);
-		$text = preg_replace("/\[vimeo\]https?:\/\/vimeo.com\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[vimeo]$1[/vimeo]', $text);
+		$text = preg_replace("/\[vimeo\]https?:\/\/player\.vimeo\.com\/video\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[vimeo]$1[/vimeo]', $text);
+		$text = preg_replace("/\[vimeo\]https?:\/\/vimeo\.com\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[vimeo]$1[/vimeo]', $text);
 
 		return $text;
 	}
