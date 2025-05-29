@@ -395,6 +395,10 @@ Karl Marx - Die ursprüngliche Akkumulation
 				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
 				'text'           => '[youtube]https://youtube.com/embed/hfwbmTzBFT0[/youtube]',
 			],
+			'task-14940-youtube-mobile' => [
+				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+				'text'           => '[youtube]https://m.youtube.com/watch?v=hfwbmTzBFT0[/youtube]',
+			],
 			'task-14940-vimeo' => [
 				'expectedBBCode' => '[url=https://vimeo.com/2345345]https://vimeo.com/2345345[/url]',
 				'text'           => '[vimeo]https://vimeo.com/2345345[/vimeo]',

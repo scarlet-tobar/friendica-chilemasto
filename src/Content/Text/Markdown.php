@@ -125,6 +125,7 @@ class Markdown
 		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/(www\.)?youtube\.com\/watch\?v\=(.*?)\].*?\[\/url\]/ism', '[youtube]$2[/youtube]', 'url', $s);
 		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/(www\.)?youtube\.com\/embed\/(.*?)\].*?\[\/url\]/ism', '[youtube]$2[/youtube]', 'url', $s);
 		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/(www\.)?youtube\.com\/shorts\/(.*?)\].*?\[\/url\]/ism', '[youtube]$2[/youtube]', 'url', $s);
+		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/m\.youtube\.com\/watch\?v\=(.*?)\].*?\[\/url\]/ism', '[youtube]$1[/youtube]', 'url', $s);
 		$s = BBCode::pregReplaceInTag('/\[url\=?(.*?)\]https?:\/\/vimeo\.com\/([0-9]+)(.*?)\[\/url\]/ism', '[vimeo]$2[/vimeo]', 'url', $s);
 		$s = BBCode::pregReplaceInTag('/\[url\=?(.*?)\]https?:\/\/player\.vimeo\.com\/video\/([0-9]+)(.*?)\[\/url\]/ism', '[vimeo]$2[/vimeo]', 'url', $s);
 		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/vimeo\.com\/([0-9]+)\](.*?)\[\/url\]/ism', '[vimeo]$1[/vimeo]', 'url', $s);

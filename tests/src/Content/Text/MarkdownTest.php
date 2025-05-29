@@ -78,6 +78,10 @@ class MarkdownTest extends FixtureTestCase
 				'expectedBBCode' => '[youtube]hfwbmTzBFT0[/youtube]',
 				'markdown'       => '[url=https://youtube.com/embed/hfwbmTzBFT0]https://youtube.com/embed/hfwbmTzBFT0[/url]',
 			],
+			'task-14940-youtube-mobile' => [
+				'expectedBBCode' => '[youtube]hfwbmTzBFT0[/youtube]',
+				'markdown'       => '[url=https://m.youtube.com/watch?v=hfwbmTzBFT0]https://m.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+			],
 			// @todo - should we really ignore the URL content in favor of parsing the link of the body?
 			'task-14940-vimeo-custom-url' => [
 				'expectedBBCode' => '[vimeo]2345345[/vimeo]',
