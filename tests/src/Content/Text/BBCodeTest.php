@@ -294,25 +294,30 @@ Karl Marx - Die ursprüngliche Akkumulation
 	public function dataBBCodesToMarkdown()
 	{
 		return [
-			'bug-7808-gt' => [
+			'bug-7808-gt'           => [
 				'expected' => '&gt;`>`',
 				'text'     => '>[code]>[/code]',
 			],
-			'bug-7808-lt' => [
+			'bug-7808-lt'           => [
 				'expected' => '&lt;`<`',
 				'text'     => '<[code]<[/code]',
 			],
-			'bug-7808-amp' => [
+			'bug-7808-amp'          => [
 				'expected' => '&amp;`&`',
 				'text'     => '&[code]&[/code]',
 			],
-			'bug-12701-quotes' => [
+			'bug-12701-quotes'      => [
 				'expected' => '[![abc"fgh](https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png)](https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581)',
 				'text'     => '[url=https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581][img=https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png]abc"fgh[/img][/url]'
 			],
-			'bug-12701-no-quotes' => [
+			'bug-12701-no-quotes'   => [
 				'expected' => '[![abcfgh](https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png "abcfgh")](https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581)',
 				'text'     => '[url=https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581][img=https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png]abcfgh[/img][/url]'
+			],
+			/** @see https://github.com/friendica/friendica/pull/14908 */
+			'task-14908-strip-tags' => [
+				'expected' => 'Norddeutscher Bürger !\[Noddeutscher Bürger - Bismark Brötchen (Roger Cziwerny - pixapay)\](/rscamo/……)',
+				'text'     => '[class=postbox-ocean]Norddeutscher Bürger ![Noddeutscher Bürger - Bismark Brötchen (Roger Cziwerny - pixapay)](/rscamo/……)[/class]',
 			],
 		];
 	}
