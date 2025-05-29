@@ -314,6 +314,11 @@ Karl Marx - Die ursprüngliche Akkumulation
 				'expected' => '[![abcfgh](https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png "abcfgh")](https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581)',
 				'text'     => '[url=https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581][img=https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png]abcfgh[/img][/url]',
 			],
+			/** @see https://github.com/friendica/friendica/pull/14908 */
+			'task-14908-strip-tags' => [
+				'expected' => 'Norddeutscher Bürger !\[Noddeutscher Bürger - Bismark Brötchen (Roger Cziwerny - pixapay)\](/rscamo/……)',
+				'text'     => '[class=postbox-ocean]Norddeutscher Bürger ![Noddeutscher Bürger - Bismark Brötchen (Roger Cziwerny - pixapay)](/rscamo/……)[/class]',
+			],
 		];
 	}
 
