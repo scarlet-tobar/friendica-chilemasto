@@ -105,8 +105,12 @@ class Jetstream
 			$last_timeout = time();
 			while (true) {
 				try {
-					$message = $this->client->receive();
-					$data    = json_decode($message);
+					$message = @$this->client->receive();
+					if (empty($message)) {
+						$this->logger->notice('Empty message received');
+						break;
+					}
+					$data = json_decode($message);
 					if (is_object($data)) {
 						$timestamp = $data->time_us;
 						$this->route($data);

@@ -327,7 +327,7 @@ class Processor
 
 	private function getHeaderFromJetstream(stdClass $data, int $uid, int $protocol = Conversation::PARCEL_JETSTREAM): array
 	{
-		$contact = $this->actor->getContactByDID($data->did, $uid, 0);
+		$contact = $this->actor->getContactByDID($data->did, $uid, 0, true);
 		if (empty($contact)) {
 			$this->logger->info('Contact not found for user', ['did' => $data->did, 'uid' => $uid]);
 			return [];
@@ -392,7 +392,7 @@ class Processor
 		if (empty($post->author) || empty($post->cid) || empty($parts->rkey)) {
 			return [];
 		}
-		$contact = $this->actor->getContactByDID($post->author->did, $uid, 0);
+		$contact = $this->actor->getContactByDID($post->author->did, $uid, 0, true);
 		if (empty($contact)) {
 			$this->logger->info('Contact not found for user', ['did' => $post->author->did, 'uid' => $uid]);
 			return [];
@@ -506,13 +506,10 @@ class Processor
 						break;
 
 					case 'app.bsky.richtext.facet#mention':
-						$contact = Contact::getByURL($feature->did, null, ['id']);
-						if (!empty($contact['id'])) {
-							$url = $this->baseURL . '/contact/' . $contact['id'];
-							if (substr($linktext, 0, 1) == '@') {
-								$prefix .= '@';
-								$linktext = substr($linktext, 1);
-							}
+						$url = $feature->did;
+						if (substr($linktext, 0, 1) == '@') {
+							$prefix .= '@';
+							$linktext = substr($linktext, 1);
 						}
 						break;
 
@@ -848,17 +845,17 @@ class Processor
 		return $class;
 	}
 
-	public function fetchUriId(string $uri, int $uid): string
+	public function fetchUriId(string $uri, int $uid): int
 	{
 		$reply = Post::selectFirst(['uri-id'], ['uri' => $uri, 'uid' => [$uid, 0]]);
 		if (!empty($reply['uri-id'])) {
 			$this->logger->debug('Post exists', ['uri' => $uri]);
-			return $reply['uri-id'];
+			return (int) $reply['uri-id'];
 		}
 		$reply = Post::selectFirst(['uri-id'], ['extid' => $uri, 'uid' => [$uid, 0]]);
 		if (!empty($reply['uri-id'])) {
 			$this->logger->debug('Post with extid exists', ['uri' => $uri]);
-			return $reply['uri-id'];
+			return (int) $reply['uri-id'];
 		}
 		return 0;
 	}
