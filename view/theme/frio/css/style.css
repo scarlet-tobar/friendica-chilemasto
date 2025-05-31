@@ -2460,7 +2460,7 @@ input[type="range"].form-control {
 
 .form-group-search .form-button-search {
 	position: absolute;
-	top: 4px;
+	top: 2px;
 	right: 4px;
 	border-radius: 30px;
 }
