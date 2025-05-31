@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.02-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-02 19:22+0200\n"
+"POT-Creation-Date: 2025-06-03 20:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,7 +44,7 @@ msgstr ""
 msgid "Item not found."
 msgstr ""
 
-#: mod/item.php:461 mod/message.php:54 mod/message.php:100 mod/notes.php:34
+#: mod/item.php:461 mod/message.php:55 mod/message.php:101 mod/notes.php:34
 #: mod/photos.php:131 mod/photos.php:623 src/Model/Event.php:511
 #: src/Module/Attach.php:40 src/Module/BaseApi.php:90
 #: src/Module/BaseNotifications.php:83 src/Module/BaseSettings.php:38
@@ -210,86 +210,86 @@ msgstr ""
 msgid "Your password has been changed at %s"
 msgstr ""
 
-#: mod/message.php:33 mod/message.php:115 src/Content/Nav.php:317
+#: mod/message.php:34 mod/message.php:116 src/Content/Nav.php:317
 msgid "New Message"
 msgstr ""
 
-#: mod/message.php:69
+#: mod/message.php:70
 msgid "No recipient selected."
 msgstr ""
 
-#: mod/message.php:74
+#: mod/message.php:75
 msgid "Unable to locate contact information."
 msgstr ""
 
-#: mod/message.php:78
+#: mod/message.php:79
 msgid "Message could not be sent."
 msgstr ""
 
-#: mod/message.php:82
+#: mod/message.php:83
 msgid "Message collection failure."
 msgstr ""
 
-#: mod/message.php:109 src/Module/Notifications/Introductions.php:127
+#: mod/message.php:110 src/Module/Notifications/Introductions.php:127
 #: src/Module/Notifications/Introductions.php:163
 #: src/Module/Notifications/Notification.php:71
 msgid "Discard"
 msgstr ""
 
-#: mod/message.php:122 src/Content/Nav.php:314 view/theme/frio/theme.php:230
+#: mod/message.php:123 src/Content/Nav.php:314 view/theme/frio/theme.php:230
 msgid "Messages"
 msgstr ""
 
-#: mod/message.php:135
+#: mod/message.php:136
 msgid "Conversation not found."
 msgstr ""
 
-#: mod/message.php:140
+#: mod/message.php:141
 msgid "Message was not deleted."
 msgstr ""
 
-#: mod/message.php:155
+#: mod/message.php:156
 msgid "Conversation was not removed."
 msgstr ""
 
-#: mod/message.php:168 mod/message.php:273
+#: mod/message.php:169 mod/message.php:276
 msgid "Please enter a link URL:"
 msgstr ""
 
-#: mod/message.php:177
+#: mod/message.php:178
 msgid "Send Private Message"
 msgstr ""
 
-#: mod/message.php:178 mod/message.php:333
+#: mod/message.php:179 mod/message.php:336
 #: src/Module/Privacy/PermissionTooltip.php:149
 msgid "To:"
 msgstr ""
 
-#: mod/message.php:179 mod/message.php:334
+#: mod/message.php:180 mod/message.php:337
 msgid "Subject:"
 msgstr ""
 
-#: mod/message.php:183 mod/message.php:337 src/Module/Invite.php:155
+#: mod/message.php:184 mod/message.php:340 src/Module/Invite.php:155
 msgid "Your message:"
 msgstr ""
 
-#: mod/message.php:186 mod/message.php:341 src/Content/Conversation.php:362
+#: mod/message.php:187 mod/message.php:344 src/Content/Conversation.php:362
 #: src/Module/Post/Edit.php:127
 msgid "Upload photo"
 msgstr ""
 
-#: mod/message.php:187 mod/message.php:342 src/Module/Post/Edit.php:131
+#: mod/message.php:188 mod/message.php:345 src/Module/Post/Edit.php:131
 msgid "Insert web link"
 msgstr ""
 
-#: mod/message.php:188 mod/message.php:344 mod/photos.php:1256
+#: mod/message.php:189 mod/message.php:347 mod/photos.php:1256
 #: src/Content/Conversation.php:393 src/Content/Conversation.php:1572
 #: src/Module/Item/Compose.php:205 src/Module/Post/Edit.php:141
 #: src/Object/Post.php:613
 msgid "Please wait"
 msgstr ""
 
-#: mod/message.php:189 mod/message.php:343 mod/photos.php:658
+#: mod/message.php:190 mod/message.php:346 mod/photos.php:658
 #: mod/photos.php:778 mod/photos.php:1055 mod/photos.php:1097
 #: mod/photos.php:1153 mod/photos.php:1233
 #: src/Module/Calendar/Event/Form.php:236 src/Module/Contact/Advanced.php:118
@@ -313,50 +313,50 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
-#: mod/message.php:210
+#: mod/message.php:211
 msgid "You have no messages."
 msgstr ""
 
-#: mod/message.php:266
+#: mod/message.php:269
 msgid "Message not available."
 msgstr ""
 
-#: mod/message.php:310
+#: mod/message.php:313
 msgid "Delete message"
 msgstr ""
 
-#: mod/message.php:312 mod/message.php:441
+#: mod/message.php:315 mod/message.php:443
 msgid "D, d M Y - g:i A"
 msgstr ""
 
-#: mod/message.php:327 mod/message.php:438
+#: mod/message.php:330 mod/message.php:440
 msgid "Delete conversation"
 msgstr ""
 
-#: mod/message.php:329
+#: mod/message.php:332
 msgid "No secure communications available. You <strong>may</strong> be able to respond from the sender's profile page."
 msgstr ""
 
-#: mod/message.php:332
+#: mod/message.php:335
 msgid "Send Reply"
-msgstr ""
-
-#: mod/message.php:412
-#, php-format
-msgid "Unknown sender - %s"
 msgstr ""
 
 #: mod/message.php:414
 #, php-format
-msgid "You and %s"
+msgid "Unknown sender - %s"
 msgstr ""
 
 #: mod/message.php:416
 #, php-format
+msgid "You and %s"
+msgstr ""
+
+#: mod/message.php:418
+#, php-format
 msgid "%s and You"
 msgstr ""
 
-#: mod/message.php:444
+#: mod/message.php:446
 #, php-format
 msgid "%d message"
 msgid_plural "%d messages"
@@ -2287,7 +2287,7 @@ msgid "Enter address or web location"
 msgstr ""
 
 #: src/Content/Widget.php:38
-msgid "Example: bob@example.com, http://example.com/barbara"
+msgid "user@x.tld, x.tld/user"
 msgstr ""
 
 #: src/Content/Widget.php:40
