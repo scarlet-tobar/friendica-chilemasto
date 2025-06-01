@@ -94,21 +94,12 @@ class Jetstream
 
 			$this->syncContacts();
 			try {
-				set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-					restore_error_handler();
-					throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
-				}, E_WARNING);
 				// @todo make the path configurable
 				$this->client = new \WebSocket\Client('wss://jetstream1.us-west.bsky.network/subscribe?requireHello=true' . $cursor);
 				$this->client->setTimeout($timeout);
 				$this->client->setLogger($this->logger);
-				restore_error_handler();
 			} catch (\WebSocket\ConnectionException $e) {
 				$this->logger->error('Error while trying to establish the connection', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
-				echo "Connection wasn't established.\n";
-				exit(1);
-			} catch (\ErrorException $e) {
-				$this->logger->notice('Warning while trying to establish the connection', ['code' => $e->getCode(), 'severity' => $e->getSeverity(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 				echo "Connection wasn't established.\n";
 				exit(1);
 			}
@@ -116,12 +107,7 @@ class Jetstream
 			$last_timeout = time();
 			while (true) {
 				try {
-					set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-						restore_error_handler();
-						throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
-					}, E_WARNING);
 					$message = $this->client->receive();
-					restore_error_handler();
 
 					if (empty($message)) {
 						$this->logger->notice('Empty message received');
@@ -150,23 +136,13 @@ class Jetstream
 						$this->logger->error('Error while trying to receive a message', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 						break;
 					}
-				} catch (\ErrorException $e) {
-					$this->logger->notice('Warning while trying to receive a message', ['code' => $e->getCode(), 'severity' => $e->getSeverity(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
-					break;
 				}
 				$last_timeout = time();
 			}
 			try {
-				set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-					restore_error_handler();
-					throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
-				}, E_WARNING);
 				$this->client->close();
-				restore_error_handler();
 			} catch (\WebSocket\ConnectionException $e) {
 				$this->logger->error('Error while trying to close the connection', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
-			} catch (\ErrorException $e) {
-				$this->logger->notice('Warning while trying to close the connection', ['code' => $e->getCode(), 'severity' => $e->getSeverity(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 			}
 		}
 		$this->logger->notice('Stop listening');
@@ -263,16 +239,9 @@ class Jetstream
 			]
 		];
 		try {
-			set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-				restore_error_handler();
-				throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
-			}, E_WARNING);
 			$this->client->send(json_encode($update));
-			restore_error_handler();
 		} catch (\WebSocket\ConnectionException $e) {
 			$this->logger->error('Error while trying to send options.', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
-		} catch (\ErrorException $e) {
-			$this->logger->notice('Warning while trying to send options.', ['code' => $e->getCode(), 'severity' => $e->getSeverity(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 		}
 	}
 
