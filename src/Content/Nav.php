@@ -318,8 +318,12 @@ class Nav
 			$nav['messages']['outbox'] = ['message/sent', $this->l10n->t('Outbox'), '', $this->l10n->t('Outbox')];
 			$nav['messages']['new']    = ['message/new', $this->l10n->t('New Message'), '', $this->l10n->t('New Message')];
 
+			$nav_accounts_name        = $this->l10n->t('Accounts');
+			$nav_accounts_description = $this->l10n->t('Manage other accounts, including groups and pages');
 			if (User::hasIdentities($this->session->getSubManagedUserId() ?: $this->session->getLocalUserId())) {
-				$nav['delegation'] = ['delegation', $this->l10n->t('Accounts'), '', $this->l10n->t('Manage other accounts, including groups and pages')];
+				$nav['delegation'] = ['delegation', $nav_accounts_name, '', $nav_accounts_description];
+			} else {
+				$nav['delegation'] = ['settings/delegation', $nav_accounts_name, '', $nav_accounts_description];
 			}
 
 			$nav['settings'] = ['settings', $this->l10n->t('Settings'), '', $this->l10n->t('Account settings')];
