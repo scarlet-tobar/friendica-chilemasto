@@ -207,7 +207,7 @@ function message_content()
 		$r = get_messages(DI::userSession()->getLocalUserId(), $pager->getStart(), $pager->getItemsPerPage());
 
 		if (!DBA::isResult($r)) {
-			DI::sysmsg()->addNotice(DI::l10n()->t('No messages.'));
+			$o .= DI::l10n()->t('You have no messages.');
 			return $o;
 		}
 
