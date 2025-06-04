@@ -2065,7 +2065,7 @@ class Receiver
 		}
 
 		foreach ($object_data['tags'] as $tag) {
-			if (HTTPSignature::isValidContentType($tag['mediaType'] ?? '', $tag['href'])) {
+			if (HTTPSignature::isValidContentType($tag['mediaType'] ?? '', $tag['href'] ?? '')) {
 				$object_data['quote-url'] = $tag['href'];
 			}
 		}

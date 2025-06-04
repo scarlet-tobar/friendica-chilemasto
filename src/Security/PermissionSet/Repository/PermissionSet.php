@@ -132,13 +132,13 @@ class PermissionSet extends BaseRepository
 			}
 
 			if (!empty($user_contact_str)) {
-				$condition = ["`uid` = ? AND (NOT (LOCATE(?, `deny_cid`) OR LOCATE(?, `deny_cid`) OR deny_gid REGEXP ?)
-				AND (LOCATE(?, allow_cid) OR LOCATE(?, allow_cid) OR allow_gid REGEXP ? OR (allow_cid = '' AND allow_gid = '')))",
+				$condition = ["`uid` = ? AND (NOT (LOCATE(?, `deny_cid`) OR LOCATE(?, `deny_cid`) OR CAST(deny_gid AS BINARY) REGEXP BINARY ?)
+				AND (LOCATE(?, allow_cid) OR LOCATE(?, allow_cid) OR  CAST(allow_gid AS BINARY) REGEXP BINARY ? OR (allow_cid = '' AND allow_gid = '')))",
 					$uid, $user_contact_str, $public_contact_str, $circle_str,
 					$user_contact_str, $public_contact_str, $circle_str];
 			} else {
-				$condition = ["`uid` = ? AND (NOT (LOCATE(?, `deny_cid`) OR deny_gid REGEXP ?)
-				AND (LOCATE(?, allow_cid) OR allow_gid REGEXP ? OR (allow_cid = '' AND allow_gid = '')))",
+				$condition = ["`uid` = ? AND (NOT (LOCATE(?, `deny_cid`) OR CAST(deny_gid AS BINARY) REGEXP BINARY ?)
+				AND (LOCATE(?, allow_cid) OR CAST(allow_gid AS BINARY) REGEXP BINARY ? OR (allow_cid = '' AND allow_gid = '')))",
 					$uid, $public_contact_str, $circle_str, $public_contact_str, $circle_str];
 			}
 
