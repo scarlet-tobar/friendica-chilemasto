@@ -99,7 +99,7 @@ class Index extends BaseSettings
 			new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SETTINGS_POST, $request),
 		)->getArray();
 
-		$dob = trim($request['dob'] ?? '');
+		$dob = $this->cleanInput($request['dob'] ?? '');
 
 		if ($dob && !in_array($dob, ['0000-00-00', DBA::NULL_DATE])) {
 			$y = substr($dob, 0, 4);
@@ -121,18 +121,18 @@ class Index extends BaseSettings
 			}
 		}
 
-		$username = trim($request['username'] ?? '');
+		$username = $this->cleanInputText($request['username'] ?? '');
 		if (!$username) {
 			$this->systemMessages->addNotice($this->t('Display Name is required.'));
 			return;
 		}
 
-		$about        = trim($request['about']);
-		$address      = trim($request['address']);
-		$locality     = trim($request['locality']);
-		$region       = trim($request['region']);
-		$postal_code  = trim($request['postal_code']);
-		$country_name = trim($request['country_name']);
+		$about        = $this->cleanInputText($request['about']);
+		$address      = $this->cleanInputText($request['address']);
+		$locality     = $this->cleanInputText($request['locality']);
+		$region       = $this->cleanInputText($request['region']);
+		$postal_code  = $this->cleanInputText($request['postal_code']);
+		$country_name = $this->cleanInputText($request['country_name']);
 		$pub_keywords = self::cleanKeywords(trim($request['pub_keywords']));
 		$prv_keywords = self::cleanKeywords(trim($request['prv_keywords']));
 		$xmpp         = $this->cleanInput(trim($request['xmpp']));
@@ -377,9 +377,14 @@ class Index extends BaseSettings
 		return $profileFields;
 	}
 
+	private function cleanInputText(string $input): string
+	{
+		return trim(strip_tags($input));
+	}
+
 	private function cleanInput(string $input): string
 	{
-		return str_replace(['<', '>', '"', ' '], '', $input);
+		return str_replace(['<', '>', '"', "'", ' '], '', $input);
 	}
 
 	private static function cleanKeywords($keywords): string
@@ -389,7 +394,7 @@ class Index extends BaseSettings
 
 		$cleaned = [];
 		foreach ($keywords as $keyword) {
-			$keyword = trim($keyword);
+			$keyword = trim(str_replace(['<', '>', '"', "'"], '', $keyword));
 			$keyword = trim($keyword, '#');
 			if ($keyword != '') {
 				$cleaned[] = $keyword;

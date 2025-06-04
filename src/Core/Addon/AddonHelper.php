@@ -63,6 +63,8 @@ interface AddonHelper
 
 	/**
 	 * Get the comment block of an addon as value object.
+	 *
+	 * @throws \Friendica\Core\Addon\Exception\InvalidAddonException if there is an error with the addon file
 	 */
 	public function getAddonInfo(string $addonId): AddonInfo;
 
