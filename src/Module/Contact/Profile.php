@@ -282,15 +282,16 @@ class Profile extends BaseModule
 		$this->page['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('contact_head.tpl'), [
 		]);
 
+		$con = $this->t('Connection:');
 		switch ($localRelationship->rel) {
 			case ContactModel::FRIEND:
-				$relation_text = $this->t('You are mutual friends with %s', $contact['name']);
+				$relation_text = $this->t('Friend');
 				break;
 			case ContactModel::FOLLOWER:
-				$relation_text = $this->t('You are sharing with %s', $contact['name']);
+				$relation_text = $this->t('Follows you');
 				break;
 			case ContactModel::SHARING:
-				$relation_text = $this->t('%s is sharing with you', $contact['name']);
+				$relation_text = $this->t('You follow');
 				break;
 			default:
 				$relation_text = '';
@@ -412,6 +413,7 @@ class Profile extends BaseModule
 			'$reason'                    => trim($contact['reason'] ?? ''),
 			'$infedit'                   => $this->t('Edit contact notes'),
 			'$common_link'               => 'contact/' . $contact['id'] . '/contacts/common',
+			'$con'                       => $con,
 			'$relation_text'             => $relation_text,
 			'$visit'                     => $this->t('Visit %s\'s profile [%s]', $contact['name'], $contact['url']),
 			'$blockunblock'              => $this->t('Block/Unblock contact'),
