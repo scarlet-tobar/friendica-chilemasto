@@ -43,7 +43,7 @@ final class AddonInfo
 
 		$result = preg_match("|/\*.*\*/|msU", $raw, $m);
 
-		if ($result === false || $result === 0) {
+		if ($result === false || $result === 0 || !is_array($m) || count($m) < 1) {
 			return self::fromArray($data);
 		}
 
