@@ -41,13 +41,7 @@ final class AddonInfo
 			'id' => $addonId,
 		];
 
-		$result = preg_match("|/\*.*\*/|msU", $raw, $m);
-
-		if ($result === false || $result === 0 || !is_array($m) || count($m) < 1) {
-			return self::fromArray($data);
-		}
-
-		$ll = explode("\n", $m[0]);
+		$ll = explode("\n", $raw);
 
 		foreach ($ll as $l) {
 			$l = trim($l, "\t\n\r */");

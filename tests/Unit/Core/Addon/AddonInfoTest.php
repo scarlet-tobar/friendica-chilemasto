@@ -30,8 +30,7 @@ class AddonInfoTest extends TestCase
 			'without-author' => [
 				'test',
 				<<<TEXT
-				<?php
-				/*
+				/**
 				 * Name: Test Addon
 				 * Description: adds awesome features to friendica
 				 * Version: 100.4.50-beta.5
@@ -55,7 +54,6 @@ class AddonInfoTest extends TestCase
 			'without-maintainer' => [
 				'test',
 				<<<TEXT
-				<?php
 				/*
 				 * Name: Test Addon
 				 * Description: adds awesome features to friendica
@@ -79,7 +77,6 @@ class AddonInfoTest extends TestCase
 			'complete' => [
 				'test',
 				<<<TEXT
-				<?php
 				/*
 				 * Name: Test Addon
 				 * Description: adds awesome features to friendica

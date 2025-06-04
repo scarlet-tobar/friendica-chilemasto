@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Friendica\Core\Addon;
 
+use Friendica\Core\Addon\Exception\InvalidAddonException;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Database\Database;
@@ -98,7 +99,14 @@ final class AddonManagerHelper implements AddonHelper
 		$addons = [];
 
 		foreach ($files as $addonId) {
-			$addonInfo = $this->getAddonInfo($addonId);
+			try {
+				$addonInfo = $this->getAddonInfo($addonId);
+			} catch (InvalidAddonException $th) {
+				$this->logger->error('Invalid addon found: ' . $addonId, ['exception' => $th]);
+
+				// skip invalid addons
+				continue;
+			}
 
 			if (
 				$this->config->get('system', 'show_unsupported_addons')
@@ -227,6 +235,8 @@ final class AddonManagerHelper implements AddonHelper
 
 	/**
 	 * Get the comment block of an addon as value object.
+	 *
+	 * @throws \Friendica\Core\Addon\Exception\InvalidAddonException if there is an error with the addon file
 	 */
 	public function getAddonInfo(string $addonId): AddonInfo
 	{
@@ -235,17 +245,31 @@ final class AddonManagerHelper implements AddonHelper
 			'name' => $addonId,
 		];
 
-		if (!is_file($this->getAddonPath() . "/$addonId/$addonId.php")) {
+		$addonFile = $this->getAddonPath() . "/$addonId/$addonId.php";
+
+		if (!is_file($addonFile)) {
 			return AddonInfo::fromArray($default);
 		}
 
 		$this->profiler->startRecording('file');
 
-		$raw = file_get_contents($this->getAddonPath() . "/$addonId/$addonId.php");
+		$raw = file_get_contents($addonFile);
 
 		$this->profiler->stopRecording();
 
-		return AddonInfo::fromString($addonId, $raw);
+		if ($raw === false) {
+			throw new InvalidAddonException('Could not read addon file: ' . $addonFile);
+		}
+
+		$result = preg_match("|/\*.*\*/|msU", $raw, $matches);
+
+		var_dump($addonFile, $result, $matches);
+
+		if ($result === false || $result === 0 || !is_array($matches) || count($matches) < 1) {
+			throw new InvalidAddonException('Could not find valid comment block in addon file: ' . $addonFile);
+		}
+
+		return AddonInfo::fromString($addonId, $matches[0]);
 	}
 
 	/**

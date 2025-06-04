@@ -12,6 +12,7 @@ namespace Friendica\Test\Unit\Core\Addon;
 use Exception;
 use Friendica\Core\Addon\AddonInfo;
 use Friendica\Core\Addon\AddonManagerHelper;
+use Friendica\Core\Addon\Exception\InvalidAddonException;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Database\Database;
@@ -52,6 +53,32 @@ class AddonManagerHelperTest extends TestCase
 		$this->assertInstanceOf(AddonInfo::class, $info);
 
 		$this->assertEquals('Hello Addon', $info->getName());
+	}
+
+	public function testGetAddonInfoThrowsInvalidAddonException(): void
+	{
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
+			'helloaddon' => [
+				'helloaddon.php' => <<<PHP
+					<?php
+					// This is not a valid addon comment section
+					PHP,
+			]
+		]);
+
+		$addonManagerHelper = new AddonManagerHelper(
+			$root->url(),
+			$this->createStub(Database::class),
+			$this->createStub(IManageConfigValues::class),
+			$this->createStub(ICanCache::class),
+			$this->createStub(LoggerInterface::class),
+			$this->createStub(Profiler::class)
+		);
+
+		$this->expectException(InvalidAddonException::class);
+		$this->expectExceptionMessage('Could not find valid comment block in addon file:');
+
+		$addonManagerHelper->getAddonInfo('helloaddon');
 	}
 
 	public function testEnabledAddons(): void
@@ -140,7 +167,18 @@ class AddonManagerHelperTest extends TestCase
 	{
 		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
 			'helloaddon' => [
-				'helloaddon.php' => '<?php',
+				'helloaddon.php' => <<<PHP
+					<?php
+					/**
+					 * Name: Hello Addon
+					 * Description: For testing purpose only
+					 * Version: 1.0
+					 * Author: Artur Weigandt <dont-mail-me@example.com>
+					 */
+					PHP,
+			],
+			'invalidaddon' => [
+				'invalidaddon.php' => 'This addon should not be loaded, because it does not contain a valid comment section.',
 			],
 			'.hidden' => [
 				'.hidden.php' => 'This folder should be ignored',
