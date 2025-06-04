@@ -263,8 +263,6 @@ final class AddonManagerHelper implements AddonHelper
 
 		$result = preg_match("|/\*.*\*/|msU", $raw, $matches);
 
-		var_dump($addonFile, $result, $matches);
-
 		if ($result === false || $result === 0 || !is_array($matches) || count($matches) < 1) {
 			throw new InvalidAddonException('Could not find valid comment block in addon file: ' . $addonFile);
 		}
