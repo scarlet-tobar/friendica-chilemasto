@@ -363,12 +363,11 @@ class Image
 	 * Rotates image
 	 *
 	 * @param integer $degrees degrees to rotate image
-	 * @return mixed
 	 */
-	public function rotate(int $degrees)
+	public function rotate(int $degrees): void
 	{
 		if (!$this->isValid()) {
-			return false;
+			return;
 		}
 
 		if ($this->isImagick()) {
@@ -393,12 +392,11 @@ class Image
 	 *
 	 * @param boolean $horiz optional, default true
 	 * @param boolean $vert  optional, default false
-	 * @return mixed
 	 */
-	public function flip(bool $horiz = true, bool $vert = false)
+	public function flip(bool $horiz = true, bool $vert = false): void
 	{
 		if (!$this->isValid()) {
-			return false;
+			return;
 		}
 
 		if ($this->isImagick()) {

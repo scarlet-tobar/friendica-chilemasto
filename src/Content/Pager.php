@@ -215,8 +215,8 @@ class Pager
 
 			// Limit the number of displayed page number buttons.
 			if ($numpages > 8) {
-				$numstart = (($this->getPage() > 4) ? ($this->getPage() - 4) : 1);
-				$numstop = (($this->getPage() > ($numpages - 7)) ? $numpages : ($numstart + 8));
+				$numstart = ($this->getPage() > 4) ? ($this->getPage() - 4) : 1;
+				$numstop = ($this->getPage() > ($numpages - 7)) ? $numpages : ($numstart + 8);
 			}
 
 			$pages = [];
