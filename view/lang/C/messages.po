@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.02-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-03 20:17+0200\n"
+"POT-Creation-Date: 2025-06-04 09:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2171,7 +2171,7 @@ msgstr ""
 msgid "Manage other pages"
 msgstr ""
 
-#: src/Content/Nav.php:323 src/Module/Admin/Addons/Details.php:131
+#: src/Content/Nav.php:323 src/Module/Admin/Addons/Details.php:140
 #: src/Module/Admin/Themes/Details.php:85 src/Module/BaseSettings.php:177
 #: src/Module/Welcome.php:38 view/theme/frio/theme.php:231
 msgid "Settings"
@@ -3861,31 +3861,35 @@ msgstr ""
 msgid "User with delegates can't be removed, please remove delegate users first"
 msgstr ""
 
-#: src/Module/Admin/Addons/Details.php:49
+#: src/Module/Admin/Addons/Details.php:52
 msgid "Addon not found."
 msgstr ""
 
-#: src/Module/Admin/Addons/Details.php:60 src/Module/Admin/Addons/Index.php:43
+#: src/Module/Admin/Addons/Details.php:63 src/Module/Admin/Addons/Index.php:44
 #, php-format
 msgid "Addon %s disabled."
 msgstr ""
 
-#: src/Module/Admin/Addons/Details.php:63 src/Module/Admin/Addons/Index.php:45
+#: src/Module/Admin/Addons/Details.php:66 src/Module/Admin/Addons/Index.php:46
 #, php-format
 msgid "Addon %s enabled."
 msgstr ""
 
-#: src/Module/Admin/Addons/Details.php:72
+#: src/Module/Admin/Addons/Details.php:75
 #: src/Module/Admin/Themes/Details.php:38
 msgid "Disable"
 msgstr ""
 
-#: src/Module/Admin/Addons/Details.php:75
+#: src/Module/Admin/Addons/Details.php:78
 #: src/Module/Admin/Themes/Details.php:41 src/Module/Settings/Display.php:341
 msgid "Enable"
 msgstr ""
 
-#: src/Module/Admin/Addons/Details.php:128 src/Module/Admin/Addons/Index.php:77
+#: src/Module/Admin/Addons/Details.php:101
+msgid "Invalid Addon found."
+msgstr ""
+
+#: src/Module/Admin/Addons/Details.php:137 src/Module/Admin/Addons/Index.php:83
 #: src/Module/Admin/Federation.php:213 src/Module/Admin/Logs/Settings.php:74
 #: src/Module/Admin/Logs/View.php:71 src/Module/Admin/Queue.php:59
 #: src/Module/Admin/Site.php:446 src/Module/Admin/Storage.php:124
@@ -3896,36 +3900,36 @@ msgstr ""
 msgid "Administration"
 msgstr ""
 
-#: src/Module/Admin/Addons/Details.php:129 src/Module/Admin/Addons/Index.php:78
+#: src/Module/Admin/Addons/Details.php:138 src/Module/Admin/Addons/Index.php:84
 #: src/Module/BaseAdmin.php:77 src/Module/BaseSettings.php:127
 msgid "Addons"
 msgstr ""
 
-#: src/Module/Admin/Addons/Details.php:130
+#: src/Module/Admin/Addons/Details.php:139
 #: src/Module/Admin/Themes/Details.php:84
 msgid "Toggle"
 msgstr ""
 
-#: src/Module/Admin/Addons/Details.php:143
+#: src/Module/Admin/Addons/Details.php:152
 #: src/Module/Admin/Themes/Details.php:92
 msgid "Author: "
 msgstr ""
 
-#: src/Module/Admin/Addons/Details.php:144
+#: src/Module/Admin/Addons/Details.php:153
 #: src/Module/Admin/Themes/Details.php:93
 msgid "Maintainer: "
 msgstr ""
 
-#: src/Module/Admin/Addons/Index.php:35
+#: src/Module/Admin/Addons/Index.php:36
 msgid "Addons reloaded"
 msgstr ""
 
-#: src/Module/Admin/Addons/Index.php:47
+#: src/Module/Admin/Addons/Index.php:48
 #, php-format
 msgid "Addon %s failed to install."
 msgstr ""
 
-#: src/Module/Admin/Addons/Index.php:79 src/Module/Admin/Features.php:69
+#: src/Module/Admin/Addons/Index.php:85 src/Module/Admin/Features.php:69
 #: src/Module/Admin/Logs/Settings.php:76 src/Module/Admin/Site.php:449
 #: src/Module/Admin/Themes/Index.php:105 src/Module/Admin/Tos.php:72
 #: src/Module/Settings/Account.php:507 src/Module/Settings/Addons.php:64
@@ -3937,11 +3941,11 @@ msgstr ""
 msgid "Save Settings"
 msgstr ""
 
-#: src/Module/Admin/Addons/Index.php:80
+#: src/Module/Admin/Addons/Index.php:86
 msgid "Reload active addons"
 msgstr ""
 
-#: src/Module/Admin/Addons/Index.php:84
+#: src/Module/Admin/Addons/Index.php:90
 #, php-format
 msgid "There are currently no addons available on your node. You can find the official addon repository at %1$s."
 msgstr ""

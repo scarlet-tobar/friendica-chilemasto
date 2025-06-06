@@ -55,12 +55,14 @@ interface AddonHelper
 	public function loadAddons(): void;
 
 	/**
-	 * Reload (uninstall and install) all updated addons.
+	 * Reload (uninstall and install) all installed and modified addons.
 	 */
 	public function reloadAddons(): void;
 
 	/**
 	 * Get the comment block of an addon as value object.
+	 *
+	 * @throws \Friendica\Core\Addon\Exception\InvalidAddonException if there is an error with the addon file
 	 */
 	public function getAddonInfo(string $addonId): AddonInfo;
 
