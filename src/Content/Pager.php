@@ -208,7 +208,7 @@ class Pager
 				'class' => $this->getPage() == 1 ? 'disabled' : ''
 			];
 
-			$numpages = $totalItemCount / $this->getItemsPerPage();
+			$numpages = (int) ceil($totalItemCount / $this->getItemsPerPage());
 
 			$numstart = 1;
 			$numstop = $numpages;
@@ -222,22 +222,6 @@ class Pager
 			$pages = [];
 
 			for ($i = $numstart; $i <= $numstop; $i++) {
-				if ($i == $this->getPage()) {
-					$pages[$i] = [
-						'url'   => '#',
-						'text'  => $i,
-						'class' => 'current active'
-					];
-				} else {
-					$pages[$i] = [
-						'url'   => Strings::ensureQueryParameter($this->baseQueryString . '&page=' . $i),
-						'text'  => $i,
-						'class' => 'n'
-					];
-				}
-			}
-
-			if (($totalItemCount % $this->getItemsPerPage()) != 0) {
 				if ($i == $this->getPage()) {
 					$pages[$i] = [
 						'url'   => '#',
