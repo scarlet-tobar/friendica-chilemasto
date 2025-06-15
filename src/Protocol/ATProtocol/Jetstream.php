@@ -38,6 +38,23 @@ use stdClass;
  */
 class Jetstream
 {
+	/** 
+	 * Maximum drift values in seconds for the threads completion.
+	 * If the drift is higher than this value, only a few posts in a thread will be fetched.
+	 */
+	const MAX_DRIFT_THREAD_COMPLETION = 30;
+	/**
+	 * Maximum drift values in seconds for the DID cap.
+	 * If the drift is higher than this value, the number of DIDs will be capped.
+	 */
+	const MAX_DRIFT_DID_CAP           = 60;
+	/**
+	 * Maximum drift values in seconds for creating posts.
+	 * If the drift is higher than this value, posts and reshares will not be created.
+	 * The other collections will still be processed.
+	 */
+	const MAX_DRIFT_CREATE_POSTS      = 1200;
+
 	private $uids   = [];
 	private $self   = [];
 	private $capped = false;
@@ -362,7 +379,7 @@ class Jetstream
 		$drift = max(0, round(time() - $data->time_us / 1000000));
 		$this->keyValue->set('jetstream_drift', $drift);
 
-		if ($drift > 60 && !$this->capped) {
+		if ($drift > self::MAX_DRIFT_DID_CAP && !$this->capped) {
 			$this->capped = true;
 			$this->setOptions();
 			$this->logger->notice('Drift is too high, dids will be capped');
@@ -389,7 +406,9 @@ class Jetstream
 				break;
 
 			case 'create':
-				$this->processor->createPost($data, $this->uids[$data->did] ?? [0], ($drift > 30));
+				if ($drift < self::MAX_DRIFT_CREATE_POSTS) {
+					$this->processor->createPost($data, $this->uids[$data->did] ?? [0], ($drift > self::MAX_DRIFT_THREAD_COMPLETION));
+				}
 				break;
 
 			default:
@@ -413,7 +432,9 @@ class Jetstream
 				break;
 
 			case 'create':
-				$this->processor->createRepost($data, $this->uids[$data->did] ?? [0], ($drift > 30));
+				if ($drift < self::MAX_DRIFT_CREATE_POSTS) {
+					$this->processor->createRepost($data, $this->uids[$data->did] ?? [0], ($drift > self::MAX_DRIFT_THREAD_COMPLETION));
+				}
 				break;
 
 			default:
