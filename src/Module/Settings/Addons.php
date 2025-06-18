@@ -70,7 +70,7 @@ class Addons extends BaseSettings
 		return Renderer::replaceMacros($tpl, [
 			'$form_security_token'           => BaseSettings::getFormSecurityToken('settings_addon'),
 			'$title'                         => $this->t('Addon Settings'),
-			'$no_addons_settings_configured' => $this->t('No Addon settings configured'),
+			'$no_addon_settings_configured' => $this->t('None of the addons installed on this server have any settings.'),
 			'$addon_settings_forms'          => $addon_settings_forms,
 		]);
 	}
