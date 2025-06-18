@@ -12,12 +12,14 @@ namespace Friendica\Protocol\ATProtocol;
 
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\KeyValueStorage\Capability\IManageKeyValuePairs;
+use Friendica\Core\Logger\Capability\DefaultContextLogger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Protocol\ATProtocol;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
 use stdClass;
 
@@ -38,7 +40,7 @@ use stdClass;
  */
 class Jetstream
 {
-	/** 
+	/**
 	 * Maximum drift values in seconds for the threads completion.
 	 * If the drift is higher than this value, only a few posts in a thread will be fetched.
 	 */
@@ -293,6 +295,14 @@ class Jetstream
 	 */
 	private function route(stdClass $data): void
 	{
+		$previousContext = [];
+
+		if ($this->logger instanceof DefaultContextLogger) {
+			$previousContext = $this->logger->replaceDefaultContext([
+				'jetstream_id' => Strings::getRandomHex(7),
+			]);
+		}
+
 		Item::incrementInbound(Protocol::BLUESKY);
 
 		switch ($data->kind) {
@@ -309,6 +319,10 @@ class Jetstream
 			case 'commit':
 				$this->routeCommits($data);
 				break;
+		}
+
+		if ($this->logger instanceof DefaultContextLogger) {
+			$this->logger->replaceDefaultContext($previousContext);
 		}
 	}
 
