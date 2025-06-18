@@ -52,7 +52,7 @@ class Xrd extends BaseModule
 				$local = substr($local, 2);
 			}
 
-			list($name, $host) = explode('@', $local);
+			[$name, $host] = explode('@', $local);
 		} else {
 			throw new BadRequestException();
 		}

@@ -133,7 +133,7 @@ class Temporal
 	 */
 	public static function getDateofBirthField(string $dob, string $timezone = 'UTC'): string
 	{
-		list($year, $month, $day) = sscanf($dob, '%4d-%2d-%2d');
+		[$year, $month, $day] = sscanf($dob, '%4d-%2d-%2d');
 
 		if ($dob < '0000-01-01') {
 			$value = '';

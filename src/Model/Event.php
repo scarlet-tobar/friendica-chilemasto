@@ -658,7 +658,7 @@ class Event
 
 		$title = strip_tags(BBCode::convertForUriId($event['uri-id'], $event['summary']));
 		if (!$title) {
-			list($title, $_trash) = explode("<br", BBCode::convertForUriId($event['uri-id'], Strings::escapeHtml($event['desc'])), BBCode::TWITTER_API);
+			[$title, $_trash] = explode("<br", BBCode::convertForUriId($event['uri-id'], Strings::escapeHtml($event['desc'])), BBCode::TWITTER_API);
 		}
 
 		$event['author-link'] = Contact::magicLink($event['author-link']);

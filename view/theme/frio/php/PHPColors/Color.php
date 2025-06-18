@@ -116,7 +116,7 @@ class Color {
             throw new Exception("Param was not an HSL array");
         }
 
-        list($H,$S,$L) = [ $hsl['H']/360,$hsl['S'],$hsl['L'] ];
+        [$H, $S, $L] = [ $hsl['H']/360,$hsl['S'],$hsl['L'] ];
 
         if( $S == 0 ) {
             $r = $L * 255;

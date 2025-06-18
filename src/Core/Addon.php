@@ -52,7 +52,7 @@ class Addon
 		if (is_array($files)) {
 			foreach ($files as $file) {
 				if (is_dir($file)) {
-					list($tmp, $addon) = array_map('trim', explode('/', $file));
+					[$tmp, $addon] = array_map('trim', explode('/', $file));
 					$info              = self::getInfo($addon);
 
 					if (DI::config()->get('system', 'show_unsupported_addons')
@@ -277,7 +277,7 @@ class Addon
 						continue;
 					}
 
-					list($type, $v) = $addon_info;
+					[$type, $v] = $addon_info;
 					$type           = strtolower($type);
 					if ($type == "author" || $type == "maintainer") {
 						$r = preg_match("|([^<]+)<([^>]+)>|", $v, $m);

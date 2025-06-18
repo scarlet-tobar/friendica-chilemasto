@@ -59,7 +59,7 @@ function get_scheme_info($scheme)
 				if (count($values) < 2) {
 					continue;
 				}
-				list($k, $v) = $values;
+				[$k, $v] = $values;
 				$k = strtolower($k);
 				if ($k == 'author') {
 					$r = preg_match('|([^<]+)<([^>]+)>|', $v, $m);

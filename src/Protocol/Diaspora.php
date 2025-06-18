@@ -3915,7 +3915,7 @@ class Diaspora
 			$data['birthday'] = '';
 
 			if ($profile['dob'] && ($profile['dob'] > '0000-00-00')) {
-				list($year, $month, $day) = sscanf($profile['dob'], '%4d-%2d-%2d');
+				[$year, $month, $day] = sscanf($profile['dob'], '%4d-%2d-%2d');
 				if ($year < 1004) {
 					$year = 1004;
 				}

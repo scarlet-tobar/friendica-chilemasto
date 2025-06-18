@@ -51,7 +51,7 @@ final class AddonInfo
 					continue;
 				}
 
-				list($type, $v) = $addon_info;
+				[$type, $v] = $addon_info;
 				$type           = strtolower($type);
 
 				if ($type === 'author' || $type === 'maintainer') {

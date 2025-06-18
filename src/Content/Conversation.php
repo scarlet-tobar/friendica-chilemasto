@@ -1547,7 +1547,7 @@ class Conversation
 
 			$body_html = ItemModel::prepareBody($item, true, $preview);
 
-			list($categories, $folders) = $this->item->determineCategoriesTerms($item, $this->session->getLocalUserId());
+			[$categories, $folders] = $this->item->determineCategoriesTerms($item, $this->session->getLocalUserId());
 
 			if (!empty($item['featured'])) {
 				$pinned = $this->l10n->t('Pinned item');

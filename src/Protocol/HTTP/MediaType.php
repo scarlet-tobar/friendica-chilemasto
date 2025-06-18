@@ -90,7 +90,7 @@ final class MediaType
 			throw new \InvalidArgumentException('Provided string doesn\'t look like a MIME type: ' . $contentType);
 		}
 
-		list($type, $subType) = $mimeTypeParts;
+		[$type, $subType] = $mimeTypeParts;
 
 		$parameters = [];
 		foreach ($parts as $parameterString) {
@@ -108,7 +108,7 @@ final class MediaType
 				throw new \InvalidArgumentException('Parameter has too many values: ' . $parameterString);
 			}
 
-			list($key, $value) = $parameterParts;
+			[$key, $value] = $parameterParts;
 
 			if (!self::isToken($value) && !self::isQuotedString($value)) {
 				throw new \InvalidArgumentException("Parameter value isn't a valid token or a quoted string: \"" . $value . '"');

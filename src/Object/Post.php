@@ -462,7 +462,7 @@ class Post
 
 		$body_html = Item::prepareBody($item, true);
 
-		list($categories, $folders) = DI::contentItem()->determineCategoriesTerms($item, DI::userSession()->getLocalUserId());
+		[$categories, $folders] = DI::contentItem()->determineCategoriesTerms($item, DI::userSession()->getLocalUserId());
 
 		$hide_dislike = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'hide_dislike');
 		if ($hide_dislike) {
