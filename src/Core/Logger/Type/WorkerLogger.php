@@ -53,7 +53,7 @@ class WorkerLogger implements LoggerInterface, DefaultContextLogger
 		}
 
 		$this->defaultContext = [
-			'worker_id' => $this->workerId,
+			'worker_id'  => $this->workerId,
 			'worker_cmd' => null,
 		];
 	}
@@ -63,7 +63,7 @@ class WorkerLogger implements LoggerInterface, DefaultContextLogger
 	 */
 	public function replaceDefaultContext(array $defaultContext): array
 	{
-		$oldContext = $this->defaultContext;
+		$oldContext           = $this->defaultContext;
 		$this->defaultContext = $defaultContext;
 
 		return $oldContext;
@@ -86,7 +86,7 @@ class WorkerLogger implements LoggerInterface, DefaultContextLogger
 		}
 
 		$this->defaultContext = [
-			'worker_id' => $this->workerId,
+			'worker_id'  => $this->workerId,
 			'worker_cmd' => $this->functionName,
 		];
 	}

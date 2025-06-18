@@ -15,7 +15,7 @@ namespace Friendica\Core\Logger\Capability;
 interface DefaultContextLogger
 {
 	/**
-     * @return array The old context that will be replaced with the new context
-     */
-    public function replaceDefaultContext(array $defaultContext): array;
+	 * @return array The old context that will be replaced with the new context
+	 */
+	public function replaceDefaultContext(array $defaultContext): array;
 }
