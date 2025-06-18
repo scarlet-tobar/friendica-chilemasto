@@ -49,13 +49,13 @@ class Jetstream
 	 * Maximum drift values in seconds for the DID cap.
 	 * If the drift is higher than this value, the number of DIDs will be capped.
 	 */
-	const MAX_DRIFT_DID_CAP           = 60;
+	const MAX_DRIFT_DID_CAP = 60;
 	/**
 	 * Maximum drift values in seconds for creating posts.
 	 * If the drift is higher than this value, posts and reshares will not be created.
 	 * The other collections will still be processed.
 	 */
-	const MAX_DRIFT_CREATE_POSTS      = 1200;
+	const MAX_DRIFT_CREATE_POSTS = 1200;
 
 	private $uids   = [];
 	private $self   = [];
