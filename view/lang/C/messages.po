@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.02-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-14 15:06+0200\n"
+"POT-Creation-Date: 2025-06-21 13:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -646,7 +646,7 @@ msgstr ""
 msgid "Map"
 msgstr ""
 
-#: src/App.php:451
+#: src/App.php:454
 msgid "Apologies but the website is unavailable at the moment."
 msgstr ""
 
@@ -2227,11 +2227,11 @@ msgstr ""
 msgid "prev"
 msgstr ""
 
-#: src/Content/Pager.php:262 src/Module/Calendar/Show.php:122
+#: src/Content/Pager.php:246 src/Module/Calendar/Show.php:122
 msgid "next"
 msgstr ""
 
-#: src/Content/Pager.php:267
+#: src/Content/Pager.php:251
 msgid "last"
 msgstr ""
 
@@ -6108,7 +6108,7 @@ msgstr ""
 msgid "Search your contacts"
 msgstr ""
 
-#: src/Module/Contact.php:441 src/Module/Search/Index.php:202
+#: src/Module/Contact.php:441 src/Module/Search/Index.php:206
 #, php-format
 msgid "Results for: %s"
 msgstr ""
@@ -6698,8 +6698,8 @@ msgid "Unable to unfollow this contact, please contact your administrator"
 msgstr ""
 
 #: src/Module/Conversation/Channel.php:125
-#: src/Module/Conversation/Community.php:114 src/Module/Search/Index.php:139
-#: src/Module/Search/Index.php:189
+#: src/Module/Conversation/Community.php:114 src/Module/Search/Index.php:140
+#: src/Module/Search/Index.php:192
 msgid "No results."
 msgstr ""
 
@@ -8901,7 +8901,7 @@ msgstr ""
 msgid "Only one search per minute is permitted for not logged in users."
 msgstr ""
 
-#: src/Module/Search/Index.php:200
+#: src/Module/Search/Index.php:204
 #, php-format
 msgid "Items tagged with: %s"
 msgstr ""
