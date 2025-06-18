@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.02-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-21 13:03+0200\n"
+"POT-Creation-Date: 2025-06-21 14:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -9545,7 +9545,7 @@ msgid "Addon Settings"
 msgstr ""
 
 #: src/Module/Settings/Addons.php:73
-msgid "No Addon settings configured"
+msgid "None of the addons installed on this server have any settings."
 msgstr ""
 
 #: src/Module/Settings/Channels.php:134
@@ -10178,6 +10178,10 @@ msgstr ""
 
 #: src/Module/Settings/OAuth.php:61
 msgid "Remove authorization"
+msgstr ""
+
+#: src/Module/Settings/OAuth.php:62
+msgid "You have no connected apps."
 msgstr ""
 
 #: src/Module/Settings/Profile/Index.php:126
