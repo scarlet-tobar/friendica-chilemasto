@@ -813,3 +813,16 @@ summary.wall-item-summary {
     	max-width: 70ch;
     	overflow-wrap: break-word;
 }
+
+/* Add alt tag indicators to the relevant images */
+a:has(img.has-alt-description)::after {
+	background: lightgray;
+	border-radius: 4px;
+	color: black;
+	content: "ALT";
+	font-weight: bold;
+	padding: 3px 8px;
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
+}
