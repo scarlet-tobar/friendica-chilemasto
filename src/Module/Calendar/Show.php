@@ -113,13 +113,13 @@ class Show extends BaseModule
 			'$view'      => $this->t('View'),
 			'$new_event' => ['calendar/event/new', $this->t('Create New Event'), '', ''],
 
-			'$today' => $this->t('today'),
-			'$month' => $this->t('month'),
-			'$week'  => $this->t('week'),
-			'$day'   => $this->t('day'),
-			'$list'  => $this->t('list'),
-			'$prev'  => $this->t('prev'),
-			'$next'  => $this->t('next'),
+			'$today' => mb_ucfirst($this->t('today')),
+			'$month' => mb_ucfirst($this->t('month')),
+			'$week'  => mb_ucfirst($this->t('week')),
+			'$day'   => mb_ucfirst($this->t('day')),
+			'$list'  => mb_ucfirst($this->t('list')),
+			'$prev'  => mb_ucfirst($this->t('prev')),
+			'$next'  => mb_ucfirst($this->t('next')),
 		]);
 
 		return $o;
