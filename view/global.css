@@ -806,6 +806,7 @@ summary.wall-item-summary {
 /* Margin to create space between the icon and the text */
 .notif-image {
     	margin-right: 10px;
+}
 
 /* Styles to ensure the text wraps properly after 70 characters */
 .notif-text {
