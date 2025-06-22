@@ -336,17 +336,13 @@ class Profile
 				}
 			}
 		}
-
-		// show edit profile to yourself, but only if this is not meant to be
-		// rendered as a "contact". i.e., if 'self' (a "contact" table column) isn't
-		// set in $profile.
-		if (!isset($profile['self']) && $local_user_is_self) {
-			$profile['edit'] = [DI::baseUrl() . '/settings/profile', DI::l10n()->t('Edit profile'), '', DI::l10n()->t('Edit profile')];
-			$profile['menu'] = [
-				'chg_photo' => DI::l10n()->t('Change profile photo'),
-				'cr_new'    => null,
-				'entries'   => [],
-			];
+		// TODO: Find a new way to identify if "view as" is active so profile picture change is hidden in that case, as the old method wasn't working anymore.
+		if ($local_user_is_self) {
+			$dest_url                    = DI::baseUrl() . '/profile/' . $profile['nickname'] . '/photos';
+			$change_profile_picture_text = DI::l10n()->t('Change profile photo');
+		} else {
+			$dest_url                    = $profile['url'];
+			$change_profile_picture_text = "";
 		}
 
 		// Fetch the account type
@@ -451,31 +447,33 @@ class Profile
 
 		$tpl = Renderer::getMarkupTemplate('profile/vcard.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
-			'$profile'             => $p,
-			'$xmpp'                => $xmpp,
-			'$matrix'              => $matrix,
-			'$follow'              => DI::l10n()->t('Follow'),
-			'$follow_link'         => $follow_link,
-			'$unfollow'            => DI::l10n()->t('Unfollow'),
-			'$unfollow_link'       => $unfollow_link,
-			'$subscribe_feed'      => DI::l10n()->t('Atom feed'),
-			'$subscribe_feed_link' => $profile['hidewall'] ?? 0 ? '' : $profile['poll'],
-			'$wallmessage'         => DI::l10n()->t('Message'),
-			'$wallmessage_link'    => $wallmessage_link,
-			'$account_type'        => $account_type,
-			'$location'            => $location,
-			'$homepage'            => $homepage,
-			'$homepage_verified'   => DI::l10n()->t('This website has been verified to belong to the same person.'),
-			'$about'               => $about,
-			'$network'             => DI::l10n()->t('Network:'),
-			'$contacts'            => $contact_count,
-			'$updated'             => $updated,
-			'$diaspora'            => $diaspora,
-			'$contact_block'       => $contact_block,
-			'$mention_label'       => $mention_label,
-			'$mention_url'         => $mention_url,
-			'$network_label'       => $network_label,
-			'$network_url'         => $network_url,
+			'$profile'                     => $p,
+			'$dest_url'                    => $dest_url,
+			'$change_profile_picture_text' => $change_profile_picture_text,
+			'$xmpp'                        => $xmpp,
+			'$matrix'                      => $matrix,
+			'$follow'                      => DI::l10n()->t('Follow'),
+			'$follow_link'                 => $follow_link,
+			'$unfollow'                    => DI::l10n()->t('Unfollow'),
+			'$unfollow_link'               => $unfollow_link,
+			'$subscribe_feed'              => DI::l10n()->t('Atom feed'),
+			'$subscribe_feed_link'         => $profile['hidewall'] ?? 0 ? '' : $profile['poll'],
+			'$wallmessage'                 => DI::l10n()->t('Message'),
+			'$wallmessage_link'            => $wallmessage_link,
+			'$account_type'                => $account_type,
+			'$location'                    => $location,
+			'$homepage'                    => $homepage,
+			'$homepage_verified'           => DI::l10n()->t('This website has been verified to belong to the same person.'),
+			'$about'                       => $about,
+			'$network'                     => DI::l10n()->t('Network:'),
+			'$contacts'                    => $contact_count,
+			'$updated'                     => $updated,
+			'$diaspora'                    => $diaspora,
+			'$contact_block'               => $contact_block,
+			'$mention_label'               => $mention_label,
+			'$mention_url'                 => $mention_url,
+			'$network_label'               => $network_label,
+			'$network_url'                 => $network_url,
 		]);
 
 		$hook_data = [
