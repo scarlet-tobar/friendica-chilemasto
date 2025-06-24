@@ -84,7 +84,7 @@ class Theme
 				$comment_line = trim($comment_line, "\t\n\r */");
 				if (strpos($comment_line, ':') !== false) {
 					[$key, $value] = array_map("trim", explode(":", $comment_line, 2));
-					$key               = strtolower($key);
+					$key           = strtolower($key);
 					if ($key == "author") {
 						$result = preg_match("|([^<]+)<([^>]+)>|", $value, $matches);
 						if ($result) {

@@ -63,7 +63,7 @@ class ParsedLogLine
 		} else {
 			// here we hope that there will not be the string ' - {' inside the $jsonsource value
 			[$logline, $jsonsource] = explode(' - {', $logline);
-			$jsonsource                 = '{' . $jsonsource;
+			$jsonsource             = '{' . $jsonsource;
 		}
 
 		$jsondata = null;

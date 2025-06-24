@@ -192,13 +192,13 @@ HELP;
 
 		if ($q === false || $s < $q) {
 			[$then, $else] = explode(':', $string, 2);
-			$node['then']      = $then;
-			$parsedElse        = [];
+			$node['then']  = $then;
+			$parsedElse    = [];
 			self::parse($else, $parsedElse);
 			$node['else'] = $parsedElse;
 		} else {
 			[$if, $thenelse] = explode('?', $string, 2);
-			$node['if']          = $if;
+			$node['if']      = $if;
 			self::parse($thenelse, $node);
 		}
 	}
