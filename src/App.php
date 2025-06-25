@@ -67,7 +67,7 @@ class App
 {
 	const PLATFORM = 'Friendica';
 	const CODENAME = 'Interrupted Fern';
-	const VERSION  = '2025.02-dev';
+	const VERSION  = '2025.07-rc';
 
 	/**
 	 * @internal
