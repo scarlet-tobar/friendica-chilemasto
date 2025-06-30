@@ -293,7 +293,7 @@ class App
 	{
 		$command = strtolower($argv[1] ?? '');
 
-		if ($command === 'daemon' || $command === 'jetstream') {
+		if ($command === 'daemon') {
 			return LogChannel::DAEMON;
 		}
 
@@ -301,7 +301,9 @@ class App
 			return LogChannel::WORKER;
 		}
 
-		// @TODO Add support for jetstream
+		if ($command === 'jetstream') {
+			return LogChannel::JETSTREAM;
+		}
 
 		return LogChannel::CONSOLE;
 	}
