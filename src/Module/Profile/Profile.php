@@ -116,32 +116,12 @@ class Profile extends BaseProfile
 
 	protected function content(array $request = []): string
 	{
-		$profile = ProfileModel::load($this->appHelper, $this->parameters['nickname'] ?? '');
-		if (!$profile) {
+		$owner = User::getByNickname($this->parameters['nickname'] ?? '', ['uid']);
+		if (!$owner) {
 			throw new HTTPException\NotFoundException($this->t('Profile not found.'));
 		}
 
-		$remote_contact_id = $this->session->getRemoteContactID($profile['uid']);
-
-		if ($this->config->get('system', 'block_public') && !$this->session->isAuthenticated()) {
-			return Login::form();
-		}
-
-		if (!empty($profile['hidewall']) && !$this->session->isAuthenticated()) {
-			$this->baseUrl->redirect('profile/' . $profile['nickname'] . '/restricted');
-		}
-
-		if (!empty($profile['page-flags']) && in_array($profile['page-flags'], [User::PAGE_FLAGS_COMMUNITY, User::PAGE_FLAGS_COMM_MAN])) {
-			$this->page['htmlhead'] .= '<meta name="friendica.community" content="true" />' . "\n";
-		}
-
-		$this->page['htmlhead'] .= $this->buildHtmlHead($profile, $this->parameters['nickname']);
-
-		Nav::setSelected('home');
-
-		$is_owner = $this->session->getLocalUserId() == $profile['uid'];
-		$o        = self::getTabsHTML('profile', $is_owner, $profile['nickname'], $profile['hide-friends']);
-
+		$is_owner              = $this->session->getLocalUserId() == $owner['uid'];
 		$view_as_contacts      = [];
 		$view_as_contact_id    = 0;
 		$view_as_contact_alert = '';
@@ -170,6 +150,31 @@ class Profile extends BaseProfile
 				);
 			}
 		}
+
+		$profile = ProfileModel::load($this->appHelper, $this->parameters['nickname'], true, $view_as_contact_id);
+		if (!$profile) {
+			throw new HTTPException\NotFoundException($this->t('Profile not found.'));
+		}
+
+		$remote_contact_id = $this->session->getRemoteContactID($profile['uid']);
+
+		if ($this->config->get('system', 'block_public') && !$this->session->isAuthenticated()) {
+			return Login::form();
+		}
+
+		if (!empty($profile['hidewall']) && !$this->session->isAuthenticated()) {
+			$this->baseUrl->redirect('profile/' . $profile['nickname'] . '/restricted');
+		}
+
+		if (!empty($profile['page-flags']) && in_array($profile['page-flags'], [User::PAGE_FLAGS_COMMUNITY, User::PAGE_FLAGS_COMM_MAN])) {
+			$this->page['htmlhead'] .= '<meta name="friendica.community" content="true" />' . "\n";
+		}
+
+		$this->page['htmlhead'] .= $this->buildHtmlHead($profile, $this->parameters['nickname']);
+
+		Nav::setSelected('home');
+
+		$o = self::getTabsHTML('profile', $is_owner, $profile['nickname'], $profile['hide-friends']);
 
 		$basic_fields = [];
 

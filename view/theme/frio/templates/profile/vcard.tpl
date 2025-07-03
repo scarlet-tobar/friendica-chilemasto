@@ -6,7 +6,7 @@
   *}}
 <div class="vcard h-card widget">
 	<div id="profile-photo-wrapper">
-		<a class="vcard-anchor" href="{{$dest_url}}" style="position: relative;">
+		<a class="vcard-anchor" href="{{$picture_dest_url}}" style="position: relative;">
 			<img class="photo u-photo" src="{{$profile.photo}}" alt="{{$profile.name}}" />
 			{{if $change_profile_picture_text }}
 				<div id="change-profile-picture">{{$change_profile_picture_text}}</div>

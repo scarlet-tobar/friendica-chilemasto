@@ -197,7 +197,7 @@ class Profile
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function load(AppHelper $appHelper, string $nickname, bool $show_contacts = true): array
+	public static function load(AppHelper $appHelper, string $nickname, bool $show_contacts = true, int $view_as_contact_id = 0): array
 	{
 		$profile = User::getOwnerDataByNick($nickname);
 		if (!isset($profile['account_removed']) || $profile['account_removed']) {
@@ -238,7 +238,7 @@ class Profile
 		 * By now, the contact block isn't shown, when a different profile is given
 		 * But: When this profile was on the same server, then we could display the contacts
 		 */
-		DI::page()['aside'] .= self::getVCardHtml($profile, $block, $show_contacts);
+		DI::page()['aside'] .= self::getVCardHtml($profile, $block, $show_contacts, $view_as_contact_id);
 
 		return $profile;
 	}
@@ -259,7 +259,7 @@ class Profile
 	 * @throws \ImagickException
 	 * @note  Returns empty string if passed $profile is wrong type or not populated
 	 */
-	public static function getVCardHtml(array $profile, bool $block, bool $show_contacts): string
+	public static function getVCardHtml(array $profile, bool $block, bool $show_contacts, int $view_as_contact_id = 0): string
 	{
 		$o        = '';
 		$location = false;
@@ -336,12 +336,11 @@ class Profile
 				}
 			}
 		}
-		// TODO: Find a new way to identify if "view as" is active so profile picture change is hidden in that case, as the old method wasn't working anymore.
-		if ($local_user_is_self) {
-			$dest_url                    = DI::baseUrl() . '/profile/' . $profile['nickname'] . '/photos';
+		if ($local_user_is_self && $view_as_contact_id == 0) {
+			$picture_dest_url            = DI::baseUrl() . '/profile/' . $profile['nickname'] . '/photos';
 			$change_profile_picture_text = DI::l10n()->t('Change profile photo');
 		} else {
-			$dest_url                    = $profile['url'];
+			$picture_dest_url            = $profile['url'];
 			$change_profile_picture_text = "";
 		}
 
@@ -448,7 +447,7 @@ class Profile
 		$tpl = Renderer::getMarkupTemplate('profile/vcard.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
 			'$profile'                     => $p,
-			'$dest_url'                    => $dest_url,
+			'$picture_dest_url'            => $picture_dest_url,
 			'$change_profile_picture_text' => $change_profile_picture_text,
 			'$xmpp'                        => $xmpp,
 			'$matrix'                      => $matrix,
