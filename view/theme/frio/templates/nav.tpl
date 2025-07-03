@@ -201,6 +201,20 @@
 										<li>
 											<a role="menuitem" class="{{$usermenu.2}}" href="{{$usermenu.0}}"
 												title="{{$usermenu.3}}">
+
+												{{if $usermenu.0|str_ends_with:$userinfo.name}}
+													<i class="fa fa-commenting"></i>
+												{{elseif $usermenu.0|str_ends_with:"/profile"}}
+													<i class="fa fa-user"></i>
+												{{elseif $usermenu.0|str_ends_with:"/photos"}}
+													<i class="fa fa-picture-o"></i>
+												{{elseif $usermenu.0|str_ends_with:"/media"}}
+													<i class="fa fa-edit"></i>
+												{{elseif $usermenu.0|str_ends_with:"calendar/"}}
+													<i class="fa fa-calendar"></i>
+												{{elseif $usermenu.0|str_ends_with:"notes/"}}
+													<i class="fa fa-book"></i>
+												{{/if}}
 												{{$usermenu.1}}
 											</a>
 										</li>
