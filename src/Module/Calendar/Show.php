@@ -27,6 +27,7 @@ use Friendica\Module\Security\Login;
 use Friendica\Network\HTTPException;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Util\Profiler;
+use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
 
 class Show extends BaseModule
@@ -113,13 +114,13 @@ class Show extends BaseModule
 			'$view'      => $this->t('View'),
 			'$new_event' => ['calendar/event/new', $this->t('Create New Event'), '', ''],
 
-			'$today' => mb_ucfirst($this->t('today')),
-			'$month' => mb_ucfirst($this->t('month')),
-			'$week'  => mb_ucfirst($this->t('week')),
-			'$day'   => mb_ucfirst($this->t('day')),
-			'$list'  => mb_ucfirst($this->t('list')),
-			'$prev'  => mb_ucfirst($this->t('prev')),
-			'$next'  => mb_ucfirst($this->t('next')),
+			'$today' => Strings::ucFirst($this->t('today')),
+			'$month' => Strings::ucFirst($this->t('month')),
+			'$week'  => Strings::ucFirst($this->t('week')),
+			'$day'   => Strings::ucFirst($this->t('day')),
+			'$list'  => Strings::ucFirst($this->t('list')),
+			'$prev'  => Strings::ucFirst($this->t('prev')),
+			'$next'  => Strings::ucFirst($this->t('next')),
 		]);
 
 		return $o;
