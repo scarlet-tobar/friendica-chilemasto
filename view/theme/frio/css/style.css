@@ -1405,6 +1405,9 @@ aside #circle-sidebar li .circle-edit-tool:first-child {
 	width: 75px;
 	border-radius: 4px;
 }
+.contact-block-h4 {
+	display: inline-block;
+}
 
 /* Tag cloud widget */
 .tagblock.widget > .tag-cloud {
