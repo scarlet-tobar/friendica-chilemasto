@@ -111,6 +111,7 @@ class Nav
 			'$banner'             => $nav_info['banner'],
 			'$emptynotifications' => $this->l10n->t('Nothing new here'),
 			'$userinfo'           => $nav_info['userinfo'],
+			'$nickname'           => $this->session->getLocalUserNickname(),
 			'$sel'                => self::$selected,
 			'$apps'               => $this->getAppMenu(),
 			'$home'               => $this->l10n->t('Home'),

@@ -202,7 +202,7 @@
 											<a role="menuitem" class="{{$usermenu.2}}" href="{{$usermenu.0}}"
 												title="{{$usermenu.3}}">
 
-												{{if $usermenu.0|str_ends_with:$userinfo.name}}
+												{{if $usermenu.0|str_ends_with:$nickname}}
 													<i class="fa fa-commenting"></i>
 												{{elseif $usermenu.0|str_ends_with:"/profile"}}
 													<i class="fa fa-user"></i>
