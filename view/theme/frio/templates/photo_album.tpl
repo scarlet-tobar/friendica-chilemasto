@@ -11,8 +11,9 @@
 
 	<div class="photo-album-actions pull-right">
 		{{if $can_post}}
-		<a class="photos-upload-link page-action faded-icon" href="{{$upload.1}}" title="{{$upload.0}}" data-toggle="tooltip">
+		<a class="btn btn-primary photos-upload-link page-action" href="{{$upload.1}}" title="{{$upload.0}}" data-toggle="tooltip">
 			<i class="fa fa-plus"></i>
+			{{$upload_text}}
 		</a>
 		{{/if}}
 

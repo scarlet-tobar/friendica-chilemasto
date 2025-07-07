@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-03 15:00+0200\n"
+"POT-Creation-Date: 2025-09-03 17:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,7 +45,7 @@ msgid "Item not found."
 msgstr ""
 
 #: mod/item.php:461 mod/message.php:56 mod/message.php:102 mod/notes.php:34
-#: mod/photos.php:131 mod/photos.php:623 src/Model/Event.php:511
+#: mod/photos.php:132 mod/photos.php:624 src/Model/Event.php:511
 #: src/Module/Attach.php:40 src/Module/BaseApi.php:90
 #: src/Module/BaseNotifications.php:83 src/Module/BaseSettings.php:38
 #: src/Module/Calendar/Event/API.php:75 src/Module/Calendar/Event/Form.php:70
@@ -283,7 +283,7 @@ msgstr ""
 msgid "Insert web link"
 msgstr ""
 
-#: mod/message.php:190 mod/message.php:348 mod/photos.php:1256
+#: mod/message.php:190 mod/message.php:348 mod/photos.php:1257
 #: src/Content/Conversation.php:393 src/Content/Conversation.php:1572
 #: src/Module/Item/Compose.php:205 src/Module/Post/Edit.php:141
 #: src/Object/Post.php:613
@@ -358,7 +358,7 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: mod/photos.php:50 mod/photos.php:113 mod/photos.php:533
+#: mod/photos.php:51 mod/photos.php:114 mod/photos.php:534
 #: src/Model/Event.php:503 src/Model/Profile.php:211
 #: src/Module/Calendar/Export.php:60 src/Module/Calendar/Show.php:63
 #: src/Module/Feed.php:52 src/Module/HCard.php:37
@@ -370,67 +370,67 @@ msgstr ""
 msgid "User not found."
 msgstr ""
 
-#: mod/photos.php:87 src/Module/BaseProfile.php:53
+#: mod/photos.php:88 src/Module/BaseProfile.php:53
 #: src/Module/Profile/Photos.php:419
 msgid "Photo Albums"
 msgstr ""
 
-#: mod/photos.php:88 src/Module/Profile/Photos.php:420
+#: mod/photos.php:89 src/Module/Profile/Photos.php:420
 #: src/Module/Profile/Photos.php:440
 msgid "Recent Photos"
 msgstr ""
 
-#: mod/photos.php:90 mod/photos.php:826 src/Module/Profile/Photos.php:422
+#: mod/photos.php:91 mod/photos.php:827 src/Module/Profile/Photos.php:422
 #: src/Module/Profile/Photos.php:442
 msgid "Upload New Photos"
 msgstr ""
 
-#: mod/photos.php:102 src/Module/BaseSettings.php:60
+#: mod/photos.php:103 src/Module/BaseSettings.php:60
 #: src/Module/Profile/Photos.php:403
 msgid "everybody"
 msgstr ""
 
-#: mod/photos.php:138
+#: mod/photos.php:139
 msgid "Contact information unavailable"
 msgstr ""
 
-#: mod/photos.php:167
+#: mod/photos.php:168
 msgid "Album not found."
 msgstr ""
 
-#: mod/photos.php:223
+#: mod/photos.php:224
 msgid "Album successfully deleted"
 msgstr ""
 
-#: mod/photos.php:225
+#: mod/photos.php:226
 msgid "Album was empty."
 msgstr ""
 
-#: mod/photos.php:256
+#: mod/photos.php:257
 msgid "Failed to delete the photo."
 msgstr ""
 
-#: mod/photos.php:500
+#: mod/photos.php:501
 msgid "a photo"
 msgstr ""
 
-#: mod/photos.php:500
+#: mod/photos.php:501
 #, php-format
 msgid "%1$s was tagged in %2$s by %3$s"
 msgstr ""
 
-#: mod/photos.php:537 src/Module/Conversation/Community.php:148
+#: mod/photos.php:538 src/Module/Conversation/Community.php:148
 #: src/Module/Directory.php:34 src/Module/Profile/Photos.php:337
 #: src/Module/Search/Index.php:50
 msgid "Public access denied."
 msgstr ""
 
-#: mod/photos.php:542
+#: mod/photos.php:543
 msgid "No photos selected"
 msgstr ""
 
-#: mod/photos.php:658 mod/photos.php:778 mod/photos.php:1055
-#: mod/photos.php:1097 mod/photos.php:1153 mod/photos.php:1233
+#: mod/photos.php:659 mod/photos.php:779 mod/photos.php:1056
+#: mod/photos.php:1098 mod/photos.php:1154 mod/photos.php:1234
 #: src/Module/Calendar/Event/Form.php:236 src/Module/Contact/Advanced.php:118
 #: src/Module/Contact/Profile.php:409
 #: src/Module/Debug/ActivityPubConversion.php:128
@@ -451,41 +451,41 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
-#: mod/photos.php:674
+#: mod/photos.php:675
 #, php-format
 msgid "The maximum accepted image size is %s"
 msgstr ""
 
-#: mod/photos.php:681
+#: mod/photos.php:682 src/Module/Profile/Photos.php:445
 msgid "Upload Photos"
 msgstr ""
 
-#: mod/photos.php:685 mod/photos.php:774
+#: mod/photos.php:686 mod/photos.php:775
 msgid "New album name: "
 msgstr ""
 
-#: mod/photos.php:686
+#: mod/photos.php:687
 msgid "or select existing album:"
 msgstr ""
 
-#: mod/photos.php:687
+#: mod/photos.php:688
 msgid "Do not show a status post for this upload"
 msgstr ""
 
-#: mod/photos.php:690 mod/photos.php:1051 src/Content/Conversation.php:395
+#: mod/photos.php:691 mod/photos.php:1052 src/Content/Conversation.php:395
 #: src/Module/Calendar/Event/Form.php:239 src/Module/Post/Edit.php:179
 msgid "Permissions"
 msgstr ""
 
-#: mod/photos.php:755
+#: mod/photos.php:756
 msgid "Do you really want to delete this photo album and all its photos?"
 msgstr ""
 
-#: mod/photos.php:756 mod/photos.php:779
+#: mod/photos.php:757 mod/photos.php:780
 msgid "Delete Album"
 msgstr ""
 
-#: mod/photos.php:757 mod/photos.php:857 src/Content/Conversation.php:410
+#: mod/photos.php:758 mod/photos.php:858 src/Content/Conversation.php:410
 #: src/Module/Contact/Follow.php:158 src/Module/Contact/Revoke.php:92
 #: src/Module/Contact/Unfollow.php:112
 #: src/Module/Media/Attachment/Browser.php:64
@@ -495,132 +495,132 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: mod/photos.php:783
+#: mod/photos.php:784
 msgid "Edit Album"
 msgstr ""
 
-#: mod/photos.php:784
+#: mod/photos.php:785
 msgid "Drop Album"
 msgstr ""
 
-#: mod/photos.php:788
+#: mod/photos.php:789
 msgid "Show Newest First"
 msgstr ""
 
-#: mod/photos.php:790
+#: mod/photos.php:791
 msgid "Show Oldest First"
 msgstr ""
 
-#: mod/photos.php:811 src/Module/Profile/Photos.php:390
+#: mod/photos.php:812 src/Module/Profile/Photos.php:390
 msgid "View Photo"
 msgstr ""
 
-#: mod/photos.php:843
+#: mod/photos.php:844
 msgid "Permission denied. Access to this item may be restricted."
 msgstr ""
 
-#: mod/photos.php:845
+#: mod/photos.php:846
 msgid "Photo not available"
 msgstr ""
 
-#: mod/photos.php:855
+#: mod/photos.php:856
 msgid "Do you really want to delete this photo?"
 msgstr ""
 
-#: mod/photos.php:856 mod/photos.php:1056
+#: mod/photos.php:857 mod/photos.php:1057
 msgid "Delete Photo"
 msgstr ""
 
-#: mod/photos.php:954
+#: mod/photos.php:955
 msgid "View photo"
 msgstr ""
 
-#: mod/photos.php:956
+#: mod/photos.php:957
 msgid "Edit photo"
 msgstr ""
 
-#: mod/photos.php:957
+#: mod/photos.php:958
 msgid "Delete photo"
 msgstr ""
 
-#: mod/photos.php:958
+#: mod/photos.php:959
 msgid "Use as profile photo"
 msgstr ""
 
-#: mod/photos.php:965
+#: mod/photos.php:966
 msgid "Private Photo"
 msgstr ""
 
-#: mod/photos.php:971
+#: mod/photos.php:972
 msgid "View Full Size"
 msgstr ""
 
-#: mod/photos.php:1024
+#: mod/photos.php:1025
 msgid "Tags: "
 msgstr ""
 
-#: mod/photos.php:1027
+#: mod/photos.php:1028
 msgid "[Select tags to remove]"
 msgstr ""
 
-#: mod/photos.php:1042
+#: mod/photos.php:1043
 msgid "New album name"
 msgstr ""
 
-#: mod/photos.php:1043
+#: mod/photos.php:1044
 msgid "Caption"
 msgstr ""
 
-#: mod/photos.php:1044
+#: mod/photos.php:1045
 msgid "Add a Tag"
 msgstr ""
 
-#: mod/photos.php:1044
+#: mod/photos.php:1045
 msgid "Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping"
 msgstr ""
 
-#: mod/photos.php:1045
+#: mod/photos.php:1046
 msgid "Do not rotate"
 msgstr ""
 
-#: mod/photos.php:1046
+#: mod/photos.php:1047
 msgid "Rotate CW (right)"
 msgstr ""
 
-#: mod/photos.php:1047
+#: mod/photos.php:1048
 msgid "Rotate CCW (left)"
 msgstr ""
 
-#: mod/photos.php:1094 mod/photos.php:1150 mod/photos.php:1230
+#: mod/photos.php:1095 mod/photos.php:1151 mod/photos.php:1231
 #: src/Module/Contact.php:609 src/Module/Item/Compose.php:187
 #: src/Object/Post.php:1156
 msgid "This is you"
 msgstr ""
 
-#: mod/photos.php:1096 mod/photos.php:1152 mod/photos.php:1232
+#: mod/photos.php:1097 mod/photos.php:1153 mod/photos.php:1233
 #: src/Module/Moderation/Reports.php:105 src/Object/Post.php:607
 #: src/Object/Post.php:1158
 msgid "Comment"
 msgstr ""
 
-#: mod/photos.php:1098 mod/photos.php:1154 mod/photos.php:1234
+#: mod/photos.php:1099 mod/photos.php:1155 mod/photos.php:1235
 #: src/Content/Conversation.php:407 src/Module/Calendar/Event/Form.php:234
 #: src/Module/Item/Compose.php:200 src/Module/Post/Edit.php:161
 #: src/Object/Post.php:1172
 msgid "Preview"
 msgstr ""
 
-#: mod/photos.php:1099 src/Content/Conversation.php:361
+#: mod/photos.php:1100 src/Content/Conversation.php:361
 #: src/Module/Post/Edit.php:126 src/Object/Post.php:1160
 msgid "Loading..."
 msgstr ""
 
-#: mod/photos.php:1191 src/Content/Conversation.php:1494
+#: mod/photos.php:1192 src/Content/Conversation.php:1494
 #: src/Object/Post.php:259
 msgid "Select"
 msgstr ""
 
-#: mod/photos.php:1192 src/Content/Conversation.php:1495
+#: mod/photos.php:1193 mod/photos.php:1280 src/Content/Conversation.php:1495
 #: src/Module/Moderation/Users/Active.php:92
 #: src/Module/Moderation/Users/Blocked.php:92
 #: src/Module/Moderation/Users/Index.php:100
@@ -629,23 +629,35 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: mod/photos.php:1253 src/Object/Post.php:431
+#: mod/photos.php:1254 src/Object/Post.php:431
 msgid "Like"
 msgstr ""
 
-#: mod/photos.php:1254 src/Object/Post.php:431
+#: mod/photos.php:1255 src/Object/Post.php:431
 msgid "I like this (toggle)"
 msgstr ""
 
-#: mod/photos.php:1255 src/Object/Post.php:432
+#: mod/photos.php:1256 src/Object/Post.php:432
 msgid "Dislike"
 msgstr ""
 
-#: mod/photos.php:1257 src/Object/Post.php:432
+#: mod/photos.php:1258 src/Object/Post.php:432
 msgid "I don't like this (toggle)"
 msgstr ""
 
-#: mod/photos.php:1279
+#: mod/photos.php:1279 src/Object/Post.php:224 src/Object/Post.php:226
+msgid "Edit"
+msgstr ""
+
+#: mod/photos.php:1281
+msgid "Use as profile picture"
+msgstr ""
+
+#: mod/photos.php:1282
+msgid "Back to viewing"
+msgstr ""
+
+#: mod/photos.php:1284
 msgid "Map"
 msgstr ""
 
@@ -1855,31 +1867,31 @@ msgstr ""
 msgid "Follow Thread"
 msgstr ""
 
-#: src/Content/Item.php:427 src/Model/Contact.php:1293
+#: src/Content/Item.php:427 src/Model/Contact.php:1299
 msgid "View Status"
 msgstr ""
 
-#: src/Content/Item.php:428 src/Content/Item.php:451 src/Model/Contact.php:1228
-#: src/Model/Contact.php:1284 src/Model/Contact.php:1294
+#: src/Content/Item.php:428 src/Content/Item.php:451 src/Model/Contact.php:1234
+#: src/Model/Contact.php:1290 src/Model/Contact.php:1300
 #: src/Module/Directory.php:143 src/Module/Settings/Profile/Index.php:275
 msgid "View Profile"
 msgstr ""
 
-#: src/Content/Item.php:429 src/Model/Contact.php:1295
+#: src/Content/Item.php:429 src/Model/Contact.php:1301
 msgid "View Photos"
 msgstr ""
 
-#: src/Content/Item.php:430 src/Model/Contact.php:1262
+#: src/Content/Item.php:430 src/Model/Contact.php:1268
 #: src/Model/Profile.php:443
 msgid "Network Posts"
 msgstr ""
 
-#: src/Content/Item.php:431 src/Model/Contact.php:1286
-#: src/Model/Contact.php:1297
+#: src/Content/Item.php:431 src/Model/Contact.php:1292
+#: src/Model/Contact.php:1303
 msgid "View Contact"
 msgstr ""
 
-#: src/Content/Item.php:432 src/Model/Contact.php:1298
+#: src/Content/Item.php:432 src/Model/Contact.php:1304
 msgid "Send PM"
 msgstr ""
 
@@ -1919,7 +1931,7 @@ msgid "Search Text"
 msgstr ""
 
 #: src/Content/Item.php:448 src/Content/Widget.php:65
-#: src/Model/Contact.php:1287 src/Model/Contact.php:1299
+#: src/Model/Contact.php:1293 src/Model/Contact.php:1305
 #: src/Module/Contact/Follow.php:152 view/theme/vier/theme.php:182
 msgid "Connect/Follow"
 msgstr ""
@@ -2422,7 +2434,7 @@ msgstr ""
 msgid "Organisations"
 msgstr ""
 
-#: src/Content/Widget.php:557 src/Model/Contact.php:1805
+#: src/Content/Widget.php:557 src/Model/Contact.php:1811
 msgid "News"
 msgstr ""
 
@@ -2484,12 +2496,12 @@ msgstr ""
 msgid "Show Less"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:94 src/Model/Contact.php:1256
+#: src/Content/Widget/VCard.php:94 src/Model/Contact.php:1262
 #: src/Model/Profile.php:437
 msgid "Post to group"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:99 src/Model/Contact.php:1260
+#: src/Content/Widget/VCard.php:99 src/Model/Contact.php:1266
 #: src/Model/Profile.php:441 src/Module/Moderation/Item/Source.php:80
 msgid "Mention"
 msgstr ""
@@ -2517,13 +2529,13 @@ msgstr ""
 msgid "Network:"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:118 src/Model/Contact.php:1288
-#: src/Model/Contact.php:1300 src/Model/Profile.php:456
+#: src/Content/Widget/VCard.php:118 src/Model/Contact.php:1294
+#: src/Model/Contact.php:1306 src/Model/Profile.php:456
 #: src/Module/Contact/Profile.php:514
 msgid "Unfollow"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:124 src/Model/Contact.php:1258
+#: src/Content/Widget/VCard.php:124 src/Model/Contact.php:1264
 #: src/Model/Profile.php:439
 msgid "View group"
 msgstr ""
@@ -3223,84 +3235,84 @@ msgstr ""
 msgid "Edit circles"
 msgstr ""
 
-#: src/Model/Contact.php:1307 src/Module/Moderation/Users/Pending.php:88
+#: src/Model/Contact.php:1313 src/Module/Moderation/Users/Pending.php:88
 #: src/Module/Notifications/Introductions.php:124
 #: src/Module/Notifications/Introductions.php:197
 msgid "Approve"
 msgstr ""
 
-#: src/Model/Contact.php:1649 src/Model/Contact.php:1721
+#: src/Model/Contact.php:1655 src/Model/Contact.php:1727
 #: src/Module/Contact/Profile.php:393
 #, php-format
 msgid "%s has blocked you"
 msgstr ""
 
-#: src/Model/Contact.php:1801
+#: src/Model/Contact.php:1807
 msgid "Organisation"
 msgstr ""
 
-#: src/Model/Contact.php:1809
+#: src/Model/Contact.php:1815
 msgid "Group"
 msgstr ""
 
-#: src/Model/Contact.php:1813 src/Module/Moderation/BaseUsers.php:150
+#: src/Model/Contact.php:1819 src/Module/Moderation/BaseUsers.php:150
 msgid "Relay"
 msgstr ""
 
-#: src/Model/Contact.php:3143
+#: src/Model/Contact.php:3149
 msgid "Disallowed profile URL."
 msgstr ""
 
-#: src/Model/Contact.php:3148 src/Module/Friendica.php:106
+#: src/Model/Contact.php:3154 src/Module/Friendica.php:106
 msgid "Blocked domain"
 msgstr ""
 
-#: src/Model/Contact.php:3153
+#: src/Model/Contact.php:3159
 msgid "Connect URL missing."
 msgstr ""
 
-#: src/Model/Contact.php:3166
+#: src/Model/Contact.php:3172
 msgid "The contact could not be added. Please check the relevant network credentials in your Settings -> Social Networks page."
 msgstr ""
 
-#: src/Model/Contact.php:3184
+#: src/Model/Contact.php:3190
 #, php-format
 msgid "Expected network %s does not match actual network %s"
 msgstr ""
 
-#: src/Model/Contact.php:3201
+#: src/Model/Contact.php:3207
 msgid "This seems to be a relay account. They can't be followed by users."
 msgstr ""
 
-#: src/Model/Contact.php:3208
+#: src/Model/Contact.php:3214
 msgid "The profile address specified does not provide adequate information."
 msgstr ""
 
-#: src/Model/Contact.php:3210
+#: src/Model/Contact.php:3216
 msgid "No compatible communication protocols or feeds were discovered."
 msgstr ""
 
-#: src/Model/Contact.php:3213
+#: src/Model/Contact.php:3219
 msgid "An author or name was not found."
 msgstr ""
 
-#: src/Model/Contact.php:3216
+#: src/Model/Contact.php:3222
 msgid "No browser URL could be matched to this address."
 msgstr ""
 
-#: src/Model/Contact.php:3219
+#: src/Model/Contact.php:3225
 msgid "Unable to match @-style Identity Address with a known protocol or email contact."
 msgstr ""
 
-#: src/Model/Contact.php:3220
+#: src/Model/Contact.php:3226
 msgid "Use mailto: in front of address to force email check."
 msgstr ""
 
-#: src/Model/Contact.php:3226
+#: src/Model/Contact.php:3232
 msgid "Limited profile. This person will be unable to receive direct/personal notifications from you."
 msgstr ""
 
-#: src/Model/Contact.php:3285
+#: src/Model/Contact.php:3291
 msgid "Unable to retrieve contact information."
 msgstr ""
 
@@ -11528,10 +11540,6 @@ msgstr ""
 
 #: src/Object/Post.php:195
 msgid "Connector Message"
-msgstr ""
-
-#: src/Object/Post.php:224 src/Object/Post.php:226
-msgid "Edit"
 msgstr ""
 
 #: src/Object/Post.php:260
