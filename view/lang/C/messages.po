@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-12 23:54+0200\n"
+"POT-Creation-Date: 2025-09-13 19:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -491,7 +491,7 @@ msgstr ""
 #: src/Module/Media/Attachment/Browser.php:64
 #: src/Module/Media/Photo/Browser.php:76 src/Module/Post/Edit.php:163
 #: src/Module/Post/Tag/Remove.php:96 src/Module/Profile/RemoteFollow.php:120
-#: src/Module/Security/TwoFactor/SignOut.php:107
+#: src/Module/Security/TwoFactor/SignOut.php:106
 msgid "Cancel"
 msgstr ""
 
@@ -1636,7 +1636,7 @@ msgid "Sort by post creation date"
 msgstr ""
 
 #: src/Content/Conversation/Factory/Network.php:27
-#: src/Module/Settings/Profile/Index.php:276
+#: src/Module/Settings/Profile/Index.php:280
 msgid "Personal"
 msgstr ""
 
@@ -1872,7 +1872,7 @@ msgstr ""
 
 #: src/Content/Item.php:435 src/Content/Item.php:458 src/Model/Contact.php:1234
 #: src/Model/Contact.php:1290 src/Model/Contact.php:1300
-#: src/Module/Directory.php:143 src/Module/Settings/Profile/Index.php:275
+#: src/Module/Directory.php:143 src/Module/Settings/Profile/Index.php:279
 msgid "View Profile"
 msgstr ""
 
@@ -2022,8 +2022,7 @@ msgstr ""
 msgid "Photos"
 msgstr ""
 
-#: src/Content/Nav.php:229 src/Module/Settings/Profile/Index.php:274
-#: view/theme/frio/theme.php:223
+#: src/Content/Nav.php:229 view/theme/frio/theme.php:223
 msgid "Your photos"
 msgstr ""
 
@@ -8660,7 +8659,7 @@ msgid "You're currently viewing your profile as <b>%s</b> <a href=\"%s\" class=\
 msgstr ""
 
 #: src/Module/Profile/Profile.php:181 src/Module/Settings/Account.php:522
-#: src/Module/Settings/Profile/Index.php:300
+#: src/Module/Settings/Profile/Index.php:303
 msgid "Display name:"
 msgstr ""
 
@@ -8680,12 +8679,12 @@ msgstr ""
 msgid "Birthday:"
 msgstr ""
 
-#: src/Module/Profile/Profile.php:204 src/Module/Settings/Profile/Index.php:308
+#: src/Module/Profile/Profile.php:204 src/Module/Settings/Profile/Index.php:311
 #: src/Util/Temporal.php:157
 msgid "Age: "
 msgstr ""
 
-#: src/Module/Profile/Profile.php:204 src/Module/Settings/Profile/Index.php:308
+#: src/Module/Profile/Profile.php:204 src/Module/Settings/Profile/Index.php:311
 #: src/Util/Temporal.php:157
 #, php-format
 msgid "%d year old"
@@ -8693,7 +8692,7 @@ msgid_plural "%d years old"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Module/Profile/Profile.php:209 src/Module/Settings/Profile/Index.php:301
+#: src/Module/Profile/Profile.php:209 src/Module/Settings/Profile/Index.php:304
 msgid "Description:"
 msgstr ""
 
@@ -9083,19 +9082,19 @@ msgstr ""
 msgid "Submit recovery code and complete login"
 msgstr ""
 
-#: src/Module/Security/TwoFactor/SignOut.php:104
+#: src/Module/Security/TwoFactor/SignOut.php:103
 msgid "Sign out of this browser?"
 msgstr ""
 
-#: src/Module/Security/TwoFactor/SignOut.php:105
+#: src/Module/Security/TwoFactor/SignOut.php:104
 msgid "<p>If you trust this browser, you will not be asked for verification code the next time you sign in.</p>"
 msgstr ""
 
-#: src/Module/Security/TwoFactor/SignOut.php:106
+#: src/Module/Security/TwoFactor/SignOut.php:105
 msgid "Sign out"
 msgstr ""
 
-#: src/Module/Security/TwoFactor/SignOut.php:108
+#: src/Module/Security/TwoFactor/SignOut.php:107
 msgid "Trust and sign out"
 msgstr ""
 
@@ -10268,31 +10267,47 @@ msgid "Edit Profile Details"
 msgstr ""
 
 #: src/Module/Settings/Profile/Index.php:273
-msgid "Change Profile Photo"
+msgid "Change profile picture"
+msgstr ""
+
+#: src/Module/Settings/Profile/Index.php:274
+msgid "To change your profile picture, you can either upload a new picture here, or click to visit your photos to pick among your existing pictures."
+msgstr ""
+
+#: src/Module/Settings/Profile/Index.php:275
+msgid "Upload new picture"
+msgstr ""
+
+#: src/Module/Settings/Profile/Index.php:276
+msgid "Upload selected picture"
 msgstr ""
 
 #: src/Module/Settings/Profile/Index.php:277
-msgid "Profile picture"
+msgid "Pick existing picture from photos"
 msgstr ""
 
 #: src/Module/Settings/Profile/Index.php:278
+msgid "Go to my photos"
+msgstr ""
+
+#: src/Module/Settings/Profile/Index.php:281
+msgid "Profile picture"
+msgstr ""
+
+#: src/Module/Settings/Profile/Index.php:282
 msgid "Location"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:279 src/Util/Temporal.php:83
+#: src/Module/Settings/Profile/Index.php:283 src/Util/Temporal.php:83
 #: src/Util/Temporal.php:85
 msgid "Miscellaneous"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:280
+#: src/Module/Settings/Profile/Index.php:284
 msgid "Custom Profile Fields"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:281 src/Module/Welcome.php:45
-msgid "Upload Profile Photo"
-msgstr ""
-
-#: src/Module/Settings/Profile/Index.php:283
+#: src/Module/Settings/Profile/Index.php:286
 #, php-format
 msgid ""
 "<p>Custom fields appear on <a href=\"%s\">your profile page</a>.</p>\n"
@@ -10302,59 +10317,59 @@ msgid ""
 "\t\t\t\t<p>Non-public fields can only be seen by the selected Friendica contacts or the Friendica contacts in the selected circles.</p>"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:303
+#: src/Module/Settings/Profile/Index.php:306
 msgid "Street Address:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:304
+#: src/Module/Settings/Profile/Index.php:307
 msgid "Locality/City:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:305
+#: src/Module/Settings/Profile/Index.php:308
 msgid "Region/State:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:306
+#: src/Module/Settings/Profile/Index.php:309
 msgid "Postal/Zip Code:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:307
+#: src/Module/Settings/Profile/Index.php:310
 msgid "Country:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:309
+#: src/Module/Settings/Profile/Index.php:312
 msgid "XMPP (Jabber) address:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:309
+#: src/Module/Settings/Profile/Index.php:312
 msgid "The XMPP address will be published so that people can follow you there."
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:310
+#: src/Module/Settings/Profile/Index.php:313
 msgid "Matrix (Element) address:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:310
+#: src/Module/Settings/Profile/Index.php:313
 msgid "The Matrix address will be published so that people can follow you there."
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:311
+#: src/Module/Settings/Profile/Index.php:314
 msgid "Homepage URL:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:312
+#: src/Module/Settings/Profile/Index.php:315
 msgid "Public Keywords:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:312
+#: src/Module/Settings/Profile/Index.php:315
 msgid "(Used for suggesting potential friends, can be seen by others)"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:313
+#: src/Module/Settings/Profile/Index.php:316
 msgid "Private Keywords:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:313
+#: src/Module/Settings/Profile/Index.php:316
 msgid "(Used for searching profiles, never shown to others)"
 msgstr ""
 
@@ -10984,6 +10999,10 @@ msgstr ""
 
 #: src/Module/Welcome.php:42
 msgid "Review the other settings, particularly the privacy settings. An unpublished directory listing is like having an unlisted phone number. In general, you should probably publish your listing - unless all of your friends and potential friends know exactly how to find you."
+msgstr ""
+
+#: src/Module/Welcome.php:45
+msgid "Upload Profile Photo"
 msgstr ""
 
 #: src/Module/Welcome.php:46
