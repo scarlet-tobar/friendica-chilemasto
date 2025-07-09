@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-07 12:09+0200\n"
+"POT-Creation-Date: 2025-07-09 20:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1773,7 +1773,7 @@ msgstr ""
 msgid "Include or exclude posts from subscribed accounts. This widget is not visible on all channels."
 msgstr ""
 
-#: src/Content/Feature.php:135
+#: src/Content/Feature.php:135 src/Content/Widget/TrendingTags.php:39
 msgid "Trending Tags"
 msgstr ""
 
@@ -2435,22 +2435,22 @@ msgstr ""
 msgid "Remove term"
 msgstr ""
 
-#: src/Content/Widget/TrendingTags.php:39
+#: src/Content/Widget/TrendingTags.php:40
 #, php-format
-msgid "Trending Tags (last %d hour)"
-msgid_plural "Trending Tags (last %d hours)"
+msgid "(%d hour)"
+msgid_plural "(%d hours)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Content/Widget/TrendingTags.php:40
+#: src/Content/Widget/TrendingTags.php:41
 msgid "More Trending Tags"
 msgstr ""
 
-#: src/Content/Widget/TrendingTags.php:41
+#: src/Content/Widget/TrendingTags.php:42
 msgid "Show More"
 msgstr ""
 
-#: src/Content/Widget/TrendingTags.php:42
+#: src/Content/Widget/TrendingTags.php:43
 msgid "Show Less"
 msgstr ""
 
