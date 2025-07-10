@@ -817,15 +817,16 @@ summary.wall-item-summary {
 
 /* Add alt tag indicators to the relevant images */
 a:has(img.has-alt-description)::after {
-	background: lightgray;
+	background: rgba(0, 0, 0, 0.69);
 	border-radius: 4px;
-	color: black;
+	color: #eee;
 	content: "ALT";
+	font-size: 12px;
 	font-weight: bold;
-	padding: 3px 8px;
+	padding: 4px 5px;
 	position: absolute;
-	bottom: 10px;
-	right: 10px;
+	bottom: 8px;
+	right: 8px;
 }
 
 #change-profile-picture {
