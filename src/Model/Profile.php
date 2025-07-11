@@ -213,7 +213,7 @@ class Profile
 
 		$appHelper->setProfileOwner($profile['uid']);
 
-		DI::page()['title'] = $profile['name'] . ' @ ' . DI::config()->get('config', 'sitename');
+		DI::page()['title'] = $profile['name'];
 
 		if (!DI::userSession()->getLocalUserId()) {
 			$appHelper->setCurrentTheme($profile['theme']);
