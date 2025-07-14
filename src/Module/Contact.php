@@ -541,6 +541,11 @@ class Contact extends BaseModule
 		return $tab_str;
 	}
 
+	public static function setPageTitle(array $contact)
+	{
+		DI::page()['title'] = $contact['name'];
+	}
+
 	/**
 	 * Return the fields for the contact template
 	 *

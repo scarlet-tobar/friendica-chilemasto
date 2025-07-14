@@ -330,6 +330,8 @@ class Profile extends BaseModule
 
 		$nettype = $this->t('Network type: %s', ContactSelector::networkToName($contact['network'], $contact['protocol'], $contact['gsid']));
 
+		ContactModule::setPageTitle($contact);
+
 		// tabs
 		$tab_str = ContactModule::getTabsHTML($contact, ContactModule::TAB_PROFILE);
 
