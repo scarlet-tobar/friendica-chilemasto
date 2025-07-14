@@ -151,7 +151,7 @@ class Channels extends BaseSettings
 			$circles[$circle['id']] = $circle['name'];
 		}
 
-		$languages         = $this->l10n->getLanguageCodes(true);
+		$languages         = $this->l10n->getLanguageCodes(true, true);
 		$channel_languages = User::getWantedLanguages($uid);
 
 		$channels = [];
