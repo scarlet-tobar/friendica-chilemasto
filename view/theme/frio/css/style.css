@@ -1839,7 +1839,6 @@ blockquote.shared_content {
 	margin: 0 0 5px;
 }
 .media-heading {
-	font-size: 14px;
 	margin: 0px;
 }
 .wall-item-name,
@@ -2625,7 +2624,7 @@ ul.viewcontact_wrapper > li {
 .contact-entry-checkbox {
 	margin-top: -20px;
 }
-.contact-wrapper .media-body .contact-entry-name h1.media-heading a {
+.contact-wrapper .media-body .contact-entry-name h4.media-heading a {
 	font-weight: bold !important;
 	color: $link_color;
 	font-size: 15px !important;
