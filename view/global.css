@@ -192,7 +192,7 @@ span.connector {
   border-radius: 4px;
 }
 .shared_header > .metadata {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
 }
 .shared_header > .metadata > p {
   margin: 0;
