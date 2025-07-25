@@ -618,6 +618,11 @@ class APContact
 			return true;
 		}
 
+		$contact = Contact::getByURL($apcontact['url'], false, ['contact-type']);
+		if ($contact['contact-type'] ?? 0 == Contact::TYPE_RELAY) {
+			return true;
+		}
+
 		return false;
 	}
 }
