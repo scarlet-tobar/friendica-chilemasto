@@ -177,6 +177,9 @@ class Contact extends BaseModule
 
 		$page = DI::page();
 
+		// Default page title when not viewing a specific contact
+		$page['title'] = DI::l10n()->t('Contacts');
+
 		$page->registerFooterScript(Theme::getPathForFile('asset/typeahead.js/dist/typeahead.bundle.js'));
 		$page->registerFooterScript(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.js'));
 		$page->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.css'));
