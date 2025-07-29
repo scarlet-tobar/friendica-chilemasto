@@ -379,7 +379,6 @@ class Statuses extends BaseApi
 		if ($uid != 0) {
 			if ($this->notification->existsForUser($uid, ['target-uri-id' => $this->parameters['id'], 'seen' => false])) {
 				$this->notification->setAllSeenForUser($uid, ['target-uri-id' => $this->parameters['id']]);
-				$this->logger->debug('Blubb-Unseen notfication', ['id' => $this->parameters['id'], 'uid' => $uid]);
 			}
 			if (Post::exists(['uri-id' => $this->parameters['id'], 'uid' => $uid, 'unseen' => true])) {
 				Post::update(['unseen' => false], ['uri-id' => $this->parameters['id'], 'uid' => $uid, 'unseen' => true]);
