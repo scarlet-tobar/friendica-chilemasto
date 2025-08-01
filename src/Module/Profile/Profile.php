@@ -293,6 +293,7 @@ class Profile extends BaseProfile
 			'$basic_fields'          => $basic_fields,
 			'$custom_fields'         => $custom_fields,
 			'$profile'               => $profile,
+			'$homepage_verified'     => $this->l10n->t('This website has been verified to belong to the same person.'),
 			'$edit_link'             => [
 				'url'   => 'settings/profile', $this->t('Edit profile'),
 				'title' => '',
