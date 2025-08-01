@@ -29,6 +29,7 @@ use Friendica\Model\User;
 use Friendica\Module\Api\ApiResponse;
 use Friendica\Module\BaseApi;
 use Friendica\Navigation\Notifications\Repository\Notification;
+use Friendica\Navigation\Notifications\Repository\Notify;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
@@ -43,11 +44,14 @@ class Statuses extends BaseApi
 {
 	/** @var Notification */
 	protected $notification;
+	/** @var Notify */
+	protected $notify;
 
-	public function __construct(Notification $notification, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	public function __construct(Notify $notify, Notification $notification, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
 	{
 		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 		$this->notification = $notification;
+		$this->notify       = $notify;
 	}
 
 	public function put(array $request = [])
@@ -379,6 +383,9 @@ class Statuses extends BaseApi
 		if ($uid != 0) {
 			if ($this->notification->existsForUser($uid, ['target-uri-id' => $this->parameters['id'], 'seen' => false])) {
 				$this->notification->setAllSeenForUser($uid, ['target-uri-id' => $this->parameters['id']]);
+			}
+			if ($this->notify->existsForUser($uid, ['uri-id' => $this->parameters['id'], 'seen' => false])) {
+				$this->notify->setAllSeenForUser($uid, ['uri-id' => $this->parameters['id']]);
 			}
 			if (Post::exists(['uri-id' => $this->parameters['id'], 'uid' => $uid, 'unseen' => true])) {
 				Post::update(['unseen' => false], ['uri-id' => $this->parameters['id'], 'uid' => $uid, 'unseen' => true]);
