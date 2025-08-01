@@ -35,13 +35,11 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Database\Database;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Circle;
-use Friendica\Model\Post;
 use Friendica\Model\Profile;
 use Friendica\Module\Response;
 use Friendica\Module\Security\Login;
@@ -522,16 +520,8 @@ class Network extends Timeline
 			return $items;
 		}
 
-		$this->setItemsSeenByCondition(['unseen' => true, 'uid' => $this->session->getLocalUserId(), 'parent-uri-id' => array_column($items, 'uri-id')]);
+		$this->setItemsSeenForUser($this->session->getLocalUserId());
 
-		$posts = Post::selectToArray(['uri-id'], ['unseen' => true, 'uid' => $this->session->getLocalUserId()], ['limit' => 100]);
-		if (!empty($posts)) {
-			$this->setItemsSeenByCondition(['unseen' => true, 'uid' => $this->session->getLocalUserId(), 'uri-id' => array_column($posts, 'uri-id')]);
-		}
-
-		if (count($posts) == 100) {
-			Worker::add(Worker::PRIORITY_MEDIUM, 'SetSeen', $this->session->getLocalUserId());
-		}
 		return $items;
 	}
 
