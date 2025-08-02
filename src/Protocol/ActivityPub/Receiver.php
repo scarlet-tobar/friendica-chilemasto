@@ -114,10 +114,10 @@ class Receiver
 			DI::logger()->notice('Invalid HTTP signature, message will not be trusted.', ['uid' => $uid, 'actor' => $actor, 'header' => $header, 'body' => $body]);
 			$signer = [];
 		} elseif (empty($http_signer)) {
-			DI::logger()->info('Signer is a tombstone. The message will be discarded, the signer account is deleted.');
+			DI::logger()->info('Signer is a tombstone. The message will be discarded, the signer account is deleted.', ['uid' => $uid, 'actor' => $actor]);
 			return;
 		} else {
-			DI::logger()->info('Valid HTTP signature', ['signer' => $http_signer]);
+			DI::logger()->info('Valid HTTP signature', ['uid' => $uid, 'actor' => $actor, 'signer' => $http_signer]);
 			$signer = [$http_signer];
 		}
 
@@ -838,6 +838,9 @@ class Receiver
 							Queue::remove($object_data);
 							return true;
 						}
+					} elseif (Queue::exists($object_data['object_id'], 'as:Create')) {
+						DI::logger()->info('Announced id will now be processed.', ['uid' => $uid, 'id' => $object_data['object_id']]);
+						Queue::processByUri($object_data['object_id'], 'as:Create');
 					} else {
 						DI::logger()->info('Announced id already exists', ['uid' => $uid, 'id' => $object_data['object_id']]);
 						Queue::remove($object_data);
