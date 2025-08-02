@@ -618,9 +618,11 @@ class APContact
 			return true;
 		}
 
-		$contact = Contact::getByURL($apcontact['url'], false, ['contact-type']);
-		if ($contact['contact-type'] ?? 0 == Contact::TYPE_RELAY) {
-			return true;
+		if (($apcontact['type'] == 'Application') && !empty($apcontact['gsid'])) {
+			$gserver = DBA::selectFirst('gserver', ['platform'], ['id' => $apcontact['gsid']]);
+			if ($gserver['platform'] ?? '' == 'peertube') {
+				return true;
+			}
 		}
 
 		return false;
