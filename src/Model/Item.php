@@ -2338,10 +2338,6 @@ class Item
 	 */
 	private static function autoReshare(array $item)
 	{
-		if ($item['gravity'] != self::GRAVITY_PARENT) {
-			return;
-		}
-
 		$ucid = Contact::getUserContactId($item['author-id'], $item['uid']);
 		if (!$ucid || ($ucid != $item['contact-id'])) {
 			return;
@@ -2359,9 +2355,26 @@ class Item
 			return;
 		}
 
-		DI::logger()->info('Automatically reshare item', ['uid' => $item['uid'], 'id' => $item['id'], 'guid' => $item['guid'], 'uri-id' => $item['uri-id']]);
+		if ($item['gravity'] == self::GRAVITY_PARENT) {
+			$id     = $item['id'];
+			$guid   = $item['guid'];
+			$uri_id = $item['uri-id'];
+		} elseif ($item['gravity'] == self::GRAVITY_ACTIVITY && $item['verb'] == Activity::ANNOUNCE) {
+			$post = Post::selectFirst(['id', 'guid', 'uri-id'], ['uri-id' => $item['parent-uri-id'], 'uid' => [0, $item['uid']]]);
+			if (!DBA::isResult($post)) {
+				DI::logger()->warning('No parent post found for reshare', ['uri-id' => $item['parent-uri-id'], 'uid' => $item['uid']]);
+				return;
+			}
+			$id     = $post['id'];
+			$guid   = $post['guid'];
+			$uri_id = $post['uri-id'];
+		} else {
+			return;
+		}
 
-		self::performActivity($item['id'], 'announce', $item['uid']);
+		DI::logger()->info('Automatically reshare item', ['gravity' => $item['gravity'], 'uid' => $item['uid'], 'id' => $id, 'guid' => $guid, 'uri-id' => $uri_id]);
+
+		self::performActivity($id, 'announce', $item['uid']);
 	}
 
 	public static function isRemoteSelf(array $contact, array &$datarray): bool
