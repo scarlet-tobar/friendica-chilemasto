@@ -686,7 +686,7 @@ class Notify extends BaseRepository
 		return false;
 	}
 
-	public function shouldShowOnDesktop(NotificationEntity $Notification, string $type = null): bool
+	public function shouldShowOnDesktop(NotificationEntity $Notification, string $type = ''): bool
 	{
 		if (is_null($type)) {
 			$type = NotificationFactory::getType($Notification);
@@ -718,12 +718,17 @@ class Notify extends BaseRepository
 		return false;
 	}
 
-	public function createFromNotification(NotificationEntity $Notification): bool
+	public function createFromNotification(NotificationEntity $Notification, string $type): bool
 	{
 		$this->logger->info('Start', ['uid' => $Notification->uid, 'id' => $Notification->id, 'type' => $Notification->type]);
-
+		
 		if ($Notification->type === Model\Post\UserNotification::TYPE_NONE) {
 			$this->logger->info('Not an item based notification, quitting', ['uid' => $Notification->uid, 'id' => $Notification->id, 'type' => $Notification->type]);
+			return false;
+		}
+
+		if (in_array($type, [Notification::TYPE_LIKE, Notification::TYPE_RESHARE])) {
+			$this->logger->info('Notification type is like or reshare, quitting', ['uid' => $Notification->uid, 'id' => $Notification->id, 'type' => $Notification->type]);
 			return false;
 		}
 
