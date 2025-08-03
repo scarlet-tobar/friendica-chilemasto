@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-03 18:01+0200\n"
+"POT-Creation-Date: 2025-08-03 20:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -10933,7 +10933,7 @@ msgid "Friendica Walk-Through"
 msgstr ""
 
 #: src/Module/Welcome.php:37
-msgid "On your <em>Quick Start</em> page - find a brief introduction to your profile and network tabs, make some new connections, and find some groups to join."
+msgid "Complete the walk-through to get a quick overview of your profile and network tabs, establish new connections and find groups to join."
 msgstr ""
 
 #: src/Module/Welcome.php:40

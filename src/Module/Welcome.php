@@ -32,9 +32,9 @@ class Welcome extends BaseModule
 			'$checklist'   => DI::l10n()->t('New Member Checklist'),
 			'$description' => DI::l10n()->t('We would like to offer some tips and links to help make your experience enjoyable. Click any item to visit the relevant page. A link to this page will be visible from your home page for two weeks after your initial registration and then will quietly disappear.'),
 
-			'$started'         => DI::l10n()->t('Getting Started'),
-			'$quickstart_link' => DI::l10n()->t('Friendica Walk-Through'),
-			'$quickstart_txt'  => DI::l10n()->t('On your <em>Quick Start</em> page - find a brief introduction to your profile and network tabs, make some new connections, and find some groups to join.'),
+			'$started'          => DI::l10n()->t('Getting Started'),
+			'$walkthrough_link' => DI::l10n()->t('Friendica Walk-Through'),
+			'$walkthrough_txt'  => DI::l10n()->t('Complete the walk-through to get a quick overview of your profile and network tabs, establish new connections and find groups to join.'),
 
 			'$settings'       => DI::l10n()->t('Settings'),
 			'$settings_link'  => DI::l10n()->t('Go to Your Settings'),
