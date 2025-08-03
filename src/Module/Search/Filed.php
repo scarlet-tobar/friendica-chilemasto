@@ -31,7 +31,7 @@ class Filed extends BaseSearch
 
 		DI::page()['aside'] .= Widget::fileAs(DI::args()->getCommand(), $_GET['file'] ?? '');
 
-		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll') && ($_GET['mode'] ?? '') != 'minimal') {
+		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll', true) && ($_GET['mode'] ?? '') != 'minimal') {
 			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
 			$o = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
 		} else {
@@ -87,7 +87,7 @@ class Filed extends BaseSearch
 
 		$o .= DI::conversation()->render($items, Conversation::MODE_FILED, false, false, '', DI::userSession()->getLocalUserId());
 
-		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll')) {
+		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll', true)) {
 			$o .= HTML::scrollLoader();
 		} else {
 			$o .= $pager->renderMinimal($count);

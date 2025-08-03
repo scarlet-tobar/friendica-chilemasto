@@ -200,7 +200,7 @@ class Network extends Timeline
 			$this->page['aside'] .= TrendingTags::getHTML($this->selectedTab);
 		}
 
-		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll') && ($_GET['mode'] ?? '') != 'minimal') {
+		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true) && ($_GET['mode'] ?? '') != 'minimal') {
 			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
 			$o .= Renderer::replaceMacros($tpl, ['$reload_uri' => $this->args->getQueryString()]);
 		}
@@ -277,7 +277,7 @@ class Network extends Timeline
 			$items = [];
 		}
 
-		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll')) {
+		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
 			$o .= HTML::scrollLoader();
 		} else {
 			$pager = new BoundariesPager(

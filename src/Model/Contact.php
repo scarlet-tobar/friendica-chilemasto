@@ -1680,7 +1680,7 @@ class Contact
 
 		$params = ['order' => ['created' => true], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];
 
-		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll')) {
+		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll', true)) {
 			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
 			$o   = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
 		} else {
@@ -1692,7 +1692,7 @@ class Contact
 
 		$o .= DI::conversation()->render($items, ConversationContent::MODE_CONTACT_POSTS);
 
-		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll')) {
+		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll', true)) {
 			$o .= HTML::scrollLoader();
 		} else {
 			$o .= $pager->renderMinimal(count($items));
@@ -1743,7 +1743,7 @@ class Contact
 
 		$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
 
-		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll')) {
+		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll', true)) {
 			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
 			$o   = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
 		} else {
@@ -1776,7 +1776,7 @@ class Contact
 		$o .= DI::conversation()->render($items, ConversationContent::MODE_CONTACTS, $update, false, 'pinned_created', $uid);
 
 		if (!$update) {
-			if (DI::pConfig()->get($uid, 'system', 'infinite_scroll')) {
+			if (DI::pConfig()->get($uid, 'system', 'infinite_scroll', true)) {
 				$o .= HTML::scrollLoader();
 			} else {
 				$o .= $pager->renderMinimal(count($items));
@@ -3659,7 +3659,7 @@ class Contact
 	 */
 	public static function magicLinkById(int $cid, string $url = ''): string
 	{
-		if (($url == '') && DI::userSession()->isAuthenticated() && DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'stay_local')) {
+		if (($url == '') && DI::userSession()->isAuthenticated() && DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'stay_local', true)) {
 			return 'contact/' . $cid . '/conversations';
 		}
 
@@ -3689,7 +3689,7 @@ class Contact
 			return $destination;
 		}
 
-		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'stay_local') && ($url == '')) {
+		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'stay_local', true) && ($url == '')) {
 			return 'contact/' . $contact['id'] . '/conversations';
 		}
 
