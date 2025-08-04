@@ -10,6 +10,7 @@ namespace Friendica\Module\Api\Mastodon;
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\AppHelper;
+use Friendica\Content\Item as ContentItem;
 use Friendica\Content\PageInfo;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\Markdown;
@@ -46,12 +47,15 @@ class Statuses extends BaseApi
 	protected $notification;
 	/** @var Notify */
 	protected $notify;
+	/** @var ContentItem */
+	protected $item;
 
-	public function __construct(Notify $notify, Notification $notification, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	public function __construct(ContentItem $item, Notify $notify, Notification $notification, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
 	{
 		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 		$this->notification = $notification;
 		$this->notify       = $notify;
+		$this->item         = $item;
 	}
 
 	public function put(array $request = [])
@@ -327,7 +331,7 @@ class Statuses extends BaseApi
 		}
 
 		if (!empty($request['scheduled_at'])) {
-			$item['guid'] = Item::guid($item, true);
+			$item['guid'] = $this->item->guid($item, true);
 			$item['uri']  = Item::newURI($item['guid']);
 
 			$id = Post\Delayed::add($item['uri'], $item, Worker::PRIORITY_HIGH, Post\Delayed::PREPARED, DateTimeFormat::utc($request['scheduled_at']));
