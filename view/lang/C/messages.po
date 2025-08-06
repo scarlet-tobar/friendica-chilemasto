@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-05 21:13+0200\n"
+"POT-Creation-Date: 2025-08-06 05:55+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1832,57 +1832,57 @@ msgstr ""
 msgid "Create new group"
 msgstr ""
 
-#: src/Content/Item.php:324 src/Model/Item.php:3025
+#: src/Content/Item.php:329 src/Model/Item.php:2780
 msgid "event"
 msgstr ""
 
-#: src/Content/Item.php:327 src/Content/Item.php:337
+#: src/Content/Item.php:332 src/Content/Item.php:342
 msgid "status"
 msgstr ""
 
-#: src/Content/Item.php:333 src/Model/Item.php:3027
+#: src/Content/Item.php:338 src/Model/Item.php:2782
 #: src/Module/Post/Tag/Add.php:112
 msgid "photo"
 msgstr ""
 
-#: src/Content/Item.php:347 src/Module/Post/Tag/Add.php:130
+#: src/Content/Item.php:352 src/Module/Post/Tag/Add.php:130
 #, php-format
 msgid "%1$s tagged %2$s's %3$s with %4$s"
 msgstr ""
 
-#: src/Content/Item.php:421 view/theme/frio/theme.php:251
+#: src/Content/Item.php:426 view/theme/frio/theme.php:251
 msgid "Follow Thread"
 msgstr ""
 
-#: src/Content/Item.php:422 src/Model/Contact.php:1293
+#: src/Content/Item.php:427 src/Model/Contact.php:1293
 msgid "View Status"
 msgstr ""
 
-#: src/Content/Item.php:423 src/Content/Item.php:446 src/Model/Contact.php:1228
+#: src/Content/Item.php:428 src/Content/Item.php:451 src/Model/Contact.php:1228
 #: src/Model/Contact.php:1284 src/Model/Contact.php:1294
 #: src/Module/Directory.php:143 src/Module/Settings/Profile/Index.php:274
 msgid "View Profile"
 msgstr ""
 
-#: src/Content/Item.php:424 src/Model/Contact.php:1295
+#: src/Content/Item.php:429 src/Model/Contact.php:1295
 msgid "View Photos"
 msgstr ""
 
-#: src/Content/Item.php:425 src/Model/Contact.php:1262
+#: src/Content/Item.php:430 src/Model/Contact.php:1262
 #: src/Model/Profile.php:443
 msgid "Network Posts"
 msgstr ""
 
-#: src/Content/Item.php:426 src/Model/Contact.php:1286
+#: src/Content/Item.php:431 src/Model/Contact.php:1286
 #: src/Model/Contact.php:1297
 msgid "View Contact"
 msgstr ""
 
-#: src/Content/Item.php:427 src/Model/Contact.php:1298
+#: src/Content/Item.php:432 src/Model/Contact.php:1298
 msgid "Send PM"
 msgstr ""
 
-#: src/Content/Item.php:428 src/Module/Contact.php:450
+#: src/Content/Item.php:433 src/Module/Contact.php:450
 #: src/Module/Contact/Profile.php:560
 #: src/Module/Moderation/Blocklist/Contact.php:104
 #: src/Module/Moderation/Users/Active.php:93
@@ -1890,7 +1890,7 @@ msgstr ""
 msgid "Block"
 msgstr ""
 
-#: src/Content/Item.php:429 src/Module/Contact.php:451
+#: src/Content/Item.php:434 src/Module/Contact.php:451
 #: src/Module/Contact/Profile.php:568
 #: src/Module/Notifications/Introductions.php:126
 #: src/Module/Notifications/Introductions.php:199
@@ -1898,33 +1898,54 @@ msgstr ""
 msgid "Ignore"
 msgstr ""
 
-#: src/Content/Item.php:430 src/Module/Contact.php:452
+#: src/Content/Item.php:435 src/Module/Contact.php:452
 #: src/Module/Contact/Profile.php:576
 msgid "Collapse"
 msgstr ""
 
-#: src/Content/Item.php:431 src/Object/Post.php:287
+#: src/Content/Item.php:436 src/Object/Post.php:287
 #, php-format
 msgid "Ignore %s server"
 msgstr ""
 
-#: src/Content/Item.php:435 src/Module/Settings/Channels.php:188
+#: src/Content/Item.php:440 src/Module/Settings/Channels.php:188
 #: src/Module/Settings/Channels.php:214 src/Object/Post.php:508
 msgid "Languages"
 msgstr ""
 
-#: src/Content/Item.php:438 src/Object/Post.php:591
+#: src/Content/Item.php:443 src/Object/Post.php:591
 msgid "Search Text"
 msgstr ""
 
-#: src/Content/Item.php:443 src/Content/Widget.php:65
+#: src/Content/Item.php:448 src/Content/Widget.php:65
 #: src/Model/Contact.php:1287 src/Model/Contact.php:1299
 #: src/Module/Contact/Follow.php:152 view/theme/vier/theme.php:182
 msgid "Connect/Follow"
 msgstr ""
 
-#: src/Content/Item.php:874
+#: src/Content/Item.php:879
 msgid "Unable to fetch user."
+msgstr ""
+
+#: src/Content/Item.php:1343 src/Core/L10n.php:453
+msgid "Undetermined"
+msgstr ""
+
+#: src/Content/Item.php:1350
+#, php-format
+msgid "%s (%s - %s): %s"
+msgstr ""
+
+#: src/Content/Item.php:1352
+#, php-format
+msgid "%s (%s): %s"
+msgstr ""
+
+#: src/Content/Item.php:1355
+#, php-format
+msgid ""
+"Detected languages in this post:\n"
+"%s"
 msgstr ""
 
 #: src/Content/Nav.php:112
@@ -2242,8 +2263,8 @@ msgstr ""
 msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:931 src/Model/Item.php:3863
-#: src/Model/Item.php:3869 src/Model/Item.php:3870
+#: src/Content/Text/BBCode.php:931 src/Model/Item.php:3618
+#: src/Model/Item.php:3624 src/Model/Item.php:3625
 msgid "Link to source"
 msgstr ""
 
@@ -2839,10 +2860,6 @@ msgstr ""
 msgid "Could not connect to database."
 msgstr ""
 
-#: src/Core/L10n.php:453 src/Model/Item.php:2051
-msgid "Undetermined"
-msgstr ""
-
 #: src/Core/L10n.php:463
 #, php-format
 msgid "%s (%s)"
@@ -3381,92 +3398,75 @@ msgstr ""
 msgid "Happy Birthday %s"
 msgstr ""
 
-#: src/Model/Item.php:2058
-#, php-format
-msgid "%s (%s - %s): %s"
-msgstr ""
-
-#: src/Model/Item.php:2060
-#, php-format
-msgid "%s (%s): %s"
-msgstr ""
-
-#: src/Model/Item.php:2063
-#, php-format
-msgid ""
-"Detected languages in this post:\n"
-"%s"
-msgstr ""
-
-#: src/Model/Item.php:3029
+#: src/Model/Item.php:2784
 msgid "activity"
 msgstr ""
 
-#: src/Model/Item.php:3031
+#: src/Model/Item.php:2786
 msgid "comment"
 msgstr ""
 
-#: src/Model/Item.php:3034 src/Module/Post/Tag/Add.php:112
+#: src/Model/Item.php:2789 src/Module/Post/Tag/Add.php:112
 msgid "post"
 msgstr ""
 
-#: src/Model/Item.php:3223
+#: src/Model/Item.php:2978
 #, php-format
 msgid "%s is blocked"
 msgstr ""
 
-#: src/Model/Item.php:3225
+#: src/Model/Item.php:2980
 #, php-format
 msgid "%s is ignored"
 msgstr ""
 
-#: src/Model/Item.php:3227
+#: src/Model/Item.php:2982
 #, php-format
 msgid "Content from %s is collapsed"
 msgstr ""
 
-#: src/Model/Item.php:3231
+#: src/Model/Item.php:2986
 msgid "Sensitive content"
 msgstr ""
 
-#: src/Model/Item.php:3763
+#: src/Model/Item.php:3518
 msgid "bytes"
 msgstr ""
 
-#: src/Model/Item.php:3794
+#: src/Model/Item.php:3549
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3796
+#: src/Model/Item.php:3551
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3801
+#: src/Model/Item.php:3556
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3803
+#: src/Model/Item.php:3558
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3805
+#: src/Model/Item.php:3560
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:3846 src/Model/Item.php:3847
+#: src/Model/Item.php:3601 src/Model/Item.php:3602
 msgid "View on separate page"
 msgstr ""
 
@@ -6278,7 +6278,7 @@ msgstr[1] ""
 #: src/Module/Debug/ItemBody.php:30 src/Module/Diaspora/Receive.php:45
 #: src/Module/Item/Display.php:83 src/Module/Item/Feed.php:45
 #: src/Module/Item/Follow.php:27 src/Module/Item/Ignore.php:27
-#: src/Module/Item/Language.php:39 src/Module/Item/Pin.php:27
+#: src/Module/Item/Language.php:43 src/Module/Item/Pin.php:27
 #: src/Module/Item/Pin.php:42 src/Module/Item/Searchtext.php:39
 #: src/Module/Item/Star.php:28 src/Module/Update/Display.php:23
 msgid "Access denied."
