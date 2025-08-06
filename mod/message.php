@@ -27,7 +27,7 @@ function message_init()
 	$tabs = '';
 
 	if (DI::args()->getArgc() > 1 && is_numeric(DI::args()->getArgv()[1])) {
-		$tabs = render_messages(get_messages(DI::userSession()->getLocalUserId(), 0, 5), 'mail_list.tpl');
+		$tabs = render_messages(get_messages(DI::userSession()->getLocalUserId(), 0, 15), 'mail_list.tpl');
 	}
 
 	$new = [
