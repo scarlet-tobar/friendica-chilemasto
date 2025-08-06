@@ -269,7 +269,7 @@ class Index extends BaseSettings
 			'$l10n' => [
 				'profile_action'            => $this->t('Profile Actions'),
 				'banner'                    => $this->t('Edit Profile Details'),
-				'submit'                    => $this->t('Submit'),
+				'submit'                    => $this->t('Save Settings'),
 				'profpic'                   => $this->t('Change Profile Photo'),
 				'viewprof'                  => $this->t('View Profile'),
 				'personal_section'          => $this->t('Personal'),
