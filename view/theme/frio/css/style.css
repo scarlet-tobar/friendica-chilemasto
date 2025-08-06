@@ -161,6 +161,11 @@ details summary {
 	body.aside-out {
 		overflow: hidden;
 	}
+	/* More space for the search field */
+	#topbar-first .container {
+		padding-left: 0;
+		padding-right: 0;
+	}
 }
 /*
 * standard page elements
@@ -884,7 +889,7 @@ nav.navbar .nav > li > button:focus {
 }
 
 #nav-search-input-field {
-	width: 250px;
+	width: 296px;
 }
 
 #nav-search-input-field::placeholder {
@@ -2479,6 +2484,10 @@ input[type="range"].form-control {
 }
 #search-box .form-button-search {
 	top: 1px;
+}
+
+#search-box .navbar-form {
+	margin-right: -15px;
 }
 
 .search-input.form-control.form-search {
