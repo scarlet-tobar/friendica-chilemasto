@@ -164,7 +164,7 @@
 								<form class="navbar-form" role="search" method="get" action="{{$nav.search.0}}">
 									<div class="form-group form-group-search">
 										<input accesskey="s" id="nav-search-input-field" class="form-control form-search"
-											type="search" name="q" placeholder="{{$nav.search.1}}: {{$search_hint}}">
+											type="search" name="q" placeholder="{{$search_placeholder}}">
 										<button class="btn btn-primary btn-md form-button-search" type="submit">
 											<i class="fa fa-search" aria-hidden="true"></i>
 											<span class="sr-only">{{$nav.search.1}}</span>
@@ -518,7 +518,7 @@
 		<form class="navbar-form" role="search" method="get" action="{{$nav.search.0}}">
 			<div class="form-group form-group-search">
 				<input id="nav-search-input-field-mobile" class="form-control form-search" type="search" name="q"
-					placeholder="{{$nav.search.1}}: {{$search_hint}}">
+					placeholder="{{$search_placeholder}}">
 				<button class="btn btn-primary btn-sm form-button-search" type="submit">
 					<i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i>
 					<span class="sr-only">{{$nav.search.1}}</span>

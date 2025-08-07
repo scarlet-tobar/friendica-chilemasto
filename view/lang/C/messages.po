@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-06 05:55+0000\n"
+"POT-Creation-Date: 2025-08-07 19:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1964,8 +1964,8 @@ msgstr ""
 msgid "Clear notifications"
 msgstr ""
 
-#: src/Content/Nav.php:120 src/Content/Text/HTML.php:863
-msgid "@name, !group, #tags, content"
+#: src/Content/Nav.php:120
+msgid "Search: @name, !group, #tags, content"
 msgstr ""
 
 #: src/Content/Nav.php:219 src/Module/Security/Login.php:146
@@ -2299,6 +2299,10 @@ msgstr ""
 #: src/Content/Text/HTML.php:855 src/Content/Widget/VCard.php:116
 #: src/Model/Profile.php:454 src/Module/Contact/Profile.php:520
 msgid "Follow"
+msgstr ""
+
+#: src/Content/Text/HTML.php:863
+msgid "@name, !group, #tags, content"
 msgstr ""
 
 #: src/Content/Widget.php:36
