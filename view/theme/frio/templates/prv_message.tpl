@@ -81,10 +81,3 @@
 
 </form>
 </div>
-
-<script type="text/javascript">
-	$(document).ready( function() {
-		// initiale autosize for the textareas
-		autosize($("textarea.text-autosize"));
-	});
-</script>
