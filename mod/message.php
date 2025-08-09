@@ -343,7 +343,7 @@ function message_content()
 			'$parent'      => $parent,
 			'$upload'      => DI::l10n()->t('Upload photo'),
 			'$insert'      => DI::l10n()->t('Insert web link'),
-			'$submit'      => DI::l10n()->t('Submit'),
+			'$submit'      => DI::l10n()->t('Send Message'),
 			'$wait'        => DI::l10n()->t('Please wait')
 		]);
 

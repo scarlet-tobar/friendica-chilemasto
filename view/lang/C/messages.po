@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-07 19:04+0200\n"
+"POT-Creation-Date: 2025-08-08 23:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -289,7 +289,7 @@ msgstr ""
 msgid "Please wait"
 msgstr ""
 
-#: mod/message.php:190
+#: mod/message.php:190 mod/message.php:346
 msgid "Send Message"
 msgstr ""
 
@@ -319,28 +319,6 @@ msgstr ""
 
 #: mod/message.php:335
 msgid "Send Reply"
-msgstr ""
-
-#: mod/message.php:346 mod/photos.php:658 mod/photos.php:778
-#: mod/photos.php:1055 mod/photos.php:1097 mod/photos.php:1153
-#: mod/photos.php:1233 src/Module/Calendar/Event/Form.php:236
-#: src/Module/Contact/Advanced.php:118 src/Module/Contact/Profile.php:407
-#: src/Module/Debug/ActivityPubConversion.php:128
-#: src/Module/Debug/Babel.php:279 src/Module/Debug/Localtime.php:50
-#: src/Module/Debug/Probe.php:40 src/Module/Debug/WebFinger.php:37
-#: src/Module/FriendSuggest.php:132 src/Module/Install.php:219
-#: src/Module/Install.php:259 src/Module/Install.php:296
-#: src/Module/Invite.php:162 src/Module/Item/Compose.php:188
-#: src/Module/Moderation/Item/Source.php:74
-#: src/Module/Moderation/Report/Create.php:153
-#: src/Module/Moderation/Report/Create.php:168
-#: src/Module/Moderation/Report/Create.php:196
-#: src/Module/Moderation/Report/Create.php:256
-#: src/Module/Profile/Profile.php:288 src/Module/Settings/Server/Action.php:65
-#: src/Module/User/Delegation.php:181 src/Object/Post.php:1159
-#: view/theme/duepuntozero/config.php:73 view/theme/frio/config.php:155
-#: view/theme/quattro/config.php:75 view/theme/vier/config.php:123
-msgid "Submit"
 msgstr ""
 
 #: mod/message.php:414
@@ -448,6 +426,28 @@ msgstr ""
 
 #: mod/photos.php:542
 msgid "No photos selected"
+msgstr ""
+
+#: mod/photos.php:658 mod/photos.php:778 mod/photos.php:1055
+#: mod/photos.php:1097 mod/photos.php:1153 mod/photos.php:1233
+#: src/Module/Calendar/Event/Form.php:236 src/Module/Contact/Advanced.php:118
+#: src/Module/Contact/Profile.php:407
+#: src/Module/Debug/ActivityPubConversion.php:128
+#: src/Module/Debug/Babel.php:279 src/Module/Debug/Localtime.php:50
+#: src/Module/Debug/Probe.php:40 src/Module/Debug/WebFinger.php:37
+#: src/Module/FriendSuggest.php:132 src/Module/Install.php:219
+#: src/Module/Install.php:259 src/Module/Install.php:296
+#: src/Module/Invite.php:162 src/Module/Item/Compose.php:188
+#: src/Module/Moderation/Item/Source.php:74
+#: src/Module/Moderation/Report/Create.php:153
+#: src/Module/Moderation/Report/Create.php:168
+#: src/Module/Moderation/Report/Create.php:196
+#: src/Module/Moderation/Report/Create.php:256
+#: src/Module/Profile/Profile.php:288 src/Module/Settings/Server/Action.php:65
+#: src/Module/User/Delegation.php:181 src/Object/Post.php:1159
+#: view/theme/duepuntozero/config.php:73 view/theme/frio/config.php:155
+#: view/theme/quattro/config.php:75 view/theme/vier/config.php:123
+msgid "Submit"
 msgstr ""
 
 #: mod/photos.php:674
