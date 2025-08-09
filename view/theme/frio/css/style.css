@@ -1495,7 +1495,6 @@ section #jotOpen {
 #jot-text-wrap textarea {
 	min-height: 100px;
 	overflow-y: auto !important;
-	overflow-y: overlay !important;
 }
 #jot-text-wrap .preview textarea {
 	width: 100%;
