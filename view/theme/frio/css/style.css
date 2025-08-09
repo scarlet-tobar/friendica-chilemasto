@@ -2786,8 +2786,8 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 .mail-thread #prvmail-message-label > label {
 	display: none;
 }
-.mail-thread #prvmail-message-label textarea {
-	max-height: 120px;
+.mail-thread #prvmail-message-label textarea, #comment-edit-text-input {
+	min-height: 120px;
 }
 .mail-conv-wrapper {
 	padding: 15px 0;
