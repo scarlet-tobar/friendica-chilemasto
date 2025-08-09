@@ -73,6 +73,13 @@ video {
 blockquote {
 	font-size: inherit;
 }
+textarea {
+	/* The JS autoresizing lib autosize appears to lock vertical resizing because I guess it may conflict with it.
+	 * This leaves horizontal resizing but that generally is less useful and it frequently breaks the layout.
+	 * So fully disable resizing for textareas until we replace this lib with CSS field-sizing
+	 * */
+	resize: none;
+}
 .clear {
 	clear: both;
 }
@@ -1488,7 +1495,6 @@ section #jotOpen {
 #jot-text-wrap textarea {
 	min-height: 100px;
 	overflow-y: auto !important;
-	overflow-y: overlay !important;
 }
 #jot-text-wrap .preview textarea {
 	width: 100%;
@@ -2786,8 +2792,8 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 .mail-thread #prvmail-message-label > label {
 	display: none;
 }
-.mail-thread #prvmail-message-label textarea {
-	max-height: 120px;
+.mail-thread #prvmail-message-label textarea, #comment-edit-text-input {
+	min-height: 120px;
 }
 .mail-conv-wrapper {
 	padding: 15px 0;

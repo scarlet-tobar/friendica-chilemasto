@@ -468,6 +468,9 @@ $(document).ready(function () {
 	} catch(err) {
 		$('.button-browser-share').hide();
 	}
+
+	// initiale autosize for the textareas
+	autosize($("textarea.text-autosize"));
 });
 
 function openClose(theID) {
