@@ -25,12 +25,12 @@
 		3 => The additional help text (if available)
 	*}}
 
-	<div class="panel-group panel-group-settings" id="profile-edit-wrapper" role="tablist" aria-multiselectable="true">
+	<div class="panel-group panel-group-settings" id="profile-photo-edit-wrapper" role="tablist" aria-multiselectable="true">
 		{{* Upload profile photo *}}
 		<div class="panel">
 			<div class="section-subtitle-wrapper panel-heading" role="tab" id="photo-upload">
 				<h2>
-					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#profile-edit-wrapper" href="#photo-upload-collapse" aria-expanded="true" aria-controls="photo-upload-collapse">
+					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#profile-photo-edit-wrapper" href="#photo-upload-collapse" aria-expanded="true" aria-controls="photo-upload-collapse">
 						{{$l10n.profile_photo}}
 					</button>
 				</h2>
@@ -57,7 +57,7 @@
 		<div class="panel">
 			<div class="section-subtitle-wrapper panel-heading" role="tab" id="photo-change">
 				<h2>
-					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#profile-edit-wrapper" href="#photo-change-collapse" aria-expanded="true" aria-controls="photo-change-collapse">
+					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#profile-photo-edit-wrapper" href="#photo-change-collapse" aria-expanded="true" aria-controls="photo-change-collapse">
 						{{$l10n.profpic}}
 					</button>
 				</h2>
@@ -73,7 +73,7 @@
 	<form id="profile-edit-form" name="form1" action="" method="post">
 		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 
-		<div class="panel-group panel-group-settings" id="profile-edit-wrapper" role="tablist" aria-multiselectable="true">
+		<div class="panel-group panel-group-settings" id="profile-edit-wrapper" role="tablist" aria-multiselectable="false">
 			{{* The personal settings *}}
 			<div class="panel">
 				<div class="section-subtitle-wrapper panel-heading" role="tab" id="personal">
