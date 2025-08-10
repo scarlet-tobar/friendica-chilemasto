@@ -271,6 +271,7 @@ class Index extends BaseSettings
 				'banner'                    => $this->t('Edit Profile Details'),
 				'submit'                    => $this->t('Save Settings'),
 				'profpic'                   => $this->t('Change Profile Photo'),
+				'yourphotos'                => $this->t('Your photos'),
 				'viewprof'                  => $this->t('View Profile'),
 				'personal_section'          => $this->t('Personal'),
 				'picture_section'           => $this->t('Profile picture'),
