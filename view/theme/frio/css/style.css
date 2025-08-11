@@ -73,7 +73,7 @@ video {
 blockquote {
 	font-size: inherit;
 }
-textarea {
+textarea.text-autosize {
 	/* The JS autoresizing lib autosize appears to lock vertical resizing because I guess it may conflict with it.
 	 * This leaves horizontal resizing but that generally is less useful and it frequently breaks the layout.
 	 * So fully disable resizing for textareas until we replace this lib with CSS field-sizing
