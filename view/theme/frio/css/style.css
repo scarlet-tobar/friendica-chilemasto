@@ -1231,11 +1231,11 @@ aside .vcard #profile-photo-wrapper.crop-preview {
 }
 aside .vcard .profile-header {
 	padding: 5px 0px 20px 0px;
-	text-align: center;
 }
 aside .vcard .fn {
 	font-weight: bold;
 	padding: 5px 0px 5px 0px;
+	text-align: center;
 }
 aside .vcard .p-addr {
 	font-style: italic;
@@ -1243,6 +1243,7 @@ aside .vcard .p-addr {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	padding-bottom: 2px;
+	text-align: center;
 }
 aside .vcard .title {
 	margin-top: 10px;
