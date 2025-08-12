@@ -250,7 +250,7 @@ class Media
 			$media = self::addAccount($media);
 		}
 
-		if (in_array($media['type'], [self::ACTIVITY, self::LD, self::JSON]) || self::isFederatedServer($media['url'])) {
+		if (in_array($media['type'], [self::ACTIVITY, self::LD, self::JSON]) || (self::isFederatedServer($media['url']) && !in_array($media['type'], [self::HLS, self::AUDIO, self::VIDEO]))) {
 			$media = self::addActivity($media);
 		}
 
@@ -552,7 +552,7 @@ class Media
 			$type = self::TEXT;
 		} elseif (($filetype == 'application') && ($subtype == 'x-bittorrent')) {
 			$type = self::TORRENT;
-		} elseif (($filetype == 'application') && ($subtype == 'vnd.apple.mpegurl')) {
+		} elseif (($filetype == 'application') && in_array($subtype, ['vnd.apple.mpegurl', 'x-mpegurl'])) {
 			$type = self::HLS;
 		} elseif (($filetype == 'application') && ($subtype == 'activity+json')) {
 			$type = self::ACTIVITY;
