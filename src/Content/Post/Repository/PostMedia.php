@@ -124,6 +124,15 @@ class PostMedia extends BaseRepository
 		$selected = '';
 		$previews = [];
 		$video    = [];
+		$is_hls   = false;
+
+		// Check if there is any HLS media
+		// This is used to determine if we should suppress some of the media types
+		foreach ($PostMedias as $PostMedia) {
+			if ($PostMedia->type == PostMediaEntity::TYPE_HLS) {
+				$is_hls = true;
+			}
+		}
 
 		foreach ($PostMedias as $PostMedia) {
 			foreach ($links as $link) {
@@ -142,6 +151,12 @@ class PostMedia extends BaseRepository
 			// Currently these two types are ignored here.
 			// Posts are added differently and contacts are not displayed as attachments.
 			if (in_array($PostMedia->type, [PostMediaEntity::TYPE_ACCOUNT, PostMediaEntity::TYPE_ACTIVITY])) {
+				continue;
+			}
+
+			if ($is_hls && in_array($PostMedia->type, [PostMediaEntity::TYPE_VIDEO, PostMediaEntity::TYPE_TORRENT])) {
+				// If there is HLS media, we don't want to show any other video or torrents.
+				// This is mainly a workaround for Peertube.
 				continue;
 			}
 

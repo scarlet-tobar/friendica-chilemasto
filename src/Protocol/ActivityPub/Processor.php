@@ -231,7 +231,7 @@ class Processor
 		$item['changed'] = DateTimeFormat::utcNow();
 		$item['edited']  = DateTimeFormat::utc($activity['updated']);
 
-		Post\Media::deleteByURIId($item['uri-id'], [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE, Post\Media::HTML]);
+		Post\Media::deleteByURIId($item['uri-id'], [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE, Post\Media::HTML, Post\Media::HLS, Post\Media::TORRENT]);
 		$item = self::processContent($activity, $item);
 		if (empty($item)) {
 			Queue::remove($activity);
