@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-08 23:53+0200\n"
+"POT-Creation-Date: 2025-08-10 20:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1624,7 +1624,7 @@ msgid "Sort by post creation date"
 msgstr ""
 
 #: src/Content/Conversation/Factory/Network.php:27
-#: src/Module/Settings/Profile/Index.php:275
+#: src/Module/Settings/Profile/Index.php:276
 msgid "Personal"
 msgstr ""
 
@@ -1860,7 +1860,7 @@ msgstr ""
 
 #: src/Content/Item.php:428 src/Content/Item.php:451 src/Model/Contact.php:1228
 #: src/Model/Contact.php:1284 src/Model/Contact.php:1294
-#: src/Module/Directory.php:143 src/Module/Settings/Profile/Index.php:274
+#: src/Module/Directory.php:143 src/Module/Settings/Profile/Index.php:275
 msgid "View Profile"
 msgstr ""
 
@@ -2010,7 +2010,8 @@ msgstr ""
 msgid "Photos"
 msgstr ""
 
-#: src/Content/Nav.php:228 view/theme/frio/theme.php:223
+#: src/Content/Nav.php:228 src/Module/Settings/Profile/Index.php:274
+#: view/theme/frio/theme.php:223
 msgid "Your photos"
 msgstr ""
 
@@ -8656,12 +8657,12 @@ msgstr ""
 msgid "Birthday:"
 msgstr ""
 
-#: src/Module/Profile/Profile.php:204 src/Module/Settings/Profile/Index.php:307
+#: src/Module/Profile/Profile.php:204 src/Module/Settings/Profile/Index.php:308
 #: src/Util/Temporal.php:157
 msgid "Age: "
 msgstr ""
 
-#: src/Module/Profile/Profile.php:204 src/Module/Settings/Profile/Index.php:307
+#: src/Module/Profile/Profile.php:204 src/Module/Settings/Profile/Index.php:308
 #: src/Util/Temporal.php:157
 #, php-format
 msgid "%d year old"
@@ -8669,7 +8670,7 @@ msgid_plural "%d years old"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Module/Profile/Profile.php:209 src/Module/Settings/Profile/Index.php:300
+#: src/Module/Profile/Profile.php:209 src/Module/Settings/Profile/Index.php:301
 msgid "Description:"
 msgstr ""
 
@@ -9271,7 +9272,7 @@ msgid "Basic Settings"
 msgstr ""
 
 #: src/Module/Settings/Account.php:522
-#: src/Module/Settings/Profile/Index.php:299
+#: src/Module/Settings/Profile/Index.php:300
 msgid "Display name:"
 msgstr ""
 
@@ -10244,28 +10245,28 @@ msgstr ""
 msgid "Change Profile Photo"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:276
+#: src/Module/Settings/Profile/Index.php:277
 msgid "Profile picture"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:277
+#: src/Module/Settings/Profile/Index.php:278
 msgid "Location"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:278 src/Util/Temporal.php:83
+#: src/Module/Settings/Profile/Index.php:279 src/Util/Temporal.php:83
 #: src/Util/Temporal.php:85
 msgid "Miscellaneous"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:279
+#: src/Module/Settings/Profile/Index.php:280
 msgid "Custom Profile Fields"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:280 src/Module/Welcome.php:45
+#: src/Module/Settings/Profile/Index.php:281 src/Module/Welcome.php:45
 msgid "Upload Profile Photo"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:282
+#: src/Module/Settings/Profile/Index.php:283
 #, php-format
 msgid ""
 "<p>Custom fields appear on <a href=\"%s\">your profile page</a>.</p>\n"
@@ -10275,59 +10276,59 @@ msgid ""
 "\t\t\t\t<p>Non-public fields can only be seen by the selected Friendica contacts or the Friendica contacts in the selected circles.</p>"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:302
+#: src/Module/Settings/Profile/Index.php:303
 msgid "Street Address:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:303
+#: src/Module/Settings/Profile/Index.php:304
 msgid "Locality/City:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:304
+#: src/Module/Settings/Profile/Index.php:305
 msgid "Region/State:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:305
+#: src/Module/Settings/Profile/Index.php:306
 msgid "Postal/Zip Code:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:306
+#: src/Module/Settings/Profile/Index.php:307
 msgid "Country:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:308
+#: src/Module/Settings/Profile/Index.php:309
 msgid "XMPP (Jabber) address:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:308
+#: src/Module/Settings/Profile/Index.php:309
 msgid "The XMPP address will be published so that people can follow you there."
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:309
+#: src/Module/Settings/Profile/Index.php:310
 msgid "Matrix (Element) address:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:309
+#: src/Module/Settings/Profile/Index.php:310
 msgid "The Matrix address will be published so that people can follow you there."
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:310
+#: src/Module/Settings/Profile/Index.php:311
 msgid "Homepage URL:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:311
+#: src/Module/Settings/Profile/Index.php:312
 msgid "Public Keywords:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:311
+#: src/Module/Settings/Profile/Index.php:312
 msgid "(Used for suggesting potential friends, can be seen by others)"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:312
+#: src/Module/Settings/Profile/Index.php:313
 msgid "Private Keywords:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:312
+#: src/Module/Settings/Profile/Index.php:313
 msgid "(Used for searching profiles, never shown to others)"
 msgstr ""
 

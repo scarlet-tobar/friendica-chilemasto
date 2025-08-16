@@ -10,38 +10,13 @@
 	{{* The actions dropdown which can performed to the current profile *}}
 	<div id="profile-edit-links">
 		<ul class="nav nav-pills preferences">
-			<li class="dropdown pull-right">
-				<button type="button" class="btn btn-link dropdown-toggle" id="profile-edit-links-dropdown" data-toggle="dropdown" aria-expanded="false">
-					<i class="fa fa-angle-down" aria-hidden="true"></i>&nbsp;{{$l10n.profile_action}}
-				</button>
-				<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="profile-edit-links-dropdown">
-					<li><a role="menuitem" href="{{$profpiclink}}" id="profile-photo_upload-link"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;{{$l10n.profpic}}</a></li>
-					<li><button role="menuitem" type="button" class="btn-link" id="profile-photo_upload-link-new" onclick="openClose('profile-photo-upload-section');"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;{{$l10n.profile_photo}}</button></li>
-					<li class="divider"></li>
-					<li><a role="menuitem" href="profile/{{$nickname}}/profile" id="profile-edit-view-link">{{$l10n.viewprof}}</a></li>
-				</ul>
+			<li class="pull-right">
+				<a class="btn btn-link btn-sm" href="profile/{{$nickname}}/profile"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;{{$l10n.viewprof}}</a>
 			</li>
 		</ul>
 	</div>
 
 	<div id="profile-edit-links-end"></div>
-
-	<form enctype="multipart/form-data" action="settings/profile/photo" method="post">
-		<input type="hidden" name="form_security_token" value="{{$form_security_token_photo}}">
-
-		<div id="profile-photo-upload-section" class="panel">
-			<a id="profile-photo-upload-close" class="close pull-right" onclick="openClose('profile-photo-upload-section');"><i class="fa fa-times" aria-hidden="true"></i></a>
-			<div id="profile-photo-upload-wrapper">
-				<label id="profile-photo-upload-label" for="profile-photo-upload">{{$l10n.profile_photo}}:</label>
-				<input name="userfile" type="file" id="profile-photo-upload" size="48" />
-			</div>
-
-			<div class="profile-edit-submit-wrapper pull-right">
-				<button type="submit" name="submit" class="profile-edit-submit-button btn btn-primary">{{$l10n.submit}}</button>
-			</div>
-			<div class="clear"></div>
-		</div>
-	</form>
 
 	{{* Most of the Variables used below are arrays in the following style
 		0 => Some kind of identifier (e.g. for the ID)
@@ -50,10 +25,55 @@
 		3 => The additional help text (if available)
 	*}}
 
+	<div class="panel-group panel-group-settings" id="profile-photo-edit-wrapper" role="tablist" aria-multiselectable="true">
+		{{* Upload profile photo *}}
+		<div class="panel">
+			<div class="section-subtitle-wrapper panel-heading" role="tab" id="photo-upload">
+				<h2>
+					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#profile-photo-edit-wrapper" href="#photo-upload-collapse" aria-expanded="true" aria-controls="photo-upload-collapse">
+						{{$l10n.profile_photo}}
+					</button>
+				</h2>
+			</div>
+			<div id="photo-upload-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="photo-upload">
+				<div class="panel-body">
+					<form enctype="multipart/form-data" action="settings/profile/photo" method="post">
+						<input type="hidden" name="form_security_token" value="{{$form_security_token_photo}}">
+							<div id="profile-photo-upload-wrapper">
+								<label id="profile-photo-upload-label" for="profile-photo-upload">{{$l10n.profile_photo}}:</label>
+								<input name="userfile" type="file" id="profile-photo-upload" size="48" />
+							</div>
+
+							<div class="profile-edit-submit-wrapper pull-right">
+								<button type="submit" name="submit" class="profile-edit-submit-button btn btn-primary">{{$l10n.submit}}</button>
+							</div>
+							<div class="clear"></div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		{{* Change profile photo *}}
+		<div class="panel">
+			<div class="section-subtitle-wrapper panel-heading" role="tab" id="photo-change">
+				<h2>
+					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#profile-photo-edit-wrapper" href="#photo-change-collapse" aria-expanded="true" aria-controls="photo-change-collapse">
+						{{$l10n.profpic}}
+					</button>
+				</h2>
+			</div>
+			<div id="photo-change-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="photo-change">
+				<div class="panel-body">
+					<a href="{{$profpiclink}}">{{$l10n.yourphotos}}</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<form id="profile-edit-form" name="form1" action="" method="post">
 		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 
-		<div class="panel-group panel-group-settings" id="profile-edit-wrapper" role="tablist" aria-multiselectable="true">
+		<div class="panel-group panel-group-settings" id="profile-edit-wrapper" role="tablist" aria-multiselectable="false">
 			{{* The personal settings *}}
 			<div class="panel">
 				<div class="section-subtitle-wrapper panel-heading" role="tab" id="personal">
