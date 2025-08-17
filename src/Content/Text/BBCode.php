@@ -2464,7 +2464,7 @@ class BBCode
 			// Otherwise pull out single word tags. These can be @nickname, @first_last
 			// and #hash tags.
 
-			if (preg_match_all('/([!#@][^\^ \x0D\x0A,;:?\']*[^\^ \x0D\x0A,;:?!\'.])/', $string, $matches)) {
+			if (preg_match_all('/(?<=^|\s)([!#@][^\^ \x0D\x0A,;:?\']*[^\^ \x0D\x0A,;:?!\'.])/', $string, $matches)) {
 				foreach ($matches[1] as $match) {
 					if (strstr($match, ']')) {
 						// we might be inside a bbcode color tag - leave it alone
