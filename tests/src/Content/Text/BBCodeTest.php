@@ -340,6 +340,29 @@ Karl Marx - Die ursprüngliche Akkumulation
 		self::assertEquals($expected, $actual);
 	}
 
+	public function dataGetTags()
+	{
+		return [
+			'bug-15076-uri-fragments-require-space-before-tags' => [
+				[],
+				'https://github.com/uBlockOrigin/uBOL-home/wiki/Frequently-asked-questions-(FAQ)#if-i-install-ubol-will-i-see-a-difference-with-ubo',
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataGetTags
+	 *
+	 * @param array $expected Expected BBCode output
+	 * @param string $text     Input text
+	 */
+	public function testGetTags(array $expected, string $text)
+	{
+		$actual = BBCode::getTags($text);
+
+		self::assertEquals($expected, $actual);
+	}
+
 	public function dataExpandTags()
 	{
 		return [
