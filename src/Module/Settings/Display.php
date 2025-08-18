@@ -234,11 +234,11 @@ class Display extends BaseSettings
 
 		$update_content         = $this->pConfig->get($uid, 'system', 'update_content') ?? false;
 		$enable_smile           = !$this->pConfig->get($uid, 'system', 'no_smilies', false);
-		$infinite_scroll        = $this->pConfig->get($uid, 'system', 'infinite_scroll', false);
+		$infinite_scroll        = $this->pConfig->get($uid, 'system', 'infinite_scroll', true);
 		$enable_smart_threading = !$this->pConfig->get($uid, 'system', 'no_smart_threading', false);
 		$enable_dislike         = !$this->pConfig->get($uid, 'system', 'hide_dislike', false);
 		$display_resharer       = $this->pConfig->get($uid, 'system', 'display_resharer', false);
-		$stay_local             = $this->pConfig->get($uid, 'system', 'stay_local', false);
+		$stay_local             = $this->pConfig->get($uid, 'system', 'stay_local', true);
 		$show_page_drop         = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
 		$display_eventlist      = $this->pConfig->get($uid, 'system', 'display_eventlist', true);
 
