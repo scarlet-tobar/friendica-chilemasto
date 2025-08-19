@@ -145,15 +145,18 @@ class Processor
 			return;
 		}
 
-		$data                = ['uri-id' => $uriid];
-		$data['type']        = Post\Media::UNKNOWN;
-		$data['url']         = $attachment['url'];
-		$data['mimetype']    = $attachment['mediaType'] ?? null;
-		$data['height']      = $attachment['height']    ?? null;
-		$data['width']       = $attachment['width']     ?? null;
-		$data['size']        = $attachment['size']      ?? null;
-		$data['preview']     = $attachment['image']     ?? null;
-		$data['description'] = $attachment['name']      ?? null;
+		$data                  = ['uri-id' => $uriid];
+		$data['type']          = Post\Media::UNKNOWN;
+		$data['url']           = $attachment['url'];
+		$data['mimetype']      = $attachment['mediaType']     ?? null;
+		$data['height']        = $attachment['height']        ?? null;
+		$data['width']         = $attachment['width']         ?? null;
+		$data['size']          = $attachment['size']          ?? null;
+		$data['preview']       = $attachment['image']         ?? null;
+		$data['description']   = $attachment['name']          ?? null;
+		$data['player-url']    = $attachment['player-url']    ?? null;
+		$data['player-height'] = $attachment['player-height'] ?? null;
+		$data['player-width']  = $attachment['player-width']  ?? null;
 
 		Post\Media::insert($data);
 	}

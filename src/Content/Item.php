@@ -8,17 +8,16 @@
 namespace Friendica\Content;
 
 use Friendica\App\BaseURL;
-use Friendica\AppHelper;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\BBCode\Video;
 use Friendica\Content\Text\HTML;
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Attach;
 use Friendica\Model\Circle;
@@ -66,17 +65,17 @@ class Item
 	private $aclFormatter;
 	/** @var IManagePersonalConfigValues */
 	private $pConfig;
+	/** @var IManageConfigValues */
+	private $config;
 	/** @var BaseURL */
 	private $baseURL;
 	/** @var Emailer */
 	private $emailer;
-	/** @var AppHelper */
-	private $appHelper;
 	private EventDispatcherInterface $eventDispatcher;
 	/** @var LoggerInterface */
 	protected $logger;
 
-	public function __construct(LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, IHandleUserSessions $userSession, Video $bbCodeVideo, ACLFormatter $aclFormatter, IManagePersonalConfigValues $pConfig, BaseURL $baseURL, Emailer $emailer, AppHelper $appHelper, EventDispatcherInterface $eventDispatcher)
+	public function __construct(LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, IHandleUserSessions $userSession, Video $bbCodeVideo, ACLFormatter $aclFormatter, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, BaseURL $baseURL, Emailer $emailer, EventDispatcherInterface $eventDispatcher)
 	{
 		$this->profiler        = $profiler;
 		$this->activity        = $activity;
@@ -86,8 +85,8 @@ class Item
 		$this->aclFormatter    = $aclFormatter;
 		$this->baseURL         = $baseURL;
 		$this->pConfig         = $pConfig;
+		$this->config          = $config;
 		$this->emailer         = $emailer;
-		$this->appHelper       = $appHelper;
 		$this->eventDispatcher = $eventDispatcher;
 		$this->logger          = $logger;
 	}
@@ -1091,7 +1090,7 @@ class Item
 	public function isTooOld(string $created, int $uid = 0): bool
 	{
 		// check for create date and expire time
-		$expire_interval = DI::config()->get('system', 'dbclean-expire-days', 0);
+		$expire_interval = $this->config->get('system', 'dbclean-expire-days', 0);
 
 		if ($uid) {
 			$user = DBA::selectFirst('user', ['expire'], ['uid' => $uid]);
@@ -1205,8 +1204,6 @@ class Item
 
 		$result = [];
 
-		$eventDispatcher = DI::eventDispatcher();
-
 		foreach ($this->splitByBlocks($searchtext) as $block) {
 			$languages = $ld->detect($block)->close() ?: [];
 
@@ -1217,7 +1214,7 @@ class Item
 				'author-id' => $author_id,
 			];
 
-			$hook_data = $eventDispatcher->dispatch(
+			$hook_data = $this->eventDispatcher->dispatch(
 				new ArrayFilterEvent(ArrayFilterEvent::DETECT_LANGUAGES, $hook_data),
 			)->getArray();
 
@@ -1354,5 +1351,39 @@ class Item
 		}
 		$used_languages = $this->l10n->t("Detected languages in this post:\n%s", $used_languages);
 		return $used_languages;
+	}
+
+	/**
+	 * Returns the HTML code for an iframe player for embedded content like videos.
+	 * The iframe will automatically adjust its height based on the aspect ratio.
+	 *
+	 * @param string $player_url URL of the embedded player
+	 * @param int|null $width Player width
+	 * @param int|null $height Player height
+	 * @return string
+	 */
+	public function getPlayerIframe(string $player_url, ?int $width, ?int $height): string
+	{
+		$attributes = ' src="' . $player_url . '"';
+		$max_height = $this->config->get('system', 'max_video_height') ?: $height;
+
+		if ($width != 0 && $height != 0) {
+			if ($height > $width && $height > $max_height) {
+				$factor      = 100;
+				$height_attr = $max_height;
+			} else {
+				$factor      = round($height / $width, 2) * 100;
+				$height_attr = '100%';
+			}
+			$attributes .= ' height="' . $height_attr. '" style="position:absolute;left:0px;top:0px"';
+			$return = '<div style="position:relative;padding-bottom:' . $factor . '%;margin-bottom:1em">';
+		} else {
+			$height = min($max_height, $height);
+			$attributes .= ' height="' . $height . '"';
+			$return = '<div style="position:relative">';
+		}
+
+		$return .= '<iframe ' . $attributes . ' width="100%" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>';
+		return $return;
 	}
 }

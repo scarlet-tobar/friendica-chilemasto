@@ -459,16 +459,19 @@ class Media
 		}
 
 		$media['type']            = self::HTML;
-		$media['size']            = $data['size']           ?? null;
-		$media['author-url']      = $data['author_url']     ?? null;
-		$media['author-name']     = $data['author_name']    ?? null;
-		$media['author-image']    = $data['author_img']     ?? null;
-		$media['publisher-url']   = $data['publisher_url']  ?? null;
-		$media['publisher-name']  = $data['publisher_name'] ?? null;
-		$media['publisher-image'] = $data['publisher_img']  ?? null;
-		$media['language']        = $data['language']       ?? null;
-		$media['published']       = $data['published']      ?? null;
-		$media['modified']        = $data['modified']       ?? null;
+		$media['size']            = $data['size']             ?? null;
+		$media['author-url']      = $data['author_url']       ?? null;
+		$media['author-name']     = $data['author_name']      ?? null;
+		$media['author-image']    = $data['author_img']       ?? null;
+		$media['publisher-url']   = $data['publisher_url']    ?? null;
+		$media['publisher-name']  = $data['publisher_name']   ?? null;
+		$media['publisher-image'] = $data['publisher_img']    ?? null;
+		$media['player-url']      = $data['player']['embed']  ?? null;
+		$media['player-height']   = $data['player']['height'] ?? null;
+		$media['player-width']    = $data['player']['width']  ?? null;
+		$media['language']        = $data['language']         ?? null;
+		$media['published']       = $data['published']        ?? null;
+		$media['modified']        = $data['modified']         ?? null;
 
 		if (DI::config()->get('system', 'add_page_media')) {
 			if (!empty($data['audio'])) {
@@ -624,7 +627,8 @@ class Media
 	/**
 	 * Fetch video dimensions using getID3
 	 *
-	 * @param array $media
+	 * @param array $media     Media array
+	 * @param bool  $full_file If true, the whole video will be fetched
 	 * @return array media with added dimensions
 	 */
 	private static function getVideoDimensions(array $media, bool $full_file): array
