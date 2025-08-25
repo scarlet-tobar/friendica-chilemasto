@@ -489,10 +489,13 @@ class Receiver
 		}
 
 		$object_data['type']           = $type;
-		$object_data['actor']          = $actor;
 		$object_data['item_receiver']  = $receivers;
 		$object_data['receiver']       = array_replace($object_data['receiver'] ?? [], $receivers);
 		$object_data['reception_type'] = array_replace($object_data['reception_type'] ?? [], $reception_types);
+
+		if (empty($object_data['actor'])) {
+			$object_data['actor'] = $actor;
+		}
 
 		$account  = Contact::selectFirstAccount(['platform'], ['nurl' => Strings::normaliseLink($actor)]);
 		$platform = $account['platform'] ?? '';
@@ -2021,9 +2024,18 @@ class Receiver
 			$object_data['published'] = $object_data['updated'];
 		}
 
-		$actor = JsonLD::fetchElement($object, 'as:attributedTo', '@id');
-		if (empty($actor)) {
-			$actor = JsonLD::fetchElement($object, 'as:actor', '@id');
+		$actor  = JsonLD::fetchElement($object, 'as:attributedTo', '@id');
+		$author = JsonLD::fetchElement($object, 'as:actor', '@id') ?? $actor;
+
+		if (!empty($actor)) {
+			foreach (JsonLD::fetchElementArray($object, 'as:attributedTo', '@id') as $element) {
+				if ($element != $author) {
+					$actor = $element;
+					break;
+				}
+			}
+		} else {
+			$actor = $author;
 		}
 
 		$location = JsonLD::fetchElement($object, 'as:location', 'as:name', '@type', 'as:Place');
@@ -2039,7 +2051,8 @@ class Receiver
 		$object_data['diaspora:guid']         = JsonLD::fetchElement($object, 'diaspora:guid', '@value');
 		$object_data['diaspora:comment']      = JsonLD::fetchElement($object, 'diaspora:comment', '@value');
 		$object_data['diaspora:like']         = JsonLD::fetchElement($object, 'diaspora:like', '@value');
-		$object_data['actor']                 = $object_data['author'] = $actor;
+		$object_data['author']                = $author;
+		$object_data['actor']                 = $actor;
 		$element                              = JsonLD::fetchElement($object, 'as:context', '@id');
 		$object_data['context']               = $element != './' ? $element : null;
 		$element                              = JsonLD::fetchElement($object, 'ostatus:conversation', '@id');

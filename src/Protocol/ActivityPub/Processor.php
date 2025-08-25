@@ -422,9 +422,6 @@ class Processor
 				$item['causer-id']   = $item['owner-id'];
 				DI::logger()->info('Use actor as causer.', ['id' => $item['owner-id'], 'actor' => $item['owner-link']]);
 			}
-
-			$item['owner-link'] = $item['author-link'];
-			$item['owner-id']   = $item['author-id'];
 		}
 
 		if (!$item['isGroup'] && !empty($activity['receiver_urls']['as:audience'])) {
