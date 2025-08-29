@@ -75,8 +75,7 @@ span.connector {
   margin-top: 10px;
 }
 
-.type-link:after, .type-video:after,
-.oembed.video:after {
+.type-link:after, .type-video:after {
   content: ".";
   display: block;
   height: 0;
@@ -84,7 +83,7 @@ span.connector {
   visibility: hidden;
 }
 
-.type-video .oembed.video:after {
+.type-video {
   float: left;
 }
 
@@ -132,11 +131,6 @@ span.connector {
   line-height: normal;
 }
 
-.type-link .oembed, .type-video .oembed {
-  font-size: 18px;
-  font-weight: 300;
-  line-height: normal;
-}
 .type-link img, .type-video img {
 }
 
@@ -144,7 +138,6 @@ span.connector {
   margin: 0em;
 }
 
-.type-link span.oembed + br, .type-video span.oembed + br,
 .type-link a + br, .type-video a + br,
 .type-link img + br, .type-video img + br{
   display: none;
@@ -160,11 +153,6 @@ span.connector {
   float: none;
 }
 
-.oembed.video .embed_video > div {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-}
 .embed_rich {
   display: block;
   transition: height .75s;
@@ -280,7 +268,7 @@ h6 {
   font-size: 14.95px;
 }
 
-span.oembed, h4 {
+h4 {
   margin: 0px 0px 0px 0px;
 }
 

@@ -1101,19 +1101,6 @@ return [
 			"notify-id" => ["notify-id"],
 		]
 	],
-	"oembed" => [
-		"comment" => "cache for OEmbed queries",
-		"fields" => [
-			"url" => ["type" => "varbinary(383)", "not null" => "1", "primary" => "1", "comment" => "page url"],
-			"maxwidth" => ["type" => "mediumint unsigned", "not null" => "1", "primary" => "1", "comment" => "Maximum width passed to Oembed"],
-			"content" => ["type" => "mediumtext", "comment" => "OEmbed data of the page"],
-			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "datetime of creation"],
-		],
-		"indexes" => [
-			"PRIMARY" => ["url", "maxwidth"],
-			"created" => ["created"],
-		]
-	],
 	"openwebauth-token" => [
 		"comment" => "Store OpenWebAuth token to verify contacts",
 		"fields" => [
@@ -1134,7 +1121,7 @@ return [
 		"fields" => [
 			"url_hash" => ["type" => "binary(64)", "not null" => "1", "primary" => "1", "comment" => "page url hash"],
 			"guessing" => ["type" => "boolean", "not null" => "1", "default" => "0", "primary" => "1", "comment" => "is the 'guessing' mode active?"],
-			"oembed" => ["type" => "boolean", "not null" => "1", "default" => "0", "primary" => "1", "comment" => "is the data the result of oembed?"],
+			"oembed" => ["type" => "boolean", "not null" => "1", "default" => "0", "primary" => "1", "comment" => "is the data the result of oembed? - Obsolete field."],
 			"url" => ["type" => "text", "not null" => "1", "comment" => "page url"],
 			"content" => ["type" => "mediumtext", "comment" => "page data"],
 			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "datetime of creation"],
