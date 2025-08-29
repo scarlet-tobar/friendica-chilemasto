@@ -28,7 +28,6 @@ use Friendica\Module\Special\DisplayNotFound;
 use Friendica\Navigation\Notifications\Repository\Notification;
 use Friendica\Navigation\Notifications\Repository\Notify;
 use Friendica\Protocol\ActivityPub;
-use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Network\HTTPException;
 use Friendica\Content\Widget;
@@ -88,7 +87,7 @@ class Display extends BaseModule
 		$item    = null;
 		$itemUid = $this->session->getLocalUserId();
 
-		$fields = ['uri-id', 'parent-uri-id', 'author-id', 'author-link', 'body', 'uid', 'guid', 'gravity'];
+		$fields = ['uri-id', 'parent-uri-id', 'author-id', 'author-link', 'contact-id', 'contact-contact-type', 'body', 'uid', 'guid', 'gravity'];
 
 		// Does the local user have this item?
 		if ($this->session->getLocalUserId()) {
@@ -121,7 +120,7 @@ class Display extends BaseModule
 
 		if (empty($item)) {
 			$this->page['aside'] = '';
-			$displayNotFound = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
+			$displayNotFound     = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
 			return $displayNotFound->content();
 		}
 
@@ -173,7 +172,11 @@ class Display extends BaseModule
 		}
 
 		if ($author === []) {
-			$author = Contact::getById($item['author-id']);
+			if ($item['contact-contact-type'] == Contact::TYPE_COMMUNITY) {
+				$author = Contact::getById($item['contact-id']);
+			} else {
+				$author = Contact::getById($item['author-id']);
+			}
 		}
 
 		if ($this->baseUrl->isLocalUrl($author['url'])) {
@@ -195,7 +198,7 @@ class Display extends BaseModule
 		}
 
 		if (!empty($parent)) {
-			$pageUid         = $parent['uid'];
+			$pageUid = $parent['uid'];
 			if ($this->session->getRemoteContactID($pageUid)) {
 				$itemUid = $parent['uid'];
 			}
@@ -237,7 +240,7 @@ class Display extends BaseModule
 
 		if (empty($item)) {
 			$this->page['aside'] = '';
-			$displayNotFound = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
+			$displayNotFound     = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
 			return $displayNotFound->content();
 		}
 
