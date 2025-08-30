@@ -540,6 +540,8 @@ class Media
 			$type = self::IMAGE;
 		} elseif ($filetype == 'video') {
 			$type = self::VIDEO;
+		} elseif (($filetype == 'audio') && ($subtype == 'x-mpegurl')) {
+			$type = self::HLS;
 		} elseif ($filetype == 'audio') {
 			$type = self::AUDIO;
 		} elseif (($filetype == 'text') && ($subtype == 'html')) {
