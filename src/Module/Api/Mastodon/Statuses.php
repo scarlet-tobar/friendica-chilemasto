@@ -137,7 +137,7 @@ class Statuses extends BaseApi
 		We can't do anything about this, but the probability for this is extremely low.
 		*/
 		$media_ids      = [];
-		$existing_media = array_column(Post\Media::getByURIId($post['uri-id'], [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE]), 'id');
+		$existing_media = array_column(Post\Media::getByURIId($post['uri-id'], [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE, Post\Media::HLS]), 'id');
 
 		foreach ($request['media_attributes'] as $attributes) {
 			if (!empty($attributes['id']) && in_array($attributes['id'], $existing_media)) {
