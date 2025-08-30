@@ -9,6 +9,7 @@ namespace Friendica\Util;
 
 use DOMDocument;
 use DOMXPath;
+use DOMElement;
 use Friendica\Content\Text\HTML;
 use Friendica\Protocol\HTTP\MediaType;
 use Friendica\Core\Hook;
@@ -19,6 +20,7 @@ use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPException;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
+use Embera\Embera;
 
 /**
  * Get information about a given URL
@@ -449,6 +451,10 @@ class ParseUrl
 					case 'og:type':
 						$siteinfo['pagetype'] = trim($meta_tag['content']);
 						break;
+					case 'og:video':
+					case 'og:video:secure_url':
+						$siteinfo['player']['embed'] = trim($meta_tag['content']);
+						break;
 					case 'twitter:description':
 						$siteinfo['text'] = trim($meta_tag['content']);
 						break;
@@ -458,9 +464,20 @@ class ParseUrl
 					case 'twitter:image':
 						$siteinfo['image'] = $meta_tag['content'];
 						break;
+					case 'twitter:player':
+						$siteinfo['player']['embed'] = trim($meta_tag['content']);
+						break;
+					case 'twitter:player:width':
+						$siteinfo['player']['width'] = intval($meta_tag['content']);
+						break;
+					case 'twitter:player:height':
+						$siteinfo['player']['height'] = intval($meta_tag['content']);
+						break;
 				}
 			}
 		}
+
+		$siteinfo = self::getOembedInfo($xpath, $siteinfo);
 
 		$list = $xpath->query("//script[@type='application/ld+json']");
 		foreach ($list as $node) {
@@ -1232,6 +1249,21 @@ class ParseUrl
 			$media['width'] = trim($content);
 		}
 
+		$content = JsonLD::fetchElement($jsonld, 'duration');
+		if (!empty($content) && is_string($content)) {
+			$media['duration'] = trim($content);
+		}
+
+		$content = JsonLD::fetchElement($jsonld, 'contentSize');
+		if (!empty($content) && is_string($content)) {
+			$media['size'] = trim($content);
+		}
+
+		$content = JsonLD::fetchElement($jsonld, 'uploadDate');
+		if (!empty($content) && is_string($content)) {
+			$media['uploaded'] = trim($content);
+		}
+
 		$content = JsonLD::fetchElement($jsonld, 'image');
 		if (!empty($content) && is_string($content)) {
 			$media['image'] = trim($content);
@@ -1248,6 +1280,145 @@ class ParseUrl
 
 		DI::logger()->info('Fetched Media information', ['url' => $siteinfo['url'], 'fetched' => $media]);
 		$siteinfo[$name][] = $media;
+		return $siteinfo;
+	}
+
+	/**
+	 * Fetch additional information via oEmbed
+	 *
+	 * @param DOMXPath $xpath
+	 * @param array    $siteinfo
+	 *
+	 * @return array siteinfo
+	 */
+	private static function getOembedInfo(DOMXPath $xpath, array $siteinfo): array
+	{
+		$oembed = '';
+		foreach ($xpath->query("//link[@type='application/json+oembed']") as $link) {
+			/** @var DOMElement $link */
+			$href   = $link->getAttributeNode('href')->nodeValue;
+			$oembed = $href;
+			DI::logger()->debug('Found oEmbed JSON', ['url' => $href]);
+		}
+
+		if (empty($oembed)) {
+			$embera  = new Embera();
+			$urldata = $embera->getUrlData([$siteinfo['url']]);
+			if (empty($urldata)) {
+				return $siteinfo;
+			}
+			$data = current($urldata);
+			DI::logger()->debug('Found oEmbed JSON from Embera', ['url' => $siteinfo['url']]);
+		} else {
+			$result = DI::httpClient()->get($oembed, HttpClientAccept::DEFAULT, [HttpClientOptions::REQUEST => HttpClientRequest::SITEINFO]);
+			if (!$result->isSuccess()) {
+				return $siteinfo;
+			}
+			$json_string = $result->getBodyString();
+			if (empty($json_string)) {
+				return $siteinfo;
+			}
+
+			$data = json_decode($json_string, true);
+		}
+
+		if (empty($data) || !is_array($data)) {
+			return $siteinfo;
+		}
+
+		// Youtube provides only basic information to some IP ranges.
+		// We can detect this by checking if the host is youtube.com and if there is no player information.
+		// In this case we remove all tainted information provided by Youtube and use the ones provided by OEmbed.
+		if (parse_url(Strings::normaliseLink($siteinfo['url']), PHP_URL_HOST) == 'youtube.com') {
+			if (empty($siteinfo['player'])) {
+				$fields = ['keywords', 'text', 'title', 'author_name', 'author_url', 'publisher_name', 'publisher_url', 'image'];
+				foreach ($fields as $field) {
+					unset($siteinfo[$field]);
+				}
+			}
+		}
+
+		$fields = [
+			'title'          => 'title',
+			'author_name'    => 'author_name',
+			'author_url'     => 'author_url',
+			'publisher_name' => 'provider_name',
+			'publisher_url'  => 'provider_url',
+			'image'          => 'thumbnail_url',
+		];
+
+		foreach ($fields as $key => $value) {
+			if (empty($siteinfo[$key]) && !empty($data[$value])) {
+				$siteinfo[$key] = $data[$value];
+			}
+		}
+
+		if (!empty($data['html']) && empty($siteinfo['player'])) {
+			$siteinfo = self::setPlayer($data['html'], $siteinfo);
+		}
+
+		if (!empty($siteinfo['player'])) {
+			$fields = [
+				'width'  => 'width',
+				'height' => 'height',
+			];
+			foreach ($fields as $key => $value) {
+				if (empty($siteinfo['player'][$key]) && !empty($data[$value])) {
+					$siteinfo['player'][$key] = $data[$value];
+				}
+			}
+		}
+
+		return $siteinfo;
+	}
+
+	/**
+	 * Set the player information from the oEmbed HTML in case that it contains an iframe
+	 *
+	 * @param string $html
+	 * @param array  $siteinfo
+	 *
+	 * @return array siteinfo
+	 */
+	private static function setPlayer(String $html, array $siteinfo): array
+	{
+		$dom = new DOMDocument();
+		if (!@$dom->loadHTML($html)) {
+			return $siteinfo;
+		}
+
+		$xpath = new DOMXPath($dom);
+
+		$nodes = $xpath->query('/html/body/*');
+		if ($nodes->length !== 1) {
+			return $siteinfo;
+		}
+
+		/** @var DOMElement $iframe */
+		$iframe = $nodes->item(0);
+		if ($iframe->nodeName !== 'iframe') {
+			return $siteinfo;
+		}
+
+		$src = $iframe->getAttributeNode('src')->nodeValue;
+		if (empty($src)) {
+			return $siteinfo;
+		}
+
+		$siteinfo['player']['embed'] = $src;
+
+		$width = $iframe->getAttributeNode('width')->nodeValue ?? null;
+		if (!empty($width) && is_numeric($width)) {
+			$siteinfo['player']['width'] = $width;
+		}
+
+		$height = $iframe->getAttributeNode('height')->nodeValue ?? null;
+		if (!empty($height) && is_numeric($height)) {
+			$siteinfo['player']['height'] = $height;
+		}
+
+		DI::logger()->debug('Found oEmbed iframe', ['embed' => $siteinfo['player']['embed'] ?? '', 'width' => $siteinfo['player']['width'] ?? '', 'height' => $siteinfo['player']['height'] ?? '']);
+
 		return $siteinfo;
 	}
 }
