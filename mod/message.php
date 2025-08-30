@@ -24,7 +24,8 @@ use Friendica\Util\Temporal;
 
 function message_init()
 {
-	$tabs = '';
+	$tabs               = '';
+	DI::page()['title'] = DI::l10n()->t('Messages');
 
 	if (DI::args()->getArgc() > 1 && is_numeric(DI::args()->getArgv()[1])) {
 		$tabs = render_messages(get_messages(DI::userSession()->getLocalUserId(), 0, 15), 'mail_list.tpl');
