@@ -193,16 +193,18 @@ class Media
 			$timeout = DI::config()->get('system', 'xrd_timeout');
 			try {
 				$curlResult = DI::httpClient()->head($media['url'], [HttpClientOptions::ACCEPT_CONTENT => HttpClientAccept::AS_DEFAULT, HttpClientOptions::TIMEOUT => $timeout, HttpClientOptions::REQUEST => HttpClientRequest::CONTENTTYPE]);
+				$is_head    = true;
 
 				// Workaround for systems that can't handle a HEAD request
 				if (!$curlResult->isSuccess() && in_array($curlResult->getReturnCode(), [400, 403, 405])) {
-					$curlResult = DI::httpClient()->get($media['url'], HttpClientAccept::AS_DEFAULT, [HttpClientOptions::TIMEOUT => $timeout]);
+					$curlResult = DI::httpClient()->get($media['url'], HttpClientAccept::AS_DEFAULT, [HttpClientOptions::TIMEOUT => $timeout, HttpClientOptions::HEADERS => ['Range' => 'bytes=0-100000']]);
+					$is_head    = false;
 				}
 				if ($curlResult->isSuccess()) {
 					if (!empty($curlResult->getContentType())) {
 						$media['mimetype'] = $curlResult->getContentType();
 					}
-					if (empty($media['size'])) {
+					if (empty($media['size']) && $is_head) {
 						$media['size'] = (int)($curlResult->getHeader('Content-Length')[0] ?? strlen($curlResult->getBodyString() ?? ''));
 					}
 					if (empty($media['modified']) && !empty($curlResult->getHeader('Last-Modified')[0])) {
@@ -277,7 +279,7 @@ class Media
 			}
 
 			return DBA::exists('gserver', ['nurl' => Strings::normaliseLink($baseurl), 'network' => Protocol::FEDERATED]);
-		} catch(\Throwable $e) {
+		} catch (\Throwable $e) {
 			DI::logger()->notice('Invalid URL provided', ['url' => $url, 'exception' => $e, 'callstack' => System::callstack(10)]);
 			return false;
 		}
