@@ -486,7 +486,7 @@ class Media
 			return;
 		}
 
-		if ($element['mimetype'] ?? '' == 'application/x-mpegURL') {
+		if (($element['mimetype'] ?? '') === 'application/x-mpegURL') {
 			// Until we can detect live streaming, we don't store HLS streams
 			return;
 		}
