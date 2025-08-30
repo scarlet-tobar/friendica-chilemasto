@@ -83,6 +83,10 @@ return [
 		// Checks for missing entries in "post", "post-thread" or "post-thread-user" and creates them
 		'add_missing_posts' => false,
 
+		// add_page_media (boolean)
+		// Add page related audio and video media when adding a HTML page entry
+		'add_page_media' => false,
+
 		// admin_inactivity_limit (Integer)
 		// Days of inactivity after which an admin is considered inactive. "0" means that there will be no check for inactivity.
 		'admin_inactivity_limit' => 30,

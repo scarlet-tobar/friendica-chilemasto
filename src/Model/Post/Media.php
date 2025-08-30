@@ -465,7 +465,48 @@ class Media
 		$media['published']       = $data['published']      ?? null;
 		$media['modified']        = $data['modified']       ?? null;
 
+		if (DI::config()->get('system', 'add_page_media')) {
+			if (!empty($data['audio'])) {
+				foreach ($data['audio'] as $entry) {
+					self::insertMedia($entry, $media['uri-id']);
+				}
+			}
+
+			if (!empty($data['video'])) {
+				foreach ($data['video'] as $entry) {
+					self::insertMedia($entry, $media['uri-id']);
+				}
+			}
+		}
+
 		return $media;
+	}
+
+	private static function insertMedia(array $element, int $uri_id)
+	{
+		if (empty($element['src']) || $uri_id <= 0) {
+			return;
+		}
+
+		if (($element['mimetype'] ?? '') === 'application/x-mpegURL') {
+			// Until we can detect live streaming, we don't store HLS streams
+			return;
+		}
+
+		$media                = ['uri-id' => $uri_id];
+		$media['type']        = Post\Media::UNKNOWN;
+		$media['url']         = $element['src'];
+		$media['mimetype']    = $element['contenttype'] ?? null;
+		$media['name']        = $element['name']        ?? null;
+		$media['description'] = $element['description'] ?? null;
+		$media['size']        = $element['size']        ?? null;
+		$media['height']      = $element['height']      ?? null;
+		$media['width']       = $element['width']       ?? null;
+		if (!empty($element['uploaded'])) {
+			$media['modified'] = DateTimeFormat::utc($element['uploaded']);
+		}
+		$result = self::insert($media);
+		DI::logger()->debug('Found media in page', ['result' => $result, 'uri-id' => $uri_id, 'media' => $media]);
 	}
 
 	/**
