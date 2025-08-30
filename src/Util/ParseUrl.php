@@ -50,9 +50,9 @@ class ParseUrl
 	public static function getContentType(string $url, string $accept = HttpClientAccept::DEFAULT, int $timeout = 0): array
 	{
 		if (!empty($timeout)) {
-			$options = [HttpClientOptions::TIMEOUT => $timeout, HttpClientOptions::REQUEST => HttpClientRequest::CONTENTTYPE];
+			$options = [HttpClientOptions::TIMEOUT => $timeout, HttpClientOptions::REQUEST => HttpClientRequest::CONTENTTYPE, HttpClientOptions::HEADERS => ['Range' => 'bytes=0-100000']];
 		} else {
-			$options = [HttpClientOptions::REQUEST => HttpClientRequest::CONTENTTYPE];
+			$options = [HttpClientOptions::REQUEST => HttpClientRequest::CONTENTTYPE, HttpClientOptions::HEADERS => ['Range' => 'bytes=0-100000']];
 		}
 
 		try {
