@@ -11,7 +11,7 @@
 
 		<div id="site-location" aria-hidden="true">{{$sitelocation}}</div>
 		<div id="banner" class="hidden-sm hidden-xs">
-			{{* show on remote/visitor connections another logo which symbols that fact*}}
+			{{* show on remote/visitor connections another logo which symbols that fact *}}
 			{{if $nav.remote}}
 				<a href="{{$baseurl}}" aria-hidden="true">
 					<div id="remote-logo-img" aria-label="{{$home}}"></div>
