@@ -3319,3 +3319,10 @@ fbrowser.photo .photo-album-image-wrapper { margin-left: 10px; }
 #settings-server td + td {
 	text-align: center;
 }
+
+iframe,
+img,
+video {
+	max-width: 100%;
+	max-height: 90vh;
+}

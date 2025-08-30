@@ -69,6 +69,7 @@ iframe,
 img,
 video {
 	max-width: 100%;
+	max-height: 85vh;
 }
 blockquote {
 	font-size: inherit;
