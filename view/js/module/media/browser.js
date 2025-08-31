@@ -72,7 +72,6 @@ const Browser = {
 		$('.folders a, .path a').on('click', function (e) {
 			e.preventDefault();
 			location.href = Browser._getUrl("minimal", location['hash'], this.dataset.folder);
-			location.reload();
 		});
 
 		$(".photo-album-photo-link").on('click', function (e) {
