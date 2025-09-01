@@ -87,7 +87,8 @@ const Browser = {
 			parent.$('body').trigger(Browser.event, [
 				this.dataset.filename,
 				embed,
-				Browser.id
+				Browser.id,
+				this.dataset.img
 			]);
 
 		});
