@@ -218,7 +218,13 @@ class Contact
 
 		$fields = DI::dbaDefinition()->truncateFieldsForTable('contact', $fields);
 		DBA::insert('contact', $fields, $duplicate_mode);
-		$contact = DBA::selectFirst('contact', [], ['id' => DBA::lastInsertId()]);
+		$id = DBA::lastInsertId();
+		if ($id == 0) {
+			DI::logger()->warning('Contact was not created', ['fields' => $fields]);
+			return 0;
+		}
+
+		$contact = DBA::selectFirst('contact', [], ['id' => $id]);
 		if (!DBA::isResult($contact)) {
 			// Shouldn't happen
 			DI::logger()->warning('Created contact could not be found', ['fields' => $fields]);
@@ -234,7 +240,7 @@ class Contact
 			$duplicate = DBA::selectFirst('contact', [], ['id' => $account_user['id'], 'deleted' => false]);
 			if (!empty($duplicate['id'])) {
 				$ret = Contact::deleteById($contact['id']);
-				DI::logger()->notice('Deleted duplicated contact', ['ret' => $ret, 'account-user' => $account_user, 'cid' => $duplicate['id'], 'uid' => $duplicate['uid'], 'uri-id' => $duplicate['uri-id'], 'url' => $duplicate['url']]);
+				DI::logger()->notice('Deleted duplicated contact', ['ret' => $ret, 'id' => $contact['id'], 'account-user' => $account_user, 'cid' => $duplicate['id'], 'uid' => $duplicate['uid'], 'uri-id' => $duplicate['uri-id'], 'url' => $duplicate['url']]);
 				$contact = $duplicate;
 			} else {
 				$ret = DBA::update('account-user', ['id' => $contact['id']], ['uid' => $contact['uid'], 'uri-id' => $contact['uri-id']]);
