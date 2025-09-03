@@ -112,7 +112,7 @@ class Show extends BaseModule
 			'$tabs'      => $tabs,
 			'$title'     => $this->t('Events'),
 			'$view'      => $this->t('View'),
-			'$new_event' => ['calendar/event/new', $this->t('Create New Event'), '', ''],
+			'$new_event' => ['calendar/event/new', $this->t('New Event'), '', ''],
 
 			'$today' => Strings::ucFirst($this->t('today')),
 			'$month' => Strings::ucFirst($this->t('month')),
