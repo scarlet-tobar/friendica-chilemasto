@@ -76,7 +76,7 @@
 				{{if $profile.addr}}
 					<div id="mention-link-button">
 						<button type="button" id="mention-link" class="btn btn-labeled btn-primary" onclick="openWallMessage('{{$mention_url}}')">
-							<span class=""><i class="fa fa-pencil-square-o"></i></span>
+							<span class=""><i class="fa fa-pencil-square-o"></i></span>&nbsp;
 							<span class="">{{$mention_label}}</span>
 						</button>
 					</div>

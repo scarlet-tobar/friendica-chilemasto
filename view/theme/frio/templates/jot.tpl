@@ -5,7 +5,10 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 {{* The button to open the jot - in This theme we move the button with js to the second nav bar *}}
-<a class="btn btn-sm btn-primary pull-right{{if !$always_open_compose}} modal-open{{/if}}" id="jotOpen" href="compose/{{$posttype}}{{if $content}}?body={{$content}}{{/if}}" aria-label="{{$new_post}}" title="{{$new_post}}"><i class="fa fa-pencil-square-o fa-2x"></i></a>
+<a class="btn btn-primary pull-right{{if !$always_open_compose}} modal-open{{/if}}" id="jotOpen" href="compose/{{$posttype}}{{if $content}}?body={{$content}}{{/if}}" aria-label="{{$new_post}}" title="{{$new_post}}">
+	<i class="fa fa-lg fa-pencil-square-o"></i>&nbsp;
+	<span>{{$new_post}}</span>
+</a>
 
 <div id="jot-content">
 	<div id="jot-sections">
@@ -191,5 +194,5 @@ can load different content into the jot modal (e.g. the item edit jot)
 </script>
 
 <script>
-	dzFactory.setupDropzone('#jot-text-wrap', 'profile-jot-text'); 
+	dzFactory.setupDropzone('#jot-text-wrap', 'profile-jot-text');
 </script>

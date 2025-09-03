@@ -67,7 +67,7 @@
 			{{if $mention_link}}
 				<div id="mention-link-button">
 					<button type="button" id="mention-link" class="btn btn-labeled btn-primary{{if !$always_open_compose}} modal-open{{/if}}" onclick="openWallMessage('{{$mention_link}}')" title="{{$mention}}" aria-label="{{$mention}}">
-						<span class=""><i class="fa fa-pencil-square-o"></i></span>
+						<span class=""><i class="fa fa-pencil-square-o"></i></span>&nbsp;
 						<span class="">{{$mention}}</span>
 					</button>
 				</div>

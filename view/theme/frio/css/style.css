@@ -1438,9 +1438,11 @@ section ul.tabs {
 section #jotOpen {
 	display: none;
 }
-#jotOpen {
-	margin-top: 3px;
-	float: right;
+#jotOpen, #mention-link {
+	align-items: center;
+	display: flex;
+	padding-bottom: 7px;
+	padding-top: 7px;
 }
 #jot-content {
 	display: none;
