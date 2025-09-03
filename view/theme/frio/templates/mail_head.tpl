@@ -6,7 +6,7 @@
   *}}
 
 <div class="pull-left">
-	<h3 class="heading">{{$messages}}</h3>
+	<h2 class="heading">{{$messages}}</h2>
 </div>
 
 <div id="message-new" class="pull-right">
