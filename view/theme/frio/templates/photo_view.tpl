@@ -18,33 +18,32 @@
 	<div class="pull-right" id="photo-edit-link-wrap">
 {{if $tools}}
 	{{if $tools.view}}
-		<span class="icon-padding"> </span>
-		<a id="photo-edit-link" href="{{$tools.view.0}}" title="{{$tools.view.1}}" data-toggle="tooltip">
-			<i class="page-action faded-icon fa fa-image"></i>
+		<a id="photo-edit-link" class="btn btn-primary photo-back-link" href="{{$tools.view.0}}" data-toggle="tooltip">
+			<i class="page-action fa fa-mail-reply"></i>
+			 {{$back_to_viewing_text}}
 		</a>
 	{{/if}}
 	{{if $tools.edit}}
-		<span class="icon-padding"> </span>
-		<a id="photo-edit-link" href="{{$tools.edit.0}}" title="{{$tools.edit.1}}" data-toggle="tooltip">
-			<i class="page-action faded-icon fa fa-pencil"></i>
+		<a id="photo-edit-link" class="btn btn-primary" href="{{$tools.edit.0}}" data-toggle="tooltip">
+			 <i class="page-action fa fa-pencil"></i>
+			 {{$edit_text}}
 		</a>
 	{{/if}}
 	{{if $tools.delete}}
-		<span class="icon-padding"> </span>
-		<a id="photo-edit-link" href="{{$tools.delete.0}}" title="{{$tools.delete.1}}" data-toggle="tooltip">
-			<i class="page-action faded-icon fa fa-trash"></i>
+		<a id="photo-edit-link" class="btn btn-primary" href="{{$tools.delete.0}}" data-toggle="tooltip">
+			<i class="page-action fa fa-trash"></i>
+			{{$delete_text}}
 		</a>
 	{{/if}}
 	{{if $tools.profile}}
-		<span class="icon-padding"> </span>
-		<a id="photo-toprofile-link" href="{{$tools.profile.0}}" title="{{$tools.profile.1}}" data-toggle="tooltip">
-			<i class="page-action faded-icon fa fa-user"></i>
+		<a id="photo-toprofile-link" class="btn btn-primary" href="{{$tools.profile.0}}" data-toggle="tooltip">
+			<i class="page-action fa fa-user"></i>
+			{{$use_as_profile_picture_text}}
 		</a>
 	{{/if}}
 	{{if $tools.lock}}
-		<span class="icon-padding"> </span>
 		<a id="photo-lock-link" onclick="lockview(event, 'photo', {{$id}});" title="{{$tools.lock}}" data-toggle="tooltip">
-			<i class="page-action faded-icon fa fa-lock"></i>
+			<i class="page-action fa fa-lg fa-lock faded-icon"></i>
 		</a>
 	{{/if}}
 {{/if}}
@@ -52,7 +51,7 @@
 	<div class="clear"></div>
 
 	<div id="photo-view-wrapper">
-		<div id="photo-photo">
+		<div id="photo-photo" class="center-block">
 			{{* The photo *}}
 			<div class="photo-container">
 				<a href="{{$photo.href}}" title="{{$photo.title}}"><img src="{{$photo.src}}" alt="{{$photo.filename}}"/></a>

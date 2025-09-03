@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (C) 2010-2024, the Friendica project
  * SPDX-FileCopyrightText: 2010-2024 the Friendica project
@@ -1266,22 +1267,26 @@ function photos_content()
 
 		$photo_tpl = Renderer::getMarkupTemplate('photo_view.tpl');
 		$o .= Renderer::replaceMacros($photo_tpl, [
-			'$id'          => $ph[0]['id'],
-			'$album'       => [$album_link, $ph[0]['album']],
-			'$tools'       => $tools,
-			'$photo'       => $photo,
-			'$prevlink'    => $prevlink,
-			'$nextlink'    => $nextlink,
-			'$desc'        => $ph[0]['desc'],
-			'$tags'        => $tags,
-			'$edit'        => $edit,
-			'$map'         => $map,
-			'$map_text'    => DI::l10n()->t('Map'),
-			'$likebuttons' => $likebuttons,
-			'$like'        => $like,
-			'$dislike'     => $dislike,
-			'$comments'    => $comments,
-			'$paginate'    => $paginate,
+			'$id'                          => $ph[0]['id'],
+			'$album'                       => [$album_link, $ph[0]['album']],
+			'$tools'                       => $tools,
+			'$photo'                       => $photo,
+			'$prevlink'                    => $prevlink,
+			'$nextlink'                    => $nextlink,
+			'$desc'                        => $ph[0]['desc'],
+			'$tags'                        => $tags,
+			'$edit'                        => $edit,
+			'$edit_text'                   => DI::l10n()->t('Edit'),
+			'$delete_text'                 => DI::l10n()->t('Delete'),
+			'$use_as_profile_picture_text' => DI::l10n()->t('Use as profile picture'),
+			'$back_to_viewing_text'        => DI::l10n()->t('Back to viewing'),
+			'$map'                         => $map,
+			'$map_text'                    => DI::l10n()->t('Map'),
+			'$likebuttons'                 => $likebuttons,
+			'$like'                        => $like,
+			'$dislike'                     => $dislike,
+			'$comments'                    => $comments,
+			'$paginate'                    => $paginate,
 		]);
 
 		DI::page()['htmlhead'] .= "\n" . '<meta name="twitter:card" content="summary_large_image" />' . "\n";

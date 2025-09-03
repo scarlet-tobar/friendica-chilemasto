@@ -2852,6 +2852,10 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 	margin-top: 15px;
 }
 
+#photo-toprofile-link, .photo-back-link {
+  margin-right: 25px;
+}
+
 /* Events page */
 
 .fc .fc-month-view .fc-content .fc-title .item-desc:hover {
