@@ -11,8 +11,9 @@
 	{{* The link to create a new event *}}
 	{{if $new_event.0}}
 	<div class="pull-right" id="new-event-link">
-		<button type="button" class="btn-link page-action faded-icon" onclick="addToModal('{{$new_event.0}}')" title="{{$new_event.1}}" data-toggle="tooltip">
+		<button type="button" class="btn btn-primary page-action onclick="addToModal('{{$new_event.0}}')" data-toggle="tooltip">
 			<i class="fa fa-plus"></i>
+			<span>{{$new_event.1}}</span>
 		</button>
 	</div>
 	{{/if}}
