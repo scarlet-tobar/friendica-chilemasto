@@ -150,6 +150,9 @@ class Display extends BaseModule
 
 		$output .= $this->getDisplayData($item);
 
+		$author              = Contact::getByURLForUser($item['author-link'], $this->session->getLocalUserId());
+		$this->page['title'] = $this->l10n->t("Post by %s", $author['name']);
+
 		return $output;
 	}
 

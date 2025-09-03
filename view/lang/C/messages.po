@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-21 21:26+0200\n"
+"POT-Creation-Date: 2025-09-03 15:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6283,7 +6283,7 @@ msgstr[1] ""
 #: src/Module/Contact/Follow.php:56 src/Module/Contact/Redir.php:47
 #: src/Module/Contact/Redir.php:208 src/Module/Conversation/Community.php:154
 #: src/Module/Debug/ItemBody.php:30 src/Module/Diaspora/Receive.php:45
-#: src/Module/Item/Display.php:83 src/Module/Item/Feed.php:45
+#: src/Module/Item/Display.php:82 src/Module/Item/Feed.php:45
 #: src/Module/Item/Follow.php:27 src/Module/Item/Ignore.php:27
 #: src/Module/Item/Language.php:43 src/Module/Item/Pin.php:27
 #: src/Module/Item/Pin.php:42 src/Module/Item/Searchtext.php:39
@@ -7374,6 +7374,11 @@ msgstr ""
 
 #: src/Module/Item/Compose.php:214
 msgid "You can make this page always open when you use the New Post button in the <a href=\"/settings/display\">Theme Customization settings</a>."
+msgstr ""
+
+#: src/Module/Item/Display.php:154
+#, php-format
+msgid "Post by %s"
 msgstr ""
 
 #: src/Module/Item/Feed.php:72
@@ -11785,7 +11790,7 @@ msgstr ""
 msgid "Quote shared by: %s"
 msgstr ""
 
-#: src/Protocol/ActivityPub/Receiver.php:565
+#: src/Protocol/ActivityPub/Receiver.php:568
 msgid "Chat"
 msgstr ""
 
