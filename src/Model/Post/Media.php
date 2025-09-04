@@ -31,6 +31,7 @@ use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\Proxy;
 use Friendica\Util\Strings;
+use getID3;
 use GuzzleHttp\Psr7\Uri;
 
 /**
@@ -246,6 +247,10 @@ class Media
 
 		if (!empty($media['preview'])) {
 			$media = self::addPreviewData($media);
+		}
+
+		if ($media['type'] === self::VIDEO) {
+			$media = self::getVideoDimensions($media, false);
 		}
 
 		if (in_array($media['type'], [self::TEXT, self::ACTIVITY, self::LD, self::JSON, self::HTML, self::XML, self::PLAIN])) {
@@ -614,6 +619,69 @@ class Media
 
 		DI::logger()->debug('Detected type', ['type' => $type, 'filetype' => $filetype, 'subtype' => $subtype, 'media' => $mimeType]);
 		return $type;
+	}
+
+	/**
+	 * Fetch video dimensions using getID3
+	 *
+	 * @param array $media
+	 * @return array media with added dimensions
+	 */
+	private static function getVideoDimensions(array $media, bool $full_file): array
+	{
+		if (isset($media['width']) && isset($media['height']) && $media['width'] > 0 && $media['height'] > 0) {
+			return $media;
+		}
+
+		DI::logger()->debug('Fetch video dimensions', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file]);
+		$timestamp  = microtime(true);
+		$timeout    = DI::config()->get('system', 'xrd_timeout');
+		$options    = $full_file ? [HttpClientOptions::TIMEOUT => $timeout] : [HttpClientOptions::TIMEOUT => $timeout, HttpClientOptions::HEADERS => ['Range' => 'bytes=0-1000000']];
+		$curlResult = DI::httpClient()->get($media['url'], HttpClientAccept::AS_DEFAULT, $options);
+		if (!$curlResult->isSuccess()) {
+			DI::logger()->notice('Could not fetch video', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file, 'code' => $curlResult->getReturnCode()]);
+			return $media;
+		}
+
+		if ((!isset($media['modified']) || !$media['modified']) && isset($curlResult->getHeader('Last-Modified')[0]) && $curlResult->getHeader('Last-Modified')[0] != '') {
+			$media['modified'] = DateTimeFormat::utc($curlResult->getHeader('Last-Modified')[0]);
+			if (!isset($media['published']) || !$media['published']) {
+				$media['published'] = $media['modified'];
+			}
+		}
+
+		$video = $curlResult->getBodyString() ?? '';
+		if (!$video) {
+			DI::logger()->notice('Empty video content', ['uri-id' => $media['uri-id'], 'media' => $media, 'full_file' => $full_file]);
+			return $media;
+		}
+
+		$tempfile = tempnam(System::getTempPath(), 'video-');
+		file_put_contents($tempfile, $video);
+		$getID3 = new getID3();
+		$info   = $getID3->analyze($tempfile);
+		unlink($tempfile);
+		$runtime = number_format(microtime(true) - $timestamp, 3);
+
+		if (isset($info['error']) && !$full_file && substr($info['error'][0], 0, 14) == 'Atom at offset') {
+			DI::logger()->info('Detection failed for shortened file, trying the full file now.', ['runtime' => $runtime, 'uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file, 'error' => $info['error']]);
+			return self::getVideoDimensions($media, true);
+		}
+
+		if (isset($info['error'])) {
+			DI::logger()->info('Error analyzing video', ['runtime' => $runtime, 'uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file, 'error' => $info['error']]);
+		} elseif (isset($info['video']['resolution_x']) && isset($info['video']['resolution_y'])) {
+			$media['width']  = $info['video']['resolution_x'];
+			$media['height'] = $info['video']['resolution_y'];
+			DI::logger()->debug('Detected video dimensions', ['runtime' => $runtime, 'uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file, 'width' => $media['width'], 'height' => $media['height']]);
+		} elseif (isset($info['audio'])) {
+			$media['width']  = 0;
+			$media['height'] = 0;
+			DI::logger()->debug('Detected audio file', ['runtime' => $runtime, 'uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file]);
+		} else {
+			DI::logger()->info('No video dimensions found', ['runtime' => $runtime, 'uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file, 'info' => $info]);
+		}
+		return $media;
 	}
 
 	/**
