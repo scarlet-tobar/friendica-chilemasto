@@ -144,9 +144,12 @@
 
 									</li>
 
-									<li>
-										<p role="menuitem" class="text-muted"><i>{{$emptynotifications}}</i></p>
-									</li>
+							<li id="nav-notifications-loading" class="loading" style="font-weight: bold; color: #555; padding-left: 10px;">
+								<i class="fa fa-spinner fa-spin" aria-hidden="true" style="vertical-align: middle;"></i> {{$loadingnotifications}}
+							</li>
+							<li id="nav-notifications-empty" class="empty" style="display: none;">
+								<p role="menuitem" class="text-muted text-center"><i>{{$emptynotifications}}</i></p>
+							</li>
 								</ul>
 							</li>
 						{{/if}}
@@ -444,12 +447,12 @@
 								</li>
 							{{/if}}
 							<li class="divider"><hr></li>
-							<li class="list-group-item">
-								<a role="menuitem" class="nav-link {{$nav.about.2}}"
-								   href="{{$nav.about.0}}" title="{{$nav.about.3}}">
-									<i class="fa fa-info fa-fw" aria-hidden="true"></i> {{$nav.about.1}}
-								</a>
-							</li>
+						<li class="list-group-item">
+							<a role="menuitem" class="nav-link {{$nav.about.2}}"
+								href="{{$nav.about.0}}" title="{{$nav.about.3}}">
+								<i class="fa fa-info fa-fw" aria-hidden="true"></i> {{$nav.about.1}}
+							</a>
+						</li>
 							<li class="divider"><hr></li>
 							{{if $nav.logout}}
 								<li class="list-group-item">
@@ -479,19 +482,19 @@
 	{{* The navbar for users which are not logged in *}}
 	<nav class="navbar navbar-fixed-top">
 		<div class="container">
-			<div class="navbar-header pull-left">
-				<button type="button" class="navbar-toggle collapsed pull-left visible-sm visible-xs"
-				        data-toggle="offcanvas" data-target="aside" aria-haspopup="true">
-					<span class="sr-only">Toggle navigation</span>
-					<i class="fa fa-ellipsis-v fa-fw fa-lg" aria-hidden="true"></i>
-				</button>
-				<a class="navbar-brand" href="#">
-					<div id="navbrand-container">
-						<div id="logo-img"></div>
-						<div id="navbar-brand-text"> Friendica</div>
-					</div>
-				</a>
-			</div>
+		<div class="navbar-header pull-left">
+			<button type="button" class="navbar-toggle collapsed pull-left visible-sm visible-xs"
+					data-toggle="offcanvas" data-target="aside" aria-haspopup="true">
+				<span class="sr-only">Toggle navigation</span>
+				<i class="fa fa-ellipsis-v fa-fw fa-lg" aria-hidden="true"></i>
+			</button>
+			<a class="navbar-brand" href="#">
+				<div id="navbrand-container">
+					<div id="logo-img"></div>
+					<div id="navbar-brand-text"> Friendica</div>
+				</div>
+			</a>
+		</div>
 			<div class="pull-right">
 				<ul class="nav navbar-nav navbar-right">
 					<li>
