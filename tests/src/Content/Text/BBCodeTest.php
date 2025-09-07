@@ -722,4 +722,42 @@ Lucas: For the right price, yes.[/share]',
 
 		self::assertEquals($expected, $actual);
 	}
+
+	public function dataConvertAttachment(): array
+	{
+		return [
+			'player' => [
+				'expected' => 'text <div class="type-link"><div style="position:relative;padding-bottom:75%;margin-bottom:1em"><iframe  src="http://domain.tld/player" height="100%" style="position:absolute;left:0px;top:0px" width="100%" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><h4><a href="http://domain.tld/page" target="_blank" rel="noopener noreferrer">title</a></h4><blockquote>description</blockquote><sup><a href="http://domain.tld/provider_url" target="_blank" rel="noopener noreferrer">author_name (provider_name)</a></sup></div>',
+				'data'     => [
+					'author_name'   => 'author_name',
+					'author_url'    => 'http://domain.tld/author_url',
+					'description'   => 'description',
+					'image'         => 'http://domain.tld/image',
+					'preview'       => 'http://domain.tld/preview',
+					'provider_name' => 'provider_name',
+					'provider_url'  => 'http://domain.tld/provider_url',
+					'text'          => 'text',
+					'title'         => 'title',
+					'type'          => 'link',
+					'url'           => 'http://domain.tld/page',
+					'player_url'    => 'http://domain.tld/player',
+					'player_width'  => 640,
+					'player_height' => 480,
+				],
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataConvertAttachment
+	 *
+	 * @param string $expected Expected BBCode output
+	 * @param string $text     Input text
+	 */
+	public function testConvertAttachment(string $expected, array $data)
+	{
+		$actual = BBCode::convertAttachment('', BBCode::INTERNAL, true, $data, 0, BBCode::PREVIEW_LARGE, true);
+
+		self::assertEquals($expected, $actual);
+	}
 }

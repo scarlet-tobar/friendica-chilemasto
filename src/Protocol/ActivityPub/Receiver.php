@@ -28,6 +28,7 @@ use Friendica\Util\HTTPSignature;
 use Friendica\Util\JsonLD;
 use Friendica\Util\LDSignature;
 use Friendica\Util\Network;
+use Friendica\Util\ParseUrl;
 use Friendica\Util\Strings;
 
 /**
@@ -1861,11 +1862,12 @@ class Receiver
 	 * This is the case with audio and video posts.
 	 * Then the links are added as attachments
 	 *
-	 * @param array       $urls The object URL list
-	 * @param string|null $icon The icon URL to use for the attachments
+	 * @param array       $urls   The object URL list
+	 * @param string|null $icon   The icon URL to use for the attachments
+	 * @param array       $player Embedded player data (url, width, height)
 	 * @return array an array of attachments
 	 */
-	private static function processAttachmentUrls(array $urls, ?string $icon): array
+	private static function processAttachmentUrls(array $urls, ?string $icon, array $player): array
 	{
 		$attachments = [];
 		foreach ($urls as $key => $url) {
@@ -1890,32 +1892,53 @@ class Receiver
 
 			$filetype = strtolower(substr($mediatype, 0, strpos($mediatype, '/')));
 
+			$height = JsonLD::fetchElement($url, 'as:height', '@value');
+			$width  = JsonLD::fetchElement($url, 'as:width', '@value');
+
 			if ($filetype == 'audio') {
-				$attachments[] = ['type' => $filetype, 'mediaType' => $mediatype, 'url' => $href, 'height' => null, 'size' => null, 'name' => '', 'image' => $icon];
+				$attachments[] = ['type' => $filetype, 'mediaType' => $mediatype, 'url' => $href, 'height' => $height, 'width' => $width, 'size' => null, 'name' => '', 'image' => $icon];
 			} elseif ($filetype == 'video') {
-				$height = (int)JsonLD::fetchElement($url, 'as:height', '@value');
 				// PeerTube audio-only track
-				if ($height === 0) {
+				if (!$height) {
 					continue;
 				}
 
 				$size = (int)JsonLD::fetchElement($url, 'pt:size', '@value');
 
-				$attachments[] = ['type' => $filetype, 'mediaType' => $mediatype, 'url' => $href, 'height' => $height, 'size' => $size, 'name' => '', 'image' => $icon];
+				$attachments[] = ['type' => $filetype, 'mediaType' => $mediatype, 'url' => $href, 'height' => $height, 'width' => $width, 'size' => $size, 'name' => '', 'image' => $icon];
 			} elseif (in_array($mediatype, ['application/x-bittorrent', 'application/x-bittorrent;x-scheme-handler/magnet'])) {
-				$height = (int)JsonLD::fetchElement($url, 'as:height', '@value');
-
 				// For Torrent links we always store the highest resolution
 				if (!empty($attachments[$mediatype]['height']) && ($height < $attachments[$mediatype]['height'])) {
 					continue;
 				}
 
-				$attachments[$mediatype] = ['type' => $mediatype, 'mediaType' => $mediatype, 'url' => $href, 'height' => $height, 'size' => null, 'name' => ''];
+				$attachments[$mediatype] = ['type' => $mediatype, 'mediaType' => $mediatype, 'url' => $href, 'height' => $height, 'width' => $width, 'size' => null, 'name' => ''];
 			} elseif ($mediatype == 'application/x-mpegURL') {
 				// PeerTube uses HLS streams for video. We prefer HLS streams over the video file itself.
 				// But we still store the video file as an attachment to be used by the API which currently does not support HLS streams.
-				$attachments   = array_merge($attachments, self::processAttachmentUrls($url['as:tag'], $icon));
-				$attachments[] = ['type' => $filetype, 'mediaType' => $mediatype, 'url' => $href, 'height' => null, 'size' => null, 'name' => '', 'image' => $icon];
+				$attachments = array_merge($attachments, self::processAttachmentUrls($url['as:tag'], $icon, []));
+
+				$attachment = ['type' => $filetype, 'mediaType' => $mediatype, 'url' => $href, 'height' => $height, 'width' => $width, 'size' => null, 'name' => '', 'image' => $icon];
+				if (!empty($player)) {
+					$attachment['player-url']    = $player['embed']  ?? null;
+					$attachment['player-height'] = $player['height'] ?? null;
+					$attachment['player-width']  = $player['width']  ?? null;
+
+					foreach ($attachments as $media) {
+						if (isset($media['height']) && isset($media['width'])) {
+							if ($media['height'] > $attachment['player-height'] || $media['width'] > $attachment['player-width']) {
+								$attachment['player-height'] = $media['height'];
+								$attachment['player-width']  = $media['width'];
+							}
+						}
+					}
+					if (!$height && !$width) {
+						$attachment['height'] = $attachment['player-height'];
+						$attachment['width']  = $attachment['player-width'];
+					}
+				}
+				DI::logger()->info('Adding video attachment', ['attachment' => $attachment]);
+				$attachments[] = $attachment;
 			}
 		}
 
@@ -2095,7 +2118,15 @@ class Receiver
 
 		if (in_array($object_data['object_type'], ['as:Audio', 'as:Video'])) {
 			$object_data['alternate-url'] = self::extractAlternateUrl($object['as:url'] ?? []) ?: $object_data['alternate-url'];
-			$object_data['attachments']   = array_merge($object_data['attachments'], self::processAttachmentUrls($object['as:url'] ?? [], self::processIcon($object)));
+
+			$siteinfo = ParseUrl::getSiteinfoCached($object_data['alternate-url']);
+			if (isset($siteinfo['player'])) {
+				$player = $siteinfo['player'];
+			} else {
+				$player = [];
+			}
+
+			$object_data['attachments'] = array_merge($object_data['attachments'], self::processAttachmentUrls($object['as:url'] ?? [], self::processIcon($object), $player));
 		}
 
 		$object_data['can-comment'] = JsonLD::fetchElement($object, 'pt:commentsEnabled', '@value');

@@ -55,6 +55,9 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 			$row['publisher-name'],
 			UtilNetwork::createUriFromString($row['publisher-image']),
 			$row['blurhash'],
+			UtilNetwork::createUriFromString($row['player-url']),
+			$row['player-width'],
+			$row['player-height'],
 			$row['id']
 		);
 	}

@@ -414,7 +414,7 @@ class BBCode
 	 * @return string
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function convertAttachment(string $text, int $simplehtml = self::INTERNAL, bool $tryoembed = true, array $data = [], int $uriid = 0, int $preview_mode = self::PREVIEW_LARGE): string
+	public static function convertAttachment(string $text, int $simplehtml = self::INTERNAL, bool $tryoembed = true, array $data = [], int $uriid = 0, int $preview_mode = self::PREVIEW_LARGE, bool $embed = false): string
 	{
 		DI::profiler()->startRecording('rendering');
 		$data = $data ?: self::getAttachmentData($text);
@@ -449,6 +449,11 @@ class BBCode
 
 			if ($simplehtml != self::CONNECTORS) {
 				$return = sprintf('<div class="type-%s">', $data['type']);
+			}
+
+			if ($embed && $data['player_url'] != '' && $data['player_height'] != 0) {
+				$return .= DI::contentItem()->getPlayerIframe($data['player_url'], $data['player_width'], $data['player_height']);
+				$preview_mode = self::PREVIEW_NO_IMAGE;
 			}
 
 			if ($preview_mode == self::PREVIEW_NO_IMAGE) {

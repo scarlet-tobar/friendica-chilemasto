@@ -35,6 +35,9 @@ use Psr\Http\Message\UriInterface;
  * @property-read ?string $publisherName
  * @property-read ?UriInterface $publisherImage
  * @property-read ?string $blurhash
+ * @property-read ?UriInterface $playerUrl
+ * @property-read ?int $playerWidth
+ * @property-read ?int $playerHeight
  */
 class PostMedia extends BaseEntity
 {
@@ -98,6 +101,12 @@ class PostMedia extends BaseEntity
 	 * @see https://blurha.sh/
 	 */
 	protected $blurhash;
+	/** @var ?UriInterface Player URL */
+	protected $playerUrl;
+	/** @var ?int In pixels */
+	protected $playerWidth;
+	/** @var ?int In pixels */
+	protected $playerHeight;
 
 	public function __construct(
 		int $uriId,
@@ -120,7 +129,10 @@ class PostMedia extends BaseEntity
 		?string $publisherName = null,
 		?UriInterface $publisherImage = null,
 		?string $blurhash = null,
-		int $id = null
+		?UriInterface $playerUrl = null,
+		?int $playerWidth = null,
+		?int $playerHeight = null,
+		?int $id = null
 	) {
 		$this->uriId          = $uriId;
 		$this->url            = $url;
@@ -142,6 +154,9 @@ class PostMedia extends BaseEntity
 		$this->publisherName  = $publisherName;
 		$this->publisherImage = $publisherImage;
 		$this->blurhash       = $blurhash;
+		$this->playerUrl      = $playerUrl;
+		$this->playerWidth    = $playerWidth;
+		$this->playerHeight   = $playerHeight;
 		$this->id             = $id;
 	}
 
@@ -247,6 +262,9 @@ class PostMedia extends BaseEntity
 			$this->publisherName,
 			$this->publisherImage,
 			$this->blurhash,
+			$this->playerUrl,
+			$this->playerWidth,
+			$this->playerHeight,
 			$this->id,
 		);
 	}
@@ -274,6 +292,9 @@ class PostMedia extends BaseEntity
 			$this->publisherName,
 			$this->publisherImage,
 			$this->blurhash,
+			$this->playerUrl,
+			$this->playerWidth,
+			$this->playerHeight,
 			$this->id,
 		);
 	}

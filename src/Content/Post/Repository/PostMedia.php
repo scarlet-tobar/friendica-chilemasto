@@ -79,6 +79,9 @@ class PostMedia extends BaseRepository
 			'publisher-image' => $PostMedia->publisherImage ? $PostMedia->publisherImage->__toString() : null,
 			'media-uri-id'    => $PostMedia->activityUriId,
 			'blurhash'        => $PostMedia->blurhash,
+			'player-url'      => $PostMedia->playerUrl,
+			'player-height'   => $PostMedia->playerHeight,
+			'player-width'    => $PostMedia->playerWidth,
 		];
 
 		if ($PostMedia->id) {
