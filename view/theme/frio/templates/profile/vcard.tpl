@@ -46,13 +46,13 @@
 					<div id="dfrn-request-link-button">
 						{{if $unfollow_link}}
 							<a id="dfrn-request-link" class="btn btn-labeled btn-primary" href="{{$unfollow_link}}">
-								<span class=""><i class="fa fa-user-times"></i></span>
-								<span class="">{{$unfollow}}</span>
+								<span><i class="fa fa-user-times"></i></span>
+								<span>{{$unfollow}}</span>
 							</a>
 						{{else}}
 							<a id="dfrn-request-link" class="btn btn-labeled btn-primary" href="{{$follow_link}}">
-								<span class=""><i class="fa fa-user-plus"></i></span>
-								<span class="">{{$follow}}</span>
+								<span><i class="fa fa-user-plus"></i></span>
+								<span>{{$follow}}</span>
 							</a>
 						{{/if}}
 					</div>
@@ -60,32 +60,32 @@
 				{{if $subscribe_feed_link}}
 					<div id="subscribe-feed-link-button">
 						<a id="subscribe-feed-link" class="btn btn-labeled btn-primary" href="{{$subscribe_feed_link}}">
-							<span class=""><i class="fa fa-rss"></i></span>
-							<span class="">{{$subscribe_feed}}</span>
+							<span><i class="fa fa-rss"></i></span>
+							<span>{{$subscribe_feed}}</span>
 						</a>
 					</div>
 				{{/if}}
 				{{if $wallmessage_link}}
 					<div id="wallmessage-link-button">
 						<button type="button" id="wallmessage-link" class="btn btn-labeled btn-primary" onclick="openWallMessage('{{$wallmessage_link}}')">
-							<span class=""><i class="fa fa-envelope"></i></span>
-							<span class="">{{$wallmessage}}</span>
+							<span><i class="fa fa-envelope"></i></span>
+							<span>{{$wallmessage}}</span>
 						</button>
 					</div>
 				{{/if}}
 				{{if $profile.addr}}
 					<div id="mention-link-button">
 						<button type="button" id="mention-link" class="btn btn-labeled btn-primary" onclick="openWallMessage('{{$mention_url}}')">
-							<span class=""><i class="fa fa-pencil-square-o"></i></span>&nbsp;
-							<span class="">{{$mention_label}}</span>
+							<span><i class="fa fa-pencil-square-o"></i></span>&nbsp;
+							<span>{{$mention_label}}</span>
 						</button>
 					</div>
 				{{/if}}
 				{{if $network_label}}
 					<div id="showgroup-button">
 						<a id="showgroup" class="btn btn-labeled btn-primary" href="{{$network_url}}">
-							<span class=""><i class="fa fa-group"></i></span>
-							<span class="">{{$network_label}}</span>
+							<span><i class="fa fa-group"></i></span>
+							<span>{{$network_label}}</span>
 						</a>
 					</div>
 				{{/if}}
