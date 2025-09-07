@@ -189,7 +189,7 @@ class BBCodeTest extends FixtureTestCase
 				'simpleHtml' => BBCode::DIASPORA,
 			],
 			'bug-7665-audio-tag' => [
-				'expectedHtml' => '<audio src="http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3" controls><a href="http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3">http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3</a></audio>',
+				'expectedHtml' => '<a class="embed" href="http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3">cendrones.fr/colloque2017/jona…</a>',
 				'text'         => '[audio]http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3[/audio]',
 				'try_oembed'   => true,
 			],
@@ -756,7 +756,7 @@ Lucas: For the right price, yes.[/share]',
 	 */
 	public function testConvertAttachment(string $expected, array $data)
 	{
-		$actual = BBCode::convertAttachment('', BBCode::INTERNAL, true, $data, 0, BBCode::PREVIEW_LARGE, true);
+		$actual = BBCode::convertAttachment('', BBCode::INTERNAL, $data, 0, BBCode::PREVIEW_LARGE, true);
 
 		self::assertEquals($expected, $actual);
 	}

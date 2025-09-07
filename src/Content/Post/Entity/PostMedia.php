@@ -38,6 +38,10 @@ use Psr\Http\Message\UriInterface;
  * @property-read ?UriInterface $playerUrl
  * @property-read ?int $playerWidth
  * @property-read ?int $playerHeight
+ * @property-read ?int $attachId
+ * @property-read ?string $language
+ * @property-read ?string $published
+ * @property-read ?string $modified
  */
 class PostMedia extends BaseEntity
 {
@@ -107,6 +111,14 @@ class PostMedia extends BaseEntity
 	protected $playerWidth;
 	/** @var ?int In pixels */
 	protected $playerHeight;
+	/** @var ?int */
+	protected $attachId;
+	/** @var ?string */
+	protected $language;
+	/** @var ?string (Datetime) */
+	protected $published;
+	/** @var ?string (Datetime) */
+	protected $modified;
 
 	public function __construct(
 		int $uriId,
@@ -132,7 +144,11 @@ class PostMedia extends BaseEntity
 		?UriInterface $playerUrl = null,
 		?int $playerWidth = null,
 		?int $playerHeight = null,
-		?int $id = null
+		?int $id = null,
+		?int $attachId = null,
+		?string $language = null,
+		?string $published = null,
+		?string $modified = null
 	) {
 		$this->uriId          = $uriId;
 		$this->url            = $url;
@@ -158,6 +174,10 @@ class PostMedia extends BaseEntity
 		$this->playerWidth    = $playerWidth;
 		$this->playerHeight   = $playerHeight;
 		$this->id             = $id;
+		$this->attachId       = $attachId;
+		$this->language       = $language;
+		$this->published      = $published;
+		$this->modified       = $modified;
 	}
 
 
@@ -266,6 +286,10 @@ class PostMedia extends BaseEntity
 			$this->playerWidth,
 			$this->playerHeight,
 			$this->id,
+			$this->attachId,
+			$this->language,
+			$this->published,
+			$this->modified,
 		);
 	}
 
@@ -296,6 +320,10 @@ class PostMedia extends BaseEntity
 			$this->playerWidth,
 			$this->playerHeight,
 			$this->id,
+			$this->attachId,
+			$this->language,
+			$this->published,
+			$this->modified,
 		);
 	}
 

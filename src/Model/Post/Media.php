@@ -189,8 +189,12 @@ class Media
 			}
 		}
 
+		if (($media['type'] == self::HLS) && empty($media['mimetype'])) {
+			$media['mimetype'] = 'application/vnd.apple.mpegurl';
+		}
+
 		// Fetch the mimetype or size if missing.
-		if (Network::isValidHttpUrl($media['url']) && (empty($media['mimetype']) || $media['type'] == self::HTML) && !in_array($media['type'], [self::IMAGE, self::HLS])) {
+		if (Network::isValidHttpUrl($media['url']) && (empty($media['mimetype']) || $media['type'] == self::HTML) && ($media['type'] != self::IMAGE)) {
 			$timeout = DI::config()->get('system', 'xrd_timeout');
 			try {
 				$curlResult = DI::httpClient()->head($media['url'], [HttpClientOptions::ACCEPT_CONTENT => HttpClientAccept::AS_DEFAULT, HttpClientOptions::TIMEOUT => $timeout, HttpClientOptions::REQUEST => HttpClientRequest::CONTENTTYPE]);
@@ -858,6 +862,14 @@ class Media
 				$body = str_replace($video[0], '', $body);
 
 				$attachments[$video[1]] = ['uri-id' => $uriid, 'type' => self::VIDEO, 'url' => $video[1]];
+			}
+		}
+
+		if (preg_match_all("/\[embed\]([^\[\]]*)\[\/embed\]$endmatchpattern/ism", $body, $embeds, PREG_SET_ORDER)) {
+			foreach ($embeds as $embed) {
+				$body = str_replace($embed[0], '', $body);
+
+				$attachments[$embed[1]] = ['uri-id' => $uriid, 'type' => self::UNKNOWN, 'url' => $embed[1]];
 			}
 		}
 
