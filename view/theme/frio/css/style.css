@@ -1438,11 +1438,14 @@ section ul.tabs {
 section #jotOpen {
 	display: none;
 }
-#jotOpen, #mention-link {
+.action-button {
 	align-items: center;
 	display: flex;
 	padding-bottom: 7px;
 	padding-top: 7px;
+}
+.action-button span {
+	margin-left: 6px;
 }
 #jot-content {
 	display: none;
@@ -2509,9 +2512,6 @@ input[type="range"].form-control {
 }
 .search-content-wrapper > .section-title-wrapper {
 	display: none;
-}
-#navbar-button > #search-save {
-	margin-top: 3px;
 }
 /* Section-Content-Wrapper */
 #search-header-wrapper {

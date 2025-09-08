@@ -74,9 +74,9 @@
 					</div>
 				{{/if}}
 				{{if $profile.addr}}
-					<div id="mention-link-button">
-						<button type="button" id="mention-link" class="btn btn-labeled btn-primary" onclick="openWallMessage('{{$mention_url}}')">
-							<span><i class="fa fa-pencil-square-o"></i></span>&nbsp;
+					<div id="jotOpen" class="pull-right">
+						<button type="button" id="mention-link" class="action-button btn btn-labeled btn-primary" onclick="openWallMessage('{{$mention_url}}')">
+							<i class="fa fa-lg fa-pencil"></i>
 							<span>{{$mention_label}}</span>
 						</button>
 					</div>

@@ -5,8 +5,8 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 {{* The button to open the jot - in This theme we move the button with js to the second nav bar *}}
-<a class="btn btn-primary pull-right{{if !$always_open_compose}} modal-open{{/if}}" id="jotOpen" href="compose/{{$posttype}}{{if $content}}?body={{$content}}{{/if}}">
-	<i class="fa fa-lg fa-pencil-square-o"></i>&nbsp;
+<a class="action-button btn btn-primary pull-right{{if !$always_open_compose}} modal-open{{/if}}" id="jotOpen" href="compose/{{$posttype}}{{if $content}}?body={{$content}}{{/if}}">
+	<i class="fa fa-lg fa-pencil"></i>
 	<span>{{$new_post}}</span>
 </a>
 
