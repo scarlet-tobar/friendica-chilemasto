@@ -152,6 +152,7 @@ class Processor
 		$data['height']        = $attachment['height']        ?? null;
 		$data['width']         = $attachment['width']         ?? null;
 		$data['size']          = $attachment['size']          ?? null;
+		$data['blurhash']      = $attachment['blurhash']      ?? null;
 		$data['preview']       = $attachment['image']         ?? null;
 		$data['description']   = $attachment['name']          ?? null;
 		$data['player-url']    = $attachment['player-url']    ?? null;

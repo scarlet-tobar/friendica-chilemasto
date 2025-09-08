@@ -1677,6 +1677,7 @@ class Receiver
 						'name'      => JsonLD::fetchElement($attachment, 'as:name', '@value'),
 						'url'       => $imageFullUrl,
 						'image'     => $imagePreviewUrl !== $imageFullUrl ? $imagePreviewUrl : null,
+						'blurhash'  => JsonLD::fetchElement($attachment, 'toot:blurhash', '@value'),
 					];
 					break;
 				default:
@@ -1693,6 +1694,7 @@ class Receiver
 						'height'    => JsonLD::fetchElement($attachment, 'as:height', '@value'),
 						'width'     => JsonLD::fetchElement($attachment, 'as:width', '@value'),
 						'image'     => JsonLD::fetchElement($attachment, 'as:image', '@id') ?? $icon,
+						'blurhash'  => JsonLD::fetchElement($attachment, 'toot:blurhash', '@value'),
 					];
 			}
 		}
