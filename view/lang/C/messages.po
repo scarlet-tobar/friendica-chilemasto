@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-07 12:22+0200\n"
+"POT-Creation-Date: 2025-09-07 23:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -8656,8 +8656,9 @@ msgstr ""
 msgid "You're currently viewing your profile as <b>%s</b> <a href=\"%s\" class=\"btn btn-sm pull-right\">Cancel</a>"
 msgstr ""
 
-#: src/Module/Profile/Profile.php:181
-msgid "Full Name:"
+#: src/Module/Profile/Profile.php:181 src/Module/Settings/Account.php:522
+#: src/Module/Settings/Profile/Index.php:300
+msgid "Display name:"
 msgstr ""
 
 #: src/Module/Profile/Profile.php:186
@@ -9288,11 +9289,6 @@ msgstr ""
 
 #: src/Module/Settings/Account.php:521
 msgid "Basic Settings"
-msgstr ""
-
-#: src/Module/Settings/Account.php:522
-#: src/Module/Settings/Profile/Index.php:300
-msgid "Display name:"
 msgstr ""
 
 #: src/Module/Settings/Account.php:523
