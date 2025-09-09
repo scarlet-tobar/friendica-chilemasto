@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-07 23:20+0200\n"
+"POT-Creation-Date: 2025-09-09 22:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -352,9 +352,9 @@ msgstr ""
 msgid "Personal notes are visible only by yourself."
 msgstr ""
 
-#: mod/notes.php:46 src/Content/Text/HTML.php:855
-#: src/Module/Admin/Storage.php:128 src/Module/Filer/SaveTag.php:60
-#: src/Module/Post/Edit.php:125 src/Module/Settings/Channels.php:220
+#: mod/notes.php:46 src/Module/Admin/Storage.php:128
+#: src/Module/Filer/SaveTag.php:60 src/Module/Post/Edit.php:125
+#: src/Module/Settings/Channels.php:220
 msgid "Save"
 msgstr ""
 
@@ -2311,9 +2311,8 @@ msgstr ""
 msgid "The end"
 msgstr ""
 
-#: src/Content/Text/HTML.php:855 src/Content/Widget/VCard.php:116
-#: src/Model/Profile.php:454 src/Module/Contact/Profile.php:522
-msgid "Follow"
+#: src/Content/Text/HTML.php:855
+msgid "Save search"
 msgstr ""
 
 #: src/Content/Text/HTML.php:863
@@ -2527,6 +2526,11 @@ msgstr ""
 #: src/Content/Widget/VCard.php:114 src/Model/Profile.php:467
 #: src/Module/Notifications/Introductions.php:194
 msgid "Network:"
+msgstr ""
+
+#: src/Content/Widget/VCard.php:116 src/Model/Profile.php:454
+#: src/Module/Contact/Profile.php:522
+msgid "Follow"
 msgstr ""
 
 #: src/Content/Widget/VCard.php:118 src/Model/Contact.php:1294
