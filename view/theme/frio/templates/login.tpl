@@ -19,12 +19,22 @@
 		<div id="login-head" class="sr-only">{{$login}}</div>
 
 		<div id="login_standard">
-			{{include file="field_input.tpl" field=$lname}}
-			{{include file="field_password.tpl" field=$lpassword}}
+			<div id="id_{{$lname.0}}_wrapper" class="form-group field input">
+				<input id="id_{{$lname.0}}" class="form-control" name="{{$lname.0}}" placeholder="{{$lname.1}}" autofocus></input>
+				{{if $lname.3}}
+					<span class="help-block" id="{{$lname.0}}_tip" role="tooltip">{{$lname.3 nofilter}}</span>
+				{{/if}}
+			</div>
+			<div id="id_{{$lpassword.0}}_wrapper" class="form-group field input">
+				<input id="id_{{$lpassword.0}}" class="form-control" name="{{$lpassword.0}}" placeholder="{{$lpassword.1}}" autofocus type="password"></input>
+				{{if $lpassword.3}}
+					<span class="help-block" id="{{$lpassword.0}}_tip" role="tooltip">{{$lpassword.3 nofilter}}</span>
+				{{/if}}
+			</div>
+			<div id="login-end"></div>
 			<div id="login-lost-password-link">
 				<a href="lostpass" title="{{$lostpass}}" id="lost-password-link">{{$lostlink}}</a>
 			</div>
-			<div id="login-end"></div>
 		</div>
 
 		{{if $openid}}
@@ -35,12 +45,7 @@
 
 		{{include file="field_checkbox.tpl" field=$lremember}}
 
-		<div id="login-submit-wrapper">
-			<div class="pull-right">
-				<button type="submit" name="submit" id="login-submit-button" class="btn btn-primary" value="{{$login}}">{{$login}}</button>
-			</div>
-		</div>
-
+		<button type="submit" name="submit" id="login-submit-button" class="btn btn-primary" value="{{$login}}">{{$login}}</button>
 
 		{{foreach $hiddens as $k=>$v}}
 			<input type="hidden" name="{{$k}}" value="{{$v}}" />
@@ -51,10 +56,9 @@
 </form>
 
 {{if $register}}
+<hr>
 <div id="login-extra-links">
 	<h3 id="login-head" class="sr-only">{{$register.title}}</h3>
 	<a href="{{$register.url}}" title="{{$register.title}}" id="register-link" class="btn btn-default">{{$register.desc}}</a>
 </div>
 {{/if}}
-
-<script type="text/javascript"> $(document).ready(function() { $("#id_{{$lname.0}}").focus();} );</script>
