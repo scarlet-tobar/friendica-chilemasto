@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-09 23:47+0200\n"
+"POT-Creation-Date: 2025-09-11 21:41+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -8993,14 +8993,6 @@ msgstr ""
 msgid "privacy policy"
 msgstr ""
 
-#: src/Module/Security/Logout.php:75
-#: src/Module/Security/TwoFactor/SignOut.php:64
-#: src/Module/Security/TwoFactor/SignOut.php:72
-#: src/Module/Security/TwoFactor/SignOut.php:94
-#: src/Module/Security/TwoFactor/SignOut.php:101
-msgid "Logged out."
-msgstr ""
-
 #: src/Module/Security/OpenID.php:40
 msgid "OpenID protocol error. No ID returned"
 msgstr ""
@@ -9089,6 +9081,13 @@ msgstr ""
 
 #: src/Module/Security/TwoFactor/Recovery.php:91
 msgid "Submit recovery code and complete login"
+msgstr ""
+
+#: src/Module/Security/TwoFactor/SignOut.php:64
+#: src/Module/Security/TwoFactor/SignOut.php:72
+#: src/Module/Security/TwoFactor/SignOut.php:94
+#: src/Module/Security/TwoFactor/SignOut.php:101
+msgid "Logged out."
 msgstr ""
 
 #: src/Module/Security/TwoFactor/SignOut.php:108
