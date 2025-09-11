@@ -667,10 +667,11 @@ class Media
 		unlink($tempfile);
 		$runtime = number_format(microtime(true) - $timestamp, 3);
 
-		if (isset($info['error']) && !$full_file && substr($info['error'][0], 0, 14) == 'Atom at offset') {
-			DI::logger()->info('Detection failed for shortened file, trying the full file now.', ['runtime' => $runtime, 'uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file, 'error' => $info['error']]);
-			return self::getVideoDimensions($media, true);
-		}
+		// @todo When we find a way to read the video file in chunks, we can enable this part again.
+		//if (isset($info['error']) && !$full_file && substr($info['error'][0], 0, 14) == 'Atom at offset') {
+		//	DI::logger()->info('Detection failed for shortened file, trying the full file now.', ['runtime' => $runtime, 'uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file, 'error' => $info['error']]);
+		//	return self::getVideoDimensions($media, true);
+		//}
 
 		if (isset($info['error'])) {
 			DI::logger()->info('Error analyzing video', ['runtime' => $runtime, 'uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file, 'error' => $info['error']]);
