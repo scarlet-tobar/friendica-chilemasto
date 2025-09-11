@@ -16,7 +16,7 @@
 	<div id="login-group" role="group" aria-labelledby="login-head">
 		<input type="hidden" name="auth-params" value="login" />
 
-		<div id="login-head" class="sr-only">{{$login}}</div>
+		<div id="login-head"><h1>{{$login}}</h1></div>
 
 		<div id="login_standard">
 			<div id="id_{{$lname.0}}_wrapper" class="form-group field input">
@@ -33,7 +33,7 @@
 			</div>
 			<div id="login-end"></div>
 			<div id="login-lost-password-link">
-				<a href="lostpass" title="{{$lostpass}}" id="lost-password-link">{{$lostlink}}</a>
+				<a href="lostpass" id="lost-password-link">{{$lostlink}}</a>
 			</div>
 		</div>
 
@@ -58,7 +58,8 @@
 {{if $register}}
 <hr>
 <div id="login-extra-links">
+	<p id="new-here">{{$new}}</p>
 	<h3 id="login-head" class="sr-only">{{$register.title}}</h3>
-	<a href="{{$register.url}}" title="{{$register.title}}" id="register-link" class="btn btn-default">{{$register.desc}}</a>
+	<a href="{{$register.url}}" id="register-link" class="btn btn-default">{{$register.title}}</a>
 </div>
 {{/if}}

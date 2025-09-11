@@ -2592,6 +2592,11 @@ section > .generic-page-wrapper,
 	overflow: hidden;
 }
 /* Home and Login Page */
+#login-head h1 {
+	margin-top: 0;
+	margin-bottom: 30px;
+}
+
 body.mod-home nav.navbar .nav > li > a:hover {
 	background-color: rgba(255, 255, 255, 0.2);
 }
@@ -2621,6 +2626,11 @@ body.mod-login .navbar #nav-login {
 #openid-header {
 	font-size: 16px;
 	margin: 15px 0;
+}
+
+#new-here {
+	font-size: 20px;
+	margin-top: -5px;
 }
 
 /* contacts page */
@@ -3699,13 +3709,10 @@ section .profile-match-wrapper {
 	text-align: right;
 }
 #div_id_remember {
-	float: left;
+	margin: 20px 0;
 }
 #id_password_wrapper {
 	margin-bottom: unset;
-}
-#login_openid {
-	clear: both;
 }
 .login-form hr, #modal-body hr {
 	margin: 25px 0;
@@ -3716,11 +3723,8 @@ section .profile-match-wrapper {
 #register-link {
 	color: white;
 	background: #5aa071;
-	margin-bottom: 15px;
+	margin-bottom: 10px;
 	width: 75%;
-}
-#login-end {
-	clear: both;
 }
 
 .mod-home.is-not-singleuser,
@@ -3927,7 +3931,7 @@ section .profile-match-wrapper {
 	.mod-home.is-not-singleuser .login-form,
 	.mod-login #content .login-form {
 		background-color: #fff;
-		padding: 1em;
+		padding: 1.5em;
 		position: relative;
 	}
 	.mod-home.is-not-singleuser .login-form > #login-extra-links {

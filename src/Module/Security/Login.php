@@ -124,7 +124,7 @@ class Login extends BaseModule
 		$reg = false;
 		if ($register && Register::getPolicy() !== Register::CLOSED) {
 			$reg = [
-				'title' => DI::l10n()->t('Create a New Account'),
+				'title' => DI::l10n()->t('Create an account'),
 				'desc'  => DI::l10n()->t('Register'),
 				'url'   => self::getRegisterURL()
 			];
@@ -148,7 +148,7 @@ class Login extends BaseModule
 			$identity        = DI::session()->get('openid_identity');
 			$username_desc   = DI::l10n()->t('Please enter your username and password to add the OpenID to your existing account.');
 		} else {
-			$openid_title    = DI::l10n()->t('Or login using OpenID');
+			$openid_title    = DI::l10n()->t('Or sign in using OpenID');
 			$openid_readonly = false;
 			$identity        = '';
 			$username_desc   = '';
@@ -160,8 +160,9 @@ class Login extends BaseModule
 			[
 				'$notices'  => $notices,
 				'$dest_url' => DI::baseUrl() . '/login',
-				'$logout'   => DI::l10n()->t('Logout'),
-				'$login'    => DI::l10n()->t('Login'),
+				'$logout'   => DI::l10n()->t('Sign out'),
+				'$login'    => DI::l10n()->t('Sign in'),
+				'$new'      => DI::l10n()->t('New here?'),
 
 				'$lname'     => ['username', DI::l10n()->t('Nickname or email'), '', $username_desc],
 				'$lpassword' => ['password', DI::l10n()->t('Password'), '', ''],
