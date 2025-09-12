@@ -1818,6 +1818,17 @@ aside .panel-body {
 	right: 0;
 	top: 0;
 }
+#profile-edit-links .preferences {
+	top: 15px;
+	right: 15px;
+}
+#profile-edit-links .preferences li:not(:first-child) {
+	padding-left: 3px;
+}
+#profile-edit-links .preferences a {
+	/* Standard btn padding */
+	padding: 8px 16px
+}
 .shared_header {
 	margin-left: 0px;
 	margin-top: 0px;

@@ -2394,6 +2394,11 @@ aside #id_password {
 	margin-bottom: 15px;
 }
 
+#aprofile-fullname {
+	clear: both;
+	padding-top: 15px;
+}
+
 #profile-edit-links ul {margin: 0; padding:0 0 20px 0; list-style: none; }
 
 #profile-edit-links li {

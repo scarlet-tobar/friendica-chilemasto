@@ -296,12 +296,10 @@ class Profile extends BaseProfile
 			'$homepage_verified'     => $this->l10n->t('This website has been verified to belong to the same person.'),
 			'$edit_link'             => [
 				'url'   => 'settings/profile', $this->t('Edit profile'),
-				'title' => '',
 				'label' => $this->t('Edit profile')
 			],
 			'$viewas_link' => [
 				'url'   => $this->args->getQueryString() . '#viewas',
-				'title' => '',
 				'label' => $this->t('View as')
 			],
 		]);

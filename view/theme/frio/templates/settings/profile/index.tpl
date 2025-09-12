@@ -10,8 +10,8 @@
 	{{* The actions dropdown which can performed to the current profile *}}
 	<div id="profile-edit-links">
 		<ul class="nav nav-pills preferences">
-			<li class="pull-right">
-				<a class="btn btn-link btn-sm" href="profile/{{$nickname}}/profile"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;{{$l10n.viewprof}}</a>
+			<li>
+				<a class="btn btn-primary" href="profile/{{$nickname}}/profile"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;{{$l10n.viewprof}}</a>
 			</li>
 		</ul>
 	</div>
