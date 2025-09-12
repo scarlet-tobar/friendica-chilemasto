@@ -21,6 +21,8 @@ use Friendica\Network\HTTPException;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
 use Embera\Embera;
+use Friendica\Content\Text\BBCode;
+use Friendica\Model\Post;
 
 /**
  * Get information about a given URL
@@ -220,7 +222,9 @@ class ParseUrl
 		}
 		DI::logger()->info('Got content-type', ['content-type' => $type, 'url' => $url]);
 		if (!empty($type) && in_array($type[0], ['image', 'video', 'audio'])) {
-			$siteinfo['type'] = $type[0];
+			$siteinfo['type']      = $type[0];
+			$siteinfo['mimetype']  = implode('/', $type);
+			$siteinfo['mediatype'] = Post\Media::getType($siteinfo['mimetype']);
 			return $siteinfo;
 		}
 
@@ -240,7 +244,20 @@ class ParseUrl
 			return $siteinfo;
 		}
 
-		$siteinfo['expires'] = DateTimeFormat::utc(self::DEFAULT_EXPIRATION_SUCCESS);
+		$siteinfo['mimetype']  = $curlResult->getContentType() ?: $mimetype;
+		$siteinfo['mediatype'] = Post\Media::getType($siteinfo['mimetype']);
+		$siteinfo['expires']   = DateTimeFormat::utc(self::DEFAULT_EXPIRATION_SUCCESS);
+
+		if (isset($curlResult->getHeader('Last-Modified')[0]) && $curlResult->getHeader('Last-Modified')[0] != '') {
+			$siteinfo['modified'] = DateTimeFormat::utc($curlResult->getHeader('Last-Modified')[0]);
+		}
+
+		if (isset($curlResult->getHeader('Expires')[0]) && $curlResult->getHeader('Expires')[0] != '') {
+			$expires = DateTimeFormat::utc($curlResult->getHeader('Expires')[0]);
+			if (time() < strtotime($expires)) {
+				$siteinfo['expires'] = $expires;
+			}
+		}
 
 		if ($cacheControlHeader = $curlResult->getHeader('Cache-Control')[0] ?? '') {
 			if (preg_match('/max-age=([0-9]+)/i', $cacheControlHeader, $matches)) {
@@ -1326,6 +1343,8 @@ class ParseUrl
 			return $siteinfo;
 		}
 
+		DI::logger()->debug('Got oEmbed data', ['url' => $siteinfo['url'], 'type' => $data['type'], 'data' => $data]);
+
 		// Youtube provides only basic information to some IP ranges.
 		// We can detect this by checking if the host is youtube.com and if there is no player information.
 		// In this case we remove all tainted information provided by Youtube and use the ones provided by OEmbed.
@@ -1340,6 +1359,7 @@ class ParseUrl
 
 		$fields = [
 			'title'          => 'title',
+			'text'           => 'description',
 			'author_name'    => 'author_name',
 			'author_url'     => 'author_url',
 			'publisher_name' => 'provider_name',
@@ -1367,6 +1387,14 @@ class ParseUrl
 					$siteinfo['player'][$key] = $data[$value];
 				}
 			}
+		}
+
+		if ($data['type'] == 'rich' && isset($data['html']) && !isset($siteinfo['text'])) {
+			$bbcode = HTML::toBBCode($data['html'] ?? '');
+			$bbcode = preg_replace("(\[url\](.*?)\[\/url\])ism", "", $bbcode);
+
+			$siteinfo['text'] = strip_tags(BBCode::convert($bbcode, false));
+			DI::logger()->debug('Text is fetched from oEmbed HTML', ['url' => $siteinfo['url'], 'text' => $siteinfo['text']]);
 		}
 
 		return $siteinfo;

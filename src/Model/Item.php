@@ -3069,6 +3069,8 @@ class Item
 			$s .= $shared_html;
 		}
 
+		$s = DI::postMediaRepository()->addEmbed($s, $uid, $item['uri-id']);
+
 		$s = HTML::applyContentFilter($s, $filter_reasons);
 
 		$hook_data = [
@@ -3150,6 +3152,23 @@ class Item
 		}
 
 		return $s;
+	}
+
+	private static function containsEmbed(string $body, string $url): bool
+	{
+		if (preg_match_all("/\[audio\]([^\[\]]*)\[\/audio\]/Usi", $body, $embeds)) {
+			return in_array($url, $embeds[1]);
+		}
+
+		if (preg_match_all("/\[video\]([^\[\]]*)\[\/video\]/Usi", $body, $embeds)) {
+			return in_array($url, $embeds[1]);
+		}
+
+		if (preg_match_all("/\[embed\]([^\[\]]*)\[\/embed\]/Usi", $body, $embeds)) {
+			return in_array($url, $embeds[1]);
+		}
+
+		return false;
 	}
 
 	/**
@@ -3259,7 +3278,7 @@ class Item
 
 		// @todo In the future we should make a single for the template engine with all media in it. This allows more flexibilty.
 		foreach ($PostMedias as $PostMedia) {
-			if (self::containsLink($item['body'], $PostMedia->preview ?? $PostMedia->url, $PostMedia->type)) {
+			if (self::containsLink($item['body'], $PostMedia->preview ?? $PostMedia->url, $PostMedia->type) || self::containsEmbed($item['body'], $PostMedia->url)) {
 				continue;
 			}
 
@@ -3275,53 +3294,21 @@ class Item
 				continue;
 			}
 
-			if (($PostMedia->mimetype->type == 'video') || ($PostMedia->type == Post\Media::HLS)) {
-				if (($PostMedia->height ?? 0) > ($PostMedia->width ?? 0)) {
-					$height = min(DI::config()->get('system', 'max_video_height') ?: '100%', $PostMedia->height);
-					$width  = 'auto';
-				} else {
-					$height = 'auto';
-					$width  = '100%';
-				}
-
-				if (DI::pConfig()->get($uid, 'system', 'embed_media', false) && ($PostMedia->playerUrl != '') && ($PostMedia->playerHeight > 0)) {
-					$media = DI::contentItem()->getPlayerIframe($PostMedia->playerUrl, $PostMedia->playerWidth, $PostMedia->playerHeight);
-				} else {
-					/// @todo Move the template to /content as well
-					$media = Renderer::replaceMacros(Renderer::getMarkupTemplate($PostMedia->type == Post\Media::HLS ? 'hls_top.tpl' : 'video_top.tpl'), [
-						'$video' => [
-							'id'          => $PostMedia->id,
-							'src'         => (string)$PostMedia->url,
-							'name'        => $PostMedia->name ?: $PostMedia->url,
-							'preview'     => $preview_url,
-							'mime'        => (string)$PostMedia->mimetype,
-							'height'      => $height,
-							'width'       => $width,
-							'description' => $PostMedia->description,
-						],
-					]);
-				}
-
+			if (in_array($PostMedia->type, [Post\Media::VIDEO, Post\Media::HLS])) {
+				$media = DI::postMediaRepository()->getVideoAttachment($PostMedia, $uid);
 				if (($item['post-type'] ?? null) == Item::PT_VIDEO) {
 					$leading .= $media;
 				} else {
 					$trailing .= $media;
 				}
-			} elseif ($PostMedia->mimetype->type == 'audio') {
-				$media = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/audio.tpl'), [
-					'$audio' => [
-						'id'   => $PostMedia->id,
-						'src'  => (string)$PostMedia->url,
-						'name' => $PostMedia->name ?: $PostMedia->url,
-						'mime' => (string)$PostMedia->mimetype,
-					],
-				]);
+			} elseif ($PostMedia->type == Post\Media::AUDIO) {
+				$media = DI::postMediaRepository()->getAudioAttachment($PostMedia);
 				if (($item['post-type'] ?? null) == Item::PT_AUDIO) {
 					$leading .= $media;
 				} else {
 					$trailing .= $media;
 				}
-			} elseif ($PostMedia->mimetype->type == 'image') {
+			} elseif ($PostMedia->type == Post\Media::IMAGE) {
 				$src_url = DI::baseUrl() . $PostMedia->getPhotoPath();
 				if (self::containsLink($item['body'], $src_url)) {
 					continue;
@@ -3416,7 +3403,6 @@ class Item
 				'player_url'    => (string)$attachment->playerUrl,
 				'player_width'  => $attachment->playerWidth,
 				'player_height' => $attachment->playerHeight,
-
 			];
 
 			if ($preview && $attachment->preview) {
@@ -3468,8 +3454,8 @@ class Item
 
 				// @todo Use a template
 				$preview_mode = DI::pConfig()->get($uid, 'system', 'preview_mode', BBCode::PREVIEW_LARGE);
-				if ($preview_mode != BBCode::PREVIEW_NONE) {
-					$rendered = BBCode::convertAttachment('', BBCode::INTERNAL, false, $data, $uriid, $preview_mode, DI::pConfig()->get($uid, 'system', 'embed_remote_media', false));
+				if ($preview_mode != BBCode::PREVIEW_NONE && !self::containsEmbed($body, $data['url'])) {
+					$rendered = BBCode::convertAttachment('', BBCode::INTERNAL, $data, $uriid, $preview_mode, DI::pConfig()->get($uid, 'system', 'embed_remote_media', false));
 				} elseif (!self::containsLink($content, $data['url'], Post\Media::HTML)) {
 					$rendered = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/link.tpl'), [
 						'$url'   => $data['url'],

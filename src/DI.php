@@ -796,6 +796,11 @@ abstract class DI
 		return self::$dice->create(Content\Post\Repository\PostMedia::class);
 	}
 
+	public static function postMediaFactory(): Content\Post\Factory\PostMedia
+	{
+		return self::$dice->create(Content\Post\Factory\PostMedia::class);
+	}
+
 	/**
 	 * @internal The EventDispatcher should never called outside of the core, like in addons or themes
 	 * @deprecated 2025.07 Use constructor injection instead

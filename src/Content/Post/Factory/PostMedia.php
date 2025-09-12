@@ -10,8 +10,10 @@ namespace Friendica\Content\Post\Factory;
 use Friendica\BaseFactory;
 use Friendica\Capabilities\ICanCreateFromTableRow;
 use Friendica\Content\Post\Entity\PostMedia as PostMediaEntity;
+use Friendica\Model\Post;
 use Friendica\Network\Entity\MimeType as MimeTypeEntity;
 use Friendica\Network\Factory\MimeType as MimeTypeFactory;
+use Friendica\Util\Images;
 use Friendica\Util\Network as UtilNetwork;
 use GuzzleHttp\Psr7\Uri;
 use Psr\Log\LoggerInterface;
@@ -58,7 +60,11 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 			UtilNetwork::createUriFromString($row['player-url']),
 			$row['player-width'],
 			$row['player-height'],
-			$row['id']
+			$row['id'],
+			$row['attach-id'],
+			$row['language'],
+			$row['published'],
+			$row['modified'],
 		);
 	}
 
@@ -100,9 +106,84 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 		);
 	}
 
-	public function createFromAttachment(int $uriId, array $attachment)
+	public function createFromAttachment(array $attachment, int $uriId = 0, int $id = 0)
 	{
-		$attachment['uri-id'] = $uriId;
-		return $this->createFromTableRow($attachment);
+		$row = [
+			'id'              => $id,
+			'uri-id'          => $uriId,
+			'url'             => $attachment['url'],
+			'type'            => Post\Media::HTML,
+			'mimetype'        => null,
+			'media-uri-id'    => null,
+			'width'           => null,
+			'height'          => null,
+			'size'            => null,
+			'preview'         => $attachment['image'] ?? $attachment['preview'] ?? null,
+			'preview-width'   => null,
+			'preview-height'  => null,
+			'description'     => $attachment['description'] ?? null,
+			'name'            => $attachment['title']       ?? null,
+			'author-url'      => $attachment['author_url']  ?? null,
+			'author-name'     => $attachment['author_name'] ?? null,
+			'author-image'    => null,
+			'publisher-url'   => $attachment['provider_url']  ?? null,
+			'publisher-name'  => $attachment['provider_name'] ?? null,
+			'publisher-image' => null,
+			'blurhash'        => null,
+			'player-url'      => $attachment['player_url']    ?? null,
+			'player-width'    => $attachment['player_width']  ?? null,
+			'player-height'   => $attachment['player_height'] ?? null,
+			'attach-id'       => null,
+			'language'        => null,
+			'published'       => null,
+			'modified'        => null,
+		];
+
+		if (isset($row['preview'])) {
+			$imagedata = Images::getInfoFromURLCached($row['preview']);
+			if ($imagedata) {
+				$row['preview-width']  = $imagedata[0];
+				$row['preview-height'] = $imagedata[1];
+				$row['blurhash']       = $imagedata['blurhash'] ?? null;
+			}
+		}
+
+		return $this->createFromTableRow($row);
+	}
+
+	public function createFromParseUrl(array $data, int $uriId = 0, int $id = 0)
+	{
+		$row = [
+			'id'              => $id,
+			'uri-id'          => $uriId,
+			'url'             => $data['url'],
+			'type'            => Post\Media::getType($data['mimetype'] ?? ''),
+			'mimetype'        => $data['mimetype'] ?? null,
+			'media-uri-id'    => null,
+			'width'           => null,
+			'height'          => null,
+			'size'            => $data['size']                  ?? null,
+			'preview'         => $data['images'][0]['src']      ?? null,
+			'preview-width'   => $data['images'][0]['width']    ?? null,
+			'preview-height'  => $data['images'][0]['height']   ?? null,
+			'description'     => $data['text']                  ?? null,
+			'name'            => $data['title']                 ?? null,
+			'author-url'      => $data['author_url']            ?? null,
+			'author-name'     => $data['author_name']           ?? null,
+			'author-image'    => $data['author_img']            ?? null,
+			'publisher-url'   => $data['publisher_url']         ?? null,
+			'publisher-name'  => $data['publisher_name']        ?? null,
+			'publisher-image' => $data['publisher_img']         ?? null,
+			'blurhash'        => $data['images'][0]['blurhash'] ?? null,
+			'player-url'      => $data['player']['embed']       ?? null,
+			'player-width'    => $data['player']['width']       ?? null,
+			'player-height'   => $data['player']['height']      ?? null,
+			'attach-id'       => null,
+			'language'        => $data['language']  ?? null,
+			'published'       => $data['published'] ?? null,
+			'modified'        => $data['modified']  ?? null,
+		];
+
+		return $this->createFromTableRow($row);
 	}
 }

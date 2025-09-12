@@ -172,6 +172,7 @@ class HTML
 			@$doc->loadHTML($message, LIBXML_HTML_NODEFDTD);
 
 			XML::deleteNode($doc, 'style');
+			XML::deleteNode($doc, 'script');
 			XML::deleteNode($doc, 'head');
 			XML::deleteNode($doc, 'title');
 			XML::deleteNode($doc, 'meta');

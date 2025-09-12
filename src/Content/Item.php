@@ -8,6 +8,8 @@
 namespace Friendica\Content;
 
 use Friendica\App\BaseURL;
+use Friendica\Content\Post\Factory\PostMedia as PostMediaFactory;
+use Friendica\Content\Post\Repository\PostMedia as PostMediaRepository;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\BBCode\Video;
 use Friendica\Content\Text\HTML;
@@ -74,21 +76,27 @@ class Item
 	private EventDispatcherInterface $eventDispatcher;
 	/** @var LoggerInterface */
 	protected $logger;
+	/** @var PostMediaRepository */
+	protected $postMediaRepository;
+	/** @var PostMediaFactory */
+	protected $postMediaFactory;
 
-	public function __construct(LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, IHandleUserSessions $userSession, Video $bbCodeVideo, ACLFormatter $aclFormatter, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, BaseURL $baseURL, Emailer $emailer, EventDispatcherInterface $eventDispatcher)
+	public function __construct(LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, IHandleUserSessions $userSession, Video $bbCodeVideo, ACLFormatter $aclFormatter, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, BaseURL $baseURL, Emailer $emailer, EventDispatcherInterface $eventDispatcher, PostMediaRepository $postMediaRepository, PostMediaFactory $postMediaFactory)
 	{
-		$this->profiler        = $profiler;
-		$this->activity        = $activity;
-		$this->l10n            = $l10n;
-		$this->userSession     = $userSession;
-		$this->bbCodeVideo     = $bbCodeVideo;
-		$this->aclFormatter    = $aclFormatter;
-		$this->baseURL         = $baseURL;
-		$this->pConfig         = $pConfig;
-		$this->config          = $config;
-		$this->emailer         = $emailer;
-		$this->eventDispatcher = $eventDispatcher;
-		$this->logger          = $logger;
+		$this->profiler            = $profiler;
+		$this->activity            = $activity;
+		$this->l10n                = $l10n;
+		$this->userSession         = $userSession;
+		$this->bbCodeVideo         = $bbCodeVideo;
+		$this->aclFormatter        = $aclFormatter;
+		$this->baseURL             = $baseURL;
+		$this->pConfig             = $pConfig;
+		$this->config              = $config;
+		$this->emailer             = $emailer;
+		$this->eventDispatcher     = $eventDispatcher;
+		$this->logger              = $logger;
+		$this->postMediaRepository = $postMediaRepository;
+		$this->postMediaFactory    = $postMediaFactory;
 	}
 
 	/**
@@ -1351,39 +1359,5 @@ class Item
 		}
 		$used_languages = $this->l10n->t("Detected languages in this post:\n%s", $used_languages);
 		return $used_languages;
-	}
-
-	/**
-	 * Returns the HTML code for an iframe player for embedded content like videos.
-	 * The iframe will automatically adjust its height based on the aspect ratio.
-	 *
-	 * @param string $player_url URL of the embedded player
-	 * @param int|null $width Player width
-	 * @param int|null $height Player height
-	 * @return string
-	 */
-	public function getPlayerIframe(string $player_url, ?int $width, ?int $height): string
-	{
-		$attributes = ' src="' . $player_url . '"';
-		$max_height = $this->config->get('system', 'max_video_height') ?: $height;
-
-		if ($width != 0 && $height != 0) {
-			if ($height > $width && $height > $max_height) {
-				$factor      = 100;
-				$height_attr = $max_height;
-			} else {
-				$factor      = round($height / $width, 2) * 100;
-				$height_attr = '100%';
-			}
-			$attributes .= ' height="' . $height_attr. '" style="position:absolute;left:0px;top:0px"';
-			$return = '<div style="position:relative;padding-bottom:' . $factor . '%;margin-bottom:1em">';
-		} else {
-			$height = min($max_height, $height);
-			$attributes .= ' height="' . $height . '"';
-			$return = '<div style="position:relative">';
-		}
-
-		$return .= '<iframe ' . $attributes . ' width="100%" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>';
-		return $return;
 	}
 }
