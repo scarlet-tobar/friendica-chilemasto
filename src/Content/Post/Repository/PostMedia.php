@@ -432,9 +432,9 @@ class PostMedia extends BaseRepository
 		$max_height = $this->config->get('system', 'max_video_height') ?: $postMedia->playerHeight;
 
 		if ($postMedia->playerWidth != 0 && $postMedia->playerHeight != 0) {
-			if ($postMedia->playerHeight > $postMedia->playerWidth && $postMedia->playerHeight > $max_height) {
+			if ($postMedia->playerHeight > $postMedia->playerWidth) {
 				$factor      = 100;
-				$height_attr = $max_height;
+				$height_attr = min($max_height, $postMedia->playerHeight);
 			} else {
 				$factor      = round($postMedia->playerHeight / $postMedia->playerWidth, 2) * 100;
 				$height_attr = '100%';
