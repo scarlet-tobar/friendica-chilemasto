@@ -960,8 +960,7 @@ class ParseUrl
 		}
 
 		DI::logger()->info('Fetched Author information', ['fetched' => $jsonldinfo]);
-
-		return array_merge($siteinfo, $jsonldinfo);
+		return array_merge($jsonldinfo, $siteinfo);
 	}
 
 	/**
@@ -1031,7 +1030,7 @@ class ParseUrl
 
 		DI::logger()->info('Fetched article information', ['url' => $siteinfo['url'], 'fetched' => $jsonldinfo]);
 
-		return array_merge($siteinfo, $jsonldinfo);
+		return array_merge($jsonldinfo, $siteinfo);
 	}
 
 	/**
@@ -1070,8 +1069,7 @@ class ParseUrl
 		$jsonldinfo = self::parseJsonLdAuthor($jsonldinfo, $jsonld);
 
 		DI::logger()->info('Fetched WebPage information', ['url' => $siteinfo['url'], 'fetched' => $jsonldinfo]);
-
-		return array_merge($siteinfo, $jsonldinfo);
+		return array_merge($jsonldinfo, $siteinfo);
 	}
 
 	/**
@@ -1110,7 +1108,7 @@ class ParseUrl
 		$jsonldinfo = self::parseJsonLdAuthor($jsonldinfo, $jsonld);
 
 		DI::logger()->info('Fetched WebSite information', ['url' => $siteinfo['url'], 'fetched' => $jsonldinfo]);
-		return array_merge($siteinfo, $jsonldinfo);
+		return array_merge($jsonldinfo, $siteinfo);
 	}
 
 	/**
@@ -1159,7 +1157,7 @@ class ParseUrl
 		}
 
 		DI::logger()->info('Fetched Organization information', ['url' => $siteinfo['url'], 'fetched' => $jsonldinfo]);
-		return array_merge($siteinfo, $jsonldinfo);
+		return array_merge($jsonldinfo, $siteinfo);
 	}
 
 	/**
@@ -1205,7 +1203,7 @@ class ParseUrl
 		}
 
 		DI::logger()->info('Fetched Person information', ['url' => $siteinfo['url'], 'fetched' => $jsonldinfo]);
-		return array_merge($siteinfo, $jsonldinfo);
+		return array_merge($jsonldinfo, $siteinfo);
 	}
 
 	/**
@@ -1346,45 +1344,56 @@ class ParseUrl
 		DI::logger()->debug('Got oEmbed data', ['url' => $siteinfo['url'], 'type' => $data['type'], 'data' => $data]);
 
 		// Youtube provides only basic information to some IP ranges.
-		// We can detect this by checking if the host is youtube.com and if there is no player information.
-		// In this case we remove all tainted information provided by Youtube and use the ones provided by OEmbed.
-		if (parse_url(Strings::normaliseLink($siteinfo['url']), PHP_URL_HOST) == 'youtube.com') {
-			if (empty($siteinfo['player'])) {
-				$fields = ['keywords', 'text', 'title', 'author_name', 'author_url', 'publisher_name', 'publisher_url', 'image'];
-				foreach ($fields as $field) {
-					unset($siteinfo[$field]);
+		// Dailymotion only provices "Dailymotion" as title in their meta tags, so oEmbed is better
+		// @todo We have to decide if we always trust oEmbed more than the meta tags
+		$overwrite = in_array(parse_url(Strings::normaliseLink($siteinfo['url']), PHP_URL_HOST), ['dailymotion.com', 'tiktok.com', 'youtube.com']);
+
+		$unknown_fields = $data;
+		foreach (['account_type', 'asset_type', 'cache_age', 'category', 'duration',
+			'embera_using_fake_response', 'embera_provider_name',
+			'height', 'html', 'iframe_url', 'is_plus', 'safety', 'success', 'type',
+			'thumbnail_credit', 'thumbnail_credit_url', 'thumbnail_credit_note',
+			'thumbnail_height', 'thumbnail_url_with_play_button', 'thumbnail_width',
+			'uri', 'url', 'version', 'video_id', 'width'] as $value) {
+			unset($unknown_fields[$value]);
+		}
+
+		$fields = [
+			'title'            => 'title',
+			'description'      => 'text',
+			'summary'          => 'text',
+			'author_name'      => 'author_name',
+			'author_url'       => 'author_url',
+			'provider_name'    => 'publisher_name',
+			'provider_url'     => 'publisher_url',
+			'thumbnail_url'    => 'image',
+			'upload_date'      => 'published',
+			'publication_date' => 'published',
+		];
+
+		foreach ($fields as $key => $value) {
+			unset($unknown_fields[$key]);
+			if (isset($data[$key]) && (empty($siteinfo[$value]) || $overwrite)) {
+				if ($value == 'published') {
+					$siteinfo[$value] = DateTimeFormat::utc($data[$key]);
+				} else {
+					$siteinfo[$value] = $data[$key];
 				}
 			}
 		}
 
-		$fields = [
-			'title'          => 'title',
-			'text'           => 'description',
-			'author_name'    => 'author_name',
-			'author_url'     => 'author_url',
-			'publisher_name' => 'provider_name',
-			'publisher_url'  => 'provider_url',
-			'image'          => 'thumbnail_url',
-		];
-
-		foreach ($fields as $key => $value) {
-			if (empty($siteinfo[$key]) && !empty($data[$value])) {
-				$siteinfo[$key] = $data[$value];
-			}
+		if (!empty($unknown_fields)) {
+			DI::logger()->debug('Unknown oEmbed fields', ['url' => $siteinfo['url'], 'fields' => $unknown_fields]);
 		}
 
 		if (!empty($data['html']) && empty($siteinfo['player'])) {
-			$siteinfo = self::setPlayer($data['html'], $siteinfo);
+			$siteinfo = self::setPlayer($data, $siteinfo);
 		}
 
 		if (!empty($siteinfo['player'])) {
-			$fields = [
-				'width'  => 'width',
-				'height' => 'height',
-			];
-			foreach ($fields as $key => $value) {
-				if (empty($siteinfo['player'][$key]) && !empty($data[$value])) {
-					$siteinfo['player'][$key] = $data[$value];
+			foreach (['width', 'height'] as $key) {
+				if (empty($siteinfo['player'][$key]) && !empty($data[$key])) {
+					$siteinfo['player'][$key] = $data[$key];
 				}
 			}
 		}
@@ -1403,15 +1412,25 @@ class ParseUrl
 	/**
 	 * Set the player information from the oEmbed HTML in case that it contains an iframe
 	 *
-	 * @param string $html
+	 * @param array $data
 	 * @param array  $siteinfo
 	 *
 	 * @return array siteinfo
 	 */
-	private static function setPlayer(String $html, array $siteinfo): array
+	private static function setPlayer(array $data, array $siteinfo): array
 	{
+		// iframe content is most likely not a video but an embedded website
+		if (($data['type'] == 'rich') && ($data['asset_type'] ?? '') == 'article') {
+			return $siteinfo;
+		}
+
+		if (isset($data['iframe_url'])) {
+			$siteinfo['player']['embed'] = $data['iframe_url'];
+			return $siteinfo;
+		}
+
 		$dom = new DOMDocument();
-		if (!@$dom->loadHTML($html)) {
+		if (!@$dom->loadHTML($data['html'])) {
 			return $siteinfo;
 		}
 
