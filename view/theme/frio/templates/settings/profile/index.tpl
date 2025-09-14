@@ -25,46 +25,40 @@
 		3 => The additional help text (if available)
 	*}}
 
-	<div class="panel-group panel-group-settings" id="profile-photo-edit-wrapper" role="tablist" aria-multiselectable="true">
-		{{* Upload profile photo *}}
+	<div class="panel-group panel-group-settings" id="profile-photo-edit-wrapper" role="tablist" aria-multiselectable="false">
+		{{* Change profile picture *}}
 		<div class="panel">
 			<div class="section-subtitle-wrapper panel-heading" role="tab" id="photo-upload">
 				<h2>
 					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#profile-photo-edit-wrapper" href="#photo-upload-collapse" aria-expanded="true" aria-controls="photo-upload-collapse">
-						{{$l10n.profile_photo}}
+						{{$l10n.profpic_header}}
 					</button>
 				</h2>
 			</div>
 			<div id="photo-upload-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="photo-upload">
 				<div class="panel-body">
-					<form enctype="multipart/form-data" action="settings/profile/photo" method="post">
-						<input type="hidden" name="form_security_token" value="{{$form_security_token_photo}}">
-							<div id="profile-photo-upload-wrapper">
-								<label id="profile-photo-upload-label" for="profile-photo-upload">{{$l10n.profile_photo}}:</label>
-								<input name="userfile" type="file" id="profile-photo-upload" size="48" />
+					<p id="profpic-intro-description">{{$l10n.profpic_intro}}</p>
+					<div class="row">
+						<div id="profpic-left" class="col-md-6">
+							<h3>{{$l10n.profpic_upload_new_header}}</h3>
+							<form enctype="multipart/form-data" action="settings/profile/photo" method="post">
+								<input type="hidden" name="form_security_token" value="{{$form_security_token_photo}}">
+									<div id="profile-photo-upload-wrapper">
+										<input name="userfile" type="file" id="profile-photo-upload" size="48" />
+									</div>
+									<div class="profile-edit-submit-wrapper">
+										<button type="submit" name="submit" class="profile-edit-submit-button btn btn-primary">{{$l10n.profpic_upload_submit}}</button>
+									</div>
+								</form>
 							</div>
-
-							<div class="profile-edit-submit-wrapper pull-right">
-								<button type="submit" name="submit" class="profile-edit-submit-button btn btn-primary">{{$l10n.submit}}</button>
+							<div id="profpic-right" class="col-md-6">
+								<h3>{{$l10n.profpic_existing_header}}</h3>
+								<div class="spacer"></div>
+								<div>
+								<a class="btn btn-primary" href="{{$profpiclink}}">{{$l10n.yourphotos}}</a>
 							</div>
-							<div class="clear"></div>
-					</form>
-				</div>
-			</div>
-		</div>
-
-		{{* Change profile photo *}}
-		<div class="panel">
-			<div class="section-subtitle-wrapper panel-heading" role="tab" id="photo-change">
-				<h2>
-					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#profile-photo-edit-wrapper" href="#photo-change-collapse" aria-expanded="true" aria-controls="photo-change-collapse">
-						{{$l10n.profpic}}
-					</button>
-				</h2>
-			</div>
-			<div id="photo-change-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="photo-change">
-				<div class="panel-body">
-					<a href="{{$profpiclink}}">{{$l10n.yourphotos}}</a>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -78,13 +72,13 @@
 			<div class="panel">
 				<div class="section-subtitle-wrapper panel-heading" role="tab" id="personal">
 					<h2>
-						<button class="btn-link accordion-toggle" data-toggle="collapse" data-parent="#profile-edit-wrapper" href="#personal-collapse" aria-expanded="true" aria-controls="personal-collapse">
+						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#profile-edit-wrapper" href="#personal-collapse" aria-expanded="false" aria-controls="personal-collapse">
 							{{$l10n.personal_section}}
 						</button>
 					</h2>
 				</div>
 				{{* for the $detailed_profile we use bootstraps collapsable panel-groups to have expandable groups *}}
-				<div id="personal-collapse" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="personal">
+				<div id="personal-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="personal">
 					<div class="panel-body">
 						{{include file="field_input.tpl" field=$username}}
 
