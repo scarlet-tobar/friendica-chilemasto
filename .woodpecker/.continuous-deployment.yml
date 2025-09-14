@@ -2,11 +2,11 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-#depends_on:
-#  - phpunit
-#  - code_standards_check
-#  - database_checks
-#  - messages.po_check
+depends_on:
+  - phpunit
+  - code_standards_check
+  - database_checks
+  - messages.po_check
 
 # This prevents executing this pipeline at other servers than ci.friendi.ca
 labels:
@@ -17,7 +17,7 @@ labels:
 when:
   repo: friendica/friendica
   branch: [ develop, '*-rc' ]
-  event: [ push, pull_request ]
+  event: push
 
 skip_clone: true
 
