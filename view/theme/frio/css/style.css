@@ -1193,7 +1193,7 @@ aside > .help-aside-wrapper h2 {
 
 /* vcard / h-card */
 aside .vcard #profile-photo-wrapper {
-	margin: 0;
+	text-align: center;
 }
 aside .vcard img.u-photo,
 aside img.vcard-photo {

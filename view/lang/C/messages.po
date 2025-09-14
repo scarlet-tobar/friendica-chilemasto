@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-13 19:32+0200\n"
+"POT-Creation-Date: 2025-09-14 18:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -543,8 +543,8 @@ msgstr ""
 msgid "Delete photo"
 msgstr ""
 
-#: mod/photos.php:959
-msgid "Use as profile photo"
+#: mod/photos.php:959 mod/photos.php:1281
+msgid "Use as profile picture"
 msgstr ""
 
 #: mod/photos.php:966
@@ -647,10 +647,6 @@ msgstr ""
 
 #: mod/photos.php:1279 src/Object/Post.php:224 src/Object/Post.php:226
 msgid "Edit"
-msgstr ""
-
-#: mod/photos.php:1281
-msgid "Use as profile picture"
 msgstr ""
 
 #: mod/photos.php:1282
@@ -3499,8 +3495,8 @@ msgstr ""
 msgid "Wall Photos"
 msgstr ""
 
-#: src/Model/Profile.php:341
-msgid "Change profile photo"
+#: src/Model/Profile.php:341 src/Module/Settings/Profile/Index.php:273
+msgid "Change profile picture"
 msgstr ""
 
 #: src/Model/Profile.php:354 src/Module/Directory.php:138
@@ -10264,10 +10260,6 @@ msgstr ""
 
 #: src/Module/Settings/Profile/Index.php:271
 msgid "Edit Profile Details"
-msgstr ""
-
-#: src/Module/Settings/Profile/Index.php:273
-msgid "Change profile picture"
 msgstr ""
 
 #: src/Module/Settings/Profile/Index.php:274
