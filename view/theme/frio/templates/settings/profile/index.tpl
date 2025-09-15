@@ -30,12 +30,12 @@
 		<div class="panel">
 			<div class="section-subtitle-wrapper panel-heading" role="tab" id="photo-upload">
 				<h2>
-					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#profile-photo-edit-wrapper" href="#photo-upload-collapse" aria-expanded="true" aria-controls="photo-upload-collapse">
+					<button class="btn-link accordion-toggle {{if !$change_profile_picture}}collapsed{{/if}}" data-toggle="collapse" data-parent="#profile-photo-edit-wrapper" href="#photo-upload-collapse" aria-expanded="true" aria-controls="photo-upload-collapse">
 						{{$l10n.profpic_header}}
 					</button>
 				</h2>
 			</div>
-			<div id="photo-upload-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="photo-upload">
+			<div id="photo-upload-collapse" class="panel-collapse collapse {{if $change_profile_picture}}in{{/if}}" role="tabpanel" aria-labelledby="photo-upload">
 				<div class="panel-body">
 					<p id="profpic-intro-description">{{$l10n.profpic_intro}}</p>
 					<div class="row">

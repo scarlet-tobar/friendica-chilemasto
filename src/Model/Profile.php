@@ -337,7 +337,7 @@ class Profile
 			}
 		}
 		if ($local_user_is_self && $view_as_contact_id == 0) {
-			$picture_dest_url            = DI::baseUrl() . '/profile/' . $profile['nickname'] . '/photos';
+			$picture_dest_url            = DI::baseUrl() . '/settings/profile?profilepicture';
 			$change_profile_picture_text = DI::l10n()->t('Change profile picture');
 		} else {
 			$picture_dest_url            = $profile['url'];
