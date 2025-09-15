@@ -254,8 +254,9 @@ $(function() {
 		if ($("#nav-notifications-loading").length && $("#nav-notifications-empty").length) {
 			// Only show loading if we haven't loaded notifications yet
 			var menu = $("#nav-notifications-menu");
-			var hasNotifications = menu.find('.notification-link, .contact-notification-link').length > 0;
-			if (!hasNotifications) {
+			var hasNotifications = menu.find('.notif-item, li').not('#nav-notifications-loading, #nav-notifications-empty').length > 0;
+			var hasContent = menu.html().indexOf('nav-notifications-see-all') > -1;			
+			if (!hasNotifications && !hasContent) {
 				$("#nav-notifications-loading").show();
 				$("#nav-notifications-empty").hide();
 			}
