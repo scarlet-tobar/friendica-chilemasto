@@ -1828,7 +1828,7 @@ class Receiver
 	 * @param array $urls
 	 * @return string
 	 */
-	private static function extractAlternateUrl(array $urls): string
+	private static function extractAlternateUrl(array $urls, string $id): string
 	{
 		$alternateUrl = '';
 		foreach ($urls as $key => $url) {
@@ -1851,7 +1851,7 @@ class Receiver
 				continue;
 			}
 
-			if ($mediatype == 'text/html') {
+			if ($mediatype == 'text/html' && $href != $id) {
 				$alternateUrl = $href;
 			}
 		}
@@ -2119,7 +2119,7 @@ class Receiver
 		}
 
 		if (in_array($object_data['object_type'], ['as:Audio', 'as:Video'])) {
-			$object_data['alternate-url'] = self::extractAlternateUrl($object['as:url'] ?? []) ?: $object_data['alternate-url'];
+			$object_data['alternate-url'] = self::extractAlternateUrl($object['as:url'] ?? [], $object_data['id']) ?: $object_data['alternate-url'];
 
 			$siteinfo = ParseUrl::getSiteinfoCached($object_data['alternate-url']);
 			if (isset($siteinfo['player'])) {

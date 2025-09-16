@@ -2907,7 +2907,7 @@ class Item
 		$shared_item        = [];
 
 		$shared = DI::contentItem()->getSharedPost($item, $fields);
-		if (!empty($shared['post'])) {
+		if (!empty($shared['post']) && !self::containsEmbed($body, $shared['post']['uri']) && !self::containsEmbed($body, $shared['post']['plink'] ?? '')) {
 			$shared_item         = $shared['post'];
 			$shared_item['body'] = Post\Media::removeFromEndOfBody($shared_item['body']);
 			$shared_item['body'] = Post\Media::replaceImage($shared_item['body']);
@@ -3156,19 +3156,21 @@ class Item
 
 	private static function containsEmbed(string $body, string $url): bool
 	{
+		$contains = false;
+
 		if (preg_match_all("/\[audio\]([^\[\]]*)\[\/audio\]/Usi", $body, $embeds)) {
-			return in_array($url, $embeds[1]);
+			$contains = in_array($url, $embeds[1]);
 		}
 
-		if (preg_match_all("/\[video\]([^\[\]]*)\[\/video\]/Usi", $body, $embeds)) {
-			return in_array($url, $embeds[1]);
+		if (!$contains && preg_match_all("/\[video\]([^\[\]]*)\[\/video\]/Usi", $body, $embeds)) {
+			$contains = in_array($url, $embeds[1]);
 		}
 
-		if (preg_match_all("/\[embed\]([^\[\]]*)\[\/embed\]/Usi", $body, $embeds)) {
-			return in_array($url, $embeds[1]);
+		if (!$contains && preg_match_all("/\[embed\]([^\[\]]*)\[\/embed\]/Usi", $body, $embeds)) {
+			$contains = in_array($url, $embeds[1]);
 		}
 
-		return false;
+		return $contains;
 	}
 
 	/**
