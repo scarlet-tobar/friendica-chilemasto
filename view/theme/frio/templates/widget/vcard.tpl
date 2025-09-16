@@ -66,11 +66,12 @@
 			{{/if}}
 			{{if $mention_link}}
 				<div id="jotOpen" class="pull-right">
-					<button type="button" id="mention-link" class="action-button btn btn-labeled btn-primary{{if !$always_open_compose}} modal-open{{/if}}" onclick="openWallMessage('{{$mention_link}}')" aria-label="{{$mention}}">
+					<button type="button" id="mention-link" class="action-button btn btn-labeled btn-primary{{if !$always_open_compose}} modal-open{{/if}}" onclick="openWallMessage('{{$mention_link}}')" aria-label="{{$mention}}" oncontextmenu="openWallMessage('compose/0')">
 						<i class="fa fa-lg fa-pencil"></i>
 						<span>{{$mention}}</span>
 					</button>
 				</div>
+				<script>jotOpen.addEventListener("contextmenu", (e) => {e.preventDefault()});</script>
 			{{/if}}
 			{{if $showgroup_link}}
 				<div id="show-group-button">
