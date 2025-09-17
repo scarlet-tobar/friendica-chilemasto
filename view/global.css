@@ -679,6 +679,10 @@ audio {
   width: 100%;
 }
 
+img {
+  max-width: 100%;
+}
+
 /**
  * Image grid settings START
  **/
