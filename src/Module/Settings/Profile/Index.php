@@ -292,7 +292,8 @@ class Index extends BaseSettings
 				),
 			],
 
-			'$personal_account' => $personal_account,
+			'$personal_account'       => $personal_account,
+			'$change_profile_picture' => isset($_GET['profilepicture']),
 
 			'$form_security_token'       => self::getFormSecurityToken('settings_profile'),
 			'$form_security_token_photo' => self::getFormSecurityToken('settings_profile_photo'),
