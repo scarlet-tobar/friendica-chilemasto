@@ -750,10 +750,6 @@ nav.navbar .nav > li > button:focus {
 	display: flex;
 }
 
-#friendica-logo-mask {
-	display: block;
-}
-
 /* Notification Menu */
 #topbar-first #nav-notifications-menu {
 	max-height: 400px;
@@ -3963,10 +3959,6 @@ section .profile-match-wrapper {
 	}
 	body.minimal {
 		padding: 15px;
-	}
-
-	#friendica-logo-mask {
-		display: none;
 	}
 
 	.container {
