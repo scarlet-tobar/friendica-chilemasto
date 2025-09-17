@@ -26,7 +26,6 @@ class BBCodeTest extends FixtureTestCase
 		DI::config()->set('system', 'url', 'https://friendica.local');
 		DI::config()->set('system', 'no_smilies', false);
 		DI::config()->set('system', 'big_emojis', false);
-		DI::config()->set('system', 'allowed_oembed', '');
 
 		$config = \HTMLPurifier_HTML5Config::createDefault();
 		$config->set('HTML.Doctype', 'HTML5');
@@ -177,21 +176,21 @@ class BBCodeTest extends FixtureTestCase
 			'bug-2199-diaspora-no-named-size' => [
 				'expectedHtml' => 'Test text',
 				'text'         => '[size=xx-large]Test text[/size]',
-				'try_oembed'   => false,
+				'embed'        => false,
 				// Triggers the diaspora compatible output
 				'simpleHtml' => BBCode::DIASPORA,
 			],
 			'bug-2199-diaspora-no-numeric-size' => [
 				'expectedHtml' => 'Test text',
 				'text'         => '[size=24]Test text[/size]',
-				'try_oembed'   => false,
+				'embed'        => false,
 				// Triggers the diaspora compatible output
 				'simpleHtml' => BBCode::DIASPORA,
 			],
 			'bug-7665-audio-tag' => [
 				'expectedHtml' => '<a class="embed" href="http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3">cendrones.fr/colloque2017/jona…</a>',
 				'text'         => '[audio]http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3[/audio]',
-				'try_oembed'   => true,
+				'embed'        => true,
 			],
 			'bug-7808-code-lt' => [
 				'expectedHtml' => '<code>&lt;</code>',
@@ -240,7 +239,7 @@ Karl Marx - Die ursprüngliche Akkumulation
 [url=https://wohlstandfueralle.podigee.io/107-urspruengliche-akkumulation]https://wohlstandfueralle.podigee.io/107-urspruengliche-akkumulation[/url]
 #[url=https://horche.demkontinuum.de/search?tag=Podcast]Podcast[/url] #[url=https://horche.demkontinuum.de/search?tag=Kapitalismus]Kapitalismus[/url]
 [attachment type='link' url='https://wohlstandfueralle.podigee.io/107-urspruengliche-akkumulation' title='Ep. 107: Karl Marx #8 - Die urspr&uuml;ngliche Akkumulation' publisher_name='Wohlstand f&uuml;r Alle' preview='https://images.podigee-cdn.net/0x,s6LXshYO7uhG23H431B30t4hxj1bQuzlTsUlze0F_-H8=/https://cdn.podigee.com/uploads/u8126/bd5fe4f4-38b7-4f3f-b269-6a0080144635.jpg']Wie der Kapitalismus funktioniert und inwieweit Menschen darin ausgebeutet werden, haben wir bereits besprochen. Immer wieder verweisen wir auch darauf, dass der Kapitalismus nicht immer schon existierte, sondern historisiert werden muss.[/attachment]",
-				'try_oembed' => false,
+				'embed'      => false,
 				'simpleHtml' => BBCode::TWITTER,
 			],
 			'task-10886-deprecate-class' => [
@@ -277,16 +276,16 @@ Karl Marx - Die ursprüngliche Akkumulation
 	 *
 	 * @param string $expectedHtml Expected HTML output
 	 * @param string $text         BBCode text
-	 * @param bool   $try_oembed   Whether to convert multimedia BBCode tag
+	 * @param bool   $embed   Whether to convert multimedia BBCode tag
 	 * @param int    $simpleHtml   BBCode::convert method $simple_html parameter value, optional.
 	 * @param bool   $forPlaintext BBCode::convert method $for_plaintext parameter value, optional.
 	 *
 	 * @throws InternalServerErrorException
 	 */
-	public function testConvert(string $expectedHtml, string $text, bool $try_oembed = true, int $simpleHtml = BBCode::INTERNAL, bool $forPlaintext = false)
+	public function testConvert(string $expectedHtml, string $text, bool $embed = true, int $simpleHtml = BBCode::INTERNAL, bool $forPlaintext = false)
 	{
 		// This assumes system.remove_multiplicated_lines = false
-		$actual = BBCode::convert($text, $try_oembed, $simpleHtml, $forPlaintext);
+		$actual = BBCode::convert($text, $embed, $simpleHtml, $forPlaintext);
 
 		self::assertEquals($expectedHtml, $actual);
 	}
