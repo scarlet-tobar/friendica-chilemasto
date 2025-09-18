@@ -11,19 +11,9 @@
 
 		<div id="site-location" aria-hidden="true">{{$sitelocation}}</div>
 		<div id="banner" class="hidden-sm hidden-xs">
-			{{* show on remote/visitor connections another logo which symbols that fact *}}
-			{{if $nav.remote}}
-				<a href="{{$baseurl}}" aria-hidden="true">
-					<div id="remote-logo-img" aria-label="{{$home}}"></div>
-				</a>
-			{{else}}
-				{{* #logo-img is the placeholder to insert a mask (friendica logo) into this div
-				For Firefox we have to call the paths of the mask (look at the bottom of this file).
-				Because for FF we need relative paths we apply them with js after the page is loaded (look at theme.js *}}
-				<a href="{{$baseurl}}" aria-hidden="true">
-					<div id="logo-img" aria-label="{{$home}}"></div>
-				</a>
-			{{/if}}
+			<a href="{{$baseurl}}" aria-hidden="true">
+				<div id="logo-img" aria-label="{{$home}}"></div>
+			</a>
 		</div>
 	</header>
 	<nav id="topbar-first" class="topbar" role="menubar">
