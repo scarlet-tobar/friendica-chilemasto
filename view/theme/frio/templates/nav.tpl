@@ -11,19 +11,9 @@
 
 		<div id="site-location" aria-hidden="true">{{$sitelocation}}</div>
 		<div id="banner" class="hidden-sm hidden-xs">
-			{{* show on remote/visitor connections another logo which symbols that fact *}}
-			{{if $nav.remote}}
-				<a href="{{$baseurl}}" aria-hidden="true">
-					<div id="remote-logo-img" aria-label="{{$home}}"></div>
-				</a>
-			{{else}}
-				{{* #logo-img is the placeholder to insert a mask (friendica logo) into this div
-				For Firefox we have to call the paths of the mask (look at the bottom of this file).
-				Because for FF we need relative paths we apply them with js after the page is loaded (look at theme.js *}}
-				<a href="{{$baseurl}}" aria-hidden="true">
-					<div id="logo-img" aria-label="{{$home}}"></div>
-				</a>
-			{{/if}}
+			<a href="{{$baseurl}}" aria-hidden="true">
+				<div id="logo-img" aria-label="{{$home}}"></div>
+			</a>
 		</div>
 	</header>
 	<nav id="topbar-first" class="topbar" role="menubar">
@@ -539,15 +529,3 @@
 		<div class="col-lg-2 col-md-2 col-sm-1 col-xs-2" id="navbar-button"></div>
 	</div>
 </div>
-
-{{* This is the mask of the firefox logo. We set the background of #logo-img to the user icon color and apply this mask to it
-The result is a friendica logo in the user icon color.*}}
-<svg id="friendica-logo-mask" x="0px" y="0px" width="0px" height="0px" viewBox="0 0 250 250">
-	<defs>
-		<mask id="logo-mask" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
-			<path style="fill-rule:evenodd;clip-rule:evenodd;fill:#ffffff;"
-				d="M0.796,0L0.172,0.004C0.068,0.008,0.008,0.068,0,0.172V0.824c0,0.076,0.06,0.16,0.168,0.172h0.652c0.072,0,0.148-0.06,0.172-0.144V0.14C1,0.06,0.908,0,0.796,0zM0.812,0.968H0.36v-0.224h0.312v-0.24H0.36V0.3h0.316l0-0.264l0.116-0c0.088,0,0.164,0.044,0.164,0.096l0,0.696C0.96,0.912,0.876,0.968,0.812,0.968z">
-			</path>
-		</mask>
-	</defs>
-</svg>
