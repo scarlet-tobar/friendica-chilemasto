@@ -63,10 +63,10 @@ class Login extends BaseModule
 	{
 		// Save sysmessages before clearing session
 		$notices = $this->session->get('sysmsg', []);
-		$infos = $this->session->get('sysmsg_info', []);
-		
+		$infos   = $this->session->get('sysmsg_info', []);
+
 		$this->session->clear();
-		
+
 		// Restore sysmessages after clearing
 		if (!empty($notices)) {
 			$this->session->set('sysmsg', $notices);
@@ -121,14 +121,14 @@ class Login extends BaseModule
 		// Retrieve system messages to display on the login page
 		$notices = DI::sysmsg()->flushNotices();
 
-		$reg = false;
-		if ($register && Register::getPolicy() !== Register::CLOSED) {
-			$reg = [
-				'title' => DI::l10n()->t('Create a New Account'),
-				'desc' => DI::l10n()->t('Register'),
-				'url' => self::getRegisterURL()
-			];
-		}
+	$reg = false;
+	if ($register && Register::getPolicy() !== Register::CLOSED) {
+		$reg = [
+			'title' => DI::l10n()->t('Create a New Account'),
+			'desc'  => DI::l10n()->t('Register'),
+			'url'   => self::getRegisterURL()
+		];
+	}
 
 		if (DI::userSession()->getLocalUserId()) {
 			$tpl = Renderer::getMarkupTemplate('logout.tpl');
@@ -142,42 +142,42 @@ class Login extends BaseModule
 			$tpl = Renderer::getMarkupTemplate('login.tpl');
 		}
 
-		if (!empty(DI::session()->get('openid_identity'))) {
-			$openid_title = DI::l10n()->t('Your OpenID: ');
-			$openid_readonly = true;
-			$identity = DI::session()->get('openid_identity');
-			$username_desc = DI::l10n()->t('Please enter your username and password to add the OpenID to your existing account.');
-		} else {
-			$openid_title = DI::l10n()->t('Or login using OpenID: ');
-			$openid_readonly = false;
-			$identity = '';
-			$username_desc = '';
-		}
+	if (!empty(DI::session()->get('openid_identity'))) {
+		$openid_title    = DI::l10n()->t('Your OpenID: ');
+		$openid_readonly = true;
+		$identity        = DI::session()->get('openid_identity');
+		$username_desc   = DI::l10n()->t('Please enter your username and password to add the OpenID to your existing account.');
+	} else {
+		$openid_title    = DI::l10n()->t('Or login using OpenID: ');
+		$openid_readonly = false;
+		$identity        = '';
+		$username_desc   = '';
+	}
 
 		$o = Renderer::replaceMacros(
 			$tpl,
 			[
-				'$notices'      => $notices,
-				'$dest_url'     => DI::baseUrl() . '/login',
-				'$logout'       => DI::l10n()->t('Logout'),
-				'$login'        => DI::l10n()->t('Login'),
+				'$notices'  => $notices,
+				'$dest_url' => DI::baseUrl() . '/login',
+				'$logout'   => DI::l10n()->t('Logout'),
+				'$login'    => DI::l10n()->t('Login'),
 
-				'$lname'        => ['username', DI::l10n()->t('Nickname or Email: '), '', $username_desc],
-				'$lpassword'    => ['password', DI::l10n()->t('Password: '), '', ''],
-				'$lremember'    => ['remember', DI::l10n()->t('Remember me'), 0,  ''],
+				'$lname'     => ['username', DI::l10n()->t('Nickname or Email: '), '', $username_desc],
+				'$lpassword' => ['password', DI::l10n()->t('Password: '), '', ''],
+				'$lremember' => ['remember', DI::l10n()->t('Remember me'), 0,  ''],
 
-				'$openid'       => !$noid,
-				'$lopenid'      => ['openid_url', $openid_title, $identity, '', $openid_readonly],
+				'$openid'  => !$noid,
+				'$lopenid' => ['openid_url', $openid_title, $identity, '', $openid_readonly],
 
-				'$hiddens'      => ['return_path' => $return_path ?? DI::args()->getQueryString()],
+				'$hiddens' => ['return_path' => $return_path ?? DI::args()->getQueryString()],
 
-				'$register'     => $reg,
+				'$register' => $reg,
 
-				'$lostpass'     => DI::l10n()->t('Forgot your password?'),
-				'$lostlink'     => DI::l10n()->t('Password Reset'),
+				'$lostpass' => DI::l10n()->t('Forgot your password?'),
+				'$lostlink' => DI::l10n()->t('Password Reset'),
 
-				'$tostitle'     => DI::l10n()->t('Website Terms of Service'),
-				'$toslink'      => DI::l10n()->t('terms of service'),
+				'$tostitle' => DI::l10n()->t('Website Terms of Service'),
+				'$toslink'  => DI::l10n()->t('terms of service'),
 
 				'$privacytitle' => DI::l10n()->t('Website Privacy Policy'),
 				'$privacylink'  => DI::l10n()->t('privacy policy'),
