@@ -44,7 +44,7 @@
 							<form enctype="multipart/form-data" action="settings/profile/photo" method="post">
 								<input type="hidden" name="form_security_token" value="{{$form_security_token_photo}}">
 									<div id="profile-photo-upload-wrapper">
-										<input name="userfile" type="file" id="profile-photo-upload" size="48" />
+										<input name="userfile" type="file" id="profile-photo-upload" required/>
 									</div>
 									<div class="profile-edit-submit-wrapper">
 										<button type="submit" name="submit" class="profile-edit-submit-button btn btn-primary">{{$l10n.profpic_upload_submit}}</button>
