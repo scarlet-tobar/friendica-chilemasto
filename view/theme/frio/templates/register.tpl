@@ -6,6 +6,13 @@
   *}}
 <div class="generic-page-wrapper">
 
+	{{* Display system messages *}}
+	{{if $notices}}
+		{{foreach $notices as $notice}}
+			<div class="alert alert-warning" role="alert">{{$notice}}</div>
+		{{/foreach}}
+	{{/if}}
+
 	<form action="register" method="post" id="register-form">
 
 		<input type="hidden" name="photo" value="{{$photo}}" />
