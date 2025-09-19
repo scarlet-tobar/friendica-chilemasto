@@ -121,14 +121,14 @@ class Login extends BaseModule
 		// Retrieve system messages to display on the login page
 		$notices = DI::sysmsg()->flushNotices();
 
-	$reg = false;
-	if ($register && Register::getPolicy() !== Register::CLOSED) {
-		$reg = [
-			'title' => DI::l10n()->t('Create a New Account'),
-			'desc'  => DI::l10n()->t('Register'),
-			'url'   => self::getRegisterURL()
-		];
-	}
+		$reg = false;
+		if ($register && Register::getPolicy() !== Register::CLOSED) {
+			$reg = [
+				'title' => DI::l10n()->t('Create a New Account'),
+				'desc'  => DI::l10n()->t('Register'),
+				'url'   => self::getRegisterURL()
+			];
+		}
 
 		if (DI::userSession()->getLocalUserId()) {
 			$tpl = Renderer::getMarkupTemplate('logout.tpl');
@@ -142,17 +142,17 @@ class Login extends BaseModule
 			$tpl = Renderer::getMarkupTemplate('login.tpl');
 		}
 
-	if (!empty(DI::session()->get('openid_identity'))) {
-		$openid_title    = DI::l10n()->t('Your OpenID: ');
-		$openid_readonly = true;
-		$identity        = DI::session()->get('openid_identity');
-		$username_desc   = DI::l10n()->t('Please enter your username and password to add the OpenID to your existing account.');
-	} else {
-		$openid_title    = DI::l10n()->t('Or login using OpenID: ');
-		$openid_readonly = false;
-		$identity        = '';
-		$username_desc   = '';
-	}
+		if (!empty(DI::session()->get('openid_identity'))) {
+			$openid_title    = DI::l10n()->t('Your OpenID: ');
+			$openid_readonly = true;
+			$identity        = DI::session()->get('openid_identity');
+			$username_desc   = DI::l10n()->t('Please enter your username and password to add the OpenID to your existing account.');
+		} else {
+			$openid_title    = DI::l10n()->t('Or login using OpenID: ');
+			$openid_readonly = false;
+			$identity        = '';
+			$username_desc   = '';
+		}
 
 		$o = Renderer::replaceMacros(
 			$tpl,
