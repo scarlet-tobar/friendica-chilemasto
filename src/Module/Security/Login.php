@@ -61,7 +61,19 @@ class Login extends BaseModule
 
 	protected function post(array $request = [])
 	{
+		// Save sysmessages before clearing session
+		$notices = $this->session->get('sysmsg', []);
+		$infos = $this->session->get('sysmsg_info', []);
+		
 		$this->session->clear();
+		
+		// Restore sysmessages after clearing
+		if (!empty($notices)) {
+			$this->session->set('sysmsg', $notices);
+		}
+		if (!empty($infos)) {
+			$this->session->set('sysmsg_info', $infos);
+		}
 
 		// OpenId Login
 		if (
@@ -106,6 +118,9 @@ class Login extends BaseModule
 			DI::session()->remove('openid_attributes');
 		}
 
+		// Retrieve system messages to display on the login page
+		$notices = DI::sysmsg()->flushNotices();
+
 		$reg = false;
 		if ($register && Register::getPolicy() !== Register::CLOSED) {
 			$reg = [
@@ -142,6 +157,7 @@ class Login extends BaseModule
 		$o = Renderer::replaceMacros(
 			$tpl,
 			[
+				'$notices'      => $notices,
 				'$dest_url'     => DI::baseUrl() . '/login',
 				'$logout'       => DI::l10n()->t('Logout'),
 				'$login'        => DI::l10n()->t('Login'),
