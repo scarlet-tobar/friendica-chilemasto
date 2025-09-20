@@ -23,6 +23,7 @@ use Friendica\Model\Post;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
+use Friendica\Object\Image;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\ATProtocol;
 use Friendica\Util\DateTimeFormat;
@@ -254,7 +255,8 @@ class Media
 		}
 
 		if ($media['type'] === self::VIDEO) {
-			$media = self::getVideoDimensions($media, false);
+			$media = self::getVideoInformationByFFMPEG($media);
+			$media = self::getVideoDimensionsByID3($media, false);
 		}
 
 		if (in_array($media['type'], [self::TEXT, self::ACTIVITY, self::LD, self::JSON, self::HTML, self::XML, self::PLAIN])) {
@@ -629,13 +631,44 @@ class Media
 	}
 
 	/**
+	 * Fetch video information (dimensions and blurhash) using ffmpeg
+	 *
+	 * @param array $media Media array
+	 * @return array media with added dimensions and blurhash
+	 */
+	private static function getVideoInformationByFFMPEG(array $media): array
+	{
+		if (!DI::config()->get('system', 'ffmpeg_installed')) {
+			return $media;
+		}
+
+		if (isset($media['width']) && isset($media['height']) && $media['width'] > 0 && $media['height'] > 0 && isset($media['blurhash'])) {
+			return $media;
+		}
+
+		DI::logger()->debug('Fetch video information', ['uri-id' => $media['uri-id'], 'url' => $media['url']]);
+
+		$image = new Image('');
+		$image->getFromVideoUrl($media['url']);
+		if ($image->isValid()) {
+			$media['blurhash'] = $image->getBlurHash();
+			$media['width']    = $image->getWidth();
+			$media['height']   = $image->getHeight();
+			DI::logger()->debug('Detected video dimensions via FFMpeg preview', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'width' => $media['width'], 'height' => $media['height']]);
+			return $media;
+		}
+
+		return $media;
+	}
+
+	/**
 	 * Fetch video dimensions using getID3
 	 *
 	 * @param array $media     Media array
 	 * @param bool  $full_file If true, the whole video will be fetched
 	 * @return array media with added dimensions
 	 */
-	private static function getVideoDimensions(array $media, bool $full_file): array
+	private static function getVideoDimensionsByID3(array $media, bool $full_file): array
 	{
 		if (isset($media['width']) && isset($media['height']) && $media['width'] > 0 && $media['height'] > 0) {
 			return $media;
