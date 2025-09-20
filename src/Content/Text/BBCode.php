@@ -1207,19 +1207,21 @@ class BBCode
 	 */
 	private static function normalizeVideoLinks(string $text): string
 	{
-		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/watch\?v\=(.*?)\[\/youtube\]/ism", '[youtube]$2[/youtube]', $text);
-		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/embed\/(.*?)\[\/youtube\]/ism", '[youtube]$2[/youtube]', $text);
-		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/shorts\/(.*?)\[\/youtube\]/ism", '[youtube]$2[/youtube]', $text);
-		$text = preg_replace("/\[youtube\]https?:\/\/youtu\.be\/(.*?)\[\/youtube\]/ism", '[youtube]$1[/youtube]', $text);
-		$text = preg_replace("/\[youtube\]https?:\/\/m\.youtube\.com\/watch\?v\=(.*?)\[\/youtube\]/ism", '[youtube]$1[/youtube]', $text);
-		$text = preg_replace("/\[vimeo\]https?:\/\/player\.vimeo\.com\/video\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[vimeo]$1[/vimeo]', $text);
-		$text = preg_replace("/\[vimeo\]https?:\/\/vimeo\.com\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[vimeo]$1[/vimeo]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/watch\?v\=(.*?)\[\/youtube\]/ism", '[embed]https://www.youtube.com/watch?v=$2[/embed]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/embed\/(.*?)\[\/youtube\]/ism", '[embed]https://www.youtube.com/watch?v=$2[/embed]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/shorts\/(.*?)\[\/youtube\]/ism", '[embed]https://www.youtube.com/watch?v=$2[/embed]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/youtu\.be\/(.*?)\[\/youtube\]/ism", '[embed]https://www.youtube.com/watch?v=$1[/embed]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/m\.youtube\.com\/watch\?v\=(.*?)\[\/youtube\]/ism", '[embed]https://www.youtube.com/watch?v=$1[/embed]', $text);
+		$text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", '[embed]https://www.youtube.com/watch?v=$1[/embed]', $text);
+		$text = preg_replace("/\[vimeo\]https?:\/\/player\.vimeo\.com\/video\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[embed]https://vimeo.com/$1[/embed]', $text);
+		$text = preg_replace("/\[vimeo\]https?:\/\/vimeo\.com\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[embed]https://vimeo.com/$1[/embed]', $text);
+		$text = preg_replace("/\[vimeo\]([0-9]+)(.*?)\[\/vimeo\]/ism", '[embed]https://vimeo.com/$1[/embed]', $text);
 
 		return $text;
 	}
 
 	/**
-	 * Expand Youtube and Vimeo links to
+	 * Expand embedded media links (e.g. Youtube or Vimeo links) to a [url] BBCode tag
 	 *
 	 * @param string $text
 	 * @return string
@@ -1227,8 +1229,7 @@ class BBCode
 	public static function expandVideoLinks(string $text): string
 	{
 		$text = self::normalizeVideoLinks($text);
-		$text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", '[url=https://www.youtube.com/watch?v=$1]https://www.youtube.com/watch?v=$1[/url]', $text);
-		$text = preg_replace("/\[vimeo\]([0-9]+)(.*?)\[\/vimeo\]/ism", '[url=https://vimeo.com/$1]https://vimeo.com/$1[/url]', $text);
+		$text = preg_replace("/\[embed\](.*?)\[\/embed\]/ism", '[url=$1]$1[/url]', $text);
 
 		return $text;
 	}
@@ -1342,7 +1343,6 @@ class BBCode
 				$text = self::convertAttachmentsToHtml($text, $simple_html, $uriid);
 				$text = self::convertMapsToHtml($text, $simple_html);
 				$text = self::convertQuotesToHtml($text);
-				$text = self::convertVideoPlatformsToHtml($text);
 				$text = self::convertEventsToHtml($text, $simple_html, $uriid, $ev);
 
 				// Some simpler non standard elements
@@ -1884,21 +1884,10 @@ class BBCode
 		return $text;
 	}
 
-	private static function convertVideoPlatformsToHtml(string $text): string
+	private static function convertEmbedToHtml(string $text, int $simple_html): string
 	{
 		$text = self::normalizeVideoLinks($text);
 
-		// Youtube extensions
-		$text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", '[embed]https://www.youtube.com/watch?v=$1[/embed]', $text);
-
-		// Vimeo extensions
-		$text = preg_replace("/\[vimeo\]([0-9]+)(.*?)\[\/vimeo\]/ism", '[embed]https://vimeo.com/$1[/embed]', $text);
-
-		return $text;
-	}
-
-	private static function convertEmbedToHtml(string $text, int $simple_html): string
-	{
 		if ($simple_html == self::INTERNAL) {
 			$max_length = DI::config()->get('system', 'display_link_length');
 		} else {
