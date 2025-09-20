@@ -436,7 +436,7 @@ class Item
 				$this->l10n->t('View Photos')                                 => $photos_link,
 				$this->l10n->t('Network Posts')                               => $posts_link,
 				$this->l10n->t('View Contact')                                => $contact_url,
-				$this->l10n->t('Send PM')                                     => $pm_url,
+				$this->l10n->t('Message')                                     => $pm_url,
 				$this->l10n->t('Block')                                       => $block_link,
 				$this->l10n->t('Ignore')                                      => $ignore_link,
 				$this->l10n->t('Collapse')                                    => $collapse_link,

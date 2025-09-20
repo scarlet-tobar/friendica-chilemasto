@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-19 20:31+0200\n"
+"POT-Creation-Date: 2025-09-20 20:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1377,7 +1377,8 @@ msgstr ""
 msgid "Public post"
 msgstr ""
 
-#: src/Content/Conversation.php:417 src/Content/Widget/VCard.php:120
+#: src/Content/Conversation.php:417 src/Content/Item.php:439
+#: src/Content/Widget/VCard.php:120 src/Model/Contact.php:1304
 #: src/Model/Profile.php:460 src/Module/Admin/Logs/View.php:80
 #: src/Module/Post/Edit.php:177
 msgid "Message"
@@ -1887,10 +1888,6 @@ msgstr ""
 msgid "View Contact"
 msgstr ""
 
-#: src/Content/Item.php:439 src/Model/Contact.php:1304
-msgid "Send PM"
-msgstr ""
-
 #: src/Content/Item.php:440 src/Module/Contact.php:453
 #: src/Module/Contact/Profile.php:564
 #: src/Module/Moderation/Blocklist/Contact.php:104
@@ -2201,7 +2198,7 @@ msgid "Accounts"
 msgstr ""
 
 #: src/Content/Nav.php:322
-msgid "Manage other pages"
+msgid "Manage other accounts, including groups and pages"
 msgstr ""
 
 #: src/Content/Nav.php:325 src/Module/Admin/Addons/Details.php:140
