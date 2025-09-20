@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-20 02:09+0200\n"
+"POT-Creation-Date: 2025-09-20 20:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2198,7 +2198,7 @@ msgid "Accounts"
 msgstr ""
 
 #: src/Content/Nav.php:322
-msgid "Manage other pages"
+msgid "Manage other accounts, including groups and pages"
 msgstr ""
 
 #: src/Content/Nav.php:325 src/Module/Admin/Addons/Details.php:140
