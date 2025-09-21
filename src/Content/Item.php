@@ -444,10 +444,10 @@ class Item
 			];
 
 			if (!empty($item['language'])) {
-				$menu[$this->l10n->t('Languages')] = 'javascript:displayLanguage(' . $item['uri-id'] . ');';
+				$menu[$this->l10n->t('Detected languages')] = 'javascript:displayLanguage(' . $item['uri-id'] . ');';
 			}
 
-			$menu[$this->l10n->t('Search Text')] = 'javascript:displaySearchText(' . $item['uri-id'] . ');';
+			$menu[$this->l10n->t('Raw content')] = 'javascript:displaySearchText(' . $item['uri-id'] . ');';
 
 			if ((($cid == 0) || ($rel == Contact::FOLLOWER)) &&
 				in_array($item['network'], Protocol::FEDERATED)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-20 20:37+0200\n"
+"POT-Creation-Date: 2025-09-21 16:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1914,13 +1914,12 @@ msgstr ""
 msgid "Ignore %s server"
 msgstr ""
 
-#: src/Content/Item.php:447 src/Module/Settings/Channels.php:188
-#: src/Module/Settings/Channels.php:214 src/Object/Post.php:508
-msgid "Languages"
+#: src/Content/Item.php:447 src/Object/Post.php:508
+msgid "Detected languages"
 msgstr ""
 
 #: src/Content/Item.php:450 src/Object/Post.php:591
-msgid "Search Text"
+msgid "Raw content"
 msgstr ""
 
 #: src/Content/Item.php:455 src/Content/Widget.php:65
@@ -2287,11 +2286,11 @@ msgstr ""
 msgid "Encrypted content"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:2175
+#: src/Content/Text/BBCode.php:2164
 msgid "Invalid source protocol"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:2194
+#: src/Content/Text/BBCode.php:2183
 msgid "Invalid link protocol"
 msgstr ""
 
@@ -9578,6 +9577,10 @@ msgstr ""
 
 #: src/Module/Settings/Channels.php:184 src/Module/Settings/Channels.php:210
 msgid "Full Text Search"
+msgstr ""
+
+#: src/Module/Settings/Channels.php:188 src/Module/Settings/Channels.php:214
+msgid "Languages"
 msgstr ""
 
 #: src/Module/Settings/Channels.php:188
