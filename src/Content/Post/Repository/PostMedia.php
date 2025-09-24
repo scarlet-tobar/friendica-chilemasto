@@ -446,7 +446,7 @@ class PostMedia extends BaseRepository
 			$return = '<div style="position:relative">';
 		}
 
-		$return .= '<iframe ' . $attributes . ' width="100%" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>';
+		$return .= '<iframe ' . $attributes . ' width="100%" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen sandbox="allow-same-origin allow-scripts"></iframe></div>';
 		return $return;
 	}
 
