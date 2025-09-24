@@ -2746,9 +2746,6 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 */
 	list-style-type: none;
 }
-.mail-thread {
-	max-height: calc(100vh - 200px);
-}
 #mail-conversation {
 	overflow-y: auto;
 	max-height: calc(100vh - 400px);
