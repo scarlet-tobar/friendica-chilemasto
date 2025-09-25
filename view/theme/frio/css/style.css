@@ -536,6 +536,7 @@ header #banner #logo-img,
 .topbar ul.nav > li {
 	float: left;
 }
+
 @media (min-width: 992px) {
 	.topbar ul.nav > li > a,
 	.topbar ul.nav > li > button {
@@ -2604,6 +2605,16 @@ body.mod-home .navbar #nav-login,
 body.mod-login .navbar #nav-login {
 	display: none;
 }
+
+.mod-lostpass #content {
+	margin-top: 0!important;
+	width: 650px;
+}
+
+.mod-lostpass #login-name-wrapper{
+	margin: 20px 0;
+}
+
 /* Profile-page */
 #profile-content-standard,
 #profile-content-advanced {
@@ -3700,8 +3711,22 @@ section .profile-match-wrapper {
 }
 
 /**
- * Login page
+ * Home / Login page
  */
+
+#openid-header, #new-here {
+	padding-top: 15px;
+}
+.mod-home .row {
+	margin: 0;
+}
+.mod-home #content {
+	padding: 0;
+}
+div.login-form, .login-content-wrapper {
+	margin: 20px 0;
+	padding: 10px 15px;
+}
 #lost-password-link {
 	flex-grow: 2;
 }
@@ -3721,15 +3746,19 @@ section .profile-match-wrapper {
 	text-align: center;
 }
 #register-link {
-	color: white;
 	background: #5aa071;
 	margin-bottom: 10px;
 	width: 75%;
 }
 
+div.login-form, .login-content-wrapper,
 .mod-home.is-not-singleuser,
 .mod-login {
 	background-color: $login_bg_color;
+}
+
+.mod-home.is-not-singleuser,
+.mod-login {
 	background-image: linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4)), url($login_bg_image);
 	background-size: cover;
 	background-attachment: fixed;
@@ -3749,13 +3778,13 @@ section .profile-match-wrapper {
 }
 .mod-home.is-not-singleuser .login-content,
 .mod-login .login-content {
-	color: #eee;
 	margin-top: 2.5%;
 }
 
-.mod-home.is-not-singleuser .login-form > #login-form label,
-.mod-login #content #login-form label {
-	color: #eee;
+.mod-home.is-not-singleuser .login-content,
+.mod-login .login-content,
+#register-link {
+	color: white;
 }
 
 .mod-home.is-not-singleuser .login-panel-content,

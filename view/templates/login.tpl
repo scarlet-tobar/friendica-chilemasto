@@ -25,7 +25,7 @@
 		<a href="lostpass" title="{{$lostpass}}" id="lost-password-link">{{$lostlink}}</a>
 	</div>
 	</div>
-	
+
 	{{if $openid}}
 		<div id="login_openid">
 		{{include file="field_openid.tpl" field=$lopenid}}
@@ -37,11 +37,11 @@
 	</div>
 
 	{{include file="field_checkbox.tpl" field=$lremember}}
-	
+
 	{{foreach $hiddens as $k=>$v}}
 		<input type="hidden" name="{{$k}}" value="{{$v}}" />
 	{{/foreach}}
-	
+
 </div>
 </form>
 

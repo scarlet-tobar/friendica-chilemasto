@@ -17,24 +17,11 @@
 		<input type="hidden" name="auth-params" value="login" />
 
 		<div id="login-head"><h1>{{$login}}</h1></div>
-
-		<div id="login_standard">
-			<div id="id_{{$lname.0}}_wrapper" class="form-group field input">
-				<input id="id_{{$lname.0}}" class="form-control" name="{{$lname.0}}" placeholder="{{$lname.1}}" autofocus></input>
-				{{if $lname.3}}
-					<span class="help-block" id="{{$lname.0}}_tip" role="tooltip">{{$lname.3 nofilter}}</span>
-				{{/if}}
-			</div>
-			<div id="id_{{$lpassword.0}}_wrapper" class="form-group field input">
-				<input id="id_{{$lpassword.0}}" class="form-control" name="{{$lpassword.0}}" placeholder="{{$lpassword.1}}" autofocus type="password"></input>
-				{{if $lpassword.3}}
-					<span class="help-block" id="{{$lpassword.0}}_tip" role="tooltip">{{$lpassword.3 nofilter}}</span>
-				{{/if}}
-			</div>
-			<div id="login-end"></div>
-			<div id="login-lost-password-link">
-				<a href="lostpass" id="lost-password-link">{{$lostlink}}</a>
-			</div>
+		{{include file="field_input.tpl" field=$lname label=false}}
+		{{include file="field_password.tpl" field=$lpassword label=false}}
+		<div id="login-end"></div>
+		<div id="login-lost-password-link">
+			<a href="lostpass" id="lost-password-link">{{$lostlink}}</a>
 		</div>
 
 		{{if $openid}}
