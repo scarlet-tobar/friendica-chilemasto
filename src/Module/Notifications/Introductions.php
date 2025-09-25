@@ -142,11 +142,12 @@ class Introductions extends BaseNotifications
 					$convertedName = BBCode::toPlaintext($Introduction->getName(), false);
 
 					$helptext  = $this->t('Accept %s as a friend or follower?', $convertedName);
-					$helptext2 = $this->t('Accepting %s as a friend allows them to follow your posts, and you will also receive updates from them in your news feed.', $convertedName);
-					$helptext3 = $this->t('Accepting %s as a follower allows them to follow your posts, but you will not receive updates from them in your news feed.', $convertedName);
+					$helptext2 = $this->t('Allows them to follow your posts.', '<strong>' . $convertedName . '</strong>');
+					$helptext3 = $this->t('You will also follow them and receive their posts.');
+					$helptext4 = $this->t('You won\'t follow them and won\'t receive their posts.');
 
-					$friend   = ['duplex', $this->t('Friend (Follow them back)'), '1', $helptext2, true];
-					$follower = ['duplex', $this->t('Follower'), '0', $helptext3, false];
+					$friend   = ['duplex', $this->t('Friend (Follow them back)'), '1', $helptext2 . '<br/>' . $helptext3, true];
+					$follower = ['duplex', $this->t('Follower'), '0', $helptext2 . '<br/>' . $helptext4, false];
 
 					$action = 'follow_confirm';
 
@@ -194,7 +195,7 @@ class Introductions extends BaseNotifications
 						'$lbl_network'           => $this->t('Network:'),
 						'$network'               => ContactSelector::networkToName($Introduction->getNetwork(), '', $gsid),
 						'$knowyou'               => $knowyou,
-						'$approve'               => $this->t('Approve'),
+						'$approve'               => $this->t('Accept request'),
 						'$note'                  => $Introduction->getNote(),
 						'$ignore'                => $this->t('Ignore'),
 						'$discard'               => $discard,
@@ -206,7 +207,6 @@ class Introductions extends BaseNotifications
 		}
 
 		if (count($notifications['notifications']) == 0) {
-			DI::sysmsg()->addNotice($this->t('No introductions.'));
 			$notificationNoContent = $this->t('No more %s notifications.', $notifications['ident']);
 		}
 
