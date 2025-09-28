@@ -280,7 +280,7 @@ function string2bb(element) {
 		};
 
 		this.attr('autocomplete','off');
-		this.textcomplete([contacts, groups, smilies, tags], {dropdown: {className:'acpopup'}, debounce: 250});
+		this.textcomplete([contacts, groups, smilies, tags], {dropdownClassName: 'acpopup', debounce: 250, zIndex: 1050});
 		this.fixTextcompleteEscape();
 
 		return this;
@@ -315,7 +315,7 @@ function string2bb(element) {
 		};
 
 		this.attr('autocomplete', 'off');
-		this.textcomplete([contacts, community, tags], {dropdown: {className:'acpopup', maxCount:100}, debounce: 250});
+		this.textcomplete([contacts, community, tags], {dropdownClassName: 'acpopup', maxCount: 100, debounce: 250, zIndex: 1050});
 		this.fixTextcompleteEscape();
 		this.on('textComplete:select', function(e, value, strategy) { submit_form(this); });
 
@@ -336,7 +336,7 @@ function string2bb(element) {
 		};
 
 		this.attr('autocomplete','off');
-		this.textcomplete([names], {dropdown: {className:'acpopup'}, debounce: 250});
+		this.textcomplete([names], {dropdownClassName: 'acpopup', debounce: 250, zIndex: 1050});
 		this.fixTextcompleteEscape();
 
 		if(autosubmit) {
@@ -386,7 +386,7 @@ function string2bb(element) {
 		};
 
 		this.attr('autocomplete','off');
-		this.textcomplete([bbco], {dropdown: {className:'acpopup'}, debounce: 250});
+		this.textcomplete([bbco], {dropdownClassName: 'acpopup', debounce: 250, zIndex: 1050});
 		this.fixTextcompleteEscape();
 
 		this.on('textComplete:select', function(e, value, strategy) { value; });
