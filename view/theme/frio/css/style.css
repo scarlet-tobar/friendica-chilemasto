@@ -2230,7 +2230,6 @@ wall-item-comment-wrapper.well hr {
 	background-color: #ffffff;
 	border-radius: 4px;
 	overflow: auto;
-	z-index: 100000;
 	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
 }
 nav .acpopup {
@@ -2240,13 +2239,13 @@ nav .acpopup {
  at the beginning of this file to get rid of the !important */
 .textcomplete-item > a {
 	color: $font_color_darker !important;
-	padding: 5px 20px !important;
+	border-left: 3px solid transparent;
+	padding: 5px 20px 5px 17px !important;
 }
 .textcomplete-item.active > a {
 	background-color: rgb(247, 247, 247) !important;
 	background-image: none !important;
-	border-left: 3px solid $link_color;
-	padding-left: 17px !important;
+	border-left-color: $link_color;
 }
 .textcomplete-item a .group {
 	color: $link_color;
