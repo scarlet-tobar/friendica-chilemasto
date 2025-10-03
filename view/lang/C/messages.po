@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-24 22:11+0200\n"
+"POT-Creation-Date: 2025-09-25 21:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -236,7 +236,7 @@ msgid "Message collection failure."
 msgstr ""
 
 #: mod/message.php:111 src/Module/Notifications/Introductions.php:127
-#: src/Module/Notifications/Introductions.php:163
+#: src/Module/Notifications/Introductions.php:164
 #: src/Module/Notifications/Notification.php:71
 msgid "Discard"
 msgstr ""
@@ -1896,7 +1896,7 @@ msgstr ""
 #: src/Content/Item.php:441 src/Module/Contact.php:454
 #: src/Module/Contact/Profile.php:572
 #: src/Module/Notifications/Introductions.php:126
-#: src/Module/Notifications/Introductions.php:199
+#: src/Module/Notifications/Introductions.php:200
 #: src/Module/Notifications/Notification.php:75
 msgid "Ignore"
 msgstr ""
@@ -2506,13 +2506,13 @@ msgstr ""
 #: src/Content/Widget/VCard.php:111 src/Model/Event.php:68
 #: src/Model/Event.php:95 src/Model/Event.php:462 src/Model/Event.php:950
 #: src/Model/Profile.php:351 src/Module/Contact/Profile.php:453
-#: src/Module/Directory.php:133 src/Module/Notifications/Introductions.php:180
+#: src/Module/Directory.php:133 src/Module/Notifications/Introductions.php:181
 #: src/Module/Profile/Profile.php:235
 msgid "Location:"
 msgstr ""
 
 #: src/Content/Widget/VCard.php:114 src/Model/Profile.php:467
-#: src/Module/Notifications/Introductions.php:194
+#: src/Module/Notifications/Introductions.php:195
 msgid "Network:"
 msgstr ""
 
@@ -3229,7 +3229,6 @@ msgstr ""
 
 #: src/Model/Contact.php:1313 src/Module/Moderation/Users/Pending.php:88
 #: src/Module/Notifications/Introductions.php:124
-#: src/Module/Notifications/Introductions.php:197
 msgid "Approve"
 msgstr ""
 
@@ -3499,7 +3498,7 @@ msgid "Homepage:"
 msgstr ""
 
 #: src/Model/Profile.php:355 src/Module/Contact/Profile.php:459
-#: src/Module/Notifications/Introductions.php:182
+#: src/Module/Notifications/Introductions.php:183
 msgid "About:"
 msgstr ""
 
@@ -6150,7 +6149,6 @@ msgid "Advanced Contact Settings"
 msgstr ""
 
 #: src/Module/Contact.php:576 src/Module/Contact/Profile.php:288
-#: src/Module/Notifications/Introductions.php:148
 msgid "Friend"
 msgstr ""
 
@@ -6306,12 +6304,12 @@ msgstr ""
 #: src/Module/Moderation/Blocklist/Contact.php:119
 #: src/Module/Moderation/Reports.php:112
 #: src/Module/Notifications/Introductions.php:121
-#: src/Module/Notifications/Introductions.php:191
+#: src/Module/Notifications/Introductions.php:192
 msgid "Profile URL"
 msgstr ""
 
 #: src/Module/Contact/Follow.php:156 src/Module/Contact/Profile.php:461
-#: src/Module/Notifications/Introductions.php:184
+#: src/Module/Notifications/Introductions.php:185
 #: src/Module/Profile/Profile.php:248
 msgid "Tags:"
 msgstr ""
@@ -6518,7 +6516,7 @@ msgid "Manage remote servers"
 msgstr ""
 
 #: src/Module/Contact/Profile.php:441
-#: src/Module/Notifications/Introductions.php:185
+#: src/Module/Notifications/Introductions.php:186
 msgid "Hide this contact from others"
 msgstr ""
 
@@ -8288,7 +8286,7 @@ msgid "Hide Ignored Requests"
 msgstr ""
 
 #: src/Module/Notifications/Introductions.php:107
-#: src/Module/Notifications/Introductions.php:171
+#: src/Module/Notifications/Introductions.php:172
 msgid "Notification type:"
 msgstr ""
 
@@ -8301,25 +8299,32 @@ msgid "Claims to be known to you: "
 msgstr ""
 
 #: src/Module/Notifications/Introductions.php:144
-msgid "Shall your connection be bidirectional or not?"
+#, php-format
+msgid "Accept %s as a friend or follower?"
 msgstr ""
 
 #: src/Module/Notifications/Introductions.php:145
-#, php-format
-msgid "Accepting %s as a friend allows %s to subscribe to your posts, and you will also receive updates from them in your news feed."
+msgid "Allows them to follow your posts."
 msgstr ""
 
 #: src/Module/Notifications/Introductions.php:146
-#, php-format
-msgid "Accepting %s as a subscriber allows them to subscribe to your posts, but you will not receive updates from them in your news feed."
+msgid "You will also follow them and receive their posts."
+msgstr ""
+
+#: src/Module/Notifications/Introductions.php:147
+msgid "You won't follow them and won't receive their posts."
 msgstr ""
 
 #: src/Module/Notifications/Introductions.php:149
-msgid "Subscriber"
+msgid "Friend (Follow them back)"
 msgstr ""
 
-#: src/Module/Notifications/Introductions.php:209
-msgid "No introductions."
+#: src/Module/Notifications/Introductions.php:150
+msgid "Follower"
+msgstr ""
+
+#: src/Module/Notifications/Introductions.php:198
+msgid "Accept request"
 msgstr ""
 
 #: src/Module/Notifications/Introductions.php:210
@@ -8892,15 +8897,15 @@ msgstr ""
 msgid "Items tagged with: %s"
 msgstr ""
 
-#: src/Module/Search/Saved.php:49
+#: src/Module/Search/Saved.php:50
 msgid "Search term was not saved."
 msgstr ""
 
-#: src/Module/Search/Saved.php:52
+#: src/Module/Search/Saved.php:53
 msgid "Search term already saved."
 msgstr ""
 
-#: src/Module/Search/Saved.php:58
+#: src/Module/Search/Saved.php:59
 msgid "Search term was not removed."
 msgstr ""
 
