@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "39c8e3e8401fb77909d35391c4dddf89",
+    "content-hash": "4a32faebbd1f583b630e971b8488ec53",
     "packages": [
         {
             "name": "asika/simple-console",
@@ -2985,16 +2985,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "3.0.46",
+            "version": "3.0.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "56483a7de62a6c2a6635e42e93b8a9e25d4f0ec6"
+                "reference": "5805c0e661cd26b4a893b021e5d8ae9cfbeaea5a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/56483a7de62a6c2a6635e42e93b8a9e25d4f0ec6",
-                "reference": "56483a7de62a6c2a6635e42e93b8a9e25d4f0ec6",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/5805c0e661cd26b4a893b021e5d8ae9cfbeaea5a",
+                "reference": "5805c0e661cd26b4a893b021e5d8ae9cfbeaea5a",
                 "shasum": ""
             },
             "require": {
@@ -3075,7 +3075,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
-                "source": "https://github.com/phpseclib/phpseclib/tree/3.0.46"
+                "source": "https://github.com/phpseclib/phpseclib/tree/3.0"
             },
             "funding": [
                 {
@@ -3091,7 +3091,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-06-26T16:29:55+00:00"
+            "time": "2025-09-28T11:15:58+00:00"
         },
         {
             "name": "phrity/net-stream",
@@ -8301,7 +8301,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "lightopenid/lightopenid": 20
+        "lightopenid/lightopenid": 20,
+        "phpseclib/phpseclib": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
