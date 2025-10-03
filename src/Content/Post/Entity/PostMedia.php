@@ -38,6 +38,10 @@ use Psr\Http\Message\UriInterface;
  * @property-read ?UriInterface $playerUrl
  * @property-read ?int $playerWidth
  * @property-read ?int $playerHeight
+ * @property-read ?string $embedType
+ * @property-read ?string $embedHtml
+ * @property-read ?int $embedWidth
+ * @property-read ?int $embedHeight
  * @property-read ?int $attachId
  * @property-read ?string $language
  * @property-read ?string $published
@@ -119,6 +123,14 @@ class PostMedia extends BaseEntity
 	protected $published;
 	/** @var ?string (Datetime) */
 	protected $modified;
+	/** @var ?string */
+	protected $embedType;
+	/** @var ?string */
+	protected $embedHtml;
+	/** @var ?int In pixels */
+	protected $embedWidth;
+	/** @var ?int In pixels */
+	protected $embedHeight;
 
 	public function __construct(
 		int $uriId,
@@ -148,7 +160,11 @@ class PostMedia extends BaseEntity
 		?int $attachId = null,
 		?string $language = null,
 		?string $published = null,
-		?string $modified = null
+		?string $modified = null,
+		?string $embedType = null,
+		?string $embedHtml = null,
+		?int $embedWidth = null,
+		?int $embedHeight = null
 	) {
 		$this->uriId          = $uriId;
 		$this->url            = $url;
@@ -178,6 +194,10 @@ class PostMedia extends BaseEntity
 		$this->language       = $language;
 		$this->published      = $published;
 		$this->modified       = $modified;
+		$this->embedType      = $embedType;
+		$this->embedHtml      = $embedHtml;
+		$this->embedWidth     = $embedWidth;
+		$this->embedHeight    = $embedHeight;
 	}
 
 
@@ -290,6 +310,10 @@ class PostMedia extends BaseEntity
 			$this->language,
 			$this->published,
 			$this->modified,
+			$this->embedType,
+			$this->embedHtml,
+			$this->embedWidth,
+			$this->embedHeight
 		);
 	}
 
@@ -324,6 +348,10 @@ class PostMedia extends BaseEntity
 			$this->language,
 			$this->published,
 			$this->modified,
+			$this->embedType,
+			$this->embedHtml,
+			$this->embedWidth,
+			$this->embedHeight
 		);
 	}
 

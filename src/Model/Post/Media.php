@@ -473,6 +473,10 @@ class Media
 		$media['player-url']      = $data['player']['embed']  ?? null;
 		$media['player-height']   = $data['player']['height'] ?? null;
 		$media['player-width']    = $data['player']['width']  ?? null;
+		$media['embed-type']      = $data['embed']['type']    ?? null;
+		$media['embed-html']      = $data['embed']['html']    ?? null;
+		$media['embed-height']    = $data['embed']['height']  ?? null;
+		$media['embed-width']     = $data['embed']['width']   ?? null;
 		$media['language']        = $data['language']         ?? null;
 		$media['published']       = $data['published']        ?? null;
 		$media['modified']        = $data['modified']         ?? null;

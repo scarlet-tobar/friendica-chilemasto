@@ -3405,6 +3405,10 @@ class Item
 				'player_url'    => (string)$attachment->playerUrl,
 				'player_width'  => $attachment->playerWidth,
 				'player_height' => $attachment->playerHeight,
+				'embed_type'    => $attachment->embedType,
+				'embed_html'    => $attachment->embedHtml,
+				'embed_width'   => $attachment->embedWidth,
+				'embed_height'  => $attachment->embedHeight,
 			];
 
 			if ($preview && $attachment->preview) {

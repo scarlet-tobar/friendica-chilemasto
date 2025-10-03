@@ -65,6 +65,10 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 			$row['language'],
 			$row['published'],
 			$row['modified'],
+			$row['embed-type'],
+			$row['embed-html'],
+			$row['embed-width'],
+			$row['embed-height']
 		);
 	}
 
@@ -133,6 +137,10 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 			'player-url'      => $attachment['player_url']    ?? null,
 			'player-width'    => $attachment['player_width']  ?? null,
 			'player-height'   => $attachment['player_height'] ?? null,
+			'embed-type'      => $attachment['embed_type']    ?? null,
+			'embed-html'      => $attachment['embed_html']    ?? null,
+			'embed-width'     => $attachment['embed_width']   ?? null,
+			'embed-height'    => $attachment['embed_height']  ?? null,
 			'attach-id'       => null,
 			'language'        => null,
 			'published'       => null,
@@ -178,6 +186,10 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 			'player-url'      => $data['player']['embed']       ?? null,
 			'player-width'    => $data['player']['width']       ?? null,
 			'player-height'   => $data['player']['height']      ?? null,
+			'embed-type'      => $data['embed']['type']         ?? null,
+			'embed-html'      => $data['embed']['html']         ?? null,
+			'embed-width'     => $data['embed']['width']        ?? null,
+			'embed-height'    => $data['embed']['height']       ?? null,
 			'attach-id'       => null,
 			'language'        => $data['language']  ?? null,
 			'published'       => $data['published'] ?? null,

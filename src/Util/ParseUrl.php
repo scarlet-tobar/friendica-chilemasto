@@ -494,8 +494,6 @@ class ParseUrl
 			}
 		}
 
-		$siteinfo = self::getOembedInfo($xpath, $siteinfo);
-
 		$list = $xpath->query("//script[@type='application/ld+json']");
 		foreach ($list as $node) {
 			if (!empty($node->nodeValue)) {
@@ -505,6 +503,8 @@ class ParseUrl
 				}
 			}
 		}
+
+		$siteinfo = self::getOembedInfo($xpath, $siteinfo);
 
 		if (!empty($siteinfo['player']['stream'])) {
 			// Only add player data to media arrays if there is no duplicate
@@ -1299,50 +1299,58 @@ class ParseUrl
 	}
 
 	/**
-	 * Fetch additional information via oEmbed
+	 * Fetch oEmbed data
 	 *
 	 * @param DOMXPath $xpath
-	 * @param array    $siteinfo
+	 * @param string   $url
 	 *
-	 * @return array siteinfo
+	 * @return array oEmbed data
 	 */
-	private static function getOembedInfo(DOMXPath $xpath, array $siteinfo): array
+	private static function getOembedData(DOMXPath $xpath, string $url): array
 	{
 		$oembed = '';
-		foreach ($xpath->query("//link[@type='application/json+oembed']") as $link) {
-			/** @var DOMElement $link */
-			$href   = $link->getAttributeNode('href')->nodeValue;
-			$oembed = $href;
-			DI::logger()->debug('Found oEmbed JSON', ['url' => $href]);
+		$data   = [];
+
+		if (in_array(parse_url(Strings::normaliseLink($url), PHP_URL_HOST), ['twitter.com', 'x.com'])) {
+			$oembed = 'https://publish.twitter.com/oembed?url=' . urlencode($url) . '&dnt=true';
+
+			$systemLanguage = DI::config()->get('system', 'language');
+			if ($systemLanguage) {
+				$oembed .= '&lang=' . $systemLanguage;
+			}
+			DI::logger()->debug('Using Twitter oEmbed', ['url' => $url, 'oembed' => $oembed]);
 		}
 
-		if (empty($oembed)) {
-			$embera  = new Embera();
-			$urldata = $embera->getUrlData([$siteinfo['url']]);
-			if (empty($urldata)) {
-				return $siteinfo;
+		if (!$oembed) {
+			foreach ($xpath->query("//link[@type='application/json+oembed']") as $link) {
+				/** @var DOMElement $link */
+				$oembed = $link->getAttributeNode('href')->nodeValue;
+				DI::logger()->debug('Found oEmbed JSON from page', ['url' => $url, 'oembed' => $oembed]);
 			}
-			$data = current($urldata);
-			DI::logger()->debug('Found oEmbed JSON from Embera', ['url' => $siteinfo['url']]);
-		} else {
-			$result = DI::httpClient()->get($oembed, HttpClientAccept::DEFAULT, [HttpClientOptions::REQUEST => HttpClientRequest::SITEINFO]);
-			if (!$result->isSuccess()) {
-				return $siteinfo;
-			}
-			$json_string = $result->getBodyString();
-			if (empty($json_string)) {
-				return $siteinfo;
-			}
+		}
 
-			$data = json_decode($json_string, true);
+		if ($oembed) {
+			$oembed .= '&maxwidth=' . DI::config()->get('system', 'max_width') . '&maxheight=' . DI::config()->get('system', 'max_height') . '&format=json';
+			$result = DI::httpClient()->get($oembed, HttpClientAccept::DEFAULT, [HttpClientOptions::REQUEST => HttpClientRequest::SITEINFO]);
+			if ($result->isSuccess() && $result->getBodyString()) {
+				$data = json_decode($result->getBodyString(), true);
+			}
 		}
 
 		if (empty($data) || !is_array($data)) {
-			return $siteinfo;
+			$embera  = new Embera(['maxwidth' => DI::config()->get('system', 'max_width'), 'maxheight' => DI::config()->get('system', 'max_height')]);
+			$urldata = $embera->getUrlData($url);
+			if (empty($urldata)) {
+				return [];
+			}
+			$data = current($urldata);
+			DI::logger()->debug('Found oEmbed JSON from Embera', ['url' => $url]);
 		}
+		return $data;
+	}
 
-		DI::logger()->debug('Got oEmbed data', ['url' => $siteinfo['url'], 'type' => $data['type'], 'data' => $data]);
-
+	private static function getSiteinfoFromoEmbed(array $siteinfo, array $data): array
+	{
 		// Youtube provides only basic information to some IP ranges.
 		// Dailymotion only provices "Dailymotion" as title in their meta tags, so oEmbed is better
 		// @todo We have to decide if we always trust oEmbed more than the meta tags
@@ -1382,6 +1390,8 @@ class ParseUrl
 			if (isset($data[$key]) && (empty($siteinfo[$value]) || $overwrite)) {
 				if ($value == 'published') {
 					$siteinfo[$value] = DateTimeFormat::utc($data[$key]);
+				} elseif (is_string($value)) {
+					$siteinfo[$value] = trim(strip_tags(html_entity_decode($data[$key], ENT_COMPAT, 'UTF-8')));
 				} else {
 					$siteinfo[$value] = $data[$key];
 				}
@@ -1391,32 +1401,82 @@ class ParseUrl
 		if (!empty($unknown_fields)) {
 			DI::logger()->debug('Unknown oEmbed fields', ['url' => $siteinfo['url'], 'fields' => $unknown_fields]);
 		}
+		return $siteinfo;
+	}
 
-		if (!empty($data['html']) && empty($siteinfo['player'])) {
-			$siteinfo = self::setPlayer($data, $siteinfo);
+	private static function getOembedInfo(DOMXPath $xpath, array $siteinfo): array
+	{
+		$data = self::getOembedData($xpath, $siteinfo['url']);
+		if (empty($data) || !is_array($data)) {
+			return $siteinfo;
 		}
+
+		$siteinfo = self::getSiteinfoFromoEmbed($siteinfo, $data);
 
 		if ($data['type'] == 'video' & empty($siteinfo['player']) && ($data['provider_url'] ?? '') == 'https://www.tiktok.com' && isset($data['embed_product_id']) && isset($data['thumbnail_width']) && isset($data['thumbnail_height'])) {
+			$siteinfo['embed']['type']    = $data['type'];
+			$siteinfo['embed']['html']    = trim($data['html']);
+			$siteinfo['embed']['width']   = is_numeric($data['width'] ?? '') ? $data['width']  : $data['thumbnail_width'];
+			$siteinfo['embed']['height']  = is_numeric($data['height'] ?? '') ? $data['height'] : $data['thumbnail_height'];
 			$siteinfo['player']['embed']  = 'https://www.tiktok.com/player/v1/' . $data['embed_product_id'] . '?description=1&rel=0';
-			$siteinfo['player']['width']  = $data['thumbnail_width'];
-			$siteinfo['player']['height'] = $data['thumbnail_height'];
+			$siteinfo['player']['width']  = $siteinfo['embed']['width'];
+			$siteinfo['player']['height'] = $siteinfo['embed']['height'];
+			return $siteinfo;
 		}
 
-		if (!empty($siteinfo['player'])) {
-			foreach (['width' => 'width', 'height' => 'height', 'fixedWidth' => 'width'] as $key => $value) {
-				if (empty($siteinfo['player'][$value]) && !empty($data[$key])) {
-					$siteinfo['player'][$value] = $data[$key];
-				}
-			}
+		if (!isset($data['html'])) {
+			return $siteinfo;
 		}
 
-		if ($data['type'] == 'rich' && isset($data['html']) && !isset($siteinfo['text'])) {
+		unset($siteinfo['player']);
+
+		if ($data['type'] == 'rich' && !isset($siteinfo['text'])) {
 			$bbcode = HTML::toBBCode($data['html'] ?? '');
 			$bbcode = preg_replace("(\[url\](.*?)\[\/url\])ism", "", $bbcode);
 
 			$siteinfo['text'] = strip_tags(BBCode::convert($bbcode, false));
 			DI::logger()->debug('Text is fetched from oEmbed HTML', ['url' => $siteinfo['url'], 'text' => $siteinfo['text']]);
 		}
+
+		$siteinfo = self::setPlayer($data, $siteinfo);
+
+		if (!empty($siteinfo['player'])) {
+			$siteinfo['embed']['type']   = $data['type'];
+			$siteinfo['embed']['html']   = trim($data['html']);
+			$siteinfo['embed']['width']  = $siteinfo['player']['width'];
+			$siteinfo['embed']['height'] = $siteinfo['player']['height'];
+			return $siteinfo;
+		}
+
+		if (($data['provider_url'] ?? '') == 'https://twitter.com') {
+			if (preg_match_all('#https?://t\.co/[a-zA-Z0-9]+#', $data['html'], $matches)) {
+				$links = array_unique($matches[0]);
+				foreach ($links as $link) {
+					$curlResult = DI::httpClient()->head($link);
+					$redirect   = $curlResult->getRedirectUrl();
+					if (preg_match('#/(video|broadcasts)/#', $redirect)) {
+						$siteinfo['embed']['type']   = $data['type'];
+						$siteinfo['embed']['html']   = trim(str_replace('<blockquote class="twitter-tweet"', '<blockquote class="twitter-tweet" data-media-max-width="560"', $data['html']));
+						$siteinfo['embed']['width']  = is_numeric($data['width'] ?? '') ? $data['width']  : null;
+						$siteinfo['embed']['height'] = is_numeric($data['height'] ?? '') ? $data['height'] : null;
+						DI::logger()->debug('Fetched Twitter video oEmbed HTML', ['url' => $siteinfo['url']]);
+						return $siteinfo;
+					}
+				}
+			}
+			// We don't embed regular Twitter posts, since this doesn't add any additional value
+			return $siteinfo;
+		}
+
+		if ($data['type'] != 'video' && ($siteinfo['pagetype'] ?? '') != 'video') {
+			return $siteinfo;
+		}
+
+		$siteinfo['embed']['type']   = $data['type'];
+		$siteinfo['embed']['html']   = trim($data['html']);
+		$siteinfo['embed']['width']  = is_numeric($data['width'] ?? '') ? $data['width']  : null;
+		$siteinfo['embed']['height'] = is_numeric($data['height'] ?? '') ? $data['height'] : null;
+		DI::logger()->debug('Fetched oEmbed HTML', ['provider' => $data['provider_url'], 'url' => $siteinfo['url']]);
 
 		return $siteinfo;
 	}
@@ -1431,13 +1491,11 @@ class ParseUrl
 	 */
 	private static function setPlayer(array $data, array $siteinfo): array
 	{
-		// iframe content is most likely not a video but an embedded website
-		if (($data['type'] == 'rich') && ($data['asset_type'] ?? '') == 'article') {
-			return $siteinfo;
-		}
-
 		if (isset($data['iframe_url'])) {
-			$siteinfo['player']['embed'] = $data['iframe_url'];
+			$siteinfo['player']['embed']  = $data['iframe_url'];
+			$siteinfo['player']['width']  = is_numeric($data['width'] ?? '') ? $data['width']  : null;
+			$siteinfo['player']['height'] = is_numeric($data['height'] ?? '') ? $data['height'] : null;
+			DI::logger()->debug('Found oEmbed iframe_url parameter', ['embed' => $siteinfo['player']['embed'], 'width' => $siteinfo['player']['width'], 'height' => $siteinfo['player']['height']]);
 			return $siteinfo;
 		}
 
@@ -1464,7 +1522,9 @@ class ParseUrl
 			return $siteinfo;
 		}
 
-		$siteinfo['player']['embed'] = $src;
+		$siteinfo['player']['embed']  = $src;
+		$siteinfo['player']['width']  = is_numeric($data['width'] ?? '') ? $data['width']  : null;
+		$siteinfo['player']['height'] = is_numeric($data['height'] ?? '') ? $data['height'] : null;
 
 		$width = $iframe->getAttributeNode('width')->nodeValue ?? null;
 		if (!empty($width) && is_numeric($width)) {
@@ -1476,8 +1536,7 @@ class ParseUrl
 			$siteinfo['player']['height'] = $height;
 		}
 
-		DI::logger()->debug('Found oEmbed iframe', ['embed' => $siteinfo['player']['embed'] ?? '', 'width' => $siteinfo['player']['width'] ?? '', 'height' => $siteinfo['player']['height'] ?? '']);
-
+		DI::logger()->debug('Found oEmbed iframe', ['embed' => $siteinfo['player']['embed'], 'width' => $siteinfo['player']['width'], 'height' => $siteinfo['player']['height']]);
 		return $siteinfo;
 	}
 }
