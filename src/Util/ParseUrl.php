@@ -1346,15 +1346,17 @@ class ParseUrl
 		// Youtube provides only basic information to some IP ranges.
 		// Dailymotion only provices "Dailymotion" as title in their meta tags, so oEmbed is better
 		// @todo We have to decide if we always trust oEmbed more than the meta tags
-		$overwrite = in_array(parse_url(Strings::normaliseLink($siteinfo['url']), PHP_URL_HOST), ['dailymotion.com', 'tiktok.com', 'youtube.com']);
+		$overwrite = in_array(parse_url(Strings::normaliseLink($siteinfo['url']), PHP_URL_HOST), ['dailymotion.com', 'tiktok.com', 'youtube.com', 'youtu.be']);
 
 		$unknown_fields = $data;
-		foreach (['account_type', 'asset_type', 'cache_age', 'category', 'duration',
-			'embera_using_fake_response', 'embera_provider_name',
-			'height', 'html', 'iframe_url', 'is_plus', 'safety', 'success', 'type',
+		foreach (['account_type', 'asset_type', 'author_unique_id', 'availability', 'brand',
+			'cache_age', 'category', 'currency_code', 'duration', 'embera_using_fake_response',
+			'embera_provider_name', 'embed_product_id', 'embed_type', 'flickr_type',
+			'height', 'html', 'images','iframe_url', 'is_plus', 'price', 'products',
+			'product_expiration', 'product_id', 'quantity', 'referrer', 'safety', 'success', 'type',
 			'thumbnail_credit', 'thumbnail_credit_url', 'thumbnail_credit_note',
 			'thumbnail_height', 'thumbnail_url_with_play_button', 'thumbnail_width',
-			'uri', 'url', 'version', 'video_id', 'width'] as $value) {
+			'uri', 'url', 'version', 'video_id', 'web_page', 'web_page_short_url', 'width'] as $value) {
 			unset($unknown_fields[$value]);
 		}
 
@@ -1364,11 +1366,15 @@ class ParseUrl
 			'summary'          => 'text',
 			'author_name'      => 'author_name',
 			'author_url'       => 'author_url',
+			'author'           => 'author_name',
 			'provider_name'    => 'publisher_name',
 			'provider_url'     => 'publisher_url',
 			'thumbnail_url'    => 'image',
 			'upload_date'      => 'published',
 			'publication_date' => 'published',
+			'license'          => 'license_name',
+			'license_url'      => 'license_url',
+			'license_id'       => 'license_id',
 		];
 
 		foreach ($fields as $key => $value) {
@@ -1390,10 +1396,16 @@ class ParseUrl
 			$siteinfo = self::setPlayer($data, $siteinfo);
 		}
 
+		if ($data['type'] == 'video' & empty($siteinfo['player']) && ($data['provider_url'] ?? '') == 'https://www.tiktok.com' && isset($data['embed_product_id']) && isset($data['thumbnail_width']) && isset($data['thumbnail_height'])) {
+			$siteinfo['player']['embed']  = 'https://www.tiktok.com/player/v1/' . $data['embed_product_id'] . '?description=1&rel=0';
+			$siteinfo['player']['width']  = $data['thumbnail_width'];
+			$siteinfo['player']['height'] = $data['thumbnail_height'];
+		}
+
 		if (!empty($siteinfo['player'])) {
-			foreach (['width', 'height'] as $key) {
-				if (empty($siteinfo['player'][$key]) && !empty($data[$key])) {
-					$siteinfo['player'][$key] = $data[$key];
+			foreach (['width' => 'width', 'height' => 'height', 'fixedWidth' => 'width'] as $key => $value) {
+				if (empty($siteinfo['player'][$value]) && !empty($data[$key])) {
+					$siteinfo['player'][$value] = $data[$key];
 				}
 			}
 		}
