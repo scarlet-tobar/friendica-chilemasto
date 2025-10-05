@@ -536,6 +536,7 @@ header #banner #logo-img,
 .topbar ul.nav > li {
 	float: left;
 }
+
 @media (min-width: 992px) {
 	.topbar ul.nav > li > a,
 	.topbar ul.nav > li > button {
@@ -2592,6 +2593,11 @@ section > .generic-page-wrapper,
 	overflow: hidden;
 }
 /* Home and Login Page */
+#login-head h1 {
+	margin-top: 0;
+	margin-bottom: 30px;
+}
+
 body.mod-home nav.navbar .nav > li > a:hover {
 	background-color: rgba(255, 255, 255, 0.2);
 }
@@ -2599,6 +2605,16 @@ body.mod-home .navbar #nav-login,
 body.mod-login .navbar #nav-login {
 	display: none;
 }
+
+.mod-lostpass #content {
+	margin-top: 0!important;
+	width: 650px;
+}
+
+.mod-lostpass #login-name-wrapper{
+	margin: 20px 0;
+}
+
 /* Profile-page */
 #profile-content-standard,
 #profile-content-advanced {
@@ -2610,6 +2626,22 @@ body.mod-login .navbar #nav-login {
 }
 .contact-block-div.group-list-profile-advanced {
 	float: left;
+}
+
+#login-submit-button, #register-submit-button, #register-link {
+	font-size: 19px;
+	font-weight: normal;
+	width: 100%;
+}
+
+#openid-header {
+	font-size: 16px;
+	margin: 15px 0;
+}
+
+#new-here {
+	font-size: 20px;
+	margin-top: -5px;
 }
 
 /* contacts page */
@@ -3679,39 +3711,54 @@ section .profile-match-wrapper {
 }
 
 /**
- * Login page
+ * Home / Login page
  */
-#login-submit-wrapper {
-	float: right;
+
+#openid-header, #new-here {
+	padding-top: 15px;
+}
+.mod-home .row {
+	margin: 0;
+}
+.mod-home #content {
+	padding: 0;
+}
+div.login-form, .login-content-wrapper {
+	margin: 20px 0;
+	padding: 10px 15px;
 }
 #lost-password-link {
 	flex-grow: 2;
 }
 #login-lost-password-link {
-	margin-bottom: 10px;
-	float: right;
+	text-align: right;
 }
 #div_id_remember {
-	float: left;
+	margin: 20px 0;
 }
 #id_password_wrapper {
 	margin-bottom: unset;
 }
-#login_openid {
-	clear: both;
+.login-form hr, #modal-body hr {
+	margin: 25px 0;
+}
+#login-extra-links {
+	text-align: center;
 }
 #register-link {
-	color: white;
-	background: #8ad0a1;
-	width: 100%;
+	background: #5aa071;
+	margin-bottom: 10px;
+	width: 75%;
 }
-#login-end {
-	clear: both;
+
+div.login-form, .login-content-wrapper,
+.mod-home.is-not-singleuser,
+.mod-login {
+	background-color: $login_bg_color;
 }
 
 .mod-home.is-not-singleuser,
 .mod-login {
-	background-color: $login_bg_color;
 	background-image: linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4)), url($login_bg_image);
 	background-size: cover;
 	background-attachment: fixed;
@@ -3731,17 +3778,13 @@ section .profile-match-wrapper {
 }
 .mod-home.is-not-singleuser .login-content,
 .mod-login .login-content {
-	color: #eee;
 	margin-top: 2.5%;
 }
 
-.mod-home.is-not-singleuser .login-form > #login-extra-links {
-	margin-top: 4em;
-}
-
-.mod-home.is-not-singleuser .login-form > #login-form label,
-.mod-login #content #login-form label {
-	color: #eee;
+.mod-home.is-not-singleuser .login-content,
+.mod-login .login-content,
+#register-link {
+	color: white;
 }
 
 .mod-home.is-not-singleuser .login-panel-content,
@@ -3914,16 +3957,15 @@ section .profile-match-wrapper {
 		margin-top: 100px !important;
 	}
 
-	.mod-home.is-not-singleuser .login-form > #login-form,
-	.mod-home.is-not-singleuser .login-form > #login-extra-links,
-	.mod-login #content #login-form {
+	.mod-home.is-not-singleuser .login-form,
+	.mod-login #content .login-form {
 		background-color: #fff;
-		padding: 1em;
+		padding: 1.5em;
 		position: relative;
 	}
 	.mod-home.is-not-singleuser .login-form > #login-extra-links {
-		margin-top: unset;
-		background-color: white;
+		padding-bottom: 0;
+		padding-top: 1em 0;
 	}
 
 	.mod-home.is-not-singleuser .login-form > #login-form label,

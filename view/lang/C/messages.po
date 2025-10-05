@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-03 20:38+0200\n"
+"POT-Creation-Date: 2025-10-05 14:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,15 +82,15 @@ msgstr ""
 msgid "Permission denied."
 msgstr ""
 
-#: mod/lostpass.php:27
+#: mod/lostpass.php:28
 msgid "No valid account found."
 msgstr ""
 
-#: mod/lostpass.php:39
+#: mod/lostpass.php:40
 msgid "Password reset request issued. Check your email."
 msgstr ""
 
-#: mod/lostpass.php:45
+#: mod/lostpass.php:46
 #, php-format
 msgid ""
 "\n"
@@ -106,7 +106,7 @@ msgid ""
 "\t\tissued this request."
 msgstr ""
 
-#: mod/lostpass.php:56
+#: mod/lostpass.php:57
 #, php-format
 msgid ""
 "\n"
@@ -123,64 +123,64 @@ msgid ""
 "\t\tLogin Name:\t%3$s"
 msgstr ""
 
-#: mod/lostpass.php:71
+#: mod/lostpass.php:72
 #, php-format
 msgid "Password reset requested at %s"
 msgstr ""
 
-#: mod/lostpass.php:87
+#: mod/lostpass.php:88
 msgid "Request could not be verified. (You may have previously submitted it.) Password reset failed."
 msgstr ""
 
-#: mod/lostpass.php:100
+#: mod/lostpass.php:101
 msgid "Request has expired, please make a new one."
 msgstr ""
 
-#: mod/lostpass.php:115
+#: mod/lostpass.php:116
 msgid "Forgot your Password?"
 msgstr ""
 
-#: mod/lostpass.php:116
+#: mod/lostpass.php:117
 msgid "Enter your email address and submit to have your password reset. Then check your email for further instructions."
 msgstr ""
 
-#: mod/lostpass.php:117 src/Module/Security/Login.php:165
-msgid "Nickname or Email: "
+#: mod/lostpass.php:118 src/Module/Security/Login.php:167
+msgid "Nickname or email"
 msgstr ""
 
-#: mod/lostpass.php:118
-msgid "Reset"
+#: mod/lostpass.php:119
+msgid "Reset my password"
 msgstr ""
 
-#: mod/lostpass.php:133 src/Module/Security/Login.php:177
+#: mod/lostpass.php:134 src/Module/Security/Login.php:179
 msgid "Password Reset"
 msgstr ""
 
-#: mod/lostpass.php:134
+#: mod/lostpass.php:135
 msgid "Your password has been reset as requested."
 msgstr ""
 
-#: mod/lostpass.php:135
+#: mod/lostpass.php:136
 msgid "Your new password is"
 msgstr ""
 
-#: mod/lostpass.php:136
+#: mod/lostpass.php:137
 msgid "Save or copy your new password - and then"
 msgstr ""
 
-#: mod/lostpass.php:137
+#: mod/lostpass.php:138
 msgid "click here to login"
 msgstr ""
 
-#: mod/lostpass.php:138
+#: mod/lostpass.php:139
 msgid "Your password may be changed from the <em>Settings</em> page after successful login."
 msgstr ""
 
-#: mod/lostpass.php:142
+#: mod/lostpass.php:143
 msgid "Your password has been reset."
 msgstr ""
 
-#: mod/lostpass.php:145
+#: mod/lostpass.php:146
 #, php-format
 msgid ""
 "\n"
@@ -191,7 +191,7 @@ msgid ""
 "\t\t"
 msgstr ""
 
-#: mod/lostpass.php:151
+#: mod/lostpass.php:152
 #, php-format
 msgid ""
 "\n"
@@ -205,7 +205,7 @@ msgid ""
 "\t\t"
 msgstr ""
 
-#: mod/lostpass.php:163
+#: mod/lostpass.php:164
 #, php-format
 msgid "Your password has been changed at %s"
 msgstr ""
@@ -1970,8 +1970,9 @@ msgstr ""
 msgid "Search: @name, !group, #tags, content"
 msgstr ""
 
-#: src/Content/Nav.php:220 src/Module/Security/Login.php:162
-msgid "Logout"
+#: src/Content/Nav.php:220 src/Module/Security/Login.php:163
+#: src/Module/Security/TwoFactor/SignOut.php:105
+msgid "Sign out"
 msgstr ""
 
 #: src/Content/Nav.php:220
@@ -1979,11 +1980,7 @@ msgid "End this session"
 msgstr ""
 
 #: src/Content/Nav.php:222 src/Module/Bookmarklet.php:30
-#: src/Module/Security/Login.php:163
-msgid "Login"
-msgstr ""
-
-#: src/Content/Nav.php:222
+#: src/Module/Security/Login.php:164
 msgid "Sign in"
 msgstr ""
 
@@ -2055,7 +2052,8 @@ msgstr ""
 msgid "Register"
 msgstr ""
 
-#: src/Content/Nav.php:253
+#: src/Content/Nav.php:253 src/Module/Register.php:157
+#: src/Module/Security/Login.php:127
 msgid "Create an account"
 msgstr ""
 
@@ -4372,7 +4370,7 @@ msgstr ""
 msgid "Republish users to directory"
 msgstr ""
 
-#: src/Module/Admin/Site.php:447 src/Module/Register.php:157
+#: src/Module/Admin/Site.php:447
 msgid "Registration"
 msgstr ""
 
@@ -8753,10 +8751,6 @@ msgstr ""
 msgid "Search term was not removed."
 msgstr ""
 
-#: src/Module/Security/Login.php:127
-msgid "Create a New Account"
-msgstr ""
-
 #: src/Module/Security/Login.php:146
 msgid "Your OpenID: "
 msgstr ""
@@ -8766,34 +8760,42 @@ msgid "Please enter your username and password to add the OpenID to your existin
 msgstr ""
 
 #: src/Module/Security/Login.php:151
-msgid "Or login using OpenID: "
+msgid "Or sign in using OpenID"
 msgstr ""
 
-#: src/Module/Security/Login.php:166
-msgid "Password: "
+#: src/Module/Security/Login.php:156
+msgid "OpenID"
 msgstr ""
 
-#: src/Module/Security/Login.php:167
+#: src/Module/Security/Login.php:165
+msgid "New here?"
+msgstr ""
+
+#: src/Module/Security/Login.php:168
+msgid "Password"
+msgstr ""
+
+#: src/Module/Security/Login.php:169
 msgid "Remember me"
 msgstr ""
 
-#: src/Module/Security/Login.php:176
+#: src/Module/Security/Login.php:178
 msgid "Forgot your password?"
 msgstr ""
 
-#: src/Module/Security/Login.php:179
+#: src/Module/Security/Login.php:181
 msgid "Website Terms of Service"
 msgstr ""
 
-#: src/Module/Security/Login.php:180
+#: src/Module/Security/Login.php:182
 msgid "terms of service"
 msgstr ""
 
-#: src/Module/Security/Login.php:182
+#: src/Module/Security/Login.php:184
 msgid "Website Privacy Policy"
 msgstr ""
 
-#: src/Module/Security/Login.php:183
+#: src/Module/Security/Login.php:185
 msgid "privacy policy"
 msgstr ""
 
@@ -8893,10 +8895,6 @@ msgstr ""
 
 #: src/Module/Security/TwoFactor/SignOut.php:104
 msgid "<p>If you trust this browser, you will not be asked for verification code the next time you sign in.</p>"
-msgstr ""
-
-#: src/Module/Security/TwoFactor/SignOut.php:105
-msgid "Sign out"
 msgstr ""
 
 #: src/Module/Security/TwoFactor/SignOut.php:107

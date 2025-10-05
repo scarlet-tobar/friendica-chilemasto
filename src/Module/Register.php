@@ -154,7 +154,7 @@ class Register extends BaseModule
 			'$invite_desc'           => DI::l10n()->t('Membership on this site is by invitation only.'),
 			'$invite_label'          => DI::l10n()->t('Your invitation code: '),
 			'$invite_id'             => $invite_id,
-			'$regtitle'              => DI::l10n()->t('Registration'),
+			'$regtitle'              => DI::l10n()->t('Create an account'),
 			'$registertext'          => BBCode::convertForUriId(User::getSystemUriId(), DI::config()->get('config', 'register_text', '')),
 			'$fillwith'              => $fillwith,
 			'$fillext'               => $fillext,
