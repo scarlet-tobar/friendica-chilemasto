@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-06 11:45+0100\n"
+"POT-Creation-Date: 2026-02-08 14:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1848,7 +1848,7 @@ msgstr ""
 msgid "Find groups to join"
 msgstr ""
 
-#: src/Content/Item.php:336 src/Model/Item.php:2834
+#: src/Content/Item.php:336 src/Model/Item.php:2841
 msgid "event"
 msgstr ""
 
@@ -1856,7 +1856,7 @@ msgstr ""
 msgid "status"
 msgstr ""
 
-#: src/Content/Item.php:345 src/Model/Item.php:2836
+#: src/Content/Item.php:345 src/Model/Item.php:2843
 #: src/Module/Post/Tag/Add.php:112
 msgid "photo"
 msgstr ""
@@ -2275,8 +2275,8 @@ msgstr ""
 msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:945 src/Model/Item.php:3724
-#: src/Model/Item.php:3730 src/Model/Item.php:3731
+#: src/Content/Text/BBCode.php:945 src/Model/Item.php:3731
+#: src/Model/Item.php:3737 src/Model/Item.php:3738
 msgid "Link to source"
 msgstr ""
 
@@ -3421,84 +3421,84 @@ msgstr ""
 msgid "Happy Birthday %s"
 msgstr ""
 
-#: src/Model/Item.php:2838
+#: src/Model/Item.php:2845
 msgid "activity"
 msgstr ""
 
-#: src/Model/Item.php:2840
+#: src/Model/Item.php:2847
 msgid "comment"
 msgstr ""
 
-#: src/Model/Item.php:2843 src/Module/Post/Tag/Add.php:112
+#: src/Model/Item.php:2850 src/Module/Post/Tag/Add.php:112
 msgid "post"
 msgstr ""
 
-#: src/Model/Item.php:3032
+#: src/Model/Item.php:3039
 #, php-format
 msgid "%s is blocked"
 msgstr ""
 
-#: src/Model/Item.php:3034
+#: src/Model/Item.php:3041
 #, php-format
 msgid "%s is ignored"
 msgstr ""
 
-#: src/Model/Item.php:3036
+#: src/Model/Item.php:3043
 #, php-format
 msgid "Content from %s is collapsed"
 msgstr ""
 
-#: src/Model/Item.php:3040
+#: src/Model/Item.php:3047
 msgid "Sensitive content"
 msgstr ""
 
-#: src/Model/Item.php:3594
+#: src/Model/Item.php:3601
 msgid "bytes"
 msgstr ""
 
-#: src/Model/Item.php:3628
+#: src/Model/Item.php:3635
 #, php-format
 msgid "The media in this post is not displayed to visitors. To view it, please go to the <a href=\"%s\">original post</a>."
 msgstr ""
 
-#: src/Model/Item.php:3630
+#: src/Model/Item.php:3637
 msgid "The media in this post is not displayed to visitors. To view it, please log in."
 msgstr ""
 
-#: src/Model/Item.php:3655
+#: src/Model/Item.php:3662
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3657
+#: src/Model/Item.php:3664
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3662
+#: src/Model/Item.php:3669
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3664
+#: src/Model/Item.php:3671
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3666
+#: src/Model/Item.php:3673
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:3707 src/Model/Item.php:3708
+#: src/Model/Item.php:3714 src/Model/Item.php:3715
 msgid "View on separate page"
 msgstr ""
 
@@ -7282,7 +7282,7 @@ msgstr ""
 msgid "You can make this page always open when you use the New Post button in the <a href=\"/settings/display\">Theme Customization settings</a>."
 msgstr ""
 
-#: src/Module/Item/Display.php:164
+#: src/Module/Item/Display.php:168
 #, php-format
 msgid "Post by %s"
 msgstr ""
@@ -11991,7 +11991,7 @@ msgid "Note"
 msgstr ""
 
 #: view/theme/frio/config.php:153
-msgid "Check image permissions if all users are allowed to see the image"
+msgid "Ensure that the image has the correct permissions, allowing all users to view it."
 msgstr ""
 
 #: view/theme/frio/config.php:158
@@ -12007,11 +12007,11 @@ msgid "Accent color"
 msgstr ""
 
 #: view/theme/frio/config.php:162
-msgid "Copy or paste schemestring"
+msgid "Copy or paste theme settings"
 msgstr ""
 
 #: view/theme/frio/config.php:162
-msgid "You can copy this string to share your theme with others. Pasting here applies the schemestring"
+msgid "You can copy this text to share your theme settings with others. Pasting here updates the theme settings below. Afterwards, if you want, click the save button below to use the new settings."
 msgstr ""
 
 #: view/theme/frio/config.php:163
@@ -12047,7 +12047,7 @@ msgid "Always open Compose page"
 msgstr ""
 
 #: view/theme/frio/config.php:172
-msgid "The New Post button always open the <a href=\"/compose\">Compose page</a> instead of the modal form. When this is disabled, the Compose page can be accessed with a middle click on the link or from the modal."
+msgid "If enabled, the button to make a new post always opens a dedicated page (the <a href=\"/compose\">Compose page</a>) instead of a small window on top of the current page. When disabled, the \"Compose page\" can be accessed with a middle click on the button to make a new post, or via a button in the small window."
 msgstr ""
 
 #: view/theme/frio/config.php:176
@@ -12059,7 +12059,7 @@ msgid "Login page background color"
 msgstr ""
 
 #: view/theme/frio/config.php:180
-msgid "Leave background image and color empty for theme defaults"
+msgid "Leave background image and color empty to use theme defaults."
 msgstr ""
 
 #: view/theme/frio/php/Image.php:27
@@ -12083,7 +12083,7 @@ msgid "Single row mosaic"
 msgstr ""
 
 #: view/theme/frio/php/Image.php:29
-msgid "Resize image to repeat it on a single row, either vertical or horizontal."
+msgid "Resize image to repeat it in a single direction, either vertical or horizontal."
 msgstr ""
 
 #: view/theme/frio/php/Image.php:30
