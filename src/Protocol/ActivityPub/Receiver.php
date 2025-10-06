@@ -1851,7 +1851,7 @@ class Receiver
 				continue;
 			}
 
-			if ($mediatype == 'text/html' && $href != $id) {
+			if ($mediatype === 'text/html' && ($href != $id || $alternateUrl === '')) {
 				$alternateUrl = $href;
 			}
 		}
@@ -2121,7 +2121,7 @@ class Receiver
 		if (in_array($object_data['object_type'], ['as:Audio', 'as:Video'])) {
 			$object_data['alternate-url'] = self::extractAlternateUrl($object['as:url'] ?? [], $object_data['id']) ?: $object_data['alternate-url'];
 
-			$siteinfo = ParseUrl::getSiteinfoCached($object_data['alternate-url']);
+			$siteinfo = ParseUrl::getSiteinfoCached($object_data['alternate-url'] ?? '');
 			if (isset($siteinfo['player'])) {
 				$player = $siteinfo['player'];
 			} else {

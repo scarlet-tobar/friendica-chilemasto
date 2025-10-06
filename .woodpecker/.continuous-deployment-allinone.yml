@@ -22,7 +22,7 @@ when:
 skip_clone: true
 
 steps:
-  clone:
+  clone_friendica_base:
     image: alpine/git
     commands:
       - git config --global user.email "no-reply@friendi.ca"
@@ -32,6 +32,14 @@ steps:
       - git checkout $CI_COMMIT_BRANCH
       - git fetch origin $CI_COMMIT_REF
       - git merge $CI_COMMIT_SHA
+  clone_friendica_addon:
+    image: alpine/git
+    commands:
+      - git config --global user.email "no-reply@friendi.ca"
+      - git config --global user.name "Friendica"
+      - git clone https://github.com/friendica/friendica-addons.git addon
+      - cd addon/
+      - git checkout $CI_COMMIT_BRANCH
   restore_cache:
     image: meltwater/drone-cache:dev
     settings:
@@ -46,7 +54,6 @@ steps:
   composer_install:
     image: friendicaci/php8.2:php8.2.28
     commands:
-      - mkdir addon # create empty addon folder to appease composer
       - export COMPOSER_HOME=.composer
       - composer validate
       - composer install --no-dev --optimize-autoloader
@@ -59,7 +66,7 @@ steps:
       - apt-get install bzip2
       - mkdir ./build
       - export VERSION="$(cat VERSION)"
-      - export RELEASE="friendica-full-$VERSION"
+      - export RELEASE="friendica-all-in-one-$VERSION"
       - export ARTIFACT="$RELEASE.tar.gz"
       - tar
         --transform "s,^,$RELEASE/,S"

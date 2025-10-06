@@ -124,7 +124,7 @@ class Login extends BaseModule
 		$reg = false;
 		if ($register && Register::getPolicy() !== Register::CLOSED) {
 			$reg = [
-				'title' => DI::l10n()->t('Create a New Account'),
+				'title' => DI::l10n()->t('Create an account'),
 				'desc'  => DI::l10n()->t('Register'),
 				'url'   => self::getRegisterURL()
 			];
@@ -148,26 +148,28 @@ class Login extends BaseModule
 			$identity        = DI::session()->get('openid_identity');
 			$username_desc   = DI::l10n()->t('Please enter your username and password to add the OpenID to your existing account.');
 		} else {
-			$openid_title    = DI::l10n()->t('Or login using OpenID: ');
+			$openid_title    = DI::l10n()->t('Or sign in using OpenID');
 			$openid_readonly = false;
 			$identity        = '';
 			$username_desc   = '';
 		}
+		$openid_placeholder = DI::l10n()->t('OpenID');
 
 		$o = Renderer::replaceMacros(
 			$tpl,
 			[
 				'$notices'  => $notices,
 				'$dest_url' => DI::baseUrl() . '/login',
-				'$logout'   => DI::l10n()->t('Logout'),
-				'$login'    => DI::l10n()->t('Login'),
+				'$logout'   => DI::l10n()->t('Sign out'),
+				'$login'    => DI::l10n()->t('Sign in'),
+				'$new'      => DI::l10n()->t('New here?'),
 
-				'$lname'     => ['username', DI::l10n()->t('Nickname or Email: '), '', $username_desc],
-				'$lpassword' => ['password', DI::l10n()->t('Password: '), '', ''],
+				'$lname'     => ['username', DI::l10n()->t('Nickname or email'), '', $username_desc, '', 'autofocus', '', DI::l10n()->t('Nickname or email')],
+				'$lpassword' => ['password', DI::l10n()->t('Password'), '', '', '', '', '', DI::l10n()->t('Password')],
 				'$lremember' => ['remember', DI::l10n()->t('Remember me'), 0,  ''],
 
 				'$openid'  => !$noid,
-				'$lopenid' => ['openid_url', $openid_title, $identity, '', $openid_readonly],
+				'$lopenid' => ['openid_url', $openid_title, $identity, '', $openid_readonly, $openid_placeholder],
 
 				'$hiddens' => ['return_path' => $return_path ?? DI::args()->getQueryString()],
 

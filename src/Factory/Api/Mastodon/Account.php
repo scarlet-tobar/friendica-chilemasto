@@ -95,7 +95,7 @@ class Account extends BaseFactory
 				// Create a default source object if the request is done by the profile owner
 				// Friendica doesn't support roles, so we create a dummy role object
 				$role = new \Friendica\Object\Api\Mastodon\Role(1, 'User', '#000000', '0000000', false);
-				$note = BBCode::toPlaintext($account['about'], true);
+				$note = BBCode::toPlaintext($account['about'] ?? '', true);
 
 				$user = User::getById($profile_uid, ['allow_gid', 'allow_cid', 'deny_gid', 'deny_cid']);
 				if ($user['allow_gid'] || $user['allow_cid'] || $user['deny_gid'] || $user['deny_cid']) {

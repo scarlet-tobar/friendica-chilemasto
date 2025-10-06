@@ -726,7 +726,7 @@ Lucas: For the right price, yes.[/share]',
 	{
 		return [
 			'player' => [
-				'expected' => 'text <div class="type-link"><div style="position:relative;padding-bottom:75%;margin-bottom:1em"><iframe  src="http://domain.tld/player" height="100%" style="position:absolute;left:0px;top:0px" width="100%" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><h4><a href="http://domain.tld/page" target="_blank" rel="noopener noreferrer">title</a></h4><blockquote>description</blockquote><sup><a href="http://domain.tld/provider_url" target="_blank" rel="noopener noreferrer">author_name (provider_name)</a></sup></div>',
+				'expected' => 'text <div class="type-link"><div style="position:relative;padding-bottom:75%;margin-bottom:1em"><iframe  src="http://domain.tld/player" height="100%" style="position:absolute;left:0px;top:0px" width="100%" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen sandbox="allow-same-origin allow-scripts"></iframe></div><h4><a href="http://domain.tld/page" target="_blank" rel="noopener noreferrer">title</a></h4><blockquote>description</blockquote><sup><a href="http://domain.tld/provider_url" target="_blank" rel="noopener noreferrer">author_name (provider_name)</a></sup></div>',
 				'data'     => [
 					'author_name'   => 'author_name',
 					'author_url'    => 'http://domain.tld/author_url',

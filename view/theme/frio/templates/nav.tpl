@@ -488,9 +488,9 @@
 			<div class="pull-right">
 				<ul class="nav navbar-nav navbar-right">
 					<li>
-						<a href="login?mode=none" id="nav-login" data-toggle="tooltip" aria-label="{{$nav.login.3}}"
-							title="{{$nav.login.3}}">
+						<a href="login?mode=none" id="nav-login">
 							<i class="fa fa-sign-in fa-fw" aria-hidden="true"></i>
+							{{$nav.login.3}}
 						</a>
 					</li>
 					<li>

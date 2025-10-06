@@ -217,9 +217,9 @@ class Nav
 
 		// nav links: array of array('href', 'text', 'extra css classes', 'title')
 		if ($this->session->isAuthenticated()) {
-			$nav['logout'] = ['logout', $this->l10n->t('Logout'), '', $this->l10n->t('End this session')];
+			$nav['logout'] = ['logout', $this->l10n->t('Sign out'), '', $this->l10n->t('End this session')];
 		} else {
-			$nav['login'] = ['login', $this->l10n->t('Login'), ($this->router->getModuleClass() == Login::class ? 'selected' : ''), $this->l10n->t('Sign in')];
+			$nav['login'] = ['login', $this->l10n->t('Sign in'), ($this->router->getModuleClass() == Login::class ? 'selected' : ''), $this->l10n->t('Sign in')];
 		}
 
 		if ($this->session->isAuthenticated()) {
