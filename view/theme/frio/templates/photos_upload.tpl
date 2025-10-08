@@ -14,7 +14,7 @@
 		<div id="photos-upload-div" class="form-group">
 			<label id="photos-upload-text" for="photos-upload-newalbum">{{$newalbum}}</label>
 
-			<input id="photos-upload-album-select" class="form-control" placeholder="{{$existalbumtext}}" list="dl-photo-upload" type="text" name="album" size="4">
+			<input id="photos-upload-album-select" class="form-control" placeholder="{{$existalbumtext}}" list="dl-photo-upload" type="text" name="album">
 			<datalist id="dl-photo-upload">
 				{{foreach $albumselect as $value => $name}}
 					<option value="{{$value}}"{{if $selname == $value}} selected{{/if}}>{{$name}}</option>
