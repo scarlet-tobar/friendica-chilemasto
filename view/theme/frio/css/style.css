@@ -2628,22 +2628,6 @@ body.mod-login .navbar #nav-login {
 	float: left;
 }
 
-#login-submit-button, #register-submit-button, #register-link {
-	font-size: 19px;
-	font-weight: normal;
-	width: 100%;
-}
-
-#openid-header {
-	font-size: 16px;
-	margin: 15px 0;
-}
-
-#new-here {
-	font-size: 20px;
-	margin-top: -5px;
-}
-
 /* contacts page */
 ul.viewcontact_wrapper {
 	margin-left: -15px;
@@ -3748,7 +3732,26 @@ div.login-form, .login-content-wrapper {
 #register-link {
 	background: #5aa071;
 	margin-bottom: 10px;
-	width: 75%;
+	min-width: 75%;
+}
+
+#login-submit-button, #register-submit-button, #register-link {
+	font-size: 19px;
+	font-weight: normal;
+}
+
+#login-submit-button, #register-submit-button {
+	min-width: 100%;
+}
+
+#openid-header {
+	font-size: 16px;
+	margin: 15px 0;
+}
+
+#new-here {
+	font-size: 20px;
+	margin-top: -5px;
 }
 
 div.login-form, .login-content-wrapper,
