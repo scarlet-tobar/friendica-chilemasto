@@ -388,7 +388,7 @@ class PostMedia extends BaseRepository
 
 	public function getVideoAttachment(PostMediaEntity $postMedia, int $uid): string
 	{
-		if ($postMedia->preview || $postMedia->blurhash) {
+		if ($postMedia->preview || ($postMedia->blurhash && $this->config->get('system', 'ffmpeg_installed'))) {
 			$preview_url = $this->baseURL . $postMedia->getPreviewPath(Proxy::SIZE_MEDIUM);
 		} else {
 			$preview_url = '';

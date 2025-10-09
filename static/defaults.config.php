@@ -278,6 +278,11 @@ return [
 		// Fetch featured posts from all contacts
 		'fetch_featured_posts' => false,
 
+		// ffmpeg_installed (Boolean)
+		// When FFMpeg is installed, video thumbnails will be generated.
+		// We will also be able to fetch video dimensions in a more ressource-friendly way.
+		'ffmpeg_installed' => false,
+
 		// free_crawls (Integer)
 		// Number of "free" searches when system => permit_crawling is enabled.
 		'free_crawls' => 10,
