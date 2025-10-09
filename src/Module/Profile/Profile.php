@@ -285,7 +285,7 @@ class Profile extends BaseProfile
 			'$view_as_contact_id'    => $view_as_contact_id,
 			'$view_as_contact_alert' => $view_as_contact_alert,
 			'$view_as'               => $this->t('View profile as:'),
-			'$submit'                => $this->t('Submit'),
+			'$submit'                => $this->t('View as selected profile'),
 			'$basic'                 => $this->t('Basic'),
 			'$advanced'              => $this->t('Advanced'),
 			'$is_owner'              => $profile['uid'] == $this->session->getLocalUserId(),
