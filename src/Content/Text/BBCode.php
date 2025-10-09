@@ -443,10 +443,19 @@ class BBCode
 			$return = sprintf('<div class="type-%s">', $data['type']);
 		}
 
-		if ($embed && $data['player_url'] != '' && $data['player_height'] != 0) {
+		if ($embed && (($data['player_url'] != '' && $data['player_height'] != 0) || $data['embed_html'] != '')) {
 			$media = DI::postMediaFactory()->createFromAttachment($data, $uriid);
-			$return .= DI::postMediaRepository()->getPlayerIframe($media);
+			if ($data['player_url'] != '' && $data['player_height'] != 0) {
+				$return .= DI::postMediaRepository()->getPlayerIframe($media);
+			} else {
+				$return .= DI::postMediaRepository()->getEmbedIframe($media);
+			}
 			$preview_mode = self::PREVIEW_NO_IMAGE;
+			unset($data['title']);
+			unset($data['url']);
+			unset($data['description']);
+			unset($data['provider_url']);
+			unset($data['provider_name']);
 		}
 
 		if ($preview_mode == self::PREVIEW_NO_IMAGE) {

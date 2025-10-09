@@ -1926,14 +1926,17 @@ class Receiver
 					$attachment['player-height'] = $player['height'] ?? null;
 					$attachment['player-width']  = $player['width']  ?? null;
 
-					foreach ($attachments as $media) {
-						if (isset($media['height']) && isset($media['width'])) {
-							if ($media['height'] > $attachment['player-height'] || $media['width'] > $attachment['player-width']) {
-								$attachment['player-height'] = $media['height'];
-								$attachment['player-width']  = $media['width'];
+					if (is_null($attachment['player-height']) && is_null($attachment['player-width'])) {
+						foreach ($attachments as $media) {
+							if (isset($media['height']) && isset($media['width'])) {
+								if ($media['height'] > $attachment['player-height'] || $media['width'] > $attachment['player-width']) {
+									$attachment['player-height'] = $media['height'];
+									$attachment['player-width']  = $media['width'];
+								}
 							}
 						}
 					}
+
 					if (!$height && !$width) {
 						$attachment['height'] = $attachment['player-height'];
 						$attachment['width']  = $attachment['player-width'];

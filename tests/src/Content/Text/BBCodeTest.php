@@ -8,6 +8,7 @@
 namespace Friendica\Test\src\Content\Text;
 
 use Friendica\Content\Text\BBCode;
+use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Test\FixtureTestCase;
@@ -726,8 +727,11 @@ Lucas: For the right price, yes.[/share]',
 	{
 		return [
 			'player' => [
-				'expected' => 'text <div class="type-link"><div style="position:relative;padding-bottom:75%;margin-bottom:1em"><iframe  src="http://domain.tld/player" height="100%" style="position:absolute;left:0px;top:0px" width="100%" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen sandbox="allow-same-origin allow-scripts"></iframe></div><h4><a href="http://domain.tld/page" target="_blank" rel="noopener noreferrer">title</a></h4><blockquote>description</blockquote><sup><a href="http://domain.tld/provider_url" target="_blank" rel="noopener noreferrer">author_name (provider_name)</a></sup></div>',
-				'data'     => [
+				'expected' => 'text <div class="type-link"><div style="">' . "\n" .
+'  <iframe src="http://domain.tld/player" style="" height="480" width="100%" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen sandbox="allow-same-origin allow-scripts"></iframe>' . "\n" .
+"</div>\n" .
+'</div>',
+				'data' => [
 					'author_name'   => 'author_name',
 					'author_url'    => 'http://domain.tld/author_url',
 					'description'   => 'description',
@@ -740,10 +744,31 @@ Lucas: For the right price, yes.[/share]',
 					'type'          => 'link',
 					'url'           => 'http://domain.tld/page',
 					'player_url'    => 'http://domain.tld/player',
-					'player_width'  => 640,
+					'player_width'  => 620,
 					'player_height' => 480,
 				],
 			],
+			'embed' => [
+				'expected' => 'text <div class="type-link"><iframe srcdoc="&lt;iframe src=&quot;http://domain.tld/player&quot;&gt;&lt;/iframe&gt;" height="500" width="620" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen sandbox="allow-same-origin allow-scripts"></iframe>' . "\n" .
+'</div>',
+				'data' => [
+					'author_name'   => 'author_name',
+					'author_url'    => 'http://domain.tld/author_url',
+					'description'   => 'description',
+					'image'         => 'http://domain.tld/image',
+					'preview'       => 'http://domain.tld/preview',
+					'provider_name' => 'provider_name',
+					'provider_url'  => 'http://domain.tld/provider_url',
+					'text'          => 'text',
+					'title'         => 'title',
+					'type'          => 'link',
+					'url'           => 'http://domain.tld/page',
+					'player_url'    => '',
+					'embed_html'    => '<iframe src="http://domain.tld/player"></iframe>',
+					'embed_width'   => 620,
+					'embed_height'  => 480,
+				]
+			]
 		];
 	}
 
@@ -755,6 +780,8 @@ Lucas: For the right price, yes.[/share]',
 	 */
 	public function testConvertAttachment(string $expected, array $data)
 	{
+		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+
 		$actual = BBCode::convertAttachment('', BBCode::INTERNAL, $data, 0, BBCode::PREVIEW_LARGE, true);
 
 		self::assertEquals($expected, $actual);
