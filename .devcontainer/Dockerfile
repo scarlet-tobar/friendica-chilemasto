@@ -1,4 +1,4 @@
-ARG VARIANT="8.2-fpm"
+ARG VARIANT="8.2-apache"
 FROM php:${VARIANT}
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -19,7 +19,7 @@ RUN apt-get install -y \
         nano \
         git \
         gnupg2 \
-        ;
+;
 
 # entrypoint.sh and cron.sh dependencies
 RUN apt-get install -y --no-install-recommends \
@@ -27,7 +27,7 @@ RUN apt-get install -y --no-install-recommends \
         bzip2 \
         msmtp \
         tini \
-        ;
+;
 
 RUN apt-get install -y --no-install-recommends \
         bash \
@@ -46,37 +46,40 @@ RUN apt-get install -y --no-install-recommends \
         libldap2-dev \
         libgmp-dev \
         # libmagickcore-6.q16-6-extra \
-        ;
+;
 
 RUN docker-php-ext-configure gd \
-            --with-freetype \
-            --with-jpeg \
-            --with-webp \
-        ;
+        --with-freetype \
+        --with-jpeg \
+        --with-webp \
+;
 
 RUN docker-php-ext-install -j "$(nproc)" \
-            pdo_mysql \
-            gd \
-            exif \
-            zip \
-            opcache \
-            ctype \
-            pcntl \
-            ldap \
-            gmp \
-            intl \
-            ;
+        pdo_mysql \
+        gd \
+        exif \
+        zip \
+        opcache \
+        ctype \
+        pcntl \
+        ldap \
+        gmp \
+        intl \
+ ;
 
 # pecl will claim success even if one install fails, so we need to perform each install separately
 RUN pecl install apcu-${apcu_version}; \
         pecl install memcached-${memcached_version}; \
         pecl install redis-${redis_version}; \
-        pecl install imagick-${imagick_version}; \
-        docker-php-ext-enable \
-            apcu \
-            memcached \
-            redis \
-            imagick
+        pecl install imagick-${imagick_version} \
+;
+
+RUN docker-php-ext-enable \
+        apcu \
+        memcached \
+        redis \
+        imagick \
+;
 
 RUN apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
@@ -98,8 +101,8 @@ RUN { \
         echo 'memory_limit=${PHP_MEMORY_LIMIT}'; \
         echo 'upload_max_filesize=${PHP_UPLOAD_LIMIT}'; \
         echo 'post_max_size=${PHP_UPLOAD_LIMIT}'; \
-    } > /usr/local/etc/php/conf.d/friendica.ini; \
-    ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini; \
-    \
-    mkdir /var/www/data; \
-    chmod -R g=u /var/www
+    } > /usr/local/etc/php/conf.d/friendica.ini;
+
+RUN ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
+RUN mkdir /var/www/data
+RUN chmod -R g=u /var/www
