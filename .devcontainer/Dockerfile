@@ -1,11 +1,6 @@
-ARG VARIANT="8.2-apache"
-FROM php:${VARIANT}
+FROM php:8.4-apache
 
-ARG DEBIAN_FRONTEND=noninteractive
-ARG apcu_version=5.1.23
-ARG memcached_version=3.2.0
-ARG redis_version=6.0.2
-ARG imagick_version=3.7.0
+ARG DEBIAN_FRONTEND=noninteractive´
 
 RUN apt-get update -y;
 
@@ -68,11 +63,10 @@ RUN docker-php-ext-install -j "$(nproc)" \
  ;
 
 # pecl will claim success even if one install fails, so we need to perform each install separately
-RUN pecl install apcu-${apcu_version}; \
-        pecl install memcached-${memcached_version}; \
-        pecl install redis-${redis_version}; \
-        pecl install imagick-${imagick_version} \
-;
+RUN pecl install apcu-5.1.27;
+RUN pecl install memcached-3.4.0;
+RUN pecl install redis-6.2.0;
+RUN pecl install imagick-3.8.0;
 
 RUN docker-php-ext-enable \
         apcu \
