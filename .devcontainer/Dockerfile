@@ -14,6 +14,7 @@ RUN apt-get install -y \
         nano \
         git \
         gnupg2 \
+        pinentry-curses \
 ;
 
 # entrypoint.sh and cron.sh dependencies
