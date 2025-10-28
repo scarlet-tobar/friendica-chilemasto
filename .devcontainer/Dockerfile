@@ -1,6 +1,6 @@
 FROM php:8.4-apache
 
-ARG DEBIAN_FRONTEND=noninteractive´
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y;
 
