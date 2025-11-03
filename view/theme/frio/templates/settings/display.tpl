@@ -86,30 +86,28 @@
 					</h2>
 				</div>
 				<div id="timeline-settings-content" class="panel-collapse collapse{{if !$theme && !$mobile_theme && !$theme_config}} in{{/if}}" role="tabpanel" aria-labelledby="timeline-settings">
-					<div class="panel-body">
-						{{$timeline_explanation}}
-						<table class="table table-condensed table-striped table-bordered">
-						<thead>
-						<tr>
-							<th>{{$timeline_label}}</th>
-							<th>{{$timeline_descriptiom}}</th>
-							<th>{{$timeline_enable}}</th>
-							<th>{{$timeline_bookmark}}</th>
-						</tr>
-						</thead>
-						<tbody>
+						<p tabindex="0">{{$timeline_explanation}} {{$sortable}}</p>
+						<h3 tabindex="0">{{$timeline_enable}}</h3>
+					<div class="panel-body timelines-widget sortable">
+						<input type="hidden" id="widget_timelineorder" name="widget_timelineorder" value=""/>
 						{{foreach $timelines as $t}}
-							<tr>
-								<td>{{$t.label}}</td>
-								<td>{{$t.description}}</td>
-								<td>{{include file="field_checkbox.tpl" field=$t.enable}}</td>
-								<td>{{include file="field_checkbox.tpl" field=$t.bookmark}}</td>
-							</tr>
+							{{include file="field_checkbox.tpl" field=$t.enable}}
 						{{/foreach}}
-						</tbody>
-						</table>
+						<div class="panel-footer">
+							<input type="hidden" name="widget_timeline_reset" value="0"/>
+							<input type="checkbox" id="widget_timeline_reset" name="widget_timeline_reset" value="1"/> <label for="widget_timeline_reset">{{$reset_label}}</label>
+							<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
+						</div>
 					</div>
+						<h3 tabindex="0">{{$timeline_bookmark}}</h3>
+						<input type="hidden" id="menu_timelineorder" name="menu_timelineorder" value=""/>
+					<div class="panel-body timelines-menu sortable">
+						{{foreach $timelines as $t}}
+							{{include file="field_checkbox.tpl" field=$t.bookmark}}
+						{{/foreach}}						
 					<div class="panel-footer">
+						<input type="hidden" name="menu_timeline_reset" value="0"/>
+						<input type="checkbox" id="menu_timeline_reset" name="menu_timeline_reset" value="1"/> <label for="menu_timeline_reset">{{$reset_label}}</label>
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>
 				</div>
