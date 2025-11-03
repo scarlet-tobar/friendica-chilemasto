@@ -20,12 +20,20 @@
 					</h2>
 				</div>
 				<div id="{{$g}}-settings-content" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{$g}}-settings-title">
-					<div class="panel-body">
+					<div class="panel-body {{if $g == "network"}}network sortable{{/if}}">
+						{{if $g == "network"}}
+						<input type="hidden" id="feature_widgetorder" name="feature_widgetorder" value=""/>
+						<p tabindex="0">{{$sortable}}</p>
+						{{/if}}
 						{{foreach $f.1 as $fcat}}
 							{{include file="field_checkbox.tpl" field=$fcat}}
 						{{/foreach}}
 					</div>
 					<div class="panel-footer">
+						{{if $g == "network"}}
+						<input type="hidden" name="feature_resetorder" value="0"/>
+						<input type="checkbox" id="feature_resetorder" name="feature_resetorder" value="1"/> <label for="feature_resetorder">{{$reset_label}}</label>
+						{{/if}}
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>
 				</div>
