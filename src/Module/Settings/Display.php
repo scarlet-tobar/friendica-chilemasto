@@ -364,8 +364,6 @@ class Display extends BaseSettings
 			'$timeline_descriptiom' => $this->t('Description'),
 			'$timeline_enable'      => $this->t('Channels Widget'),
 			'$timeline_bookmark'    => $this->t('Top Menu'),
-			'$timeline_enable'      => $this->t('Enable'),
-			'$timeline_bookmark'    => $this->t('Bookmark'),
 			'$timelines'            => $timelines,
 			'$timeline_explanation' => $this->t('Enable timelines that you want to see in the channels widget. Bookmark timelines that you want to see in the top menu.'),
 
