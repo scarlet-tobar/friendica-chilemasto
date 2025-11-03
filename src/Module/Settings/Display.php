@@ -107,6 +107,10 @@ class Display extends BaseSettings
 		$update_content          = (int)$request['update_content'];
 		$embed_remote_media      = (bool)$request['embed_remote_media'];
 		$embed_media             = (bool)$request['embed_media'];
+		$widget_timelineorder	 = trim($request['widget_timelineorder']);
+		$menu_timelineorder      = trim($request['menu_timelineorder']);
+		$widget_timeline_reset	 = (bool)$request['widget_timeline_reset'];
+		$menu_timeline_reset     = (bool)$request['menu_timeline_reset'];
 
 		$enabled_timelines = [];
 		foreach ($enable as $code => $enabled) {
@@ -153,7 +157,16 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'preview_mode', $preview_mode);
 		$this->pConfig->set($uid, 'system', 'embed_remote_media', $embed_remote_media);
 		$this->pConfig->set($uid, 'system', 'embed_media', $embed_media);
-
+		if ($widget_timeline_reset == 1){
+			$this->pConfig->delete($uid, 'system', 'widget_timeline_order');
+		} else {
+			$this->pConfig->set($uid, 'system', 'widget_timeline_order', $widget_timelineorder);
+		}
+		if ($menu_timeline_reset == 1){
+			$this->pConfig->delete($uid, 'system', 'menu_timeline_order');
+		} else {
+			$this->pConfig->set($uid, 'system', 'menu_timeline_order', $menu_timelineorder);
+		}
 		$this->pConfig->set($uid, 'system', 'network_timelines', $network_timelines);
 		$this->pConfig->set($uid, 'system', 'enabled_timelines', $enabled_timelines);
 		$this->pConfig->set($uid, 'channel', 'languages', $channel_languages);
@@ -277,10 +290,8 @@ class Display extends BaseSettings
 		$timelines = [];
 		foreach ($this->getAvailableTimelines($uid) as $timeline) {
 			$timelines[] = [
-				'label'       => $timeline->label,
-				'description' => $timeline->description,
-				'enable'      => ["enable[{$timeline->code}]", '', in_array($timeline->code, $enabled_timelines)],
-				'bookmark'    => ["bookmark[{$timeline->code}]", '', in_array($timeline->code, $bookmarked_timelines)],
+				'enable'      => ["enable[{$timeline->code}]", $timeline->label, in_array($timeline->code, $enabled_timelines), $timeline->description],
+				'bookmark'    => ["bookmark[{$timeline->code}]", $timeline->label, in_array($timeline->code, $bookmarked_timelines), $timeline->description],
 			];
 		}
 
@@ -321,6 +332,8 @@ class Display extends BaseSettings
 			'$timeline_title'      => $this->t('Timelines'),
 			'$channel_title'       => $this->t('Channels'),
 			'$calendar_title'      => $this->t('Calendar'),
+			'$sortable'            => $this->t('Drag to reorder or tab to item with keyboard and move up/down with arrow keys'),
+			'$reset_label'         => $this->t('Reset order'),
 
 			'$form_security_token' => self::getFormSecurityToken('settings_display'),
 			'$uid'                 => $uid,
@@ -349,6 +362,8 @@ class Display extends BaseSettings
 
 			'$timeline_label'       => $this->t('Label'),
 			'$timeline_descriptiom' => $this->t('Description'),
+			'$timeline_enable'      => $this->t('Channels Widget'),
+			'$timeline_bookmark'    => $this->t('Top Menu'),
 			'$timeline_enable'      => $this->t('Enable'),
 			'$timeline_bookmark'    => $this->t('Bookmark'),
 			'$timelines'            => $timelines,
