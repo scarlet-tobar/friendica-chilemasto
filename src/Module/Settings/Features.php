@@ -35,10 +35,10 @@ class Features extends BaseSettings
 		BaseSettings::checkFormSecurityTokenRedirectOnError('/settings/features', 'settings_features');
 		foreach ($request as $k => $v) {
 			if (strpos($k, 'feature_') === 0) {
-				if (substr($k, 8) == 'widgetorder'){ // not boolean, stringified array
-					$this->pConfig->set($this->session->getLocalUserId(), 'feature', 'widgetorder', $v);	
-				} else if (substr($k, 8) == 'resetorder' && (bool)$v == 1){
-					$this->pConfig->delete($this->session->getLocalUserId(), 'feature', 'widgetorder');			
+				if (substr($k, 8) == 'widgetorder') { // not boolean, stringified array
+					$this->pConfig->set($this->session->getLocalUserId(), 'feature', 'widgetorder', $v);
+				} elseif (substr($k, 8) == 'resetorder' && (bool)$v == 1) {
+					$this->pConfig->delete($this->session->getLocalUserId(), 'feature', 'widgetorder');
 				} else {
 					$this->pConfig->set($this->session->getLocalUserId(), 'feature', substr($k, 8), (bool)$v);
 				}
@@ -60,12 +60,12 @@ class Features extends BaseSettings
 		}
 		// try to get widget order preference
 		$widgetorder = json_decode($this->pConfig->get($this->session->getLocalUserId(), 'feature', 'widgetorder'));
-		if (!empty($widgetorder)){
+		if (!empty($widgetorder)) {
 			$tmp = [];
 			// iterate through widgetorder and network items
-			foreach($widgetorder as $widget){
-				foreach($arr['network'][1] as $list_item){
-					if ($list_item[0] == 'feature_'.$widget){
+			foreach($widgetorder as $widget) {
+				foreach($arr['network'][1] as $list_item) {
+					if ($list_item[0] == 'feature_'.$widget) {
 						$tmp[] = $list_item;
 					}
 				}
@@ -78,8 +78,8 @@ class Features extends BaseSettings
 		return Renderer::replaceMacros($tpl, [
 			'$form_security_token' => BaseSettings::getFormSecurityToken('settings_features'),
 			'$title'               => $this->t('Additional Features'),
-			'$sortable'			   => $this->t('Drag to reorder or tab to item with keyboard and move up/down with arrow keys'),
-			'$reset_label'		   => $this->t('Reset order'),
+			'$sortable'            => $this->t('Drag to reorder or tab to item with keyboard and move up/down with arrow keys'),
+			'$reset_label'         => $this->t('Reset order'),
 			'$features'            => $arr,
 			'$submit'              => $this->t('Save Settings'),
 		]);

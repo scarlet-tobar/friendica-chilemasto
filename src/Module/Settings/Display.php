@@ -107,9 +107,9 @@ class Display extends BaseSettings
 		$update_content          = (int)$request['update_content'];
 		$embed_remote_media      = (bool)$request['embed_remote_media'];
 		$embed_media             = (bool)$request['embed_media'];
-		$widget_timelineorder	 = trim($request['widget_timelineorder']);
+		$widget_timelineorder    = trim($request['widget_timelineorder']);
 		$menu_timelineorder      = trim($request['menu_timelineorder']);
-		$widget_timeline_reset	 = (bool)$request['widget_timeline_reset'];
+		$widget_timeline_reset   = (bool)$request['widget_timeline_reset'];
 		$menu_timeline_reset     = (bool)$request['menu_timeline_reset'];
 
 		$enabled_timelines = [];
@@ -157,12 +157,12 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'preview_mode', $preview_mode);
 		$this->pConfig->set($uid, 'system', 'embed_remote_media', $embed_remote_media);
 		$this->pConfig->set($uid, 'system', 'embed_media', $embed_media);
-		if ($widget_timeline_reset == 1){
+		if ($widget_timeline_reset == 1) {
 			$this->pConfig->delete($uid, 'system', 'widget_timeline_order');
 		} else {
 			$this->pConfig->set($uid, 'system', 'widget_timeline_order', $widget_timelineorder);
 		}
-		if ($menu_timeline_reset == 1){
+		if ($menu_timeline_reset == 1) {
 			$this->pConfig->delete($uid, 'system', 'menu_timeline_order');
 		} else {
 			$this->pConfig->set($uid, 'system', 'menu_timeline_order', $menu_timelineorder);
@@ -290,8 +290,8 @@ class Display extends BaseSettings
 		$timelines = [];
 		foreach ($this->getAvailableTimelines($uid) as $timeline) {
 			$timelines[] = [
-				'enable'      => ["enable[{$timeline->code}]", $timeline->label, in_array($timeline->code, $enabled_timelines), $timeline->description],
-				'bookmark'    => ["bookmark[{$timeline->code}]", $timeline->label, in_array($timeline->code, $bookmarked_timelines), $timeline->description],
+				'enable'   => ["enable[{$timeline->code}]", $timeline->label, in_array($timeline->code, $enabled_timelines), $timeline->description],
+				'bookmark' => ["bookmark[{$timeline->code}]", $timeline->label, in_array($timeline->code, $bookmarked_timelines), $timeline->description],
 			];
 		}
 

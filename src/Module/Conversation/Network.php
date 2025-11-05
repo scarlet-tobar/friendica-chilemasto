@@ -148,9 +148,10 @@ class Network extends Timeline
 		$this->userDefinedChannel = $userDefinedChannel;
 	}
 
-	protected function widgets(string $widget) {
+	protected function widgets(string $widget)
+	{
 		$module = 'network';
-		switch($widget){
+		switch($widget) {
 			case "circles":
 				if (Feature::isEnabled($this->session->getLocalUserId(), Feature::CIRCLES)) {
 					$this->page['aside'] .= Circle::sidebarWidget($module, $module . '/circle', 'standard', $this->circleId);
@@ -204,7 +205,7 @@ class Network extends Timeline
 				break;
 		}
 	}
-	
+
 	protected function content(array $request = []): string
 	{
 		if (!$this->session->getLocalUserId()) {
@@ -223,10 +224,10 @@ class Network extends Timeline
 			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_CONTENT_START, $hook_data)
 		);
 
-		$o = '';
+		$o           = '';
 		$widgetorder = json_decode($this->pConfig->get($this->session->getLocalUserId(), 'feature', 'widgetorder'));
 
-		if (empty($widgetorder)){
+		if (empty($widgetorder)) {
 			$widgetorder = [
 				"circles",
 				"forumlist_profile",
@@ -240,8 +241,8 @@ class Network extends Timeline
 				"trending_tags"
 			];
 		}
-		
-		foreach($widgetorder as $widget){
+
+		foreach($widgetorder as $widget) {
 			$this->widgets($widget);
 		}
 
@@ -368,11 +369,11 @@ class Network extends Timeline
 		}
 
 		$menu_tab_order = json_decode($this->pConfig->get($this->session->getLocalUserId(), 'system', 'menu_timeline_order'));
-		if (!empty($menu_tab_order)){
+		if (!empty($menu_tab_order)) {
 			$tmp = [];
-			foreach($menu_tab_order as $order){
-				foreach($tabs as $key => $val){
-					if($key == $order){
+			foreach($menu_tab_order as $order) {
+				foreach($tabs as $key => $val) {
+					if($key == $order) {
 						$tmp[$key] = $val;
 					}
 				}
