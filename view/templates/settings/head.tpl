@@ -161,7 +161,7 @@
 		border-top-left-radius: 8px;
 		border-top-right-radius: 8px;
 	}
-	.sortable .field:last-of-type {
+	.sortable .field:nth-last-of-type(2) {
 		border-bottom-left-radius: 8px;
 		border-bottom-right-radius: 8px;
 	}
