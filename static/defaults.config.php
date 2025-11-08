@@ -370,6 +370,10 @@ return [
 		// The system timezone is used when no timezone is defined here.
 		'maintenance_end' => '03:00 +00:00',
 
+		// max_banner_width (Integer)
+		// Maximum width for profile banner images
+		'max_banner_width' => 960,
+
 		// max_connections (Integer)
 		// The maximum number of database connections which can be in use before the worker process is deferred to its next interval.
 		// When the system can't detect the maximum numbers of connection then this value can be used. Use 0 for auto-detection.
