@@ -28,6 +28,7 @@
 						{{foreach $f.1 as $fcat}}
 							{{include file="field_checkbox.tpl" field=$fcat}}
 						{{/foreach}}
+						<div class="clear"></div>
 					</div>
 					<div class="panel-footer">
 						{{if $g == "network"}}
