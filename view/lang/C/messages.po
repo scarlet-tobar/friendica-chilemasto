@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-02 23:29+0100\n"
+"POT-Creation-Date: 2025-11-08 12:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1839,7 +1839,7 @@ msgstr ""
 msgid "Create new group"
 msgstr ""
 
-#: src/Content/Item.php:336 src/Model/Item.php:2781
+#: src/Content/Item.php:336 src/Model/Item.php:2785
 msgid "event"
 msgstr ""
 
@@ -1847,7 +1847,7 @@ msgstr ""
 msgid "status"
 msgstr ""
 
-#: src/Content/Item.php:345 src/Model/Item.php:2783
+#: src/Content/Item.php:345 src/Model/Item.php:2787
 #: src/Module/Post/Tag/Add.php:112
 msgid "photo"
 msgstr ""
@@ -2267,8 +2267,8 @@ msgstr ""
 msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:945 src/Model/Item.php:3645
-#: src/Model/Item.php:3651 src/Model/Item.php:3652
+#: src/Content/Text/BBCode.php:945 src/Model/Item.php:3649
+#: src/Model/Item.php:3655 src/Model/Item.php:3656
 msgid "Link to source"
 msgstr ""
 
@@ -2505,7 +2505,7 @@ msgid "Matrix:"
 msgstr ""
 
 #: src/Content/Widget/VCard.php:111 src/Model/Event.php:68
-#: src/Model/Event.php:95 src/Model/Event.php:462 src/Model/Event.php:950
+#: src/Model/Event.php:95 src/Model/Event.php:462 src/Model/Event.php:953
 #: src/Model/Profile.php:351 src/Module/Contact/Profile.php:453
 #: src/Module/Directory.php:133 src/Module/Notifications/Introductions.php:181
 #: src/Module/Profile/Profile.php:235
@@ -3313,12 +3313,12 @@ msgid "l F d, Y \\@ g:i A \\G\\M\\TP (e)"
 msgstr ""
 
 #: src/Model/Event.php:61 src/Model/Event.php:78 src/Model/Event.php:460
-#: src/Model/Event.php:932
+#: src/Model/Event.php:934
 msgid "Starts:"
 msgstr ""
 
 #: src/Model/Event.php:64 src/Model/Event.php:84 src/Model/Event.php:461
-#: src/Model/Event.php:936
+#: src/Model/Event.php:938
 msgid "Finishes:"
 msgstr ""
 
@@ -3391,93 +3391,97 @@ msgstr ""
 msgid "g:i A"
 msgstr ""
 
-#: src/Model/Event.php:951 src/Model/Event.php:953
+#: src/Model/Event.php:889
+msgid "e"
+msgstr ""
+
+#: src/Model/Event.php:954 src/Model/Event.php:956
 msgid "Show map"
 msgstr ""
 
-#: src/Model/Event.php:952
+#: src/Model/Event.php:955
 msgid "Hide map"
 msgstr ""
 
-#: src/Model/Event.php:1045
+#: src/Model/Event.php:1048
 #, php-format
 msgid "%s's birthday"
 msgstr ""
 
-#: src/Model/Event.php:1046
+#: src/Model/Event.php:1049
 #, php-format
 msgid "Happy Birthday %s"
 msgstr ""
 
-#: src/Model/Item.php:2785
+#: src/Model/Item.php:2789
 msgid "activity"
 msgstr ""
 
-#: src/Model/Item.php:2787
+#: src/Model/Item.php:2791
 msgid "comment"
 msgstr ""
 
-#: src/Model/Item.php:2790 src/Module/Post/Tag/Add.php:112
+#: src/Model/Item.php:2794 src/Module/Post/Tag/Add.php:112
 msgid "post"
-msgstr ""
-
-#: src/Model/Item.php:2979
-#, php-format
-msgid "%s is blocked"
-msgstr ""
-
-#: src/Model/Item.php:2981
-#, php-format
-msgid "%s is ignored"
 msgstr ""
 
 #: src/Model/Item.php:2983
 #, php-format
-msgid "Content from %s is collapsed"
+msgid "%s is blocked"
+msgstr ""
+
+#: src/Model/Item.php:2985
+#, php-format
+msgid "%s is ignored"
 msgstr ""
 
 #: src/Model/Item.php:2987
+#, php-format
+msgid "Content from %s is collapsed"
+msgstr ""
+
+#: src/Model/Item.php:2991
 msgid "Sensitive content"
 msgstr ""
 
-#: src/Model/Item.php:3545
+#: src/Model/Item.php:3549
 msgid "bytes"
 msgstr ""
 
-#: src/Model/Item.php:3576
+#: src/Model/Item.php:3580
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3578
+#: src/Model/Item.php:3582
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3583
+#: src/Model/Item.php:3587
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3585
+#: src/Model/Item.php:3589
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3587
+#: src/Model/Item.php:3591
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:3628 src/Model/Item.php:3629
+#: src/Model/Item.php:3632 src/Model/Item.php:3633
 msgid "View on separate page"
 msgstr ""
 
