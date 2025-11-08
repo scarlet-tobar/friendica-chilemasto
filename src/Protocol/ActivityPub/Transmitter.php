@@ -1926,6 +1926,10 @@ class Transmitter
 			$richbody = BBCode::replaceAttachment($richbody);
 
 			$data['contentMap'][$language] = BBCode::convertForUriId($item['uri-id'], $richbody, BBCode::EXTERNAL);
+
+			if ($data['content'] == '') {
+				$data['content'] = $data['contentMap'][$language];
+			}
 		}
 
 		if (!empty($item['quote-uri-id']) && ($item['quote-uri-id'] != $item['uri-id'])) {
