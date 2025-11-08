@@ -407,6 +407,9 @@ class PostMedia extends BaseRepository
 		} elseif ($this->pConfig->get($uid, 'system', 'embed_media', false) && $postMedia->hasEmbedHtml() && !$postMedia->isPhoto()) {
 			$media = $this->getEmbedIframe($postMedia);
 		} else {
+			if ($postMedia->width === 0 && $postMedia->height === 0) {
+				return $this->getAudioAttachment($postMedia);
+			}
 			if ($this->config->get('system', 'videojs')) {
 				$template = 'content/videojs.tpl';
 			} else {
