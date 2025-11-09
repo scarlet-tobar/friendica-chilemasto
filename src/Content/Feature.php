@@ -21,16 +21,16 @@ class Feature
 	const PUBLIC_CALENDAR   = 'public_calendar';
 	const TAGCLOUD          = 'tagadelic';
 	// The different widgets:
-	const ACCOUNTS          = 'accounts';
-	const ARCHIVE           = 'archive';
-	const CIRCLES           = 'circles';
-	const CHANNELS          = 'channels';
-	const FOLDERS           = 'folders';
-	const GROUPS            = 'forumlist_profile';
-	const NETWORKS          = 'networks';
-	const NOSHARER          = 'nosharer';
-	const SEARCHES          = 'searches';
-	const TRENDING_TAGS     = 'trending_tags';
+	const ACCOUNTS      = 'accounts';
+	const ARCHIVE       = 'archive';
+	const CIRCLES       = 'circles';
+	const CHANNELS      = 'channels';
+	const FOLDERS       = 'folders';
+	const GROUPS        = 'forumlist_profile';
+	const NETWORKS      = 'networks';
+	const NOSHARER      = 'nosharer';
+	const SEARCHES      = 'searches';
+	const TRENDING_TAGS = 'trending_tags';
 
 	/**
 	 * check if feature is enabled
