@@ -1289,7 +1289,7 @@ class ParseUrl
 
 		$content = JsonLD::fetchElement($jsonld, 'uploadDate');
 		if (!empty($content) && is_string($content)) {
-			$media['uploaded'] = trim($content);
+			$media['uploaded'] = DateTimeFormat::utc($content);
 		}
 
 		$content = JsonLD::fetchElement($jsonld, 'image');
