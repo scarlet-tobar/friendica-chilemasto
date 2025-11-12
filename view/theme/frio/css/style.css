@@ -560,21 +560,30 @@ header #banner #logo-img,
 	padding: 3px 10px;
 	margin-bottom: 10px;
 	font-weight: 300;
-	color: #bebebe;
+	color: white;
 }
-.topbar .dropdown-header .dropdown-header-link {
-	position: absolute;
-	top: 2px;
-	right: 10px;
+#nav-notifications-menu {
+	margin-top: 4px;
+	padding: 0;
 }
-.topbar .dropdown-header .dropdown-header-link a,
-.topbar .dropdown-header .dropdown-header-link .btn-link {
-	color: $link_color !important;
-	font-size: 12px;
+#nav-notifications-mark-all {
+	margin: 0;
+	padding: 0;
+}
+#notifications-header {
+	align-items: center;
+	background: $nav_bg;
+	display: flex;
+	justify-content: space-between;
+	margin-top: 0;
+	padding: 3px 13px;
+ }
+ #notifications-header a, #notifications-header button
+{
+	color: white !important;
+	font-size: 14px;
 	font-weight: 400;
-}
-.topbar .dropdown-header:hover {
-	color: #bebebe;
+	text-decoration: underline;
 }
 #topbar-first,
 nav.navbar {
@@ -2414,7 +2423,6 @@ ul.dropdown-menu li:hover {
 	box-sizing: border-box;
 }
 /* Dropdown Menu */
-.dropdown-menu li .btn-link,
 .dropdown-menu li a,
 .tabs .dropdown-menu li a {
 	padding: 6px 20px;
