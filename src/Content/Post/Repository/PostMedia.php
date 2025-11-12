@@ -216,6 +216,7 @@ class PostMedia extends BaseRepository
 
 		// Check if there is any HLS media
 		// This is used to determine if we should suppress some of the media types
+		/** @var PostMediaEntity $PostMedia */
 		foreach ($PostMedias as $PostMedia) {
 			if ($PostMedia->type == PostMediaEntity::TYPE_HLS) {
 				$is_hls = true;
@@ -225,6 +226,7 @@ class PostMedia extends BaseRepository
 			}
 		}
 
+		/** @var PostMediaEntity $PostMedia */
 		foreach ($PostMedias as $PostMedia) {
 			foreach ($links as $link) {
 				if (Strings::compareLink($link, $PostMedia->url)) {
