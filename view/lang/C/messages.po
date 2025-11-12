@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-08 12:54+0000\n"
+"POT-Creation-Date: 2025-11-12 18:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -420,7 +420,7 @@ msgstr ""
 msgid "%1$s was tagged in %2$s by %3$s"
 msgstr ""
 
-#: mod/photos.php:538 src/Module/Conversation/Community.php:148
+#: mod/photos.php:538 src/Module/Conversation/Community.php:150
 #: src/Module/Directory.php:34 src/Module/Profile/Photos.php:337
 #: src/Module/Search/Index.php:50
 msgid "Public access denied."
@@ -5756,11 +5756,13 @@ msgstr ""
 msgid "Group Search - %s"
 msgstr ""
 
-#: src/Module/BaseSearch.php:114 src/Module/Contact/MatchInterests.php:136
-msgid "No matches"
+#: src/Module/BaseSearch.php:115 src/Module/Conversation/Channel.php:125
+#: src/Module/Conversation/Community.php:115 src/Module/Search/Index.php:140
+#: src/Module/Search/Index.php:192
+msgid "No results."
 msgstr ""
 
-#: src/Module/BaseSearch.php:140
+#: src/Module/BaseSearch.php:142
 #, php-format
 msgid "%d result was filtered out because your node blocks the domain it is registered on. You can review the list of domains your node is currently blocking in the <a href=\"/friendica\">About page</a>."
 msgid_plural "%d results were filtered out because your node blocks the domain they are registered on. You can review the list of domains your node is currently blocking in the <a href=\"/friendica\">About page</a>."
@@ -6267,7 +6269,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: src/Module/Contact/Follow.php:56 src/Module/Contact/Redir.php:47
-#: src/Module/Contact/Redir.php:208 src/Module/Conversation/Community.php:154
+#: src/Module/Contact/Redir.php:208 src/Module/Conversation/Community.php:156
 #: src/Module/Debug/ItemBody.php:30 src/Module/Diaspora/Receive.php:45
 #: src/Module/Item/Display.php:82 src/Module/Item/Feed.php:45
 #: src/Module/Item/Follow.php:27 src/Module/Item/Ignore.php:27
@@ -6342,12 +6344,17 @@ msgstr ""
 msgid "Invalid request."
 msgstr ""
 
-#: src/Module/Contact/MatchInterests.php:88
+#: src/Module/Contact/MatchInterests.php:89
+#: src/Module/Contact/MatchInterests.php:145
+msgid "Profile Match"
+msgstr ""
+
+#: src/Module/Contact/MatchInterests.php:90
 msgid "No keywords to match. Please add keywords to your profile."
 msgstr ""
 
-#: src/Module/Contact/MatchInterests.php:141
-msgid "Profile Match"
+#: src/Module/Contact/MatchInterests.php:140
+msgid "No matches"
 msgstr ""
 
 #: src/Module/Contact/Profile.php:157
@@ -6677,12 +6684,6 @@ msgstr ""
 msgid "Unable to unfollow this contact, please contact your administrator"
 msgstr ""
 
-#: src/Module/Conversation/Channel.php:125
-#: src/Module/Conversation/Community.php:114 src/Module/Search/Index.php:140
-#: src/Module/Search/Index.php:192
-msgid "No results."
-msgstr ""
-
 #: src/Module/Conversation/Channel.php:163
 msgid "Channel not available."
 msgstr ""
@@ -6691,11 +6692,11 @@ msgstr ""
 msgid "This community stream shows all public posts received by this node. They may not reflect the opinions of this node’s users."
 msgstr ""
 
-#: src/Module/Conversation/Community.php:168
+#: src/Module/Conversation/Community.php:170
 msgid "Community option not available."
 msgstr ""
 
-#: src/Module/Conversation/Community.php:184
+#: src/Module/Conversation/Community.php:186
 msgid "Not available."
 msgstr ""
 
