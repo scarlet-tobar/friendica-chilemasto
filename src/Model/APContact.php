@@ -68,7 +68,7 @@ class APContact
 
 			if (!empty($link['template']) && ($link['rel'] == ActivityNamespace::OSTATUSSUB)) {
 				$data['subscribe'] = $link['template'];
-			} elseif (!empty($link['href']) && !empty($link['type']) && ($link['rel'] == 'self') && ($link['type'] == 'application/activity+json')) {
+			} elseif (!empty($link['href']) && !empty($link['type']) && ($link['rel'] == 'self') && in_array($link['type'], ['application/activity+json', 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"'])) {
 				$data['url'] = $link['href'];
 			} elseif (!empty($link['href']) && !empty($link['type']) && ($link['rel'] == ActivityNamespace::WEBFINGERPROFILE) && ($link['type'] == 'text/html')) {
 				$data['alias'] = $link['href'];
