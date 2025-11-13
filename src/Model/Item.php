@@ -3140,6 +3140,7 @@ class Item
 			return $s;
 		}
 
+		/** @var PostMedia $PostMedia */
 		foreach ($PostMedias as $PostMedia) {
 			if (!$PostMedia->preview || ($PostMedia->type !== Post\Media::IMAGE)) {
 				continue;
@@ -3244,6 +3245,7 @@ class Item
 	{
 		DI::profiler()->startRecording('rendering');
 
+		/** @var PostMedia $PostMedia */
 		foreach ($PostMedias as $PostMedia) {
 			if ($PostMedia->preview) {
 				if (DI::baseUrl()->isLocalUri($PostMedia->preview)) {
@@ -3292,6 +3294,7 @@ class Item
 		$images   = new PostMedias();
 
 		// @todo In the future we should make a single for the template engine with all media in it. This allows more flexibilty.
+		/** @var PostMedia $PostMedia */
 		foreach ($PostMedias as $PostMedia) {
 			if (self::containsLink($item['body'], $PostMedia->preview ?? $PostMedia->url, $PostMedia->type) || self::containsEmbed($item['body'], $PostMedia->url)) {
 				continue;
@@ -3388,6 +3391,8 @@ class Item
 
 		/** @var ?PostMedia $attachment */
 		$attachment = null;
+
+		/** @var PostMedia $PostMedia */
 		foreach ($attachments['link'] as $PostMedia) {
 			$found = false;
 			foreach ($ignore_links as $ignore_link) {
@@ -3529,6 +3534,7 @@ class Item
 
 		DI::profiler()->startRecording('rendering');
 		$trailing = '';
+		/** @var PostMedia $PostMedia */
 		foreach ($PostMedias as $PostMedia) {
 			if (strpos($item['body'], (string)$PostMedia->url)) {
 				continue;
