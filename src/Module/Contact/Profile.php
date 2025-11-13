@@ -447,7 +447,7 @@ class Profile extends BaseModule
 			'$sparkle'                   => $sparkle,
 			'$url'                       => $url,
 			'$profileurllabel'           => $this->t('Profile URL'),
-			'$profileurl'                => $contact['url'],
+			'$profileurl'                => $contact['alias'] ?: $contact['url'],
 			'$account_type'              => ContactModel::getAccountType($contact['contact-type']),
 			'$location'                  => BBCode::convertForUriId($contact['uri-id'] ?? 0, $contact['location']),
 			'$location_label'            => $this->t('Location:'),

@@ -159,7 +159,7 @@ class Follow extends BaseModule
 
 			'$action'   => $requestUrl,
 			'$name'     => $contact['name'],
-			'$url'      => $contact['url'],
+			'$url'      => $contact['alias'] ?: $contact['url'],
 			'$zrl'      => OpenWebAuth::getZrlUrl($contact['url']),
 			'$myaddr'   => $myaddr,
 			'$keywords' => $contact['keywords'],
@@ -173,7 +173,8 @@ class Follow extends BaseModule
 		if (!in_array($protocol, [Protocol::PHANTOM, Protocol::MAIL])) {
 			$this->page['aside'] = VCard::getHTML($contact, false, true);
 
-			$output .= Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'),
+			$output .= Renderer::replaceMacros(
+				Renderer::getMarkupTemplate('section_title.tpl'),
 				['$title' => $this->t('Posts and Replies')]
 			);
 
