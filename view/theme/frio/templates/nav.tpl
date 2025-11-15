@@ -125,7 +125,7 @@
 									<li id="nav-notifications-mark-all" class="dropdown-header">
 										<div class="arrow"></div>
 										<header id="notifications-header">
-											<span style="font-size: 20px;">{{$nav.notifications.1}}</span>
+											<span style="font-size: 18px;">{{$nav.notifications.1}}</span>
 											<a href="{{$nav.notifications.all.0}}">{{$nav.notifications.all.1}}</a>
 											<div class="dropdown-header-link">
 												<button role="menuitem" type="button" class="btn-link"

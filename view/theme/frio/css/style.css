@@ -560,7 +560,7 @@ header #banner #logo-img,
 	padding: 3px 10px;
 	margin-bottom: 10px;
 	font-weight: 300;
-	color: white;
+	color: $font_color_darker;
 }
 #nav-notifications-menu {
 	margin-top: 4px;
@@ -572,7 +572,7 @@ header #banner #logo-img,
 }
 #notifications-header {
 	align-items: center;
-	background: $nav_bg;
+	background: $background_color;
 	display: flex;
 	justify-content: space-between;
 	margin-top: 0;
@@ -580,7 +580,7 @@ header #banner #logo-img,
  }
  #notifications-header a, #notifications-header button
 {
-	color: white !important;
+	color: $link_color!important;
 	font-size: 14px;
 	font-weight: 400;
 	text-decoration: underline;
