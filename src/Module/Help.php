@@ -12,6 +12,7 @@ use Friendica\Content\Nav;
 use Friendica\Content\Text\Markdown;
 use Friendica\DI;
 use Friendica\Network\HTTPException;
+use Friendica\Util\Strings;
 
 /**
  * Shows the friendica help based on the /doc/ directory
@@ -40,7 +41,7 @@ class Help extends BaseModule
 
 				$path .= DI::args()->get($x);
 			}
-			$title              = mb_ucfirst(basename($path));
+			$title              = Strings::ucFirst(basename($path));
 			$filename           = $path;
 			$text               = self::loadDocFile($path . '.md', $lang);
 			DI::page()['title'] = DI::l10n()->t('Help:') . ' ' . str_replace('-', ' ', $title);
