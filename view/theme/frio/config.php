@@ -155,7 +155,7 @@ function frio_form($arr)
 		'$submit'           => DI::l10n()->t('Submit'),
 		'$title'            => DI::l10n()->t('Theme settings'),
 		'$scheme'           => ['frio_scheme', DI::l10n()->t('Appearance'), $arr['scheme'], frio_scheme_get_list()],
-		'$scheme_accent'    => !$scheme_info['accented'] ? '' : ['frio_scheme_accent', DI::l10n()->t('Accent color'), $arr['scheme_accent'], ['blue' => DI::l10n()->t('Blue'), 'red' => DI::l10n()->t('Red'), 'purple' => DI::l10n()->t('Purple'), 'green' => DI::l10n()->t('Green'), 'pink' => DI::l10n()->t('Pink')]],
+		'$scheme_accent'    => !$scheme_info['accented'] ? '' : ['frio_scheme_accent', DI::l10n()->t('Accent color'), $arr['scheme_accent']],
 		'$share_string'     => $arr['scheme'] != FRIO_CUSTOM_SCHEME ? '' : ['frio_share_string', DI::l10n()->t('Copy or paste schemestring'), $arr['share_string'], DI::l10n()->t('You can copy this string to share your theme with others. Pasting here applies the schemestring'), false, false],
 		'$nav_bg'           => array_key_exists('nav_bg', $disable) ? '' : ['frio_nav_bg', DI::l10n()->t('Navigation bar background color'), $arr['nav_bg'], '', false],
 		'$nav_icon_color'   => array_key_exists('nav_icon_color', $disable) ? '' : ['frio_nav_icon_color', DI::l10n()->t('Navigation bar icon color '), $arr['nav_icon_color'], '', false],

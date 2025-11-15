@@ -312,10 +312,11 @@ class Display extends BaseSettings
 		return Renderer::replaceMacros($tpl, [
 			'$ptitle'         => $this->t('Display Settings'),
 			'$submit'         => $this->t('Save Settings'),
-			'$d_tset'         => $this->t('General Theme Settings'),
-			'$d_ctset'        => $this->t('Custom Theme Settings'),
 			'$d_cset'         => $this->t('Content Settings'),
 			'$stitle'         => $this->t('Theme settings'),
+			'$themes_title'   => $this->t('Themes'),
+			'$themes_settings_for' => $this->t('Settings for %s', $theme_selected),
+      '$theme_changed_text' => $this->t('Note: If you change the theme, you need to save changes to see the settings for the new theme below!'),
 			'$timeline_title' => $this->t('Timelines'),
 			'$channel_title'  => $this->t('Channels'),
 			'$calendar_title' => $this->t('Calendar'),
@@ -323,8 +324,8 @@ class Display extends BaseSettings
 			'$form_security_token' => self::getFormSecurityToken('settings_display'),
 			'$uid'                 => $uid,
 
-			'$theme'        => ['theme', $this->t('Display Theme:'), $theme_selected, '', $themes, true],
-			'$mobile_theme' => ['mobile_theme', $this->t('Mobile Theme:'), $mobile_theme_selected, '', $mobile_themes, false],
+			'$theme'        => ['theme', $this->t('Display theme'), $theme_selected, '', $themes, true],
+			'$mobile_theme' => ['mobile_theme', $this->t('Mobile theme'), $mobile_theme_selected, '', $mobile_themes, false],
 			'$theme_config' => $theme_config,
 
 			'$itemspage_network'        => ['itemspage_network', $this->t('Number of items to display per page:'), $itemspage_network, $this->t('Maximum of 100 items')],
