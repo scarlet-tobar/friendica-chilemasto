@@ -19,26 +19,26 @@
 {{if $scheme_accent}}
 <div class="form-group">
 	<p><label>{{$scheme_accent.1}}</label></p>
-	<div id="frio-colors">
+	<div id="frio-accents">
 		<div>
 			<input id="blue" type="radio" name="{{$scheme_accent.0}}" value="{{$smarty.const.FRIO_SCHEME_ACCENT_BLUE}}" {{if $scheme_accent.2 == $smarty.const.FRIO_SCHEME_ACCENT_BLUE}} checked{{/if}}>
-			<label for="blue" class="frio-color-option" style="background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_BLUE}}"></label>
+			<label for="blue" class="frio-accent" style="background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_BLUE}}"></label>
 		</div>
 		<div>
 			<input id="red" type="radio" name="{{$scheme_accent.0}}" value="{{$smarty.const.FRIO_SCHEME_ACCENT_RED}}" {{if $scheme_accent.2 == $smarty.const.FRIO_SCHEME_ACCENT_RED}} checked{{/if}}>
-			<label for="red" class="frio-color-option" style="background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_RED}}"></label>
+			<label for="red" class="frio-accent" style="background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_RED}}"></label>
 		</div>
 		<div>
 			<input id="purple" type="radio" name="{{$scheme_accent.0}}" value="{{$smarty.const.FRIO_SCHEME_ACCENT_PURPLE}}" {{if $scheme_accent.2 == $smarty.const.FRIO_SCHEME_ACCENT_PURPLE}} checked{{/if}}>
-			<label for="purple" class="frio-color-option" style="background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_PURPLE}}"></label>
+			<label for="purple" class="frio-accent" style="background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_PURPLE}}"></label>
 		</div>
 		<div>
 			<input id="green" type="radio" name="{{$scheme_accent.0}}" value="{{$smarty.const.FRIO_SCHEME_ACCENT_GREEN}}" {{if $scheme_accent.2 == $smarty.const.FRIO_SCHEME_ACCENT_GREEN}} checked{{/if}}>
-			<label for="green" class="frio-color-option" style="background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_GREEN}}"></label>
+			<label for="green" class="frio-accent" style="background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_GREEN}}"></label>
 		</div>
 		<div>
 			<input id="pink" type="radio" name="{{$scheme_accent.0}}" value="{{$smarty.const.FRIO_SCHEME_ACCENT_PINK}}" {{if $scheme_accent.2 == $smarty.const.FRIO_SCHEME_ACCENT_PINK}} checked{{/if}}>
-			<label for="pink" class="frio-color-option" style="background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_PINK}}"></label>
+			<label for="pink" class="frio-accent" style="background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_PINK}}"></label>
 		</div>
 	</div>
 </div>
