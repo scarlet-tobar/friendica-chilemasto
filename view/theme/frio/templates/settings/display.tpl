@@ -28,7 +28,7 @@
 						{{include file="field_themeselect.tpl" field=$mobile_theme}}
 						{{/if}}
 
-						<p id="theme-changed"><strong>{{$theme_changed_text}}</p>
+						<p class="alert alert-info" id="theme-changed">{{$theme_changed_text}}</p>
 
 					{{if $theme_config}}
 						<h3>{{$themes_settings_for}}</h3>

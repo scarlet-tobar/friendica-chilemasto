@@ -1110,13 +1110,7 @@ Array.prototype.remove = function(item) {
 	return this.push.apply(this, rest);
 };
 
-function previewTheme(elm, theme_changed_display=false) {
-	// This part is currently Frio-specific
-	if (theme_changed_display) {
-	  const theme_changed = document.getElementById("theme-changed")
-	  theme_changed.style.display = "block"
-	}
-	// General
+function previewTheme(elm) {
 	theme = $(elm).val();
 	$.getJSON('pretheme?theme=' + theme,function(data) {
 			$('#theme-preview').html(`

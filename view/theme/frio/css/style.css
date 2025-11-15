@@ -3184,8 +3184,7 @@ details.profile-jot-net[open] summary:before {
 }
 /* This text is only shown after the theme was changed */
 #theme-changed {
-	color: $link_color;
-	display: none;
+	margin: 25px 0;
 }
 
 #frio-colors {
