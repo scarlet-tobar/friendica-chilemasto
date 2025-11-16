@@ -3203,15 +3203,17 @@ details.profile-jot-net[open] summary:before {
 	cursor: pointer;
 }
 
-#frio-accents input[type="radio"]:checked + label {
-	border: 5px solid $font_color_darker!important;
+#frio-accents input[type="radio"]:checked + label::before {
+	content: '\f00c';
+	font-family: ForkAwesome;
+	font-weight: normal;
+	font-size: 18px;
 }
 
 .frio-accent {
 	align-items: center;
 	border-radius: 50px;
 	display: flex;
-	font-size: 25px;
 	justify-content: center;
 	margin-right: 20px;
 	height: 45px;
