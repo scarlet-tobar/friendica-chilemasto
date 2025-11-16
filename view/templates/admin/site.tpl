@@ -145,6 +145,7 @@
 		{{include file="field_input.tpl" field=$worker_load_cooldown}}
 		{{include file="field_checkbox.tpl" field=$worker_fastlane}}
 		{{include file="field_checkbox.tpl" field=$decoupled_receiver}}
+		{{include file="field_select.tpl" field=$fetch_replies}}
 		{{include file="field_input.tpl" field=$worker_defer_limit}}
 		{{include file="field_input.tpl" field=$worker_fetch_limit}}
 

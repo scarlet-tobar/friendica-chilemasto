@@ -1527,9 +1527,9 @@ class Transmitter
 	 *
 	 * @param array $tags Tag array
 	 * @param string $text Text containing tags like :tag:
-	 * @return string normalized text
+ 	 * @return string|null normalized text or null
 	 */
-	private static function addEmojiTags(array &$tags, string $text): string
+	private static function addEmojiTags(array &$tags, string $text): ?string
 	{
 		$emojis = Smilies::extractUsedSmilies($text, $normalized);
 		foreach ($emojis as $name => $url) {
@@ -1956,6 +1956,12 @@ class Transmitter
 
 		$data['attachment'] = self::createAttachmentList($item);
 		$data['tag']        = array_merge(self::createTagList($item, $data['quoteUrl'] ?? ''), $emojis);
+
+		$data['replies'] = [
+			'id'         => $item['uri'] . '/replies',
+			'type'       => 'Collection',
+			'totalItems' => Post::countPosts(['thr-parent-id' => $item['uri-id'], 'gravity' => Item::GRAVITY_COMMENT, 'deleted' => false, 'private' => [Item::PUBLIC, Item::UNLISTED]])
+		];
 
 		if (empty($data['location']) && (!empty($item['coord']) || !empty($item['location']))) {
 			$data['location'] = self::createLocation($item);
