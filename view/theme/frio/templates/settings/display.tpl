@@ -14,7 +14,7 @@
 				<div class="section-subtitle-wrapper panel-heading" role="tab" id="theme-settings-title">
 					<h2>
 						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#settings" href="#theme-settings-content" aria-expanded="true" aria-controls="theme-settings-content">
-							{{$d_tset}}
+							{{$themes_title}}
 						</button>
 					</h2>
 				</div>
@@ -27,28 +27,18 @@
 						{{if count($mobile_theme.4) > 1}}
 						{{include file="field_themeselect.tpl" field=$mobile_theme}}
 						{{/if}}
-					</div>
-					<div class="panel-footer">
-						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
-					</div>
-				</div>
-			</div>
 
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="custom-settings-title">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#settings" href="#custom-settings-content" aria-expanded="false" aria-controls="custom-settings-content">
-							{{$d_ctset}}
-						</button>
-					</h2>
-				</div>
-				<div id="custom-settings-content" class="panel-collapse collapse{{if !$theme && !$mobile_theme}} in{{/if}}" role="tabpanel" aria-labelledby="custom-settings">
-					<div class="panel-body">
+						<p class="alert alert-info" id="theme-changed">{{$theme_changed_text}}</p>
 
 					{{if $theme_config}}
+						<h3>{{$themes_settings_for}}</h3>
 						{{$theme_config nofilter}}
 					{{/if}}
+					</div>
 
+					<div class="panel-footer">
+						{{*Technically the variable below could just be hardcoded, but it's relevant if at some point this template is copied to the main template dir so other themes starting using it *}}
+						<button type="submit" name="{{$theme.2}}-settings-submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>
 				</div>
 			</div>
@@ -124,7 +114,7 @@
 					</div>
 				</div>
 			</div>
-		
+
 			<div class="panel">
 				<div class="section-subtitle-wrapper panel-heading" role="tab" id="channel-settings-title">
 					<h2>

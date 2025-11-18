@@ -32,6 +32,7 @@ use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Profiler;
+use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -310,21 +311,22 @@ class Display extends BaseSettings
 
 		$tpl = Renderer::getMarkupTemplate('settings/display.tpl');
 		return Renderer::replaceMacros($tpl, [
-			'$ptitle'         => $this->t('Display Settings'),
-			'$submit'         => $this->t('Save Settings'),
-			'$d_tset'         => $this->t('General Theme Settings'),
-			'$d_ctset'        => $this->t('Custom Theme Settings'),
-			'$d_cset'         => $this->t('Content Settings'),
-			'$stitle'         => $this->t('Theme settings'),
-			'$timeline_title' => $this->t('Timelines'),
-			'$channel_title'  => $this->t('Channels'),
-			'$calendar_title' => $this->t('Calendar'),
+			'$ptitle'              => $this->t('Display Settings'),
+			'$submit'              => $this->t('Save Settings'),
+			'$d_cset'              => $this->t('Content Settings'),
+			'$stitle'              => $this->t('Theme settings'),
+			'$themes_title'        => $this->t('Themes'),
+			'$themes_settings_for' => $this->t('Settings for %s', Strings::ucFirst($theme_selected)),
+			'$theme_changed_text'  => $this->t('Note: If you switch the theme, you need to save changes before you can see the settings for the new theme below.'),
+			'$timeline_title'      => $this->t('Timelines'),
+			'$channel_title'       => $this->t('Channels'),
+			'$calendar_title'      => $this->t('Calendar'),
 
 			'$form_security_token' => self::getFormSecurityToken('settings_display'),
 			'$uid'                 => $uid,
 
-			'$theme'        => ['theme', $this->t('Display Theme:'), $theme_selected, '', $themes, true],
-			'$mobile_theme' => ['mobile_theme', $this->t('Mobile Theme:'), $mobile_theme_selected, '', $mobile_themes, false],
+			'$theme'        => ['theme', $this->t('Display theme'), $theme_selected, '', $themes, true],
+			'$mobile_theme' => ['mobile_theme', $this->t('Mobile theme'), $mobile_theme_selected, '', $mobile_themes, false],
 			'$theme_config' => $theme_config,
 
 			'$itemspage_network'        => ['itemspage_network', $this->t('Number of items to display per page:'), $itemspage_network, $this->t('Maximum of 100 items')],

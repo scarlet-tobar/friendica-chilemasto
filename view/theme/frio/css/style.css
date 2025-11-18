@@ -3146,6 +3146,10 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 }
 
 /* Settings */
+#settings h3 {
+	font-size: 18px
+}
+
 .section-subtitle-wrapper {
 	padding: 1px 10px;
 }
@@ -3177,6 +3181,47 @@ details.profile-jot-net[open] summary:before {
 }
 .group {
 	margin-left: 20px;
+}
+/* This text is only shown after the theme was changed */
+#theme-changed {
+	margin: 25px 0;
+}
+
+#frio-accents {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+}
+
+#frio-accents input {
+	display: none;
+}
+
+#frio-accents label {
+	align-items: center;
+	cursor: pointer;
+}
+
+#frio-accents input[type="radio"]:checked + label::before {
+	content: '\f00c';
+	font-family: ForkAwesome;
+	font-weight: normal;
+	font-size: 18px;
+}
+
+.frio-accent {
+	align-items: center;
+	border-radius: 50px;
+	display: flex;
+	justify-content: center;
+	margin-right: 20px;
+	height: 45px;
+	width: 45px;
+}
+
+#field-theme-select-container select {
+	margin-bottom: 15px
 }
 
 /* Emulates Bootstrap display */
