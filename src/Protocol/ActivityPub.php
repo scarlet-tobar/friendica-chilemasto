@@ -214,10 +214,11 @@ class ActivityPub
 	 *
 	 * @param string  $url
 	 * @param integer $uid User ID
+	 * @param integer $max Maximum number of activities to fetch (0 = all)
 	 * @return void
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function fetchOutbox(string $url, int $uid)
+	public static function fetchOutbox(string $url, int $uid, int $max = 0)
 	{
 		$data = HTTPSignature::fetch($url, $uid);
 		if (empty($data)) {
@@ -235,9 +236,14 @@ class ActivityPub
 			$items = [];
 		}
 
+		$count = 0;
 		foreach ($items as $activity) {
 			$ldactivity = JsonLD::compact($activity);
 			ActivityPub\Receiver::processActivity($ldactivity, '', $uid, true);
+			if ($max > 0 && ++$count >= $max) {
+				DI::logger()->info('Reached maximum number of activities to fetch', ['url' => $url, 'uid' => $uid, 'max' => $max]);
+				return;
+			}
 		}
 	}
 
