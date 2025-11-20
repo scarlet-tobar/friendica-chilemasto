@@ -1318,14 +1318,16 @@ class Item
 			return;
 		}
 
-		$languages = $item['language'] ? array_keys(json_decode($item['language'], true)) : [];
+		$languages = $item['language'] ? json_decode($item['language'], true) : [];
+		$quality   = DI::config()->get('system', 'relay_language_quality');
 
 		foreach (Tag::getUIDListByURIId($item['uri-id']) as $uid => $tags) {
 			if (!empty($languages)) {
 				$keep           = false;
 				$user_languages = User::getWantedLanguages($uid);
 				foreach ($user_languages as $language) {
-					if (in_array($language, $languages)) {
+					if (in_array($language, array_keys($languages)) && $languages[$language] > $quality) {
+						DI::logger()->debug('Wanted language found', ['uid' => $uid, 'language' => $language, 'quality' => $languages[$language], 'limit' => $quality]);
 						$keep = true;
 					}
 				}
