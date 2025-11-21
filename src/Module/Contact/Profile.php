@@ -22,6 +22,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Event\ArrayFilterEvent;
@@ -212,6 +213,10 @@ class Profile extends BaseModule
 
 			if ($cmd === 'updateprofile') {
 				$this->updateContactFromProbe($contact['id']);
+			}
+
+			if ($cmd === 'fetchoutbox') {
+				Worker::add(Worker::PRIORITY_MEDIUM, 'FetchOutbox', $contact['id'], 0);
 			}
 
 			if ($cmd === 'block') {
@@ -557,6 +562,16 @@ class Profile extends BaseModule
 				'title' => '',
 				'sel'   => '',
 				'id'    => 'updateprofile',
+			];
+		}
+
+		if (in_array($contact['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN])) {
+			$contact_actions['fetchoutbox'] = [
+				'label' => $this->t('Fetch latest posts'),
+				'url'   => 'contact/' . $contact['id'] . '/fetchoutbox?t=' . $formSecurityToken,
+				'title' => '',
+				'sel'   => '',
+				'id'    => 'fetchoutbox',
 			];
 		}
 
