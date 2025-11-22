@@ -16,8 +16,19 @@
 			var hls = new Hls();
 			hls.loadSource(videoSrc);
 			hls.attachMedia(video);
-		} else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+			hls.on(Hls.Events.ERROR, function (event, data) {
+				var errorType = data.type;
+				var errorDetails = data.details;
+				var errorFatal = data.fatal;
+				console.error('HLS.js error:', errorType, errorDetails, 'Fatal:', errorFatal);
+				if (errorFatal) {
+					document.getElementById('video-top-wrapper-{{$video.id}}').style.display = 'none';
+				}
+			});
+		} else if (video.canPlayType('{{$video.mime}}')) {
 			video.src = videoSrc;
+		} else {
+			document.getElementById('video-top-wrapper-{{$video.id}}').style.display = 'none';
 		}
 	</script>
 </div>

@@ -1895,13 +1895,14 @@ class Receiver
 			}
 
 			$filetype = strtolower(substr($mediatype, 0, strpos($mediatype, '/')));
+			$type     = Post\Media::getType($mediatype);
 
 			$height = JsonLD::fetchElement($url, 'as:height', '@value');
 			$width  = JsonLD::fetchElement($url, 'as:width', '@value');
 
-			if ($filetype == 'audio') {
+			if ($type == Post\Media::AUDIO) {
 				$attachments[] = ['type' => $filetype, 'mediaType' => $mediatype, 'url' => $href, 'height' => $height, 'width' => $width, 'size' => null, 'name' => '', 'image' => $icon];
-			} elseif ($filetype == 'video') {
+			} elseif ($type == Post\Media::VIDEO) {
 				// PeerTube audio-only track
 				if (!$height) {
 					continue;
@@ -1910,14 +1911,14 @@ class Receiver
 				$size = (int)JsonLD::fetchElement($url, 'pt:size', '@value');
 
 				$attachments[] = ['type' => $filetype, 'mediaType' => $mediatype, 'url' => $href, 'height' => $height, 'width' => $width, 'size' => $size, 'name' => '', 'image' => $icon];
-			} elseif (in_array($mediatype, ['application/x-bittorrent', 'application/x-bittorrent;x-scheme-handler/magnet'])) {
+			} elseif ($type == Post\Media::TORRENT) {
 				// For Torrent links we always store the highest resolution
 				if (!empty($attachments[$mediatype]['height']) && ($height < $attachments[$mediatype]['height'])) {
 					continue;
 				}
 
 				$attachments[$mediatype] = ['type' => $mediatype, 'mediaType' => $mediatype, 'url' => $href, 'height' => $height, 'width' => $width, 'size' => null, 'name' => ''];
-			} elseif ($mediatype == 'application/x-mpegURL') {
+			} elseif ($type == Post\Media::HLS) {
 				$attachment = ['type' => $filetype, 'mediaType' => $mediatype, 'url' => $href, 'height' => $height, 'width' => $width, 'size' => null, 'name' => '', 'image' => $icon];
 				if (is_array($player)) {
 					$attachment['player-url']    = $player['embed']  ?? null;
