@@ -754,6 +754,15 @@ function doFollowThread(ident) {
 	update_item = ident.toString();
 }
 
+function doCompleteThread(ident) {
+	unpause();
+	$('#like-rotator-' + ident.toString()).show();
+	$.post('item/' + ident.toString() + '/complete', NavUpdate);
+	liking = 1;
+	force_update = true;
+	update_item = ident.toString();
+}
+
 function doStar(ident) {
 	ident = ident.toString();
 	$('#like-rotator-' + ident).show();

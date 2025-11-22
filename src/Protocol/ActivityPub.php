@@ -279,6 +279,8 @@ class ActivityPub
 			$items = $data['first']['items'];
 		} elseif (!empty($data['first']) && is_string($data['first']) && ($data['first'] != $url)) {
 			return self::fetchItems($data['first'], $uid, $start_timestamp);
+		} elseif (isset($data['first']) && isset($data['first']['next']) && ($data['first']['next'] != $url)) {
+			return self::fetchItems($data['first']['next'], $uid, $start_timestamp);
 		} else {
 			return [];
 		}

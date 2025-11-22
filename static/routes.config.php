@@ -467,6 +467,7 @@ return [
 	'/item/{id:\d+}'            => [
 		'/activity/{verb}' => [Module\Item\Activity::class,    [        R::POST]],
 		'/follow'          => [Module\Item\Follow::class,      [        R::POST]],
+		'/complete'        => [Module\Item\Complete::class,    [        R::POST]],
 		'/ignore'          => [Module\Item\Ignore::class,      [        R::POST]],
 		'/language'        => [Module\Item\Language::class,    [R::GET]],
 		'/pin'             => [Module\Item\Pin::class,         [        R::POST]],

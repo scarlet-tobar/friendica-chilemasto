@@ -46,6 +46,11 @@ class Processor
 	const CACHEKEY_FETCH_ACTIVITY = 'processor:fetchMissingActivity:';
 	const CACHEKEY_JUST_FETCHED   = 'processor:isJustFetched:';
 
+	const FETCH_REPLIES_ALL         = 0;
+	const FETCH_REPLIES_NONE        = 1;
+	const FETCH_REPLIES_FOLLOWED    = 2;
+	const FETCH_REPLIES_INTERACTION = 3;
+
 	/**
 	 * Add an object id to the list of processed ids
 	 *
@@ -260,7 +265,60 @@ class Processor
 				self::updateEvent($post['event-id'], $activity);
 			}
 		}
-		self::processReplies($activity, $item);
+
+		if (self::shouldCompleteThread($item)) {
+			if (Worker::isInWorkerMode()) {
+				self::processReplies($activity, $item);
+			} else {
+				Worker::add(Worker::PRIORITY_MEDIUM, 'FetchMissingReplies', $item['uri-id'], $activity);
+			}
+		}
+	}
+
+	private static function shouldCompleteThread(array $item): bool
+	{
+		switch (DI::config()->get('system', 'fetch_replies')) {
+			case self::FETCH_REPLIES_ALL:
+				DI::logger()->debug('Fetch all replies is enabled');
+				return true;
+
+			case self::FETCH_REPLIES_FOLLOWED:
+				DI::logger()->debug('Fetch replies from followed users is enabled');
+				return Post::exists(["`parent-uri-id` = ? AND `gravity` IN (?, ?) AND `uid` != ?", $item['parent-uri-id'], Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT, 0]);
+
+			case self::FETCH_REPLIES_INTERACTION:
+				DI::logger()->debug('Fetch replies with interaction is enabled');
+				return Post::exists(["`parent-uri-id` = ? AND `origin`", $item['parent-uri-id']]);
+		}
+
+		DI::logger()->debug('No reply fetching is enabled');
+		return false;
+	}
+
+	/**
+	 * Fetch replies for a given uri id
+	 *
+	 * @param int   $uriId Uri-id of the parent item
+	 * @param array $child Child activity data
+	 */
+	public static function fetchRepliesByUriId(int $uriId, array $child = [])
+	{
+		$item = Post::selectFirstPost(['thr-parent', 'parent-uri', 'replies'], ['uri-id' => $uriId, 'private' => [Item::PUBLIC, Item::UNLISTED]]);
+		if (!$item) {
+			return;
+		}
+
+		if (!$child) {
+			$activity = DBA::selectFirst('post-activity', [], ['uri-id' => $uriId]);
+			$data     = json_decode($activity['activity'], true);
+			$activity = JsonLD::compact($data);
+
+			$trust_source = true;
+			$child        = Receiver::prepareObjectData($activity, 0, false, $trust_source);
+		}
+
+		DI::logger()->debug('Process replies', ['uri-id' => $uriId, 'replies' => !$item['replies']]);
+		self::processReplies($child, $item);
 	}
 
 	/**
@@ -520,29 +578,28 @@ class Processor
 
 	private static function processReplies(array $activity, array $item)
 	{
-		// @todo fetch replies not only in the decoupled mode
-		if (!DI::config()->get('system', 'decoupled_receiver')) {
+		if (isset($item['parent-uri-id'])) {
+			$condition = ['parent-uri-id' => $item['parent-uri-id']];
+		} elseif (isset($item['thr-parent-id'])) {
+			$parent = Post::selectFirstPost(['parent-uri-id'], ['uri-id' => $item['thr-parent-id']]);
+			if (isset($parent['parent-uri-id'])) {
+				$condition = ['parent-uri-id' => $parent['parent-uri-id']];
+			} else {
+				$condition = ['uri-id' => [$item['thr-parent-id'], $item['uri-id']]];
+			}
+		} elseif (isset($item['replies'])) {
+			self::fetchReplies($item['replies'], $activity);
+			return;
+		} else {
 			return;
 		}
 
-		$replies = [$item['thr-parent']];
-		if (!empty($item['parent-uri'])) {
-			$replies[] = $item['parent-uri'];
-		}
-		$condition = DBA::mergeConditions(['uri' => $replies], ["`replies-id` IS NOT NULL"]);
+		$condition = DBA::mergeConditions($condition, ["`replies-id` IS NOT NULL"]);
 		$posts     = Post::select(['replies', 'replies-id'], $condition);
 		while ($post = Post::fetch($posts)) {
-			$cachekey = 'Processor-CreateItem-Replies-' . $post['replies-id'];
-			if (!DI::cache()->get($cachekey)) {
-				self::fetchReplies($post['replies'], $activity);
-				DI::cache()->set($cachekey, true);
-			}
+			self::fetchReplies($post['replies'], $activity);
 		}
-		DBA::close($replies);
-
-		if (!empty($item['replies'])) {
-			self::fetchReplies($item['replies'], $activity);
-		}
+		DBA::close($posts);
 	}
 
 	/**
@@ -1246,8 +1303,12 @@ class Processor
 			}
 		}
 
-		if ($success) {
-			self::processReplies($activity, $item);
+		if ($success && self::shouldCompleteThread($item)) {
+			if (Worker::isInWorkerMode()) {
+				self::processReplies($activity, $item);
+			} else {
+				Worker::add(Worker::PRIORITY_MEDIUM, 'FetchMissingReplies', $item['uri-id'], $activity);
+			}
 		}
 	}
 
@@ -1850,6 +1911,16 @@ class Processor
 
 	private static function fetchReplies(string $url, array $child)
 	{
+		if (DI::baseUrl()->isLocalUrl($url)) {
+			return;
+		}
+
+		if (self::isFetched($url)) {
+			DI::logger()->debug('Url is already processed', ['url' => $url]);
+			return;
+		}
+		self::addActivityId($url);
+
 		$callstack_count = 0;
 		foreach ($child['callstack'] ?? [] as $function) {
 			if ($function == __FUNCTION__) {
@@ -1903,6 +1974,7 @@ class Processor
 				$id = $reply;
 			}
 			if (!self::alreadyKnown($id, $child['id'] ?? '')) {
+				DI::logger()->debug('Fetch missing activity', ['url' => $url, 'id' => $id]);
 				self::fetchMissingActivity($id, $child, '', Receiver::COMPLETION_REPLIES);
 				++$fetched;
 			}
