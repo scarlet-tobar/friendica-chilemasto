@@ -208,4 +208,9 @@
 
 {{include file="field_checkbox.tpl" field=$always_open_compose}}
 
+{{if $admin_theme_settings}}
+<div class="settings-submit-wrapper pull-right">
+	<button type="submit" value="{{$submit}}" class="settings-submit btn btn-primary" name="frio-settings-submit">{{$submit}}</button>
+</div>
+{{/if}}
 <div class="clearfix"></div>
