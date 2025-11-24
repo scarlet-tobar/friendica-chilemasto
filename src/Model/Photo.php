@@ -436,6 +436,10 @@ class Photo
 		$storage     = '';
 		$img_str     = $image->asString();
 
+		if (!is_string($img_str)) {
+			return false;
+		}
+
 		try {
 			if (DBA::isResult($existing_photo)) {
 				$backend_ref = (string)$existing_photo['backend-ref'];

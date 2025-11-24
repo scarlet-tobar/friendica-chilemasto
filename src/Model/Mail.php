@@ -223,7 +223,7 @@ class Mail
 		}
 
 		if ($post_id) {
-			Worker::add(Worker::PRIORITY_HIGH, "Notifier", Delivery::MAIL, $post_id);
+			Worker::add(Worker::PRIORITY_HIGH, "Notifier", Delivery::MAIL, $post_id, $sender_uid);
 			return intval($post_id);
 		} else {
 			return -3;
