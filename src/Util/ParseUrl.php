@@ -1347,15 +1347,15 @@ class ParseUrl
 		}
 
 		if (!$oembed) {
+			$oembed = self::fetchFromProviderList($url);
+		}
+
+		if (!$oembed) {
 			foreach ($xpath->query("//link[@type='application/json+oembed']") as $link) {
 				/** @var DOMElement $link */
 				$oembed = $link->getAttributeNode('href')->nodeValue;
 				DI::logger()->debug('Found oEmbed JSON from page', ['url' => $url, 'oembed' => $oembed]);
 			}
-		}
-
-		if (!$oembed) {
-			$oembed = self::fetchFromProviderList($url);
 		}
 
 		if ($oembed) {
