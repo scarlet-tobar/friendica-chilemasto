@@ -107,6 +107,8 @@
 			// This cancels the automatic redirection after item submission
 			formData.delete('return');
 
+			let isNewPost = !formData.get('post_id');
+
 			$.ajax({
 				url: 'item',
 				data: formData,
@@ -129,10 +131,17 @@
 				$share.button('reset');
 				$sharePreview.button('reset');
 
-				// Force the display update of the edited post/comment
+				force_update = true;
 				if (formData.get('post_id')) {
-					force_update = true;
 					update_item = formData.get('post_id');
+				}
+
+				if (isNewPost) {
+					let scrollHandler = function() {
+						$('html, body').animate({ scrollTop: 0 }, 400);
+						document.removeEventListener('postprocess_liveupdate', scrollHandler);
+					};
+					document.addEventListener('postprocess_liveupdate', scrollHandler);
 				}
 
 				NavUpdate();
