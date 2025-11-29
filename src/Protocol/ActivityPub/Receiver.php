@@ -454,6 +454,13 @@ class Receiver
 			$object_data['object_id']      = JsonLD::fetchElement($activity, 'as:object', '@id');
 			$object_data['object_type']    = JsonLD::fetchElement($activity['as:object'], '@type');
 			$object_data['object_content'] = JsonLD::fetchElement($activity['as:object'], 'as:content', '@type');
+		} elseif (in_array($type, ['quote:QuoteRequest'])) {
+			$object_data = [];
+
+			$object_data['id']          = JsonLD::fetchElement($activity, '@id');
+			$object_data['target_id']   = JsonLD::fetchElement($activity, 'as:instrument', '@id', '@type', 'as:Note');
+			$object_data['object_id']   = JsonLD::fetchElement($activity, 'as:object', '@id');
+			$object_data['object_type'] = JsonLD::fetchElement($activity['as:object'], '@type');
 		} else {
 			$object_data = [];
 
@@ -1054,6 +1061,10 @@ class Receiver
 				} else {
 					return false;
 				}
+				break;
+
+			case 'quote:QuoteRequest':
+				ActivityPub\Processor::processQuoteRequest($object_data);
 				break;
 
 			default:
@@ -2189,6 +2200,10 @@ class Receiver
 		}
 		if (empty($object_data['quote-url'])) {
 			$object_data['quote-url'] = JsonLD::fetchElement($object, 'quote:quote');
+		}
+
+		if (!is_null($object_data['quote-url']) && !is_null($object_data['content'])) {
+			$object_data['content'] = HTML::removeElementByClass($object_data['content'], 'quote-inline');
 		}
 
 		foreach ($object_data['tags'] as $tag) {
