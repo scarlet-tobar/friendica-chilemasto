@@ -65,7 +65,19 @@
 <script type="text/javascript">
 	var ispublic = '{{$ispublic nofilter}}';
 	aStr.linkurl = '{{$linkurl}}';
+	aStr.postPublished = '{{$postPublished}}';
+	aStr.goToPost = '{{$goToPost}}';
 
+	function goToElement(elementId) {
+		let $element = $('#' + elementId);
+		if ($element.length) {
+			window.scrollTo(0, $element.offset().top - 100);
+			$element.addClass('highlight-post');
+			setTimeout(function() {
+				$element.removeClass('highlight-post');
+			}, 2000);
+		}
+	}
 
 	$(document).ready(function() {
 
@@ -109,6 +121,14 @@
 
 			let isNewPost = !formData.get('post_id');
 
+			// remember existing post IDs to find our new one later
+			let existingPostIds = new Set();
+			if (isNewPost) {
+				$('.toplevel_item').each(function() {
+					existingPostIds.add($(this).attr('id'));
+				});
+			}
+
 			$.ajax({
 				url: 'item',
 				data: formData,
@@ -137,11 +157,38 @@
 				}
 
 				if (isNewPost) {
-					let scrollHandler = function() {
-						$('html, body').animate({ scrollTop: 0 }, 400);
-						document.removeEventListener('postprocess_liveupdate', scrollHandler);
+					let alertHandler = function() {
+						// find our new post (has edit button)
+						let newPostElement = null;
+						$('.toplevel_item').each(function() {
+							if (!existingPostIds.has($(this).attr('id')) && $(this).find('.pencil').length > 0) {
+								newPostElement = $(this);
+								return false;
+							}
+						});
+
+						if (newPostElement) {
+							let postId = newPostElement.attr('id');
+							let alertHtml = '<div id="post-published-alert" class="alert alert-info alert-dismissible" role="alert">' +
+								'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+								aStr.postPublished + ' ' +
+								'<a href="#' + postId + '" class="alert-link" onclick="goToElement(\'' + postId + '\'); return false;">' + aStr.goToPost + '</a>' +
+								'</div>';
+
+							$('#post-published-alert').remove();
+							$('body').append(alertHtml);
+
+							// auto-dismiss after 5 seconds
+							setTimeout(function() {
+								$('#post-published-alert').fadeOut(400, function() {
+									$(this).remove();
+								});
+							}, 5000);
+						}
+
+						document.removeEventListener('postprocess_liveupdate', alertHandler);
 					};
-					document.addEventListener('postprocess_liveupdate', scrollHandler);
+					document.addEventListener('postprocess_liveupdate', alertHandler);
 				}
 
 				NavUpdate();
