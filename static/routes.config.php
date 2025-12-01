@@ -549,7 +549,11 @@ return [
 		'/token'       => [Module\OAuth\Token::class,       [R::POST]],
 	],
 
-	'/objects/{guid}[/{activity}]' => [Module\ActivityPub\Objects::class, [R::GET]],
+	'/objects/{guid}' => [
+		'[/]'                           => [Module\ActivityPub\Objects::class,            [R::GET]],
+		'/quote_authorization/{remote}' => [Module\ActivityPub\QuoteAuthorization::class, [R::GET]],
+		'/{activity}'                   => [Module\ActivityPub\Objects::class,            [R::GET]],
+	],
 
 	'/outbox/{nickname}' => [Module\ActivityPub\Outbox::class, [R::GET, R::POST]],
 	'/owa'               => [Module\Owa::class,                [R::GET]],

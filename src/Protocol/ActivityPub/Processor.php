@@ -2253,6 +2253,46 @@ class Processor
 	}
 
 	/**
+	 * process a "quote" request
+	 *
+	 * @param array $activity
+	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
+	 */
+	public static function processQuoteRequest(array $activity)
+	{
+		if (!($post = Post::selectFirst(['author-link', 'uid'], ['uri' => $activity['object_id'], 'origin' => true, 'private' => [Item::PUBLIC, Item::UNLISTED]]))) {
+			DI::logger()->info('Quoted post not found locally or it is not public', ['uri' => $activity['object_id']]);
+			Queue::remove($activity);
+			return;
+		}
+		if (!($contact = Contact::getByURL($activity['actor'], null, ['url']))) {
+			DI::logger()->info('Actor is not a known contact', ['actor' => $activity['actor']]);
+			return;
+		}
+
+		$owner = User::getOwnerDataById($post['uid']);
+		if (!DBA::isResult($owner)) {
+			return;
+		}
+
+		$quote = Post::selectFirst(['guid'], ['uri' => $activity['target_id']]);
+		if (!isset($quote['guid'])) {
+			if (Processor::fetchMissingActivity($activity['target_id'], $activity, '', Receiver::COMPLETION_ANNOUNCE)) {
+				$quote = Post::selectFirst(['guid'], ['uri' => $activity['target_id']]);
+			}
+		}
+		if (!isset($quote['guid'])) {
+			DI::logger()->debug('Remote quote was not found', ['uri' => $activity['target_id']]);
+			return;
+		}
+
+		ActivityPub\Transmitter::acceptQuoteRequest($contact['url'], $activity['target_id'], $quote['guid'], $post['author-link'], $activity['object_id'], $activity['id'], $owner);
+		Queue::remove($activity);
+	}
+
+	/**
 	 * Transmit pending events to the new follower
 	 *
 	 * @param integer $cid Contact id

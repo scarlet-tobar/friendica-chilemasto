@@ -105,7 +105,7 @@ class Objects extends BaseModule
 		} elseif (empty($this->parameters['activity']) || in_array(
 			$this->parameters['activity'],
 			['Create', 'Announce', 'Update', 'Like', 'Dislike', 'Accept', 'Reject',
-				'TentativeAccept', 'Follow', 'Add']
+				'TentativeAccept', 'Follow', 'Add', 'Delete']
 		)) {
 			$data = ActivityPub\Transmitter::createCachedActivityFromItem($item['id']);
 			if (empty($data)) {
