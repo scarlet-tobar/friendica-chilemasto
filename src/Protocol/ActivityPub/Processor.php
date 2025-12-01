@@ -310,11 +310,13 @@ class Processor
 
 		if (!$child) {
 			$activity = DBA::selectFirst('post-activity', [], ['uri-id' => $uriId]);
-			$data     = json_decode($activity['activity'], true);
-			$activity = JsonLD::compact($data);
+			$data = json_decode($activity['activity'] ?? '', true);
+			if ($data) {
+				$activity = JsonLD::compact($data);
 
-			$trust_source = true;
-			$child        = Receiver::prepareObjectData($activity, 0, false, $trust_source);
+				$trust_source = true;
+				$child        = Receiver::prepareObjectData($activity, 0, false, $trust_source);
+			}
 		}
 
 		DI::logger()->debug('Process replies', ['uri-id' => $uriId, 'replies' => !$item['replies']]);
