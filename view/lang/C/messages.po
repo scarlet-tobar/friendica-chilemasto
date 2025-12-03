@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-17 20:39+0100\n"
+"POT-Creation-Date: 2025-12-03 13:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -236,6 +236,7 @@ msgid "Message collection failure."
 msgstr ""
 
 #: mod/message.php:111 src/Module/Notifications/Introductions.php:127
+#: src/Module/Notifications/Introductions.php:164
 #: src/Module/Notifications/Notification.php:71
 msgid "Discard"
 msgstr ""
@@ -832,13 +833,13 @@ msgid "The avatar cache needs to be disabled in local.config.php to use this com
 msgstr ""
 
 #: src/Console/GlobalCommunityBlock.php:82
-#: src/Module/Moderation/Blocklist/Contact.php:53
+#: src/Module/Moderation/Blocklist/Contact.php:96
 #, php-format
 msgid "Could not find any contact entry for this URL (%s)"
 msgstr ""
 
 #: src/Console/GlobalCommunityBlock.php:87
-#: src/Module/Moderation/Blocklist/Contact.php:70
+#: src/Module/Moderation/Blocklist/Contact.php:113
 msgid "The contact has been blocked from the node"
 msgstr ""
 
@@ -1897,7 +1898,7 @@ msgstr ""
 
 #: src/Content/Item.php:443 src/Module/Contact.php:453
 #: src/Module/Contact/Profile.php:579
-#: src/Module/Moderation/Blocklist/Contact.php:104
+#: src/Module/Moderation/Blocklist/Contact.php:150
 #: src/Module/Moderation/Users/Active.php:93
 #: src/Module/Moderation/Users/Index.php:101
 msgid "Block"
@@ -2175,11 +2176,11 @@ msgid "Notifications"
 msgstr ""
 
 #: src/Content/Nav.php:312
-msgid "View all"
+msgid "See all notifications"
 msgstr ""
 
 #: src/Content/Nav.php:313 src/Module/Settings/Connectors.php:226
-msgid "Mark as read"
+msgid "Mark as seen"
 msgstr ""
 
 #: src/Content/Nav.php:313
@@ -2229,7 +2230,8 @@ msgid "Site setup and configuration"
 msgstr ""
 
 #: src/Content/Nav.php:333 src/Module/BaseModeration.php:117
-#: src/Module/Moderation/Blocklist/Contact.php:98
+#: src/Module/Moderation/Blocklist/Contact.php:141
+#: src/Module/Moderation/Blocklist/Contact/Import.php:164
 #: src/Module/Moderation/Blocklist/Server/Add.php:110
 #: src/Module/Moderation/Blocklist/Server/Import.php:105
 #: src/Module/Moderation/Blocklist/Server/Index.php:84
@@ -2277,8 +2279,8 @@ msgstr ""
 msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:945 src/Model/Item.php:3645
-#: src/Model/Item.php:3651 src/Model/Item.php:3652
+#: src/Content/Text/BBCode.php:945 src/Model/Item.php:3657
+#: src/Model/Item.php:3663 src/Model/Item.php:3664
 msgid "Link to source"
 msgstr ""
 
@@ -3454,44 +3456,44 @@ msgstr ""
 msgid "Sensitive content"
 msgstr ""
 
-#: src/Model/Item.php:3545
+#: src/Model/Item.php:3557
 msgid "bytes"
 msgstr ""
 
-#: src/Model/Item.php:3576
+#: src/Model/Item.php:3588
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3578
+#: src/Model/Item.php:3590
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3583
+#: src/Model/Item.php:3595
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3585
+#: src/Model/Item.php:3597
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3587
+#: src/Model/Item.php:3599
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:3628 src/Model/Item.php:3629
+#: src/Model/Item.php:3640 src/Model/Item.php:3641
 msgid "View on separate page"
 msgstr ""
 
@@ -5832,7 +5834,9 @@ msgstr ""
 msgid "Remote servers"
 msgstr ""
 
-#: src/Module/BaseSettings.php:155 src/Module/Settings/ContactImport.php:109
+#: src/Module/BaseSettings.php:155
+#: src/Module/Moderation/Blocklist/Contact/Import.php:171
+#: src/Module/Settings/ContactImport.php:109
 msgid "Import Contacts"
 msgstr ""
 
@@ -5890,6 +5894,7 @@ msgstr ""
 #: src/Module/Install.php:251 src/Module/Install.php:256
 #: src/Module/Install.php:270 src/Module/Install.php:283
 #: src/Module/Install.php:312
+#: src/Module/Moderation/Blocklist/Contact/Import.php:176
 #: src/Module/Moderation/Blocklist/Server/Add.php:125
 #: src/Module/Moderation/Blocklist/Server/Add.php:127
 #: src/Module/Moderation/Blocklist/Server/Import.php:116
@@ -6146,7 +6151,7 @@ msgid "Update"
 msgstr ""
 
 #: src/Module/Contact.php:453 src/Module/Contact/Profile.php:579
-#: src/Module/Moderation/Blocklist/Contact.php:105
+#: src/Module/Moderation/Blocklist/Contact.php:151
 #: src/Module/Moderation/Users/Blocked.php:94
 #: src/Module/Moderation/Users/Index.php:103
 msgid "Unblock"
@@ -6222,7 +6227,7 @@ msgid "Return to contact editor"
 msgstr ""
 
 #: src/Module/Contact/Advanced.php:120
-#: src/Module/Moderation/Blocklist/Contact.php:110
+#: src/Module/Moderation/Blocklist/Contact.php:156
 #: src/Module/Moderation/Reports.php:110
 #: src/Module/Moderation/Users/Active.php:82
 #: src/Module/Moderation/Users/Blocked.php:82
@@ -6305,7 +6310,7 @@ msgstr[1] ""
 #: src/Module/Contact/Follow.php:56 src/Module/Contact/Redir.php:47
 #: src/Module/Contact/Redir.php:208 src/Module/Conversation/Community.php:156
 #: src/Module/Debug/ItemBody.php:30 src/Module/Diaspora/Receive.php:45
-#: src/Module/Item/Complete.php:25 src/Module/Item/Display.php:84
+#: src/Module/Item/Complete.php:25 src/Module/Item/Display.php:82
 #: src/Module/Item/Feed.php:45 src/Module/Item/Follow.php:27
 #: src/Module/Item/Ignore.php:27 src/Module/Item/Language.php:43
 #: src/Module/Item/Pin.php:27 src/Module/Item/Pin.php:42
@@ -6341,7 +6346,7 @@ msgstr ""
 
 #: src/Module/Contact/Follow.php:155 src/Module/Contact/Profile.php:454
 #: src/Module/Contact/Unfollow.php:115
-#: src/Module/Moderation/Blocklist/Contact.php:119
+#: src/Module/Moderation/Blocklist/Contact.php:165
 #: src/Module/Moderation/Reports.php:117
 #: src/Module/Notifications/Introductions.php:121
 #: src/Module/Notifications/Introductions.php:192
@@ -7235,7 +7240,7 @@ msgstr ""
 msgid "You can make this page always open when you use the New Post button in the <a href=\"/settings/display\">Theme Customization settings</a>."
 msgstr ""
 
-#: src/Module/Item/Display.php:164
+#: src/Module/Item/Display.php:154
 #, php-format
 msgid "Post by %s"
 msgstr ""
@@ -7375,30 +7380,42 @@ msgstr ""
 msgid "Community Group"
 msgstr ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:58
+#: src/Module/Moderation/Blocklist/Contact.php:101
 msgid "You can't block a local contact, please block the user instead"
 msgstr ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:77
+#: src/Module/Moderation/Blocklist/Contact.php:120
 #, php-format
 msgid "%s contact unblocked"
 msgid_plural "%s contacts unblocked"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:99
+#: src/Module/Moderation/Blocklist/Contact.php:142
 msgid "Remote Contact Blocklist"
 msgstr ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:100
+#: src/Module/Moderation/Blocklist/Contact.php:143
 msgid "This page allows you to prevent any message from a remote contact to reach your node."
 msgstr ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:101
+#: src/Module/Moderation/Blocklist/Contact.php:144
 msgid "Block Remote Contact"
 msgstr ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:102
+#: src/Module/Moderation/Blocklist/Contact.php:145
+msgid "Import/Export"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact.php:146
+msgid "Import from CSV file"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact.php:147
+msgid "Export to CSV file"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact.php:148
 #: src/Module/Moderation/Users/Active.php:91
 #: src/Module/Moderation/Users/Blocked.php:91
 #: src/Module/Moderation/Users/Index.php:98
@@ -7406,53 +7423,159 @@ msgstr ""
 msgid "select all"
 msgstr ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:103
+#: src/Module/Moderation/Blocklist/Contact.php:149
 msgid "select none"
 msgstr ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:106
+#: src/Module/Moderation/Blocklist/Contact.php:152
 msgid "No remote contact is blocked from this node."
 msgstr ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:108
+#: src/Module/Moderation/Blocklist/Contact.php:154
 msgid "Blocked Remote Contacts"
 msgstr ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:109
+#: src/Module/Moderation/Blocklist/Contact.php:155
 msgid "Block New Remote Contact"
 msgstr ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:110
+#: src/Module/Moderation/Blocklist/Contact.php:156
 #: src/Module/Moderation/Reports.php:110
 msgid "Photo"
 msgstr ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:110
+#: src/Module/Moderation/Blocklist/Contact.php:156
 msgid "Reason"
 msgstr ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:116
+#: src/Module/Moderation/Blocklist/Contact.php:162
 #, php-format
 msgid "%s total blocked contact"
 msgid_plural "%s total blocked contacts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:119
+#: src/Module/Moderation/Blocklist/Contact.php:165
 msgid "URL of the remote contact to block."
 msgstr ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:120
+#: src/Module/Moderation/Blocklist/Contact.php:166
 msgid "Also purge contact"
 msgstr ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:120
+#: src/Module/Moderation/Blocklist/Contact.php:166
 msgid "Removes all content related to this contact from the node. Keeps the contact record. This action cannot be undone."
 msgstr ""
 
-#: src/Module/Moderation/Blocklist/Contact.php:121
+#: src/Module/Moderation/Blocklist/Contact.php:167
+#: src/Module/Moderation/Blocklist/Contact/Import.php:170
 #: src/Module/Moderation/Blocklist/Server/Import.php:111
 msgid "Block Reason"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:67
+msgid "No valid contacts found in CSV file."
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:73
+#, php-format
+msgid "Error importing contact file: %s"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:79
+msgid "Error parsing contact data."
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:100
+#, php-format
+msgid "Contact not found: %s"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:106
+#, php-format
+msgid "Skipped local contact: %s"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:114
+#, php-format
+msgid "Already blocked: %s"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:131
+#, php-format
+msgid "%d contact was blocked."
+msgid_plural "%d contacts were blocked."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:134
+#, php-format
+msgid "%d contact was skipped."
+msgid_plural "%d contacts were skipped."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:139
+#, php-format
+msgid "... and %d more errors"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:143
+msgid "No contacts were imported."
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:163
+#: src/Module/Moderation/Blocklist/Server/Add.php:109
+#: src/Module/Moderation/Blocklist/Server/Import.php:104
+msgid "← Return to the list"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:165
+msgid "Import a Contact Blocklist"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:166
+msgid "<p>Upload a CSV file with contact URLs and reasons for blocking.</p>"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:167
+#: src/Module/Moderation/Blocklist/Server/Import.php:108
+#: src/Module/Moderation/Blocklist/Server/Index.php:95
+msgid "Upload file"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:168
+msgid "Contacts to import"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:169
+msgid "Contact URL"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:172
+#, php-format
+msgid "%d total contact"
+msgid_plural "%d total contacts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:173
+#: src/Module/Moderation/Blocklist/Contact/Import.php:177
+msgid "Also purge contacts"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:174
+#: src/Module/Moderation/Blocklist/Contact/Import.php:177
+msgid "Removes all content related to these contacts from the node. Keeps the contact records. This action cannot be undone."
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:176
+msgid "Contact blocklist CSV file"
+msgstr ""
+
+#: src/Module/Moderation/Blocklist/Contact/Import.php:195
+#, php-format
+msgid "The file \"%s\" could not be opened for importing"
 msgstr ""
 
 #: src/Module/Moderation/Blocklist/Server/Add.php:69
@@ -7465,11 +7588,6 @@ msgid "%s server scheduled to be purged."
 msgid_plural "%s servers scheduled to be purged."
 msgstr[0] ""
 msgstr[1] ""
-
-#: src/Module/Moderation/Blocklist/Server/Add.php:109
-#: src/Module/Moderation/Blocklist/Server/Import.php:104
-msgid "← Return to the list"
-msgstr ""
 
 #: src/Module/Moderation/Blocklist/Server/Add.php:111
 msgid "Block A New Server Domain Pattern"
@@ -7573,11 +7691,6 @@ msgstr ""
 
 #: src/Module/Moderation/Blocklist/Server/Import.php:107
 msgid "<p>This file can be downloaded from the <code>/friendica</code> path of any Friendica server.</p>"
-msgstr ""
-
-#: src/Module/Moderation/Blocklist/Server/Import.php:108
-#: src/Module/Moderation/Blocklist/Server/Index.php:95
-msgid "Upload file"
 msgstr ""
 
 #: src/Module/Moderation/Blocklist/Server/Import.php:109
@@ -8203,12 +8316,6 @@ msgstr ""
 msgid "Follower"
 msgstr ""
 
-#: src/Module/Notifications/Introductions.php:164
-#: src/Module/Post/Tag/Remove.php:95
-#: src/Module/Settings/TwoFactor/Trusted.php:133
-msgid "Remove"
-msgstr ""
-
 #: src/Module/Notifications/Introductions.php:198
 msgid "Accept request"
 msgstr ""
@@ -8387,6 +8494,11 @@ msgstr ""
 
 #: src/Module/Post/Tag/Remove.php:94
 msgid "Select a tag to remove: "
+msgstr ""
+
+#: src/Module/Post/Tag/Remove.php:95
+#: src/Module/Settings/TwoFactor/Trusted.php:133
+msgid "Remove"
 msgstr ""
 
 #: src/Module/Privacy/PermissionTooltip.php:76
