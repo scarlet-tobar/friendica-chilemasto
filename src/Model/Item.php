@@ -2960,14 +2960,14 @@ class Item
 		if (!empty($shared_item['uri-id'])) {
 			$shared_uri_id          = $shared_item['uri-id'];
 			$shared_links[]         = strtolower($shared_item['plink']);
-			$sharedSplitAttachments = DI::postMediaRepository()->splitAttachments($shared_uri_id, [], $shared_item['has-media']);
+			$sharedSplitAttachments = DI::postMediaRepository()->splitAttachments($shared_uri_id, [], $shared_item['has-media'], $uid != 0);
 			$shared_links           = array_merge($shared_links, $sharedSplitAttachments['visual']->column('url'));
 			$shared_links           = array_merge($shared_links, $sharedSplitAttachments['link']->column('url'));
 			$shared_links           = array_merge($shared_links, $sharedSplitAttachments['additional']->column('url'));
 			$item['body']           = self::replaceVisualAttachments($sharedSplitAttachments['visual'], $item['body']);
 		}
 
-		$itemSplitAttachments = DI::postMediaRepository()->splitAttachments($item['uri-id'], $shared_links, $item['has-media'] ?? false);
+		$itemSplitAttachments = DI::postMediaRepository()->splitAttachments($item['uri-id'], $shared_links, $item['has-media'] ?? false, $uid != 0);
 		$item['body']         = self::replaceVisualAttachments($itemSplitAttachments['visual'], $item['body'] ?? '');
 
 		self::putInCache($item);
@@ -3039,10 +3039,10 @@ class Item
 		}
 
 		if (!empty($sharedSplitAttachments)) {
-			$s    = self::addGallery($s, $sharedSplitAttachments['visual'], $uid);
+			$s    = self::addGallery($s, $sharedSplitAttachments['visual']);
 			$s    = self::addVisualAttachments($sharedSplitAttachments['visual'], $shared_item, $s, true, $uid);
 			$s    = self::addLinkAttachment($shared_uri_id ?: $item['uri-id'], $sharedSplitAttachments, $body, $s, true, $quote_shared_links, $uid, $shared_item);
-			$s    = self::addNonVisualAttachments($sharedSplitAttachments['additional'], $item, $s, $uid);
+			$s    = self::addNonVisualAttachments($sharedSplitAttachments['additional'], $item, $s);
 			$body = BBCode::removeSharedData($body);
 		}
 
@@ -3052,10 +3052,10 @@ class Item
 			$s           = substr($s, 0, $pos);
 		}
 
-		$s = self::addGallery($s, $itemSplitAttachments['visual'], $uid);
+		$s = self::addGallery($s, $itemSplitAttachments['visual']);
 		$s = self::addVisualAttachments($itemSplitAttachments['visual'], $item, $s, false, $uid);
 		$s = self::addLinkAttachment($item['uri-id'], $itemSplitAttachments, $body, $s, false, $shared_links, $uid, $item);
-		$s = self::addNonVisualAttachments($itemSplitAttachments['additional'], $item, $s, $uid);
+		$s = self::addNonVisualAttachments($itemSplitAttachments['additional'], $item, $s);
 		$s = self::addQuestions($item, $s);
 
 		// Map.
@@ -3076,7 +3076,7 @@ class Item
 			$s .= $shared_html;
 		}
 
-		$s = DI::postMediaRepository()->addEmbed($s, $uid, $item['uri-id']);
+		$s = DI::postMediaRepository()->addEmbed($s, $uid, $item['uri-id'], $uid != 0);
 
 		$s = HTML::applyContentFilter($s, $filter_reasons);
 
@@ -3136,12 +3136,8 @@ class Item
 	 * @param PostMedias $PostMedias
 	 * @return string
 	 */
-	private static function addGallery(string $s, PostMedias $PostMedias, $uid): string
+	private static function addGallery(string $s, PostMedias $PostMedias): string
 	{
-		if ($uid == 0) {
-			return $s;
-		}
-
 		/** @var PostMedia $PostMedia */
 		foreach ($PostMedias as $PostMedia) {
 			if (!$PostMedia->preview || ($PostMedia->type !== Post\Media::IMAGE)) {
@@ -3286,10 +3282,6 @@ class Item
 	 */
 	private static function addVisualAttachments(PostMedias $PostMedias, array $item, string $content, bool $shared, int $uid): string
 	{
-		if ($uid == 0) {
-			return $content;
-		}
-
 		DI::profiler()->startRecording('rendering');
 		$leading  = '';
 		$trailing = '';
@@ -3528,12 +3520,8 @@ class Item
 	 * @throws InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function addNonVisualAttachments(PostMedias $PostMedias, array $item, string $content, int $uid): string
+	private static function addNonVisualAttachments(PostMedias $PostMedias, array $item, string $content): string
 	{
-		if ($uid == 0) {
-			return $content;
-		}
-
 		DI::profiler()->startRecording('rendering');
 		$trailing = '';
 		/** @var PostMedia $PostMedia */
@@ -3626,7 +3614,7 @@ class Item
 			$plink = $item['uri'];
 		}
 
-		if ((($item['post-reason'] ?? self::PR_NONE) == self::PR_ANNOUNCEMENT) && ($item['owner-contact-type'] == Contact::TYPE_COMMUNITY) && ($item['owner-network'] == Protocol::DFRN)) {
+		if (($item['owner-contact-type'] == Contact::TYPE_COMMUNITY) && ($item['owner-network'] == Protocol::DFRN)) {
 			$contact = Contact::getById($item['owner-id'], ['baseurl']);
 			if (!empty($contact['baseurl'])) {
 				$plink = $contact['baseurl'] . '/display/' . $item['guid'];
