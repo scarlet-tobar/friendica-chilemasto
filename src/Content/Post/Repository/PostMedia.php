@@ -188,9 +188,10 @@ class PostMedia extends BaseRepository
 	 * @param int    $uri_id URI id
 	 * @param array  $links list of links that shouldn't be added
 	 * @param bool   $has_media
+	 * @param bool   $display_remote_media
 	 * @return PostMediasCollection[] Three collections in "visual", "link" and "additional" keys
 	 */
-	public function splitAttachments(int $uri_id, array $links = [], bool $has_media = true): array
+	public function splitAttachments(int $uri_id, array $links = [], bool $has_media = true, bool $display_remote_media = true): array
 	{
 		$attachments = [
 			'visual'     => new PostMediasCollection(),
@@ -228,6 +229,10 @@ class PostMedia extends BaseRepository
 
 		/** @var PostMediaEntity $PostMedia */
 		foreach ($PostMedias as $PostMedia) {
+			if (!$display_remote_media && in_array($PostMedia->type, [PostMediaEntity::TYPE_IMAGE, PostMediaEntity::TYPE_AUDIO, PostMediaEntity::TYPE_HLS, PostMediaEntity::TYPE_VIDEO]) && !$this->baseURL->isLocalUri($PostMedia->url)) {
+				continue;
+			}
+
 			foreach ($links as $link) {
 				if (Strings::compareLink($link, $PostMedia->url)) {
 					continue 2;
@@ -323,7 +328,7 @@ class PostMedia extends BaseRepository
 	 * @param integer $uri_id The uri-id of the item that is rendered
 	 * @return string
 	 */
-	public function addEmbed(string $html, int $uid, int $uri_id): string
+	public function addEmbed(string $html, int $uid, int $uri_id, bool $display_remote_media = true): string
 	{
 		if ($html == '') {
 			return $html;
@@ -365,6 +370,10 @@ class PostMedia extends BaseRepository
 					$result = Post\Media::insert($fields);
 					$this->logger->debug('Media is now assigned to this post', ['uri-id' => $uri_id, 'uid' => $uid, 'result' => $result, 'fields' => $fields]);
 				}
+			}
+
+			if (!$display_remote_media && in_array($media->type, [PostMediaEntity::TYPE_IMAGE, PostMediaEntity::TYPE_AUDIO, PostMediaEntity::TYPE_HLS, PostMediaEntity::TYPE_VIDEO]) && !$this->baseURL->isLocalUri($media->url)) {
+				continue;
 			}
 
 			if ($media->type === Post\Media::AUDIO) {
