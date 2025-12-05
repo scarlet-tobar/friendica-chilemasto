@@ -8,7 +8,6 @@
 <div class="notif-item {{if !$item_seen}}unseen{{/if}}" {{if $item_seen}}aria-hidden="true"{{/if}}>
 	<a href="{{$notification.link}}">
 		<img src="{{$notification.image}}" aria-hidden="true" class="notif-image">
-		<link rel="stylesheet" href="view/global.css">
 		<div>
 			<p class="notif-text">{{$notification.text}}</p>
 			<p class="notif-when"><small data-toggle="tooltip" title="{{$notification.when}}">{{$notification.ago}}</small></p>
