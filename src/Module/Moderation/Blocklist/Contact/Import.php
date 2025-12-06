@@ -7,39 +7,17 @@
 
 namespace Friendica\Module\Moderation\Blocklist\Contact;
 
-use Friendica\App\Arguments;
-use Friendica\App\BaseURL;
-use Friendica\App\Page;
-use Friendica\AppHelper;
-use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Worker;
-use Friendica\Database\Database;
-use Friendica\Model;
-use Friendica\Module\Response;
-use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException;
-use Friendica\Util\Profiler;
-use Psr\Log\LoggerInterface;
 
 class Import extends \Friendica\Module\BaseModeration
 {
-	/** @var Database */
-	private $database;
-
 	/** @var array of contacts to import */
 	private $contactlist = [];
 
 	/** @var array of notices/errors to display */
 	private $notices = [];
-
-	public function __construct(Database $database, Page $page, AppHelper $appHelper, SystemMessages $systemMessages, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
-		parent::__construct($page, $appHelper, $systemMessages, $session, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->database = $database;
-	}
 
 	/**
 	 * @param array $request
@@ -81,10 +59,9 @@ class Import extends \Friendica\Module\BaseModeration
 			}
 		}
 
-		$blocked = 0;
+		$queued = 0;
 		$skipped = 0;
-		$errors = [];
-		$purge = $request['purge'] ?? false;
+		$purge = !empty($request['purge']);
 
 		foreach ($this->contactlist as $item) {
 			$contact_url = $item['url'] ?? '';
@@ -95,55 +72,19 @@ class Import extends \Friendica\Module\BaseModeration
 				continue;
 			}
 
-			$contact = Model\Contact::getByURL($contact_url, null, ['id', 'nurl']);
-			if (empty($contact)) {
-				$errors[] = $this->t('Contact not found: %s', $contact_url);
-				$skipped++;
-				continue;
-			}
-
-			if ($this->baseUrl->isLocalUrl($contact['nurl'])) {
-				$errors[] = $this->t('Skipped local contact: %s', $contact_url);
-				$skipped++;
-				continue;
-			}
-
-			// Check if already blocked
-			$existing = $this->database->selectFirst('contact', ['blocked'], ['id' => $contact['id'], 'uid' => 0]);
-			if (!empty($existing) && $existing['blocked']) {
-				$errors[] = $this->t('Already blocked: %s', $contact_url);
-				$skipped++;
-				continue;
-			}
-
-			Model\Contact::block($contact['id'], $block_reason);
-			$blocked++;
-
-			if ($purge) {
-				foreach (Model\Contact::selectToArray(['id'], ['nurl' => $contact['nurl']]) as $contact_entry) {
-					Worker::add(Worker::PRIORITY_LOW, 'Contact\RemoveContent', $contact_entry['id']);
-				}
-			}
+			Worker::add(Worker::PRIORITY_LOW, 'Contact\BlockFromCSV', $contact_url, $block_reason, $purge);
+			$queued++;
 		}
 
-		// Build result messages
-		if ($blocked > 0) {
-			$this->notices[] = $this->tt('%d contact was blocked.', '%d contacts were blocked.', $blocked);
+		// Build result messages (inline, not via systemMessages)
+		if ($queued > 0) {
+			$this->notices[] = $this->tt('%d contact blocking was queued.', '%d contact blockings were queued.', $queued);
 		}
 		if ($skipped > 0) {
-			$this->notices[] = $this->tt('%d contact was skipped.', '%d contacts were skipped.', $skipped);
-		}
-		if (!empty($errors)) {
-			$this->notices = array_merge($this->notices, array_slice($errors, 0, 10)); // Show max 10 errors
-			if (count($errors) > 10) {
-				$this->notices[] = $this->t('... and %d more errors', count($errors) - 10);
-			}
-		}
-		if ($blocked === 0 && $skipped === 0) {
-			$this->notices[] = $this->t('No contacts were imported.');
+			$this->notices[] = $this->tt('%d contact was skipped (empty URL).', '%d contacts were skipped (empty URL).', $skipped);
 		}
 
-		// Clear contactlist after import
+		// Clear contactlist to show upload form again with result notices
 		$this->contactlist = [];
 	}
 
