@@ -37,7 +37,6 @@ class BlockFromCSV
 			return;
 		}
 
-		// Check if already blocked (uid = 0 means global block)
 		$existing = DBA::selectFirst('contact', ['blocked'], ['id' => $contact['id'], 'uid' => 0]);
 		if (!empty($existing) && $existing['blocked']) {
 			DI::logger()->debug('Contact already blocked', ['url' => $url]);

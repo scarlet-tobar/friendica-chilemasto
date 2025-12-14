@@ -43,9 +43,7 @@ class Import extends \Friendica\Module\BaseModeration
 				$this->contactlist = $this->extractFromCSVFile($_FILES['listfile']['tmp_name']);
 				if (empty($this->contactlist)) {
 					$this->notices[] = $this->t('No valid contacts found in CSV file.');
-					return;
 				}
-				// Show preview, don't import yet
 				return;
 			} catch (\Throwable $e) {
 				$this->notices[] = $this->t('Error importing contact file: %s', $e->getMessage());
@@ -76,7 +74,6 @@ class Import extends \Friendica\Module\BaseModeration
 			$queued++;
 		}
 
-		// Build result messages (inline, not via systemMessages)
 		if ($queued > 0) {
 			$this->notices[] = $this->tt('%d contact blocking was queued.', '%d contact blockings were queued.', $queued);
 		}
@@ -84,7 +81,6 @@ class Import extends \Friendica\Module\BaseModeration
 			$this->notices[] = $this->tt('%d contact was skipped (empty URL).', '%d contacts were skipped (empty URL).', $skipped);
 		}
 
-		// Clear contactlist to show upload form again with result notices
 		$this->contactlist = [];
 	}
 

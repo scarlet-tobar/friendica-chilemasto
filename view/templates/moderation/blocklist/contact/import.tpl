@@ -14,11 +14,11 @@
 		{{/foreach}}
 	{{/if}}
 {{if !$contactlist}}
-    {{$l10n.download nofilter}}
+	{{$l10n.download nofilter}}
 
 	<form action="{{$baseurl}}/moderation/blocklist/contact/import" method="post" enctype="multipart/form-data">
 		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
-        {{include file="field_input.tpl" field=$listfile}}
+		{{include file="field_input.tpl" field=$listfile}}
 		<div class="submit">
 			<button type="submit" class="btn btn-primary" name="page_contactblock_upload" value="{{$l10n.upload}}">{{$l10n.upload}}</button>
 		</div>
@@ -27,7 +27,7 @@
 	<h2>{{$l10n.contacts}}</h2>
 	<form action="{{$baseurl}}/moderation/blocklist/contact/import" method="post">
 		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
-        <input type="hidden" name="contactlist" value="{{$contactlist|json_encode}}">
+		<input type="hidden" name="contactlist" value="{{$contactlist|json_encode}}">
 		<table class="table table-condensed table-striped table-bordered">
 			<thead>
 				<tr>
@@ -41,12 +41,12 @@
 				</tr>
 			</tfoot>
 			<tbody>
-            {{foreach $contactlist as $contact}}
+				{{foreach $contactlist as $contact}}
 				<tr>
 					<td>{{$contact.url}}</td>
 					<td>{{$contact.reason}}</td>
 				</tr>
-            {{/foreach}}
+				{{/foreach}}
 			</tbody>
 		</table>
 
