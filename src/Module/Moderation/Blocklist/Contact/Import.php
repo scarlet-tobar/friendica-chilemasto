@@ -57,12 +57,12 @@ class Import extends \Friendica\Module\BaseModeration
 			}
 		}
 
-		$queued = 0;
+		$queued  = 0;
 		$skipped = 0;
-		$purge = !empty($request['purge']);
+		$purge   = !empty($request['purge']);
 
 		foreach ($this->contactlist as $item) {
-			$contact_url = $item['url'] ?? '';
+			$contact_url  = $item['url']    ?? '';
 			$block_reason = $item['reason'] ?? '';
 
 			if (empty($contact_url)) {
@@ -96,19 +96,19 @@ class Import extends \Friendica\Module\BaseModeration
 		$t = Renderer::getMarkupTemplate('moderation/blocklist/contact/import.tpl');
 		return Renderer::replaceMacros($t, [
 			'$notices' => $this->notices,
-			'$l10n' => [
-				'return_list'    => $this->t('← Return to the list'),
-				'title'          => $this->t('Moderation'),
-				'page'           => $this->t('Import a Contact Blocklist'),
-				'download'       => $this->t('<p>Upload a CSV file with contact URLs and reasons for blocking.</p>'),
-				'upload'         => $this->t('Upload file'),
-				'contacts'       => $this->t('Contacts to import'),
-				'contact_url'    => $this->t('Contact URL'),
-				'block_reason'   => $this->t('Block Reason'),
-				'import'         => $this->t('Import Contacts'),
-				'contact_count'  => $this->tt('%d total contact', '%d total contacts', count($this->contactlist)),
-				'purge'          => $this->t('Also purge contacts'),
-				'purge_desc'     => $this->t('Removes all content related to these contacts from the node. Keeps the contact records. This action cannot be undone.'),
+			'$l10n'    => [
+				'return_list'   => $this->t('â† Return to the list'),
+				'title'         => $this->t('Moderation'),
+				'page'          => $this->t('Import a Contact Blocklist'),
+				'download'      => $this->t('<p>Upload a CSV file with contact URLs and reasons for blocking.</p>'),
+				'upload'        => $this->t('Upload file'),
+				'contacts'      => $this->t('Contacts to import'),
+				'contact_url'   => $this->t('Contact URL'),
+				'block_reason'  => $this->t('Block Reason'),
+				'import'        => $this->t('Import Contacts'),
+				'contact_count' => $this->tt('%d total contact', '%d total contacts', count($this->contactlist)),
+				'purge'         => $this->t('Also purge contacts'),
+				'purge_desc'    => $this->t('Removes all content related to these contacts from the node. Keeps the contact records. This action cannot be undone.'),
 			],
 			'$listfile'            => ['listfile', $this->t('Contact blocklist CSV file'), '', '', $this->t('Required'), '', 'file'],
 			'$purge'               => ['purge', $this->t('Also purge contacts'), false, $this->t('Removes all content related to these contacts from the node. Keeps the contact records. This action cannot be undone.')],
@@ -135,10 +135,10 @@ class Import extends \Friendica\Module\BaseModeration
 		$contactlist = [];
 		while (($data = fgetcsv($fp, 1000)) !== false) {
 			$item = [
-				'url' => $data[0] ?? '',
+				'url'    => $data[0] ?? '',
 				'reason' => $data[1] ?? '',
 			];
-			
+
 			if (!empty($item['url']) && !in_array($item, $contactlist)) {
 				$contactlist[] = $item;
 			}

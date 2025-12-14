@@ -51,7 +51,7 @@ class Contact extends BaseModeration
 		}
 
 		$condition = ['uid' => 0, 'blocked' => true];
-		$contacts = Model\Contact::selectToArray(['url', 'addr', 'alias', 'name', 'block_reason'], $condition);
+		$contacts  = Model\Contact::selectToArray(['url', 'addr', 'alias', 'name', 'block_reason'], $condition);
 
 		header('Content-Type: text/csv; charset=utf-8');
 		header('Content-Transfer-Encoding: Binary');
@@ -138,18 +138,18 @@ class Contact extends BaseModeration
 		$t = Renderer::getMarkupTemplate('moderation/blocklist/contact.tpl');
 		return Renderer::replaceMacros($t, [
 			// strings //
-			'$title'       => $this->t('Moderation'),
-			'$page'        => $this->t('Remote Contact Blocklist'),
-			'$description' => $this->t('This page allows you to prevent any message from a remote contact to reach your node.'),
-			'$submit'      => $this->t('Block Remote Contact'),
+			'$title'        => $this->t('Moderation'),
+			'$page'         => $this->t('Remote Contact Blocklist'),
+			'$description'  => $this->t('This page allows you to prevent any message from a remote contact to reach your node.'),
+			'$submit'       => $this->t('Block Remote Contact'),
 			'$importexport' => $this->t('Import/Export'),
-			'$import_csv'  => $this->t('Import from CSV file'),
-			'$export_csv'  => $this->t('Export to CSV file'),
-			'$select_all'  => $this->t('select all'),
-			'$select_none' => $this->t('select none'),
-			'$block'       => $this->t('Block'),
-			'$unblock'     => $this->t('Unblock'),
-			'$no_data'     => $this->t('No remote contact is blocked from this node.'),
+			'$import_csv'   => $this->t('Import from CSV file'),
+			'$export_csv'   => $this->t('Export to CSV file'),
+			'$select_all'   => $this->t('select all'),
+			'$select_none'  => $this->t('select none'),
+			'$block'        => $this->t('Block'),
+			'$unblock'      => $this->t('Unblock'),
+			'$no_data'      => $this->t('No remote contact is blocked from this node.'),
 
 			'$h_contacts'  => $this->t('Blocked Remote Contacts'),
 			'$h_newblock'  => $this->t('Block New Remote Contact'),
