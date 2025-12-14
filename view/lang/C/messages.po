@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-14 11:23+0100\n"
+"POT-Creation-Date: 2025-12-14 11:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -7501,7 +7501,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: src/Module/Moderation/Blocklist/Contact/Import.php:100
-msgid "â† Return to the list"
+#: src/Module/Moderation/Blocklist/Server/Add.php:109
+#: src/Module/Moderation/Blocklist/Server/Import.php:104
+msgid "← Return to the list"
 msgstr ""
 
 #: src/Module/Moderation/Blocklist/Contact/Import.php:102
@@ -7562,11 +7564,6 @@ msgid "%s server scheduled to be purged."
 msgid_plural "%s servers scheduled to be purged."
 msgstr[0] ""
 msgstr[1] ""
-
-#: src/Module/Moderation/Blocklist/Server/Add.php:109
-#: src/Module/Moderation/Blocklist/Server/Import.php:104
-msgid "← Return to the list"
-msgstr ""
 
 #: src/Module/Moderation/Blocklist/Server/Add.php:111
 msgid "Block A New Server Domain Pattern"
