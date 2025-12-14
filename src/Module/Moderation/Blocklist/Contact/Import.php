@@ -97,7 +97,7 @@ class Import extends \Friendica\Module\BaseModeration
 		return Renderer::replaceMacros($t, [
 			'$notices' => $this->notices,
 			'$l10n'    => [
-				'return_list'   => $this->t('â† Return to the list'),
+				'return_list'   => $this->t('← Return to the list'),
 				'title'         => $this->t('Moderation'),
 				'page'          => $this->t('Import a Contact Blocklist'),
 				'download'      => $this->t('<p>Upload a CSV file with contact URLs and reasons for blocking.</p>'),
