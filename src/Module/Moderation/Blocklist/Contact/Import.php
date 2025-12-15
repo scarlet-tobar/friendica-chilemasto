@@ -70,7 +70,7 @@ class Import extends \Friendica\Module\BaseModeration
 				continue;
 			}
 
-			Worker::add(Worker::PRIORITY_LOW, 'Contact\BlockFromCSV', $contact_url, $block_reason, $purge);
+			Worker::add(Worker::PRIORITY_LOW, 'Contact\BlockByUrl', $contact_url, $block_reason, $purge);
 			$queued++;
 		}
 

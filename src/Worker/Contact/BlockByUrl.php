@@ -13,12 +13,12 @@ use Friendica\DI;
 use Friendica\Model\Contact;
 
 /**
- * Block a contact from a CSV import
+ * Block a contact by URL
  */
-class BlockFromCSV
+class BlockByUrl
 {
 	/**
-	 * Block a contact by URL (used for CSV import)
+	 * Block a contact by URL
 	 *
 	 * @param string $url Contact URL or handle
 	 * @param string $reason Block reason
@@ -44,7 +44,7 @@ class BlockFromCSV
 		}
 
 		Contact::block($contact['id'], $reason);
-		DI::logger()->info('Contact blocked from CSV import', ['url' => $url, 'id' => $contact['id']]);
+		DI::logger()->info('Contact blocked', ['url' => $url, 'id' => $contact['id']]);
 
 		if ($purge) {
 			foreach (Contact::selectToArray(['id'], ['nurl' => $contact['nurl']]) as $contact_entry) {
