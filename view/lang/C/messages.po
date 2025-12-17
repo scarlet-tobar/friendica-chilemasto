@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-30 14:45+0100\n"
+"POT-Creation-Date: 2025-12-17 20:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -236,7 +236,6 @@ msgid "Message collection failure."
 msgstr ""
 
 #: mod/message.php:111 src/Module/Notifications/Introductions.php:127
-#: src/Module/Notifications/Introductions.php:164
 #: src/Module/Notifications/Notification.php:71
 msgid "Discard"
 msgstr ""
@@ -2278,8 +2277,8 @@ msgstr ""
 msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:945 src/Model/Item.php:3657
-#: src/Model/Item.php:3663 src/Model/Item.php:3664
+#: src/Content/Text/BBCode.php:945 src/Model/Item.php:3645
+#: src/Model/Item.php:3651 src/Model/Item.php:3652
 msgid "Link to source"
 msgstr ""
 
@@ -3455,44 +3454,44 @@ msgstr ""
 msgid "Sensitive content"
 msgstr ""
 
-#: src/Model/Item.php:3557
+#: src/Model/Item.php:3545
 msgid "bytes"
 msgstr ""
 
-#: src/Model/Item.php:3588
+#: src/Model/Item.php:3576
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3590
+#: src/Model/Item.php:3578
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3595
+#: src/Model/Item.php:3583
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3597
+#: src/Model/Item.php:3585
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3599
+#: src/Model/Item.php:3587
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:3640 src/Model/Item.php:3641
+#: src/Model/Item.php:3628 src/Model/Item.php:3629
 msgid "View on separate page"
 msgstr ""
 
@@ -6306,7 +6305,7 @@ msgstr[1] ""
 #: src/Module/Contact/Follow.php:56 src/Module/Contact/Redir.php:47
 #: src/Module/Contact/Redir.php:208 src/Module/Conversation/Community.php:156
 #: src/Module/Debug/ItemBody.php:30 src/Module/Diaspora/Receive.php:45
-#: src/Module/Item/Complete.php:25 src/Module/Item/Display.php:82
+#: src/Module/Item/Complete.php:25 src/Module/Item/Display.php:84
 #: src/Module/Item/Feed.php:45 src/Module/Item/Follow.php:27
 #: src/Module/Item/Ignore.php:27 src/Module/Item/Language.php:43
 #: src/Module/Item/Pin.php:27 src/Module/Item/Pin.php:42
@@ -7236,7 +7235,7 @@ msgstr ""
 msgid "You can make this page always open when you use the New Post button in the <a href=\"/settings/display\">Theme Customization settings</a>."
 msgstr ""
 
-#: src/Module/Item/Display.php:154
+#: src/Module/Item/Display.php:164
 #, php-format
 msgid "Post by %s"
 msgstr ""
@@ -8204,6 +8203,12 @@ msgstr ""
 msgid "Follower"
 msgstr ""
 
+#: src/Module/Notifications/Introductions.php:164
+#: src/Module/Post/Tag/Remove.php:95
+#: src/Module/Settings/TwoFactor/Trusted.php:133
+msgid "Remove"
+msgstr ""
+
 #: src/Module/Notifications/Introductions.php:198
 msgid "Accept request"
 msgstr ""
@@ -8382,11 +8387,6 @@ msgstr ""
 
 #: src/Module/Post/Tag/Remove.php:94
 msgid "Select a tag to remove: "
-msgstr ""
-
-#: src/Module/Post/Tag/Remove.php:95
-#: src/Module/Settings/TwoFactor/Trusted.php:133
-msgid "Remove"
 msgstr ""
 
 #: src/Module/Privacy/PermissionTooltip.php:76
@@ -11679,7 +11679,7 @@ msgstr ""
 msgid "Quote shared by: %s"
 msgstr ""
 
-#: src/Protocol/ActivityPub/Receiver.php:570
+#: src/Protocol/ActivityPub/Receiver.php:577
 msgid "Chat"
 msgstr ""
 

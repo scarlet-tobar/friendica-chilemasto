@@ -789,10 +789,22 @@ summary.wall-item-summary {
 }
 
 /* css instructions notification.tpl */
+.notifications-content-wrapper h2 {
+	font-size: 24.5px;
+	margin-top: 10px;
+}
+
+#notifications-show-hide-link {
+	display: inline-block;
+	padding-bottom: 10px;
+}
+
 /* Flexbox layout to align the icon and text in a single line */
 .notif-item a {
-	display: flex;
 	align-items: flex-start;
+	color: black;
+	display: flex;
+	font-size: 14px;
 }
 
 /* Margin to create space between the icon and the text */
@@ -803,8 +815,13 @@ summary.wall-item-summary {
 /* Styles to ensure the text wraps properly after 70 characters */
 .notif-text {
 	display: inline-block;
-	max-width: 70ch;
+	max-width: 80ch;
 	overflow-wrap: break-word;
+}
+
+.notif-when {
+	color: #777777;
+	margin-bottom: 0;
 }
 
 /* Add alt tag indicators to the relevant images */

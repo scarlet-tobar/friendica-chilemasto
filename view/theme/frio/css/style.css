@@ -942,9 +942,16 @@ nav.navbar .nav > li > button:focus {
 	max-height: 400px;
 	overflow: auto;
 }
+
+.intro-block{
+  display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+}
 .intro-actions {
 	font-size: 2em;
-	padding: 1em;
+	padding: 0.5em;
 }
 .intro-wrapper button.intro-action-link {
 	padding-left: 10px;
