@@ -157,12 +157,12 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'preview_mode', $preview_mode);
 		$this->pConfig->set($uid, 'system', 'embed_remote_media', $embed_remote_media);
 		$this->pConfig->set($uid, 'system', 'embed_media', $embed_media);
-		if ($widget_timeline_reset == 1) {
+		if ($widget_timeline_reset) {
 			$this->pConfig->delete($uid, 'system', 'widget_timeline_order');
 		} else {
 			$this->pConfig->set($uid, 'system', 'widget_timeline_order', $widget_timelineorder);
 		}
-		if ($menu_timeline_reset == 1) {
+		if ($menu_timeline_reset) {
 			$this->pConfig->delete($uid, 'system', 'menu_timeline_order');
 		} else {
 			$this->pConfig->set($uid, 'system', 'menu_timeline_order', $menu_timelineorder);

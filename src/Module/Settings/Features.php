@@ -37,7 +37,7 @@ class Features extends BaseSettings
 			if (strpos($k, 'feature_') === 0) {
 				if (substr($k, 8) == 'widgetorder') { // not boolean, stringified array
 					$this->pConfig->set($this->session->getLocalUserId(), 'feature', 'widgetorder', $v);
-				} elseif (substr($k, 8) == 'resetorder' && (bool)$v == 1) {
+				} elseif (substr($k, 8) == 'resetorder' && $v) {
 					$this->pConfig->delete($this->session->getLocalUserId(), 'feature', 'widgetorder');
 				} else {
 					$this->pConfig->set($this->session->getLocalUserId(), 'feature', substr($k, 8), (bool)$v);
