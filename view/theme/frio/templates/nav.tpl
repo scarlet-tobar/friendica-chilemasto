@@ -124,13 +124,17 @@
 									{{* the following list entry must have the id "nav-notifications-mark-all". Without it this isn't visible. ....strange behavior :-/ *}}
 									<li id="nav-notifications-mark-all" class="dropdown-header">
 										<div class="arrow"></div>
-										{{$nav.notifications.1}}
-										<div class="dropdown-header-link">
-											<button role="menuitem" type="button" class="btn-link"
-												onclick="notificationMarkAll();" data-toggle="tooltip"
-												aria-label="{{$nav.notifications.mark.3}}"
-												title="{{$nav.notifications.mark.3}}">{{$nav.notifications.mark.1}}</button>
-										</div>
+										<header id="notifications-header">
+											<p id="notifications-title">{{$nav.notifications.1}}</p>
+											<header id="notifications-subheader">
+												<a href="{{$nav.notifications.all.0}}">{{$nav.notifications.all.1}}</a>
+												<div class="dropdown-header-link">
+													<button role="menuitem" type="button" class="btn-link"
+														onclick="notificationMarkAll();" data-toggle="tooltip">{{$nav.notifications.mark.1}}
+													</button>
+												</div>
+											</header>
+										</header>
 
 									</li>
 

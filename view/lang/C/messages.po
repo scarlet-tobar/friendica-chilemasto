@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-17 20:00+0100\n"
+"POT-Creation-Date: 2025-12-17 20:39+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2175,11 +2175,11 @@ msgid "Notifications"
 msgstr ""
 
 #: src/Content/Nav.php:312
-msgid "See all notifications"
+msgid "View all"
 msgstr ""
 
 #: src/Content/Nav.php:313 src/Module/Settings/Connectors.php:226
-msgid "Mark as seen"
+msgid "Mark as read"
 msgstr ""
 
 #: src/Content/Nav.php:313
