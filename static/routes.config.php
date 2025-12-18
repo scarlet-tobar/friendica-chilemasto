@@ -494,6 +494,7 @@ return [
 		'[/]' => [Module\Moderation\Summary::class, [R::GET]],
 
 		'/blocklist/contact'        => [Module\Moderation\Blocklist\Contact::class,         [R::GET, R::POST]],
+		'/blocklist/contact/export' => [Module\Moderation\Blocklist\Contact\Export::class,  [R::GET]],
 		'/blocklist/contact/import' => [Module\Moderation\Blocklist\Contact\Import::class,  [R::GET, R::POST]],
 		'/blocklist/server'         => [Module\Moderation\Blocklist\Server\Index::class,    [R::GET, R::POST]],
 		'/blocklist/server/add'     => [Module\Moderation\Blocklist\Server\Add::class,      [R::GET, R::POST]],
