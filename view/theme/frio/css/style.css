@@ -2894,9 +2894,6 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 }
 
 /* photos */
-.photo-album-edit-name, #photo-album-edit-submit {
-	display: inline-block;
-}
 #photo-album-edit-name-label {
 	width: 100%;
 }
@@ -3133,6 +3130,12 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 	opacity: 1;
 	color: #fff;
 }
+#photo-like-div {
+	text-align: center;
+}
+#photo-like-div button.active {
+	color: $link_color;
+}
 .photo-comment-wrapper .comment {
 	position: relative;
 }
@@ -3140,7 +3143,7 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 	color: $font_color_darker;
 	font-size: 13px;
 }
-.photo-comment-wrapper .comment-wwedit-wrapper,
+#photo-like-div, .photo-comment-wrapper .comment-wwedit-wrapper,
 .photo-comment-wrapper .wall-item-outside-wrapper.media:first-child {
 	margin-top: 15px;
 }
