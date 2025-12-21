@@ -42,8 +42,7 @@
 			{{include file="field_checkbox.tpl" field=$t.enable}}
 		{{/foreach}}
 		<div class="settings-submit-wrapper">
-			<input type="hidden" name="widget_timeline_reset" value="0"/>
-			<input type="checkbox" id="widget_timeline_reset" name="widget_timeline_reset" value="1"/> <label for="widget_timeline_reset">{{$reset_label}}</label>
+			{{include file="field_checkbox.tpl" field=$reset_widget}}
 		</div>
 	</div>
 	<h3 tabindex="0">{{$timeline_bookmark}}</h3>
@@ -53,8 +52,7 @@
 			{{include file="field_checkbox.tpl" field=$t.bookmark}}
 		{{/foreach}}
 		<div class="settings-submit-wrapper">
-			<input type="hidden" name="menu_timeline_reset" value="0"/>
-			<input type="checkbox" id="menu_timeline_reset" name="menu_timeline_reset" value="1"/> <label for="menu_timeline_reset">{{$reset_label}}</label>
+			{{include file="field_checkbox.tpl" field=$reset_menu}}
 		</div>
 	</div>
 
