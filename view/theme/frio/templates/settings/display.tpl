@@ -94,8 +94,7 @@
 							{{include file="field_checkbox.tpl" field=$t.enable}}
 						{{/foreach}}
 						<div class="panel-footer">
-							<input type="hidden" name="widget_timeline_reset" value="0"/>
-							<input type="checkbox" id="widget_timeline_reset" name="widget_timeline_reset" value="1"/> <label for="widget_timeline_reset">{{$reset_label}}</label>
+							{{include file="field_checkbox.tpl" field=$reset_widget}}
 							<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 						</div>
 					</div>
@@ -106,8 +105,7 @@
 							{{include file="field_checkbox.tpl" field=$t.bookmark}}
 						{{/foreach}}						
 					<div class="panel-footer">
-						<input type="hidden" name="menu_timeline_reset" value="0"/>
-						<input type="checkbox" id="menu_timeline_reset" name="menu_timeline_reset" value="1"/> <label for="menu_timeline_reset">{{$reset_label}}</label>
+						{{include file="field_checkbox.tpl" field=$reset_menu}}
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>
 				</div>
