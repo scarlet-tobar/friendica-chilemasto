@@ -82,6 +82,7 @@ class Features extends BaseSettings
 			'$form_security_token' => BaseSettings::getFormSecurityToken('settings_features'),
 			'$title'               => $this->t('Additional Features'),
 			'$sortable'            => $this->t('Drag to reorder or tab to item with keyboard and move up/down with arrow keys'),
+			'$sort_key'			   => self::NETWORK_KEY,
 			'$reset'               => [
 				'0'	=> 'feature_resetorder',
 				'1'	=> $this->t('Reset order')
