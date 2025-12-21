@@ -150,22 +150,22 @@
 	border: 1px dashed black;
 	list-style: none;
 }
-.sortable .field {
+.sortable > .field {
 	position: relative;
 	border: 1px solid #eee;
 	padding: 10px 30px 10px 30px;
 	margin: 0;
 	box-sizing: border-box;
 }
-	.sortable .field:first-of-type {
+	.sortable > .field:first-of-type {
 		border-top-left-radius: 8px;
 		border-top-right-radius: 8px;
 	}
-	.sortable .field:nth-last-of-type(2) {
+	.sortable > .field:nth-last-of-type(2) {
 		border-bottom-left-radius: 8px;
 		border-bottom-right-radius: 8px;
 	}
-	.sortable .field::after {
+	.sortable > .field::after {
 		content: '\2B0D';	/* unicode double-arrow */
 		position: absolute;
 		font-size: 18px;
@@ -173,10 +173,10 @@
 		top: 40%;
 		opacity: .2;
 	}
-	.sortable .field:hover::after,
-	.sortable .field:focus::after,
-	.sortable .field:active::after,
-	.sortable .field:focus-within::after {
+	.sortable > .field:hover::after,
+	.sortable > .field:focus::after,
+	.sortable > .field:active::after,
+	.sortable > .field:focus-within::after {
 		opacity: 1;
 	}
 	.dragged {
