@@ -20,6 +20,8 @@ use Psr\Log\LoggerInterface;
 
 class Features extends BaseSettings
 {
+	const NETWORK_KEY = "network";
+	
 	/** @var IManagePersonalConfigValues */
 	private $pConfig;
 
@@ -35,12 +37,13 @@ class Features extends BaseSettings
 		BaseSettings::checkFormSecurityTokenRedirectOnError('/settings/features', 'settings_features');
 		foreach ($request as $k => $v) {
 			if (strpos($k, 'feature_') === 0) {
-				if (substr($k, 8) == 'widgetorder') { // not boolean, stringified array
+				$key = substr($k, 8);
+				if ($key == 'widgetorder') { // not boolean, stringified array
 					$this->pConfig->set($this->session->getLocalUserId(), 'feature', 'widgetorder', $v);
-				} elseif (substr($k, 8) == 'resetorder' && $v) {
+				} elseif ($key == 'resetorder' && $v) {
 					$this->pConfig->delete($this->session->getLocalUserId(), 'feature', 'widgetorder');
 				} else {
-					$this->pConfig->set($this->session->getLocalUserId(), 'feature', substr($k, 8), (bool)$v);
+					$this->pConfig->set($this->session->getLocalUserId(), 'feature', $key, (bool)$v);
 				}
 			}
 		}
@@ -79,7 +82,10 @@ class Features extends BaseSettings
 			'$form_security_token' => BaseSettings::getFormSecurityToken('settings_features'),
 			'$title'               => $this->t('Additional Features'),
 			'$sortable'            => $this->t('Drag to reorder or tab to item with keyboard and move up/down with arrow keys'),
-			'$reset_label'         => $this->t('Reset order'),
+			'$reset'               => [
+				'0'	=> 'feature_resetorder',
+				'1'	=> $this->t('Reset order')
+			],
 			'$features'            => $arr,
 			'$submit'              => $this->t('Save Settings'),
 		]);
