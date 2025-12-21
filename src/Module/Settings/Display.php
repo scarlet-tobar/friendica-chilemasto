@@ -294,7 +294,74 @@ class Display extends BaseSettings
 				'bookmark' => ["bookmark[{$timeline->code}]", $timeline->label, in_array($timeline->code, $bookmarked_timelines), $timeline->description],
 			];
 		}
-
+		/*  GET CUSTOM TIMELINE ORDERS IF ANY
+			=================================
+			First we see if there is a custom order saved in user prefs, if there is we set working array to that.
+			If we have an array create a temporary array with the items in the correct order.
+			Lastly we modify the $timelines array with our new order for "enable", "bookmark", or both.	
+		*/
+		$widget_timeline_order = json_decode($this->pConfig->get($uid, 'system', 'widget_timeline_order'));
+		$menu_timeline_order = json_decode($this->pConfig->get($uid, 'system', 'menu_timeline_order'));
+		$temp_widget_order = [];
+		$temp_menu_order = [];
+		// do the sidebar widget order first...
+		if (!empty($widget_timeline_order)){
+			$tmp = [];
+			$xtr = [];
+			foreach($widget_timeline_order as $order){
+				foreach($timelines as $timeline){
+					$name = str_replace(['enable[',']'],'',$timeline['enable'][0]);
+					if ($name == $order){
+						$tmp[]['enable'] = $timeline['enable'];
+					}
+				}
+			}
+			// there could be custom or add-on channels not in our array, append those
+			foreach($timelines as $timeline){
+				$name = str_replace(['enable[',']'],'',$timeline['enable'][0]);
+				if (!in_array($name,$widget_timeline_order)){
+					$xtr[]['enable'] = $timeline['enable'];
+				}
+			}
+			// combine our two temp arrays into one big temp array
+			$temp_widget_order = array_merge($tmp,$xtr);
+		}
+		// do the top menu order next...
+		if (!empty($menu_timeline_order)){
+			$tmp = [];
+			$xtr = [];
+			foreach($menu_timeline_order as $order){
+				foreach($timelines as $timeline){
+					$name = str_replace(['bookmark[',']'],'',$timeline['bookmark'][0]);
+					if ($name == $order){
+						$tmp[]['bookmark'] = $timeline['bookmark'];
+					}
+				}
+			}
+			// there could be custom or add-on channels unaccounted for in our array, append them
+			foreach($timelines as $timeline){
+				$name = str_replace(['bookmark[',']'],'',$timeline['bookmark'][0]);
+				if (!in_array($name,$menu_timeline_order)){
+					$xtr[]['bookmark'] = $timeline['bookmark'];
+				}
+			}
+			// combine our two temp arrays into one big temp array
+			$temp_menu_order = array_merge($tmp,$xtr);
+		}
+		/*  now we need to alter the original timelines array directly...
+			in theory populated temp arrays should be same length as timelines
+		*/
+		for($t=0; $t<count($timelines);$t++){
+			// only mod from populated widget array
+			if (count($temp_widget_order) > 0){
+				$timelines[$t]['enable'] = $temp_widget_order[$t]['enable'];
+			}
+			// only mod from populated menu array
+			if (count($temp_menu_order) > 0){
+				$timelines[$t]['bookmark'] = $temp_menu_order[$t]['bookmark'];
+			}
+		}
+		
 		$first_day_of_week = $this->pConfig->get($uid, 'calendar', 'first_day_of_week', 0);
 		$weekdays          = [
 			0 => $this->t('Sunday'),
@@ -333,7 +400,14 @@ class Display extends BaseSettings
 			'$channel_title'       => $this->t('Channels'),
 			'$calendar_title'      => $this->t('Calendar'),
 			'$sortable'            => $this->t('Drag to reorder or tab to item with keyboard and move up/down with arrow keys'),
-			'$reset_label'         => $this->t('Reset order'),
+			'$reset_widget'        => [
+				'0' => 'widget_timeline_reset',
+				'1'	=> $this->t('Reset order')
+			],
+			'$reset_menu'		   => [
+				'0' => 'menu_timeline_reset',
+				'1' => $this->t('Reset order')
+			],
 
 			'$form_security_token' => self::getFormSecurityToken('settings_display'),
 			'$uid'                 => $uid,
