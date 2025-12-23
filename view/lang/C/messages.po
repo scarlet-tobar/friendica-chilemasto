@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-18 09:50+0100\n"
+"POT-Creation-Date: 2025-12-18 18:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -282,7 +282,7 @@ msgstr ""
 msgid "Insert web link"
 msgstr ""
 
-#: mod/message.php:190 mod/message.php:348 mod/photos.php:1257
+#: mod/message.php:190 mod/message.php:348 mod/photos.php:1256
 #: src/Content/Conversation.php:395 src/Content/Conversation.php:1574
 #: src/Module/Item/Compose.php:205 src/Module/Post/Edit.php:143
 #: src/Object/Post.php:617
@@ -379,7 +379,7 @@ msgstr ""
 msgid "Recent Photos"
 msgstr ""
 
-#: mod/photos.php:91 mod/photos.php:682 mod/photos.php:827
+#: mod/photos.php:91 mod/photos.php:682 mod/photos.php:826
 #: src/Module/Profile/Photos.php:422 src/Module/Profile/Photos.php:442
 #: src/Module/Profile/Photos.php:445
 msgid "Upload Photos"
@@ -429,25 +429,8 @@ msgstr ""
 msgid "No photos selected"
 msgstr ""
 
-#: mod/photos.php:659 mod/photos.php:779 mod/photos.php:1056
-#: mod/photos.php:1098 mod/photos.php:1154 mod/photos.php:1234
-#: src/Module/Calendar/Event/Form.php:236 src/Module/Contact/Advanced.php:118
-#: src/Module/Contact/Profile.php:415
-#: src/Module/Debug/ActivityPubConversion.php:128
-#: src/Module/Debug/Babel.php:280 src/Module/Debug/Localtime.php:50
-#: src/Module/Debug/Probe.php:40 src/Module/Debug/WebFinger.php:37
-#: src/Module/FriendSuggest.php:132 src/Module/Install.php:219
-#: src/Module/Install.php:259 src/Module/Install.php:296
-#: src/Module/Invite.php:162 src/Module/Item/Compose.php:188
-#: src/Module/Moderation/Item/Source.php:75
-#: src/Module/Moderation/Report/Create.php:157
-#: src/Module/Moderation/Report/Create.php:172
-#: src/Module/Moderation/Report/Create.php:200
-#: src/Module/Moderation/Report/Create.php:260
-#: src/Module/Settings/Server/Action.php:65 src/Module/User/Delegation.php:181
-#: src/Object/Post.php:1163 view/theme/duepuntozero/config.php:73
-#: view/theme/quattro/config.php:75 view/theme/vier/config.php:123
-msgid "Submit"
+#: mod/photos.php:659 src/Module/Settings/Profile/Index.php:276
+msgid "Upload selected picture"
 msgstr ""
 
 #: mod/photos.php:675
@@ -467,7 +450,7 @@ msgstr ""
 msgid "Do not show a status post for this upload"
 msgstr ""
 
-#: mod/photos.php:691 mod/photos.php:1052 src/Content/Conversation.php:397
+#: mod/photos.php:691 mod/photos.php:1051 src/Content/Conversation.php:397
 #: src/Module/Calendar/Event/Form.php:239 src/Module/Post/Edit.php:181
 msgid "Permissions"
 msgstr ""
@@ -476,11 +459,11 @@ msgstr ""
 msgid "Do you really want to delete this photo album and all its photos?"
 msgstr ""
 
-#: mod/photos.php:757 mod/photos.php:780
+#: mod/photos.php:757
 msgid "Delete Album"
 msgstr ""
 
-#: mod/photos.php:758 mod/photos.php:858 src/Content/Conversation.php:412
+#: mod/photos.php:758 mod/photos.php:857 src/Content/Conversation.php:412
 #: src/Module/Contact/Follow.php:158 src/Module/Contact/Revoke.php:92
 #: src/Module/Contact/Unfollow.php:112
 #: src/Module/Media/Attachment/Browser.php:64
@@ -490,132 +473,139 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: mod/photos.php:784
+#: mod/photos.php:779 mod/photos.php:1055
+#: src/Module/Settings/Server/Index.php:98
+msgid "Save changes"
+msgstr ""
+
+#: mod/photos.php:783
 msgid "Edit Album"
 msgstr ""
 
-#: mod/photos.php:785
+#: mod/photos.php:784
 msgid "Delete album"
 msgstr ""
 
-#: mod/photos.php:789
+#: mod/photos.php:788
 msgid "Show Newest First"
 msgstr ""
 
-#: mod/photos.php:791
+#: mod/photos.php:790
 msgid "Show Oldest First"
 msgstr ""
 
-#: mod/photos.php:812 src/Module/Profile/Photos.php:390
+#: mod/photos.php:811 src/Module/Profile/Photos.php:390
 msgid "View Photo"
 msgstr ""
 
-#: mod/photos.php:844
+#: mod/photos.php:843
 msgid "Permission denied. Access to this item may be restricted."
 msgstr ""
 
-#: mod/photos.php:846
+#: mod/photos.php:845
 msgid "Photo not available"
 msgstr ""
 
-#: mod/photos.php:856
+#: mod/photos.php:855
 msgid "Do you really want to delete this photo?"
 msgstr ""
 
-#: mod/photos.php:857 mod/photos.php:1057
+#: mod/photos.php:856 mod/photos.php:1056
 msgid "Delete Photo"
 msgstr ""
 
-#: mod/photos.php:955
+#: mod/photos.php:954
 msgid "View photo"
 msgstr ""
 
-#: mod/photos.php:957
+#: mod/photos.php:956
 msgid "Edit photo"
 msgstr ""
 
-#: mod/photos.php:958
+#: mod/photos.php:957
 msgid "Delete photo"
 msgstr ""
 
-#: mod/photos.php:959 mod/photos.php:1281
+#: mod/photos.php:958 mod/photos.php:1280
 msgid "Use as profile picture"
 msgstr ""
 
-#: mod/photos.php:966
+#: mod/photos.php:965
 msgid "Private Photo"
 msgstr ""
 
-#: mod/photos.php:972
+#: mod/photos.php:971
 msgid "View Full Size"
 msgstr ""
 
-#: mod/photos.php:1025
-msgid "Tags: "
+#: mod/photos.php:1024 src/Content/Nav.php:271 src/Content/Text/HTML.php:872
+#: src/Content/Widget/TagCloud.php:54
+msgid "Tags"
 msgstr ""
 
-#: mod/photos.php:1028
+#: mod/photos.php:1027
 msgid "[Select tags to remove]"
 msgstr ""
 
-#: mod/photos.php:1043
+#: mod/photos.php:1042
 msgid "New album name"
 msgstr ""
 
-#: mod/photos.php:1044
+#: mod/photos.php:1043
 msgid "Caption"
 msgstr ""
 
-#: mod/photos.php:1045
+#: mod/photos.php:1044
 msgid "Add a Tag"
 msgstr ""
 
-#: mod/photos.php:1045
+#: mod/photos.php:1044
 msgid "Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping"
 msgstr ""
 
-#: mod/photos.php:1046
+#: mod/photos.php:1045
 msgid "Do not rotate"
 msgstr ""
 
-#: mod/photos.php:1047
+#: mod/photos.php:1046
 msgid "Rotate CW (right)"
 msgstr ""
 
-#: mod/photos.php:1048
+#: mod/photos.php:1047
 msgid "Rotate CCW (left)"
 msgstr ""
 
-#: mod/photos.php:1095 mod/photos.php:1151 mod/photos.php:1231
+#: mod/photos.php:1094 mod/photos.php:1150 mod/photos.php:1230
 #: src/Module/Contact.php:609 src/Module/Item/Compose.php:187
 #: src/Object/Post.php:1160
 msgid "This is you"
 msgstr ""
 
-#: mod/photos.php:1097 mod/photos.php:1153 mod/photos.php:1233
+#: mod/photos.php:1096 mod/photos.php:1097 mod/photos.php:1152
+#: mod/photos.php:1153 mod/photos.php:1232 mod/photos.php:1233
 #: src/Module/Moderation/Reports.php:110 src/Object/Post.php:611
 #: src/Object/Post.php:1162
 msgid "Comment"
 msgstr ""
 
-#: mod/photos.php:1099 mod/photos.php:1155 mod/photos.php:1235
+#: mod/photos.php:1098 mod/photos.php:1154 mod/photos.php:1234
 #: src/Content/Conversation.php:409 src/Module/Calendar/Event/Form.php:234
 #: src/Module/Item/Compose.php:200 src/Module/Post/Edit.php:163
 #: src/Object/Post.php:1176
 msgid "Preview"
 msgstr ""
 
-#: mod/photos.php:1100 src/Content/Conversation.php:363 src/Content/Nav.php:113
+#: mod/photos.php:1099 src/Content/Conversation.php:363 src/Content/Nav.php:113
 #: src/Module/Post/Edit.php:128 src/Object/Post.php:1164
 msgid "Loading..."
 msgstr ""
 
-#: mod/photos.php:1192 src/Content/Conversation.php:1496
+#: mod/photos.php:1191 src/Content/Conversation.php:1496
 #: src/Object/Post.php:263
 msgid "Select"
 msgstr ""
 
-#: mod/photos.php:1193 mod/photos.php:1280 src/Content/Conversation.php:1497
+#: mod/photos.php:1192 mod/photos.php:1279 src/Content/Conversation.php:1497
 #: src/Module/Moderation/Users/Active.php:92
 #: src/Module/Moderation/Users/Blocked.php:92
 #: src/Module/Moderation/Users/Index.php:100
@@ -624,31 +614,31 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: mod/photos.php:1254 src/Object/Post.php:435
+#: mod/photos.php:1253 src/Object/Post.php:435
 msgid "Like"
 msgstr ""
 
-#: mod/photos.php:1255 src/Object/Post.php:435
+#: mod/photos.php:1254 src/Object/Post.php:435
 msgid "I like this (toggle)"
 msgstr ""
 
-#: mod/photos.php:1256 src/Object/Post.php:436
+#: mod/photos.php:1255 src/Object/Post.php:436
 msgid "Dislike"
 msgstr ""
 
-#: mod/photos.php:1258 src/Object/Post.php:436
+#: mod/photos.php:1257 src/Object/Post.php:436
 msgid "I don't like this (toggle)"
 msgstr ""
 
-#: mod/photos.php:1279 src/Object/Post.php:228 src/Object/Post.php:230
+#: mod/photos.php:1278 src/Object/Post.php:228 src/Object/Post.php:230
 msgid "Edit"
 msgstr ""
 
-#: mod/photos.php:1282
+#: mod/photos.php:1281
 msgid "Back to viewing"
 msgstr ""
 
-#: mod/photos.php:1284
+#: mod/photos.php:1283
 msgid "Map"
 msgstr ""
 
@@ -2099,11 +2089,6 @@ msgstr ""
 
 #: src/Content/Nav.php:270 src/Content/Text/HTML.php:871
 msgid "Full Text"
-msgstr ""
-
-#: src/Content/Nav.php:271 src/Content/Text/HTML.php:872
-#: src/Content/Widget/TagCloud.php:54
-msgid "Tags"
 msgstr ""
 
 #: src/Content/Nav.php:272 src/Content/Nav.php:327
@@ -5935,6 +5920,25 @@ msgstr ""
 #: src/Module/Calendar/Event/Form.php:230
 #: src/Module/Calendar/Event/Form.php:231
 msgid "Share this event"
+msgstr ""
+
+#: src/Module/Calendar/Event/Form.php:236 src/Module/Contact/Advanced.php:118
+#: src/Module/Contact/Profile.php:415
+#: src/Module/Debug/ActivityPubConversion.php:128
+#: src/Module/Debug/Babel.php:280 src/Module/Debug/Localtime.php:50
+#: src/Module/Debug/Probe.php:40 src/Module/Debug/WebFinger.php:37
+#: src/Module/FriendSuggest.php:132 src/Module/Install.php:219
+#: src/Module/Install.php:259 src/Module/Install.php:296
+#: src/Module/Invite.php:162 src/Module/Item/Compose.php:188
+#: src/Module/Moderation/Item/Source.php:75
+#: src/Module/Moderation/Report/Create.php:157
+#: src/Module/Moderation/Report/Create.php:172
+#: src/Module/Moderation/Report/Create.php:200
+#: src/Module/Moderation/Report/Create.php:260
+#: src/Module/Settings/Server/Action.php:65 src/Module/User/Delegation.php:181
+#: src/Object/Post.php:1163 view/theme/duepuntozero/config.php:73
+#: view/theme/quattro/config.php:75 view/theme/vier/config.php:123
+msgid "Submit"
 msgstr ""
 
 #: src/Module/Calendar/Event/Form.php:237 src/Module/Profile/Profile.php:289
@@ -10225,10 +10229,6 @@ msgstr ""
 msgid "Upload new picture"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:276
-msgid "Upload selected picture"
-msgstr ""
-
 #: src/Module/Settings/Profile/Index.php:277
 msgid "Pick existing picture from photos"
 msgstr ""
@@ -10463,10 +10463,6 @@ msgstr ""
 
 #: src/Module/Settings/Server/Index.php:97
 msgid "Delete all your settings for the remote server"
-msgstr ""
-
-#: src/Module/Settings/Server/Index.php:98
-msgid "Save changes"
 msgstr ""
 
 #: src/Module/Settings/Server/Index.php:102
