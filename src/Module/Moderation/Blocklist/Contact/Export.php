@@ -7,6 +7,7 @@
 
 namespace Friendica\Module\Moderation\Blocklist\Contact;
 
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Model;
 use Friendica\Module\BaseModeration;
@@ -24,8 +25,8 @@ class Export extends BaseModeration
 	{
 		$this->checkModerationAccess();
 
-		$condition = ['uid' => 0, 'blocked' => true];
-		$contacts  = Model\Contact::selectToArray(['url', 'addr', 'alias', 'name', 'block_reason'], $condition);
+		$condition = ['uid' => 0, 'blocked' => true, 'network' => Protocol::FEDERATED];
+		$contacts  = Model\Contact::selectToArray(['url', 'addr', 'alias', 'block_reason'], $condition);
 
 		header('Content-Type: text/csv; charset=utf-8');
 		header('Content-Transfer-Encoding: Binary');
@@ -39,11 +40,8 @@ class Export extends BaseModeration
 
 			if (!empty($contact['addr']) && strpos($contact['addr'], '@') !== false) {
 				$identifier = $contact['addr'];
-			} elseif (!empty($contact['alias']) && !str_starts_with($contact['alias'], 'did:')) {
+			} elseif (!empty($contact['alias'])) {
 				$identifier = $contact['alias'];
-			} elseif (!empty($contact['name']) && str_starts_with($contact['url'], 'did:')) {
-				// For DIDs, use name if available
-				$identifier = $contact['name'] . ' (' . $contact['url'] . ')';
 			}
 
 			fputcsv($output, [$identifier, $contact['block_reason'] ?? '']);
