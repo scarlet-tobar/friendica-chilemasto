@@ -1092,6 +1092,8 @@ ul li .intro-wrapper button.intro-action-link {
 .nav-pills .dropdown-menu li.selected a,
 .nav-tabs .dropdown-menu li.selected a,
 .account .dropdown-menu li.selected a,
+#fc-header .dropdown-menu li button:hover,
+#fc-header .dropdown-menu li button:focus,
 .contact-photo-wrapper .dropdown-menu li.selected a {
 	border-left: 3px solid $link_color;
 	color: #fff;
@@ -3940,6 +3942,15 @@ div.login-form, .login-content-wrapper,
 }
 #fc-header-right .dropdown > button {
 	color: inherit;
+}
+#fc-header .dropdown-menu {
+	padding: 0;
+}
+#fc-header .dropdown-menu li {
+	margin-top: 0;
+}
+#fc-header .dropdown-menu li button {
+	padding: 8px;
 }
 #event-calendar-title {
 	flex: 1;
