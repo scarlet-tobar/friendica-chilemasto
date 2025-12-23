@@ -1671,29 +1671,52 @@ textarea.comment-edit-text:focus + .comment-edit-form .preview {
 	display: inline-block;
 }
 
-.photo-top-image-wrapper .jg-caption {
+/* ALT badge for photos with descriptions in justified gallery */
+.photo-top-image-wrapper:has(img.has-alt-description)::after {
+	background: rgba(0, 0, 0, 0.69);
+	border-radius: 4px;
+	color: #eee;
+	content: "ALT";
+	font-size: 12px;
+	font-weight: bold;
+	padding: 4px 5px;
 	position: absolute;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	background-color: rgba(0, 0, 0, 0.7);
-	color: #fff;
-	padding: 8px 12px;
-	font-size: 14px;
-	text-align: center;
+	bottom: 8px;
+	right: 8px;
+	z-index: 1;
+	pointer-events: none;
+}
+
+.photo-top-image-wrapper .jg-caption,
+#photo-album-contents .photo-top-image-wrapper .jg-caption,
+.justified-gallery > .photo-top-image-wrapper > .jg-caption,
+#photo-album-contents.justified-gallery > .photo-top-image-wrapper > .jg-caption {
+	display: block !important;
+	position: absolute !important;
+	bottom: 0 !important;
+	left: 0 !important;
+	right: 0 !important;
+	background-color: rgba(0, 0, 0, 0.7) !important;
+	color: #fff !important;
+	padding: 8px 12px !important;
+	font-size: 14px !important;
+	text-align: center !important;
 	opacity: 0;
 	visibility: hidden;
 	transition: opacity 0.3s ease, visibility 0.3s ease;
 	pointer-events: none;
 }
 
-.photo-top-image-wrapper:hover .jg-caption {
-	opacity: 1;
-	visibility: visible;
+.photo-top-image-wrapper:hover .jg-caption,
+#photo-album-contents .photo-top-image-wrapper:hover .jg-caption,
+.justified-gallery > .photo-top-image-wrapper:hover > .jg-caption,
+#photo-album-contents.justified-gallery > .photo-top-image-wrapper:hover > .jg-caption {
+	opacity: 1 !important;
+	visibility: visible !important;
 }
 
 .photo-top-image-wrapper .jg-caption a {
-	color: #fff;
+	color: #fff !important;
 	text-decoration: none;
 }
 .fbrowser .profile-rotator-wrapper {
