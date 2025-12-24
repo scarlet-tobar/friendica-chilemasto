@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
 class Features extends BaseSettings
 {
 	const NETWORK_KEY = "network";
-	
+
 	/** @var IManagePersonalConfigValues */
 	private $pConfig;
 
@@ -66,8 +66,8 @@ class Features extends BaseSettings
 		if (!empty($widgetorder)) {
 			$tmp = [];
 			// iterate through widgetorder and network items
-			foreach($widgetorder as $widget) {
-				foreach($arr['network'][1] as $list_item) {
+			foreach ($widgetorder as $widget) {
+				foreach ($arr['network'][1] as $list_item) {
 					if ($list_item[0] == 'feature_'.$widget) {
 						$tmp[] = $list_item;
 					}
@@ -82,13 +82,13 @@ class Features extends BaseSettings
 			'$form_security_token' => BaseSettings::getFormSecurityToken('settings_features'),
 			'$title'               => $this->t('Additional Features'),
 			'$sortable'            => $this->t('Drag to reorder or tab to item with keyboard and move up/down with arrow keys'),
-			'$sort_key'			   => self::NETWORK_KEY,
+			'$sort_key'            => self::NETWORK_KEY,
 			'$reset'               => [
-				'0'	=> 'feature_resetorder',
-				'1'	=> $this->t('Reset order')
+				'0' => 'feature_resetorder',
+				'1' => $this->t('Reset order')
 			],
-			'$features'            => $arr,
-			'$submit'              => $this->t('Save Settings'),
+			'$features' => $arr,
+			'$submit'   => $this->t('Save Settings'),
 		]);
 	}
 }
