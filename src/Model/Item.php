@@ -3043,6 +3043,7 @@ class Item
 			$s    = self::addVisualAttachments($sharedSplitAttachments['visual'], $shared_item, $s, true, $uid);
 			$s    = self::addLinkAttachment($shared_uri_id ?: $item['uri-id'], $sharedSplitAttachments, $body, $s, true, $quote_shared_links, $uid, $shared_item);
 			$s    = self::addNonVisualAttachments($sharedSplitAttachments['additional'], $item, $s);
+			$s    = self::addHiddenAttachments($sharedSplitAttachments['hidden'], $item, $s);
 			$body = BBCode::removeSharedData($body);
 		}
 
@@ -3056,6 +3057,7 @@ class Item
 		$s = self::addVisualAttachments($itemSplitAttachments['visual'], $item, $s, false, $uid);
 		$s = self::addLinkAttachment($item['uri-id'], $itemSplitAttachments, $body, $s, false, $shared_links, $uid, $item);
 		$s = self::addNonVisualAttachments($itemSplitAttachments['additional'], $item, $s);
+		$s = self::addHiddenAttachments($itemSplitAttachments['hidden'], $item, $s);
 		$s = self::addQuestions($item, $s);
 
 		// Map.
@@ -3556,6 +3558,36 @@ class Item
 
 		DI::profiler()->stopRecording();
 		return $content;
+	}
+
+	/**
+	 * Add hidden attachments message to the content
+	 *
+	 * @param PostMedias $PostMedias
+	 * @param array      $item
+	 * @param string     $content
+	 * @return string modified content
+	 */
+	private static function addHiddenAttachments(PostMedias $PostMedias, array $item, string $content): string
+	{
+		if (count($PostMedias) == 0) {
+			return $content;
+		}
+
+
+		$plink = self::getPlink($item);
+
+		if (isset($plink['href']) && !DI::baseUrl()->isLocalUrl($plink['href'])) {
+			$message = DI::l10n()->t('The media in this post is not displayed to visitors. To view it, please go to the <a href="%s">original post</a>.', $plink['href']);
+		} else {
+			$message = DI::l10n()->t('The media in this post is not displayed to visitors. To view it, please log in.');
+		}
+
+		$media = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/hidden.tpl'), [
+			'message' => $message,
+		]);
+
+		return $media . $content;
 	}
 
 	private static function addQuestions(array $item, string $content): string
