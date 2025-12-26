@@ -20,8 +20,8 @@
 					</h2>
 				</div>
 				<div id="{{$g}}-settings-content" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{$g}}-settings-title">
-					<div class="panel-body {{if $g == "network"}}network sortable{{/if}}">
-						{{if $g == $sort_key}}
+					<div class="panel-body {{if $g == $network_mode}}network sortable{{/if}}">
+						{{if $g == $network_mode}}
 						<input type="hidden" id="feature_widgetorder" name="feature_widgetorder" value=""/>
 						<p tabindex="0">{{$sortable}}</p>
 						{{/if}}
@@ -31,7 +31,7 @@
 						<div class="clear"></div>
 					</div>
 					<div class="panel-footer">
-						{{if $g == $sort_key}}
+						{{if $g == $network_mode}}
 							{{include file="field_checkbox.tpl" field=$reset}}
 						{{/if}}
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>

@@ -11,8 +11,8 @@
 
 	{{foreach $features as $key => $f}}
 		<h2 class="settings-heading"><a href="javascript:;">{{$f.0}}</a></h2>
-		<div class="settings-content-block {{if $key=="network"}}network sortable{{/if}}">
-			{{if $key == $sort_key}}
+		<div class="settings-content-block {{if $key == $network_mode}}network sortable{{/if}}">
+			{{if $key == $network_mode}}
 			<input type="hidden" id="feature_widgetorder" name="feature_widgetorder" value=""/>
 			<p tabindex="0">{{$sortable}}</p>
 			{{/if}}
@@ -20,7 +20,7 @@
 				{{include file="field_checkbox.tpl" field=$fcat}}
 			{{/foreach}}
 			<div class="settings-submit-wrapper">
-				{{if $key == $sort_key}}
+				{{if $key == $network_mode}}
 					{{include file="field_checkbox.tpl" field=$reset}}
 				{{/if}}
 				<input type="submit" name="submit" class="settings-features-submit" value="{{$submit}}"/>
