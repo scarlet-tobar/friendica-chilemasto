@@ -351,7 +351,7 @@ class Network extends Timeline
 			$tmp = [];
 			foreach ($menu_tab_order as $order) {
 				foreach ($tabs as $key => $val) {
-					if ($key == $order) {
+					if ($key == $order || $order == $val['code']) {
 						$tmp[$key] = $val;
 					}
 				}
