@@ -8,6 +8,7 @@
 namespace Friendica\Module\Settings;
 
 use Friendica\App;
+use Friendica\Content\Conversation;
 use Friendica\Content\Feature;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
@@ -20,8 +21,6 @@ use Psr\Log\LoggerInterface;
 
 class Features extends BaseSettings
 {
-	const NETWORK_KEY = "network";
-
 	/** @var IManagePersonalConfigValues */
 	private $pConfig;
 
@@ -82,7 +81,7 @@ class Features extends BaseSettings
 			'$form_security_token' => BaseSettings::getFormSecurityToken('settings_features'),
 			'$title'               => $this->t('Additional Features'),
 			'$sortable'            => $this->t('Drag to reorder or tab to item with keyboard and move up/down with arrow keys'),
-			'$sort_key'            => self::NETWORK_KEY,
+			'$network_mode'        => Conversation::MODE_NETWORK,
 			'$reset'               => [
 				'0' => 'feature_resetorder',
 				'1' => $this->t('Reset order')
