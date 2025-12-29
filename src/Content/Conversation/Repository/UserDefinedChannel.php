@@ -11,6 +11,8 @@ use Friendica\BaseRepository;
 use Friendica\Content\Conversation\Collection\UserDefinedChannels;
 use Friendica\Content\Conversation\Entity\UserDefinedChannel as UserDefinedChannelEntity;
 use Friendica\Content\Conversation\Factory\UserDefinedChannel as UserDefinedChannelFactory;
+use Friendica\Core\Cache\Capability\ICanCache;
+use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
@@ -28,13 +30,15 @@ class UserDefinedChannel extends BaseRepository
 	/** @var UserDefinedChannelFactory */
 	protected $factory;
 
+	private ICanCache $cache;
 	private IManageConfigValues $config;
 
-	public function __construct(Database $database, LoggerInterface $logger, UserDefinedChannelFactory $factory, IManageConfigValues $config)
+	public function __construct(Database $database, LoggerInterface $logger, UserDefinedChannelFactory $factory, IManageConfigValues $config, ICanCache $cache)
 	{
 		parent::__construct($database, $logger, $factory);
 
 		$this->config = $config;
+		$this->cache  = $cache;
 	}
 
 	/**
@@ -260,6 +264,67 @@ class UserDefinedChannel extends BaseRepository
 		return $filteredChannels->column('uid');
 	}
 
+	public function getMatchingChannels(string $searchtext, string $language, array $tags, int $media_type, int $owner_id, int $reshare_id, int $uid): ?UserDefinedChannels
+	{
+		if (!in_array($language, User::getLanguages())) {
+			$this->logger->debug('Unwanted language found. No matched channel found.', ['language' => $language, 'searchtext' => $searchtext]);
+			return null;
+		}
+
+		if ($uid == 0) {
+			$condition = $this->getUserCondition();
+			$condition = DBA::mergeConditions($condition, ["NOT `account-type` IN (?, ?)", User::ACCOUNT_TYPE_RELAY, User::ACCOUNT_TYPE_COMMUNITY]);
+			$users     = $this->db->selectToArray('user', ['uid'], $condition);
+			if (empty($users)) {
+				return null;
+			}
+			$uids = array_column($users, 'uid');
+		} else {
+			$uids = $uid;
+		}
+
+		$disposableFullTextSearch = new DisposableFullTextSearch($this->db, $searchtext);
+
+		$filteredChannels = $this->select(['uid' => $uids, 'valid' => true])->filter(
+			function (UserDefinedChannelEntity $channel) use ($owner_id, $reshare_id, $language, $tags, $media_type, $disposableFullTextSearch, $searchtext) {
+				if (
+					($channel->circle ?? 0)
+					&& !$this->inCircle($channel->circle, $channel->uid, $owner_id)
+					&& !$this->inCircle($channel->circle, $channel->uid, $reshare_id)
+				) {
+					return false;
+				}
+
+				if (!in_array($language, $channel->languages ?: User::getWantedLanguages($channel->uid))) {
+					return false;
+				}
+
+				if ($channel->includeTags && !$this->inTaglist($channel->includeTags, $tags)) {
+					return false;
+				}
+
+				if ($channel->excludeTags && $this->inTaglist($channel->excludeTags, $tags)) {
+					return false;
+				}
+
+				if ($channel->mediaType && !($channel->mediaType & $media_type)) {
+					return false;
+				}
+
+				if ($channel->fullTextSearch && !$disposableFullTextSearch->match(Engagement::escapeKeywords($channel->fullTextSearch))) {
+					return false;
+				}
+
+				$this->logger->debug('Matching channel found.', ['id' => $channel->code, 'label' => $channel->label, 'language' => $language, 'tags' => $tags, 'media_type' => $media_type, 'searchtext' => $searchtext]);
+
+				return true;
+			}
+		);
+
+		/** @var UserDefinedChannels $filteredChannels */
+		return $filteredChannels;
+	}
+
 	private function inCircle(int $circleId, int $uid, int $cid): bool
 	{
 		if ($cid == 0) {
@@ -289,7 +354,7 @@ class UserDefinedChannel extends BaseRepository
 		return false;
 	}
 
-	private function getUserCondition(): array
+	public function getUserCondition(): array
 	{
 		$condition = ["`verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired` AND `user`.`uid` > ?", 0];
 
@@ -298,5 +363,245 @@ class UserDefinedChannel extends BaseRepository
 			$condition = DBA::mergeConditions($condition, ["`last-activity` > ?", DateTimeFormat::utc('now - ' . $abandon_days . ' days')]);
 		}
 		return $condition;
+	}
+
+	public function getCondition(UserDefinedChannelEntity $channel, int $uid): array
+	{
+		$condition = [];
+
+		if (!empty($channel->circle)) {
+			if ($channel->circle == -1) {
+				$condition = ["`owner-id` IN (SELECT `pid` FROM `account-user-view` WHERE `uid` = ? AND `rel` IN (?, ?))", $uid, Contact::SHARING, Contact::FRIEND];
+			} elseif ($channel->circle == -2) {
+				$condition = ["`owner-id` IN (SELECT `pid` FROM `account-user-view` WHERE `uid` = ? AND `rel` = ?)", $uid, Contact::FOLLOWER];
+			} elseif ($channel->circle > 0) {
+				$condition = DBA::mergeConditions($condition, ["`owner-id` IN (SELECT `pid` FROM `group_member` INNER JOIN `account-user-view` ON `group_member`.`contact-id` = `account-user-view`.`id` WHERE `gid` = ? AND `account-user-view`.`uid` = ?)", $channel->circle, $uid]);
+			}
+		}
+
+		if (!empty($channel->fullTextSearch)) {
+			if (!empty($channel->includeTags)) {
+				$additional = $this->addIncludeTags($channel->includeTags);
+			} else {
+				$additional = '';
+			}
+
+			if (!empty($channel->excludeTags)) {
+				foreach (explode(',', mb_strtolower($channel->excludeTags)) as $tag) {
+					$additional .= ' -tag:' . $tag;
+				}
+			}
+
+			if (!empty($channel->mediaType)) {
+				$additional .= $this->addMediaTerms($channel->mediaType);
+			}
+
+			$additional .= $this->addLanguageSearchTerms($uid, $channel->languages);
+
+			if ($additional) {
+				$searchterms = '+(' . trim($channel->fullTextSearch) . ')' . $additional;
+			} else {
+				$searchterms = $channel->fullTextSearch;
+			}
+
+			$condition = DBA::mergeConditions($condition, ["MATCH (`searchtext`) AGAINST (? IN BOOLEAN MODE)", Engagement::escapeKeywords($searchterms)]);
+		} else {
+			if (!empty($channel->includeTags)) {
+				$search       = explode(',', mb_strtolower($channel->includeTags));
+				$placeholders = substr(str_repeat("?, ", count($search)), 0, -2);
+				$condition    = DBA::mergeConditions($condition, array_merge(["`uri-id` IN (SELECT `uri-id` FROM `post-tag` INNER JOIN `tag` ON `tag`.`id` = `post-tag`.`tid` WHERE `post-tag`.`type` = 1 AND `name` IN (" . $placeholders . "))"], $search));
+			}
+
+			if (!empty($channel->excludeTags)) {
+				$search       = explode(',', mb_strtolower($channel->excludeTags));
+				$placeholders = substr(str_repeat("?, ", count($search)), 0, -2);
+				$condition    = DBA::mergeConditions($condition, array_merge(["NOT `uri-id` IN (SELECT `uri-id` FROM `post-tag` INNER JOIN `tag` ON `tag`.`id` = `post-tag`.`tid` WHERE `post-tag`.`type` = 1 AND `name` IN (" . $placeholders . "))"], $search));
+			}
+
+			if (!empty($channel->mediaType)) {
+				$condition = DBA::mergeConditions($condition, ["`media-type` & ?", $channel->mediaType]);
+			}
+
+			// For "addLanguageCondition" to work, the condition must not be empty
+			$condition = $this->addLanguageCondition($uid, $condition ?: ["true"], $channel->languages);
+		}
+
+		if (!is_null($channel->minSize)) {
+			$condition = DBA::mergeConditions($condition, ["`size` >= ?", $channel->minSize]);
+		}
+
+		if (!is_null($channel->maxSize)) {
+			$condition = DBA::mergeConditions($condition, ["`size` <= ?", $channel->maxSize]);
+		}
+
+		if (in_array($channel->circle, [-3, -4, -5])) {
+			$condition = DBA::mergeConditions($condition, ['uid' => $uid]);
+		}
+
+		return $condition;
+	}
+
+	private function addIncludeTags(string $includeTags): string
+	{
+		$tagterms = '';
+		foreach (explode(',', mb_strtolower($includeTags)) as $tag) {
+			$tagterms .= ' tag:' . $tag;
+		}
+
+		if ($tagterms) {
+			return ' +(' . trim($tagterms) . ')';
+		} else {
+			return '';
+		}
+	}
+
+	private function addMediaTerms(int $mediaType): string
+	{
+		$mediaterms = '';
+		if ($mediaType & 1) {
+			$mediaterms .= ' media:image';
+		}
+
+		if ($mediaType & 2) {
+			$mediaterms .= ' media:video';
+		}
+
+		if ($mediaType & 4) {
+			$mediaterms .= ' media:audio';
+		}
+
+		if ($mediaterms) {
+			return ' +(' . trim($mediaterms) . ')';
+		} else {
+			return '';
+		}
+	}
+
+	private function addLanguageSearchTerms(int $uid, $languages = null): string
+	{
+		$langterms = '';
+		foreach ($languages ?: User::getWantedLanguages($uid) as $language) {
+			$langterms .= ' language:' . $language;
+		}
+
+		if ($langterms) {
+			return ' +(' . trim($langterms) . ')';
+		} else {
+			return '';
+		}
+	}
+
+	public function addLanguageCondition(int $uid, array $condition, $languages = null): array
+	{
+		$conditions = [];
+		foreach ($languages ?: User::getWantedLanguages($uid) as $language) {
+			$conditions[] = "`language` = ?";
+			$condition[]  = $language;
+		}
+
+		if (!empty($conditions)) {
+			$condition[0] .= " AND (" . implode(' OR ', $conditions) . ")";
+		}
+		return $condition;
+	}
+
+	public function getMedianPostScore(int $cid, int $divider): int
+	{
+		$cache_key = 'Channel:getPostScore:' . $cid . ':' . $divider;
+		$score     = $this->cache->get($cache_key);
+		if (!empty($score)) {
+			return $score;
+		}
+
+		$condition = ["`relation-cid` = ? AND `post-score` > ?", $cid, 0];
+
+		$limit    = $this->db->count('contact-relation', $condition) / $divider;
+		$relation = $this->db->selectToArray('contact-relation', ['post-score'], $condition, ['order' => ['post-score' => true], 'limit' => [$limit, 1]]);
+		$score    = $relation[0]['post-score'] ?? 0;
+		if (empty($score)) {
+			return 0;
+		}
+
+		$this->cache->set($cache_key, $score, Duration::HALF_HOUR);
+		$this->logger->debug('Calculated median score', ['cid' => $cid, 'divider' => $divider, 'median' => $score]);
+		return $score;
+	}
+
+	public function getMedianComments(int $uid, int $divider, string $network = ''): int
+	{
+		$languages = User::getWantedLanguages($uid);
+		$cache_key = 'Channel:getMedianComments:' . $divider . ':' . implode(':', $languages) . $network;
+		$comments  = $this->cache->get($cache_key);
+		if (!empty($comments)) {
+			return $comments;
+		}
+
+		$condition = ["`contact-type` != ? AND `comments` > ? AND NOT `restricted`", Contact::TYPE_COMMUNITY, 0];
+		$condition = $this->addLanguageCondition($uid, $condition);
+
+		if ($network) {
+			$condition = DBA::mergeConditions($condition, ["`network` = ?", $network]);
+		}
+
+		$limit    = $this->db->count('post-engagement', $condition) / $divider;
+		$post     = $this->db->selectToArray('post-engagement', ['comments'], $condition, ['order' => ['comments' => true], 'limit' => [$limit, 1]]);
+		$comments = $post[0]['comments'] ?? 0;
+		if (empty($comments)) {
+			return 0;
+		}
+
+		$this->cache->set($cache_key, $comments, Duration::HALF_HOUR);
+		$this->logger->debug('Calculated median comments', ['divider' => $divider, 'languages' => $languages, 'network' => $network, 'median' => $comments]);
+		return $comments;
+	}
+
+	public function getMedianActivities(int $uid, int $divider, string $network = ''): int
+	{
+		$languages  = User::getWantedLanguages($uid);
+		$cache_key  = 'Channel:getMedianActivities:' . $divider . ':' . implode(':', $languages) . $network;
+		$activities = $this->cache->get($cache_key);
+		if (!empty($activities)) {
+			return $activities;
+		}
+
+		$condition = ["`contact-type` != ? AND `activities` > ? AND NOT `restricted`", Contact::TYPE_COMMUNITY, 0];
+		$condition = $this->addLanguageCondition($uid, $condition);
+
+		if ($network) {
+			$condition = DBA::mergeConditions($condition, ["`network` = ?", $network]);
+		}
+
+		$limit      = $this->db->count('post-engagement', $condition) / $divider;
+		$post       = $this->db->selectToArray('post-engagement', ['activities'], $condition, ['order' => ['activities' => true], 'limit' => [$limit, 1]]);
+		$activities = $post[0]['activities'] ?? 0;
+		if (empty($activities)) {
+			return 0;
+		}
+
+		$this->cache->set($cache_key, $activities, Duration::HALF_HOUR);
+		$this->logger->debug('Calculated median activities', ['divider' => $divider, 'languages' => $languages, 'network' => $network, 'median' => $activities]);
+		return $activities;
+	}
+
+	public function getMedianRelationThreadScore(int $cid, int $divider): int
+	{
+		$cache_key = 'Channel:getThreadScore:' . $cid . ':' . $divider;
+		$score     = $this->cache->get($cache_key);
+		if (!empty($score)) {
+			return $score;
+		}
+
+		$condition = ["`relation-cid` = ? AND `relation-thread-score` > ?", $cid, 0];
+
+		$limit    = $this->db->count('contact-relation', $condition) / $divider;
+		$relation = $this->db->selectToArray('contact-relation', ['relation-thread-score'], $condition, ['order' => ['relation-thread-score' => true], 'limit' => [$limit, 1]]);
+		$score    = $relation[0]['relation-thread-score'] ?? 0;
+		if (empty($score)) {
+			return 0;
+		}
+
+		$this->cache->set($cache_key, $score, Duration::HALF_HOUR);
+		$this->logger->debug('Calculated median score', ['cid' => $cid, 'divider' => $divider, 'median' => $score]);
+		return $score;
 	}
 }

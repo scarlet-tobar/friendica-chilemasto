@@ -88,6 +88,10 @@ class Cron
 			// Update interaction scores
 			Worker::add(Worker::PRIORITY_LOW, 'UpdateScores');
 
+			if (DI::config()->get('system', 'optimize_tables')) {
+				DBA::optimizeTable('check-full-text-search');
+			}
+
 			DI::keyValue()->set('last_cron_hourly', time());
 		}
 

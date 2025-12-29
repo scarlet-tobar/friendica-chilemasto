@@ -15,6 +15,7 @@
 | [attach](help/spec/database/db-attach) | file attachments |
 | [cache](help/spec/database/db-cache) | Stores temporary data |
 | [channel](help/spec/database/db-channel) | User defined Channels |
+| [channel-post](help/spec/database/db-channel-post) | Posts in a user defined channel |
 | [check-full-text-search](help/spec/database/db-check-full-text-search) | Check for a full text search match in user defined channels before storing the message in the system |
 | [config](help/spec/database/db-config) | main configuration storage |
 | [contact](help/spec/database/db-contact) | contact table |
@@ -84,6 +85,7 @@
 | [session](help/spec/database/db-session) | web session storage |
 | [storage](help/spec/database/db-storage) | Data stored by Database storage backend |
 | [subscription](help/spec/database/db-subscription) | Push Subscription for the API |
+| [system-channel-post](help/spec/database/db-system-channel-post) | Posts in a system channel |
 | [tag](help/spec/database/db-tag) | tags and mentions |
 | [user](help/spec/database/db-user) | The local users |
 | [user-contact](help/spec/database/db-user-contact) | User specific public contact data |

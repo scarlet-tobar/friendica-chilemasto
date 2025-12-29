@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1584);
+	define('DB_UPDATE_VERSION', 1585);
 }
 
 return [
@@ -1365,6 +1365,42 @@ return [
 			"owner-id" => ["owner-id"],
 			"created" => ["created"],
 			"searchtext" => ["FULLTEXT", "searchtext"],
+		]
+	],
+	"channel-post" => [
+		"comment" => "Posts in a user defined channel",
+		"fields" => [
+			"channel" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["channel" => "id"], "comment" => "Channel id"],
+			"uri-id" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["post-engagement" => "uri-id"], "comment" => "Post engagement entry"],
+			"uid" => ["type" => "mediumint unsigned", "not null" => "1", "foreign" => ["user" => "uid"], "comment" => "User id"],
+			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
+			"received" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
+			"commented" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""]
+		],
+		"indexes" => [
+			"PRIMARY" => ["channel", "uri-id"],
+			"uri-id" => ["uri-id"],
+			"uid" => ["uid"],
+			"channel_created" => ["channel", "created"],
+			"channel_received" => ["channel", "received"],
+			"channel_commented" => ["channel", "commented"],
+		]
+	],
+	"system-channel-post" => [
+		"comment" => "Posts in a system channel",
+		"fields" => [
+			"channel" => ["type" => "varchar(20)", "not null" => "1", "primary" => "1", "comment" => "System channel id"],
+			"uid" => ["type" => "mediumint unsigned", "not null" => "1", "primary" => "1", "foreign" => ["user" => "uid"], "comment" => "User id"],
+			"uri-id" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["post-engagement" => "uri-id"], "comment" => "Post engagement entry"],
+			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
+			"received" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
+			"commented" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""]
+		],
+		"indexes" => [
+			"PRIMARY" => ["channel", "uid", "uri-id"],
+			"uri-id" => ["uri-id"],
+			"uid" => ["uid"],
+			"channel_created" => ["channel", "uid", "created"],
 		]
 	],
 	"post-history" => [

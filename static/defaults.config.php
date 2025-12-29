@@ -143,6 +143,10 @@ return [
 		// Deny public access to the local user directory.
 		'block_local_dir' => false,
 
+		// channel_cache (Boolean)
+		// Pregenerate channel posts.
+		'channel_cache' => false,
+
 		// contact_update_limit (Integer)
 		// How many contacts should be checked at a time?
 		'contact_update_limit' => 100,

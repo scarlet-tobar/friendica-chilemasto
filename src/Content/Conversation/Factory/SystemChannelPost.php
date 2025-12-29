@@ -1,0 +1,184 @@
+<?php
+
+// Copyright (C) 2010-2024, the Friendica project
+// SPDX-FileCopyrightText: 2010-2024 the Friendica project
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+namespace Friendica\Content\Conversation\Factory;
+
+use Friendica\Content\Conversation\Repository\UserDefinedChannel;
+use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Content\Conversation\Entity\Channel;
+use Friendica\Database\Database;
+use Friendica\DI;
+use Friendica\Model\Contact;
+use Friendica\Model\Post;
+use Friendica\Model\User;
+use Friendica\Util\DateTimeFormat;
+use Psr\Log\LoggerInterface;
+
+final class SystemChannelPost
+{
+	private LoggerInterface $logger;
+	private UserDefinedChannel $channelRepository;
+	private Database $dba;
+	private IManageConfigValues $config;
+
+	public function __construct(Database $dba, UserDefinedChannel $channel, LoggerInterface $logger, IManageConfigValues $config)
+	{
+		$this->dba               = $dba;
+		$this->logger            = $logger;
+		$this->channelRepository = $channel;
+		$this->config            = $config;
+	}
+
+	public function add(int $uri_id, int $post_uid, string $network, int $reshare_id = 0)
+	{
+		if (!$this->config->get('system', 'channel_cache')) {
+			return;
+		}
+
+		DI::logger()->debug('Adding system channel post', ['uri-id' => $uri_id, 'post_uid' => $post_uid, 'reshare_id' => $reshare_id]);
+
+		$engagement = $this->dba->selectFirst('post-engagement', ['searchtext', 'media-type', 'owner-id', 'language', 'activities', 'comments', 'contact-type', 'created'], ['uri-id' => $uri_id]);
+		if (!$engagement) {
+			$this->logger->debug('No engagement found', ['uri-id' => $uri_id, 'post-uid' => $post_uid, 'reshare_id' => $reshare_id]);
+			return;
+		}
+
+		$owner = $reshare_id ?: $engagement['owner-id'];
+
+		$post = Post::selectFirstPost(['created', 'received', 'commented'], ['uri-id' => $uri_id]);
+		if (!$post) {
+			return;
+		}
+
+		if ($post_uid != 0) {
+			$uids = [$post_uid];
+		} else {
+			$users = $this->dba->selectToArray('user', ['uid'], $this->channelRepository->getUserCondition());
+			if (empty($users)) {
+				return;
+			}
+			$uids = array_column($users, 'uid');
+		}
+
+		foreach ($uids as $uid) {
+			foreach ([Channel::WHATSHOT, Channel::FORYOU, Channel::DISCOVER, Channel::FOLLOWERS, Channel::SHARERSOFSHARERS, Channel::QUIETSHARERS, Channel::IMAGE, Channel::VIDEO, Channel::AUDIO, Channel::LANGUAGE] as $channel) {
+				if ($this->dba->exists('system-channel-post', ['channel' => $channel, 'uid' => $uid, 'uri-id' => $uri_id])) {
+					continue;
+				}
+				$store = false;
+				switch ($channel) {
+					case Channel::WHATSHOT:
+						$store = ($engagement['comments'] > $this->channelRepository->getMedianComments($uid, 4, $network) || $engagement['activities'] > $this->channelRepository->getMedianActivities($uid, 4, $network)) && $engagement['contact-type'] != Contact::TYPE_COMMUNITY;
+						break;
+
+					case Channel::FORYOU:
+						$cid = Contact::getPublicIdByUserId($uid);
+
+						if ($relation = $this->dba->selectFirst('contact-relation', ['relation-thread-score', 'follows'], ['relation-cid' => $cid, 'cid' => $owner])) {
+							$store = $relation['relation-thread-score'] > $this->channelRepository->getMedianRelationThreadScore($cid, 4);
+							if (!$store && $relation['follows']) {
+								$store = ($engagement['comments'] >= $this->channelRepository->getMedianComments($uid, 4, $network) || $engagement['activities'] >= $this->channelRepository->getMedianActivities($uid, 4, $network));
+							}
+						}
+
+						if (!$store && $user_contact = $this->dba->selectFirst('user-contact', ['channel-frequency', 'notify_new_posts'], ['cid' => $owner, 'uid' => $uid])) {
+							$store = $user_contact['channel-frequency'] == Contact\User::FREQUENCY_ALWAYS || $user_contact['notify_new_posts'];
+						}
+						break;
+
+					case Channel::DISCOVER:
+						$cid = Contact::getPublicIdByUserId($uid);
+						if (!Contact::isSharing($owner, $uid)) {
+							$store = $this->dba->exists('contact-relation', ["`cid` = ? AND `relation-cid` = ? AND `relation-thread-score` > ?",
+								$owner, $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4)]);
+							if (!$store) {
+								$store = $this->dba->exists('contact-relation', ["`relation-cid` = ? AND `cid` = ? AND `relation-thread-score` > ?",
+									$owner, $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4)]);
+							}
+							if (!$store) {
+								$store = $this->dba->exists('contact-relation', ["`relation-cid` = ? AND `cid` = ? AND `follows` AND `relation-thread-score` > ?",
+									$owner, $cid, 0]);
+							}
+							if (!$store && ($engagement['comments'] >= $this->channelRepository->getMedianComments($uid, 4, $network) || $engagement['activities'] >= $this->channelRepository->getMedianActivities($uid, 4, $network))) {
+								$store = $this->dba->exists('contact-relation', ["`relation-cid` = ? AND `cid` = ? AND `relation-thread-score` > ?", $owner, $cid, 0]);
+								if (!$store) {
+									$store = $this->dba->exists('contact-relation', ["`cid` = ? AND `relation-cid` = ? AND `relation-thread-score` > ?", $owner, $cid, 0]);
+								}
+								if (!$store) {
+									$condition = [
+										"`cid` = ? AND `follows` AND `last-interaction` > ?
+										AND `relation-cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ? AND `relation-thread-score` >= ?)
+										AND NOT `cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?)",
+										$owner, DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4), $cid
+									];
+									$store = $this->dba->exists('contact-relation', $condition);
+								}
+							}
+						}
+						break;
+
+					case Channel::FOLLOWERS:
+						$store = Contact::isFollower($owner, $uid) && !Contact::isSharing($owner, $uid);
+						break;
+
+					case Channel::SHARERSOFSHARERS:
+						$cid = Contact::getPublicIdByUserId($uid);
+
+						$condition = [
+							"`cid` = ? AND `follows` AND `last-interaction` > ?
+							AND `relation-cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ? AND `relation-thread-score` >= ?)
+							AND NOT `cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?)",
+							$owner, DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4), $cid
+						];
+						$store = $this->dba->exists('contact-relation', $condition);
+						break;
+
+					case Channel::QUIETSHARERS:
+						$cid      = Contact::getPublicIdByUserId($uid);
+						$relation = $this->dba->selectFirst('contact-relation', ['post-score'], [
+							'follows'      => true,
+							'relation-cid' => $cid,
+							'cid'          => $owner,
+						]);
+						$store = ($relation && $relation['post-score'] <= $this->channelRepository->getMedianPostScore($cid, 2));
+						break;
+
+					case Channel::IMAGE:
+						$store = $engagement['media-type'] & 1;
+						break;
+
+					case Channel::VIDEO:
+						$store = $engagement['media-type'] & 2;
+						break;
+
+					case Channel::AUDIO:
+						$store = $engagement['media-type'] & 4;
+						break;
+
+					case Channel::LANGUAGE:
+						$store = $engagement['language'] == User::getLanguageCode($uid);
+						break;
+				}
+
+				if (!$store) {
+					continue;
+				}
+
+				$cache = [
+					'channel'   => $channel,
+					'uid'       => $uid,
+					'uri-id'    => $uri_id,
+					'created'   => $post['created'],
+					'received'  => $post['received'],
+					'commented' => $post['commented'],
+				];
+				$ret = $this->dba->insert('system-channel-post', $cache, Database::INSERT_UPDATE);
+				$this->logger->debug('Added system channel post', ['uri-id' => $uri_id, 'cache' => $cache, 'ret' => $ret]);
+			}
+		}
+	}
+}
