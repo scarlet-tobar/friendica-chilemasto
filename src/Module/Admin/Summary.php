@@ -8,6 +8,7 @@
 namespace Friendica\Module\Admin;
 
 use Friendica\App;
+use Friendica\Core\Addon\Exception\InvalidAddonException;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Renderer;
 use Friendica\Core\Update;
@@ -178,18 +179,42 @@ class Summary extends BaseAdmin
 			]
 		];
 
+		$addons = [];
+
+		$addonHelper = DI::addonHelper();
+		foreach ($addonHelper->getEnabledAddons() as $addonId) {
+			try {
+				$addonInfo = $addonHelper->getAddonInfo($addonId);
+			} catch (InvalidAddonException $th) {
+				$this->logger->error('Invalid addon found: ' . $addonId, ['exception' => $th]);
+				continue;
+			}
+
+			$info = [
+				'name'        => $addonInfo->getName(),
+				'description' => $addonInfo->getDescription(),
+				'version'     => $addonInfo->getVersion(),
+			];
+
+			$addons[] = [
+				$addonId,
+				$info,
+			];
+		}
+
 		$t = Renderer::getMarkupTemplate('admin/summary.tpl');
 		return Renderer::replaceMacros($t, [
-			'$title'          => DI::l10n()->t('Administration'),
-			'$page'           => DI::l10n()->t('Summary'),
-			'$queues'         => $queues,
-			'$version_label'  => DI::l10n()->t('Version'),
-			'$platform'       => App::PLATFORM,
-			'$codename'       => App::CODENAME,
-			'$build'          => DI::config()->get('system', 'build'),
-			'$addons'         => [DI::l10n()->t('Active addons'), DI::addonHelper()->getEnabledAddons()],
-			'$serversettings' => $server_settings,
-			'$warningtext'    => $warningtext,
+			'$title'              => DI::l10n()->t('Administration'),
+			'$page'               => DI::l10n()->t('Summary'),
+			'$queues'             => $queues,
+			'$version_label'      => DI::l10n()->t('Version'),
+			'$platform'           => App::PLATFORM,
+			'$codename'           => App::CODENAME,
+			'$build'              => DI::config()->get('system', 'build'),
+			'$addons'             => [DI::l10n()->t('Active addons'), $addons],
+			'$serversettings'     => $server_settings,
+			'$warningtext'        => $warningtext,
+			'$link_enable_addons' => DI::l10n()->t('Enable new addons'),
 		]);
 	}
 
