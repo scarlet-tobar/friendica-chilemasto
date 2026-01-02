@@ -161,7 +161,7 @@ class Introductions extends BaseNotifications
 					$header .= ' (' . ContactSelector::networkToName($Introduction->getNetwork(), '', $gsid) . ')';
 
 					if ($Introduction->getNetwork() != Protocol::DIASPORA) {
-						$discard = $this->t('Discard');
+						$discard = $this->t('Remove');
 					} else {
 						$discard = '';
 					}

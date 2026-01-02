@@ -72,8 +72,9 @@
 		<div id="photo-caption">{{$desc}}</div>
 
 		{{* Tags and mentions *}}
-		{{if $tags}}
-		<div id="photo-tags">{{$tags.title}}
+		{{if $tags.tags}}
+		<div id="photo-tags">
+			<p><strong>{{$tags.title}}</strong></p>
 			{{foreach $tags.tags as $t}}
 			<span class="category label btn-success sm">
 				<span class="p-category">{{$t.name nofilter}}</span>

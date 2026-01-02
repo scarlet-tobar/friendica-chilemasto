@@ -27,6 +27,14 @@ use Friendica\Util\Proxy;
 use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Repository for PostMedia entities.
+ *
+ * Provides persistence and rendering helpers for post media objects
+ * (images, audio, video, embeds, etc.).
+ *
+ * @package Friendica\Content\Post\Repository
+ */
 class PostMedia extends BaseRepository
 {
 	protected static $table_name = 'post-media';
@@ -42,6 +50,17 @@ class PostMedia extends BaseRepository
 	/** @var Item */
 	private $item;
 
+	/**
+	 * PostMedia repository constructor.
+	 *
+	 * @param Database $database Database connection wrapper
+	 * @param LoggerInterface $logger PSR-3 logger
+	 * @param PostMediaFactory $factory Factory for creating entities
+	 * @param IManagePersonalConfigValues $pConfig Personal configuration access
+	 * @param IManageConfigValues $config Global configuration access
+	 * @param BaseURL $baseURL Base URL helper
+	 * @param Item $item Item helper
+	 */
 	public function __construct(Database $database, LoggerInterface $logger, PostMediaFactory $factory, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, BaseURL $baseURL, Item $item)
 	{
 		parent::__construct($database, $logger, $factory);
@@ -52,6 +71,16 @@ class PostMedia extends BaseRepository
 		$this->item    = $item;
 	}
 
+	/**
+	 * Low level select helper used by higher-level selectors.
+	 *
+	 * Queries the `post-media` table and maps rows to entities. Invalid rows
+	 * are logged and skipped.
+	 *
+	 * @param array $condition DBA-style condition array
+	 * @param array $params Optional positional parameters
+	 * @return PostMediasCollection Collection of PostMediaEntity objects
+	 */
 	protected function _select(array $condition, array $params = []): PostMediasCollection
 	{
 		$rows = $this->db->selectToArray(static::$table_name, [], $condition, $params);
@@ -69,10 +98,10 @@ class PostMedia extends BaseRepository
 	}
 
 	/**
-	 * Returns a single PostMedia entity, selected by their id.
+	 * Return a single PostMedia entity selected by its id.
 	 *
-	 * @param int $postMediaId
-	 * @return PostMediaEntity
+	 * @param int $postMediaId Primary key of the media row
+	 * @return PostMediaEntity The entity for the requested id
 	 * @throws NotFoundException
 	 */
 	public function selectById(int $postMediaId): PostMediaEntity
@@ -83,11 +112,11 @@ class PostMedia extends BaseRepository
 	}
 
 	/**
-	 * Select PostMedia collection for the given uri-id and the given types
+	 * Select PostMedia collection for the given uri-id and optional types.
 	 *
-	 * @param integer $uriId
-	 * @param array $types
-	 * @return PostMediasCollection
+	 * @param int $uriId URI id to select media for
+	 * @param array $types Optional list of media types to restrict the result
+	 * @return PostMediasCollection Collection of PostMedia entities
 	 */
 	public function selectByUriId(int $uriId, array $types = []): PostMediasCollection
 	{
@@ -101,12 +130,12 @@ class PostMedia extends BaseRepository
 	}
 
 	/**
-	 * Select PostMedia entity for the given uri-id, the media url and the given types
+	 * Select a single PostMedia entity for the given uri-id and media URL.
 	 *
-	 * @param integer $uriId
-	 * @param string $url
-	 * @param array $types
-	 * @return PostMediaEntity
+	 * @param int $uriId URI id to search within
+	 * @param string $url Full media URL to match
+	 * @param array $types Optional list of media types to restrict the search
+	 * @return PostMediaEntity|null Matching media entity or null when not found
 	 */
 	public function selectByURL(int $uriId, string $url, array $types = []): ?PostMediaEntity
 	{
@@ -120,6 +149,16 @@ class PostMedia extends BaseRepository
 		return $medias[0] ?? null;
 	}
 
+	/**
+	 * Map a PostMedia entity to an array of storage fields.
+	 *
+	 * The returned array is suitable for insert/update operations on the
+	 * `post-media` table. When $includeId is true the `id` field is included.
+	 *
+	 * @param PostMediaEntity $PostMedia Entity to map
+	 * @param bool $includeId Include the `id` field when true
+	 * @return array Associative array of storage fields
+	 */
 	public function getFields(PostMediaEntity $PostMedia, bool $includeId = false): array
 	{
 		$fields = [
@@ -164,6 +203,15 @@ class PostMedia extends BaseRepository
 		return $fields;
 	}
 
+	/**
+	 * Save a PostMedia entity to the database.
+	 *
+	 * Updates when an id is present, otherwise inserts and returns the
+	 * persisted entity.
+	 *
+	 * @param PostMediaEntity $PostMedia Entity to persist
+	 * @return PostMediaEntity Persisted entity
+	 */
 	public function save(PostMediaEntity $PostMedia): PostMediaEntity
 	{
 		$fields = $this->getFields($PostMedia);
@@ -183,19 +231,21 @@ class PostMedia extends BaseRepository
 
 
 	/**
-	 * Split the attachment media in the three segments "visual", "link" and "additional"
+	 * Split the attachment media into four segments: `visual`, `link`, `additional`, 'hidden'.
 	 *
-	 * @param int    $uri_id URI id
-	 * @param array  $links list of links that shouldn't be added
-	 * @param bool   $has_media
-	 * @return PostMediasCollection[] Three collections in "visual", "link" and "additional" keys
+	 * @param int $uri_id URI id the attachments belong to
+	 * @param array $links List of link URLs that should be ignored
+	 * @param bool $has_media Whether the item has media at all
+	 * @param bool $local_visitor Whether the viewer is local (affects remote-media handling)
+	 * @return PostMediasCollection[] Associative array with keys `visual`, `link`, `additional`, 'hidden'
 	 */
-	public function splitAttachments(int $uri_id, array $links = [], bool $has_media = true): array
+	public function splitAttachments(int $uri_id, array $links = [], bool $has_media = true, bool $local_visitor = true): array
 	{
 		$attachments = [
 			'visual'     => new PostMediasCollection(),
 			'link'       => new PostMediasCollection(),
 			'additional' => new PostMediasCollection(),
+			'hidden'     => new PostMediasCollection(),
 		];
 
 		if (!$has_media) {
@@ -257,15 +307,14 @@ class PostMedia extends BaseRepository
 				$previews[] = $PostMedia->preview;
 			}
 
-			//$PostMedia->filetype = $filetype;
-			//$PostMedia->subtype = $subtype;
-
 			if ($PostMedia->type == PostMediaEntity::TYPE_HTML) {
 				$attachments['link'][] = $PostMedia;
 				continue;
 			}
 
-			if (in_array($PostMedia->type, [PostMediaEntity::TYPE_AUDIO, PostMediaEntity::TYPE_IMAGE, PostMediaEntity::TYPE_HLS])) {
+			if (!$local_visitor && !$this->displayMedia($PostMedia)) {
+				$attachments['hidden'][] = $PostMedia;
+			} elseif (in_array($PostMedia->type, [PostMediaEntity::TYPE_AUDIO, PostMediaEntity::TYPE_IMAGE, PostMediaEntity::TYPE_HLS])) {
 				$attachments['visual'][] = $PostMedia;
 			} elseif ($PostMedia->type == PostMediaEntity::TYPE_VIDEO) {
 				if ($is_torrent) {
@@ -301,6 +350,31 @@ class PostMedia extends BaseRepository
 		return $attachments;
 	}
 
+	/**
+	 * Decide whether a media item should be displayed based on configuration.
+	 *
+	 * @param PostMediaEntity $PostMedia Media entity to check
+	 * @return bool display mode
+	 */
+	private function displayMedia(PostMediaEntity $PostMedia): bool
+	{
+		if (!in_array($PostMedia->type, [PostMediaEntity::TYPE_AUDIO, PostMediaEntity::TYPE_IMAGE, PostMediaEntity::TYPE_HLS, PostMediaEntity::TYPE_VIDEO])) {
+			return true;
+		}
+
+		if ($this->baseURL->isLocalUri($PostMedia->url)) {
+			return $this->config->get('system', 'display_local_media');
+		} else {
+			return $this->config->get('system', 'display_remote_media');
+		}
+	}
+
+	/**
+	 * Create a PostMedia entity from a remote URL using siteinfo parsing.
+	 *
+	 * @param string $url Remote resource URL
+	 * @return PostMediaEntity Created media entity
+	 */
 	public function createFromUrl(string $url): PostMediaEntity
 	{
 		$data  = ParseUrl::getSiteinfoCached($url);
@@ -308,6 +382,12 @@ class PostMedia extends BaseRepository
 		return $this->fetchAdditionalData($media);
 	}
 
+	/**
+	 * Fetch additional metadata for a PostMedia and return an updated entity.
+	 *
+	 * @param PostMediaEntity $postMedia Media entity to enrich
+	 * @return PostMediaEntity Enriched media entity
+	 */
 	public function fetchAdditionalData(PostMediaEntity $postMedia): PostMediaEntity
 	{
 		$data = $this->getFields($postMedia, true);
@@ -316,14 +396,15 @@ class PostMedia extends BaseRepository
 	}
 
 	/**
-	 * Embed remote media, that had been added with the [embed] element
+	 * Replace `[embed]` link placeholders in the provided HTML with embed markup.
 	 *
-	 * @param string $html    The already rendered HTML output
-	 * @param integer $uid    The user the output is rendered for
-	 * @param integer $uri_id The uri-id of the item that is rendered
-	 * @return string
+	 * @param string $html HTML that may contain anchor tags with class `embed`
+	 * @param int $uid Viewer user id used for personal preferences
+	 * @param int $uri_id URI id of the item being rendered
+	 * @param bool $local_visitor Whether the viewer is local
+	 * @return string Modified HTML with embeds replaced
 	 */
-	public function addEmbed(string $html, int $uid, int $uri_id): string
+	public function addEmbed(string $html, int $uid, int $uri_id, bool $local_visitor = true): string
 	{
 		if ($html == '') {
 			return $html;
@@ -367,7 +448,9 @@ class PostMedia extends BaseRepository
 				}
 			}
 
-			if ($media->type === Post\Media::AUDIO) {
+			if (!$local_visitor && !$this->displayMedia($media)) {
+				$player = '<span></span>';
+			} elseif ($media->type === Post\Media::AUDIO) {
 				$player = $this->getAudioAttachment($media);
 			} elseif (in_array($media->type, [Post\Media::VIDEO, Post\Media::HLS])) {
 				$player = $this->getVideoAttachment($media, $uid);
@@ -396,6 +479,13 @@ class PostMedia extends BaseRepository
 		return $html;
 	}
 
+	/**
+	 * Render a video attachment as HTML.
+	 *
+	 * @param PostMediaEntity $postMedia Media entity to render
+	 * @param int $uid Viewer user id
+	 * @return string HTML snippet for the video attachment
+	 */
 	public function getVideoAttachment(PostMediaEntity $postMedia, int $uid): string
 	{
 		if ($postMedia->preview || ($postMedia->blurhash && $this->config->get('system', 'ffmpeg_installed'))) {
@@ -434,6 +524,12 @@ class PostMedia extends BaseRepository
 		return $media;
 	}
 
+	/**
+	 * Build an iframe-based player markup for the given media.
+	 *
+	 * @param PostMediaEntity $postMedia Media entity providing player URL and dimensions
+	 * @return string HTML markup for the iframe player
+	 */
 	public function getPlayerIframe(PostMediaEntity $postMedia): string
 	{
 		if ($postMedia->playerUrl == '') {
@@ -471,6 +567,12 @@ class PostMedia extends BaseRepository
 		]);
 	}
 
+	/**
+	 * Build an iframe wrapper for embed HTML provided by the media.
+	 *
+	 * @param PostMediaEntity $postMedia Media entity containing embed HTML and dimensions
+	 * @return string Rendered iframe embedding the media
+	 */
 	public function getEmbedIframe(PostMediaEntity $postMedia): string
 	{
 		if ($postMedia->embedHtml == '') {
@@ -509,6 +611,12 @@ class PostMedia extends BaseRepository
 		]);
 	}
 
+	/**
+	 * Render an audio attachment as HTML.
+	 *
+	 * @param PostMediaEntity $postMedia Media entity to render
+	 * @return string HTML snippet for the audio player
+	 */
 	public function getAudioAttachment(PostMediaEntity $postMedia): string
 	{
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('content/audio.tpl'), [
@@ -521,6 +629,12 @@ class PostMedia extends BaseRepository
 		]);
 	}
 
+	/**
+	 * Render a generic link attachment.
+	 *
+	 * @param PostMediaEntity $postMedia Media entity to render
+	 * @return string HTML snippet for the link attachment
+	 */
 	public function getLinkAttachment(PostMediaEntity $postMedia): string
 	{
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('content/link.tpl'), [

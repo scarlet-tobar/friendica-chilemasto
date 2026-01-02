@@ -560,21 +560,42 @@ header #banner #logo-img,
 	padding: 3px 10px;
 	margin-bottom: 10px;
 	font-weight: 300;
-	color: #bebebe;
+	color: $font_color_darker;
 }
-.topbar .dropdown-header .dropdown-header-link {
-	position: absolute;
-	top: 2px;
-	right: 10px;
+#nav-notifications-menu {
+	margin-top: 4px;
+	padding: 0;
 }
-.topbar .dropdown-header .dropdown-header-link a,
-.topbar .dropdown-header .dropdown-header-link .btn-link {
-	color: $link_color !important;
-	font-size: 12px;
+#nav-notifications-mark-all {
+	margin: 0;
+	padding: 0;
+}
+#notifications-header {
+	border-bottom: 2px solid $link_color;
+	margin-top: 0;
+	padding: 3px 13px;
+ }
+#notifications-subheader {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+ }
+ #notifications-title {
+	font-size: 17px;
+	font-weight: 500;
+	margin: 0;
+ }
+ #notifications-header a, #notifications-header button {
+	color: $link_color!important;
+	font-size: 14px;
 	font-weight: 400;
 }
-.topbar .dropdown-header:hover {
-	color: #bebebe;
+.media time.notif-when {
+	color: #666666;
+	float: right;
+	line-height: 1.8;
+	padding-left: 25px;
 }
 #topbar-first,
 nav.navbar {
@@ -760,8 +781,9 @@ nav.navbar .nav > li > button:focus {
 }
 
 /* Notification Menu */
-#topbar-first #nav-notifications-menu {
-	max-height: 400px;
+#topbar-first .topbar-nav #nav-notifications-menu {
+	max-height: 600px;
+	width: clamp(200px, 100vw, 350px);
 }
 #topbar-first #nav-notifications-menu a {
 	color: $font_color_darker;
@@ -942,9 +964,16 @@ nav.navbar .nav > li > button:focus {
 	max-height: 400px;
 	overflow: auto;
 }
+
+.intro-block{
+  display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+}
 .intro-actions {
 	font-size: 2em;
-	padding: 1em;
+	padding: 0.5em;
 }
 .intro-wrapper button.intro-action-link {
 	padding-left: 10px;
@@ -1063,6 +1092,8 @@ ul li .intro-wrapper button.intro-action-link {
 .nav-pills .dropdown-menu li.selected a,
 .nav-tabs .dropdown-menu li.selected a,
 .account .dropdown-menu li.selected a,
+#fc-header .dropdown-menu li button:hover,
+#fc-header .dropdown-menu li button:focus,
 .contact-photo-wrapper .dropdown-menu li.selected a {
 	border-left: 3px solid $link_color;
 	color: #fff;
@@ -2430,7 +2461,6 @@ ul.dropdown-menu li:hover {
 	box-sizing: border-box;
 }
 /* Dropdown Menu */
-.dropdown-menu li .btn-link,
 .dropdown-menu li a,
 .tabs .dropdown-menu li a {
 	padding: 6px 20px;
@@ -2889,9 +2919,6 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 }
 
 /* photos */
-.photo-album-edit-name, #photo-album-edit-submit {
-	display: inline-block;
-}
 #photo-album-edit-name-label {
 	width: 100%;
 }
@@ -3128,6 +3155,12 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 	opacity: 1;
 	color: #fff;
 }
+#photo-like-div {
+	text-align: center;
+}
+#photo-like-div button.active {
+	color: $link_color;
+}
 .photo-comment-wrapper .comment {
 	position: relative;
 }
@@ -3135,7 +3168,7 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 	color: $font_color_darker;
 	font-size: 13px;
 }
-.photo-comment-wrapper .comment-wwedit-wrapper,
+#photo-like-div, .photo-comment-wrapper .comment-wwedit-wrapper,
 .photo-comment-wrapper .wall-item-outside-wrapper.media:first-child {
 	margin-top: 15px;
 }
@@ -3932,6 +3965,15 @@ div.login-form, .login-content-wrapper,
 }
 #fc-header-right .dropdown > button {
 	color: inherit;
+}
+#fc-header .dropdown-menu {
+	padding: 0;
+}
+#fc-header .dropdown-menu li {
+	margin-top: 0;
+}
+#fc-header .dropdown-menu li button {
+	padding: 8px;
 }
 #event-calendar-title {
 	flex: 1;
