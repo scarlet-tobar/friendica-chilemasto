@@ -31,10 +31,10 @@
 		</a>
 	{{/if}}
 	{{if $tools.delete}}
-		<a id="photo-delete-link" class="btn btn-primary" href="{{$tools.delete.0}}">
+		<button id="photo-delete-link" class="btn btn-primary" type="button" data-modal-url="{{$tools.delete.0}}">
 			<i class="page-action fa fa-trash"></i>
 			{{$delete_text}}
-		</a>
+		</button>
 	{{/if}}
 	{{if $tools.profile}}
 		<a id="photo-toprofile-link" class="btn btn-primary" href="{{$tools.profile.0}}">
