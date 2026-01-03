@@ -1398,12 +1398,12 @@ div#sidebar-group-list {
 }
 
 .circle-edit-tool,
-.group-new-tool {
+.widget-action-top {
 	padding-top: 0;
 	color: $font_color_darker;
 }
 .sidebar-widget-header .circle-edit-tool,
-.group-new-tool {
+.widget-action-top {
 	margin-top: -5px;
 }
 
@@ -1424,14 +1424,14 @@ aside .widget-action {
 	padding: 5px 10px;
 }
 aside #circle-sidebar .sidebar-circle-li .circle-edit-tool.faded-icon:hover,
-aside #group-sidebar .group-new-tool.faded-icon:hover,
+aside #group-sidebar .widget-action-top.faded-icon:hover,
 aside #saved-search-list .saved-search-li .savedsearchdrop.faded-icon:hover,
 aside .widget.widget-action.faded-icon:hover {
 	opacity: 0.8;
 	transition: all 0.25s ease-in-out;
 }
 aside #circle-sidebar .sidebar-circle-li .circle-edit-tool.faded-icon:hover,
-aside #group-sidebar .group-new-tool.faded-icon:hover,
+aside #group-sidebar .widget-action-top.faded-icon:hover,
 aside #saved-search-list .saved-search-li .savedsearchdrop.faded-icon:hover,
 aside .widget .widget-action.faded-icon:hover {
 	opacity: 1;
