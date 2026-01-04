@@ -1397,19 +1397,14 @@ div#sidebar-group-list {
 	clear: both;
 }
 
-.circle-edit-tool,
-.widget-action-top {
-	padding-top: 0;
-	color: $font_color_darker;
-}
-.sidebar-widget-header .circle-edit-tool,
 .widget-action-top {
 	margin-top: -5px;
+	padding-top: 0;
 }
 
 .faded-icon {
-	color: $font_color_darker;
-	opacity: 0.3;
+	color: $font_color;
+	opacity: 0.58;
 	transition: all 0.1s ease-in-out;
 }
 .faded-icon:hover {
@@ -1423,27 +1418,19 @@ div#sidebar-group-list {
 aside .widget-action {
 	padding: 5px 10px;
 }
-aside #circle-sidebar .sidebar-circle-li .circle-edit-tool.faded-icon:hover,
-aside #group-sidebar .widget-action-top.faded-icon:hover,
+aside .widget-action-top.faded-icon:hover,
 aside #saved-search-list .saved-search-li .savedsearchdrop.faded-icon:hover,
 aside .widget.widget-action.faded-icon:hover {
 	opacity: 0.8;
 	transition: all 0.25s ease-in-out;
 }
-aside #circle-sidebar .sidebar-circle-li .circle-edit-tool.faded-icon:hover,
-aside #group-sidebar .widget-action-top.faded-icon:hover,
+aside .widget-action-top.faded-icon:hover,
 aside #saved-search-list .saved-search-li .savedsearchdrop.faded-icon:hover,
 aside .widget .widget-action.faded-icon:hover {
 	opacity: 1;
 }
 aside #circle-sidebar li .circle-checkbox {
 	margin: 6px 0 0;
-}
-aside #circle-sidebar li .circle-edit-tool {
-	padding-right: 10px;
-}
-aside #circle-sidebar li .circle-edit-tool:first-child {
-	padding-right: 0px;
 }
 
 /* contact block widget */
@@ -1455,8 +1442,6 @@ aside #circle-sidebar li .circle-edit-tool:first-child {
 .contact-block-div {
 	float: left;
 	margin: 0px 5px 5px 0px;
-}
-.contact-block-link {
 }
 .contact-block-img {
 	height: 75px;
