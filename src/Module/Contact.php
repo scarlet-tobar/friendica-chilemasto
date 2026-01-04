@@ -204,7 +204,7 @@ class Contact extends BaseModule
 		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, []);
 
 		$o = '';
-		Nav::setSelected('contact');
+		Nav::setSelected('contacts');
 
 		$_SESSION['return_path'] = DI::args()->getQueryString();
 

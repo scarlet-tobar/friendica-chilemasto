@@ -90,7 +90,10 @@ class Show extends BaseModule
 			'$i18n'         => $i18n,
 		]);
 
-		Nav::setSelected($is_owner ? 'home' : 'calendar');
+		// Only highlight the calendar link if you're on your own calendar
+		if ($is_owner) {
+		  Nav::setSelected('calendar');
+		}
 
 		if ($is_owner) {
 			// Removing the vCard added by Profile::load for owners
