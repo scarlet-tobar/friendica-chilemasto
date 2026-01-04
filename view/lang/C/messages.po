@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-04 14:20+0100\n"
+"POT-Creation-Date: 2026-01-04 19:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -235,8 +235,7 @@ msgstr ""
 msgid "Message collection failure."
 msgstr ""
 
-#: mod/message.php:111 src/Module/Notifications/Introductions.php:127
-#: src/Module/Notifications/Notification.php:71
+#: mod/message.php:111
 msgid "Discard"
 msgstr ""
 
@@ -1897,7 +1896,6 @@ msgstr ""
 #: src/Module/Contact/Profile.php:587
 #: src/Module/Notifications/Introductions.php:126
 #: src/Module/Notifications/Introductions.php:200
-#: src/Module/Notifications/Notification.php:75
 msgid "Ignore"
 msgstr ""
 
@@ -8292,6 +8290,13 @@ msgstr ""
 msgid "Suggested by:"
 msgstr ""
 
+#: src/Module/Notifications/Introductions.php:127
+#: src/Module/Notifications/Introductions.php:164
+#: src/Module/Post/Tag/Remove.php:95
+#: src/Module/Settings/TwoFactor/Trusted.php:133
+msgid "Remove"
+msgstr ""
+
 #: src/Module/Notifications/Introductions.php:135
 msgid "Claims to be known to you: "
 msgstr ""
@@ -8319,12 +8324,6 @@ msgstr ""
 
 #: src/Module/Notifications/Introductions.php:150
 msgid "Follower"
-msgstr ""
-
-#: src/Module/Notifications/Introductions.php:164
-#: src/Module/Post/Tag/Remove.php:95
-#: src/Module/Settings/TwoFactor/Trusted.php:133
-msgid "Remove"
 msgstr ""
 
 #: src/Module/Notifications/Introductions.php:198

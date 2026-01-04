@@ -124,7 +124,7 @@ class Introductions extends BaseNotifications
 						'$approve'               => $this->t('Approve'),
 						'$note'                  => $Introduction->getNote(),
 						'$ignore'                => $this->t('Ignore'),
-						'$discard'               => $this->t('Discard'),
+						'$discard'               => $this->t('Remove'),
 						'$is_mobile'             => $this->mode->isMobile(),
 					]);
 					break;
