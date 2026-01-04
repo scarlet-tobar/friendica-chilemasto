@@ -95,7 +95,7 @@
 						{{/if}}
 
 						{{if $nav.calendar}}
-						<li class="nav-segment hidden-xs">
+							<li class="nav-segment hidden-xs">
 								<a accesskey="e" id="nav-calendar-link" href="{{$nav.calendar.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
 									aria-label="{{$nav.calendar.1}}" title="{{$nav.calendar.1}}" class="nav-menu {{$sel.calendar}}"><i
 										class="fa fa-lg fa-calendar fa-fw"></i></a>
