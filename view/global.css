@@ -889,3 +889,13 @@ a:has(img.has-alt-description)::after {
 		background-color: transparent;
 	}
 }
+
+/* Profile page custom fields - prevent long links from overflowing */
+#profile-page .profile-entry {
+	overflow-wrap: break-word;
+	word-break: break-word;
+}
+
+#profile-page .profile-entry a {
+	word-break: break-all;
+}

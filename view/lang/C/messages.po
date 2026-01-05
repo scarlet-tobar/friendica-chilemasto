@@ -1,5 +1,5 @@
 # FRIENDICA Distributed Social Network
-# Copyright (C) 2010-2025, the Friendica project
+# Copyright (C) 2010-2026, the Friendica project
 # This file is distributed under the same license as the Friendica package.
 # Mike Macgirvin, 2010
 #
@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-24 17:17+0100\n"
+"POT-Creation-Date: 2026-01-04 19:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -235,8 +235,7 @@ msgstr ""
 msgid "Message collection failure."
 msgstr ""
 
-#: mod/message.php:111 src/Module/Notifications/Introductions.php:127
-#: src/Module/Notifications/Notification.php:71
+#: mod/message.php:111
 msgid "Discard"
 msgstr ""
 
@@ -1700,8 +1699,8 @@ msgid "Network Widgets"
 msgstr ""
 
 #: src/Content/Feature.php:127 src/Content/Widget.php:233
-#: src/Model/Circle.php:587 src/Module/Contact.php:385
-#: src/Module/Welcome.php:63
+#: src/Model/Circle.php:587 src/Module/Circle.php:132
+#: src/Module/Contact.php:385 src/Module/Welcome.php:63
 msgid "Circles"
 msgstr ""
 
@@ -1897,7 +1896,6 @@ msgstr ""
 #: src/Module/Contact/Profile.php:587
 #: src/Module/Notifications/Introductions.php:126
 #: src/Module/Notifications/Introductions.php:200
-#: src/Module/Notifications/Notification.php:75
 msgid "Ignore"
 msgstr ""
 
@@ -2382,7 +2380,7 @@ msgstr ""
 msgid "Relationships"
 msgstr ""
 
-#: src/Content/Widget.php:267 src/Module/Circle.php:281
+#: src/Content/Widget.php:267 src/Module/Circle.php:282
 #: src/Module/Contact.php:329
 msgid "All Contacts"
 msgstr ""
@@ -3207,7 +3205,7 @@ msgstr ""
 msgid "Edit circle"
 msgstr ""
 
-#: src/Model/Circle.php:592 src/Module/Circle.php:185
+#: src/Model/Circle.php:592 src/Module/Circle.php:186
 msgid "Contacts not in any circle"
 msgstr ""
 
@@ -3215,8 +3213,8 @@ msgstr ""
 msgid "Create a new circle"
 msgstr ""
 
-#: src/Model/Circle.php:595 src/Module/Circle.php:168 src/Module/Circle.php:190
-#: src/Module/Circle.php:265
+#: src/Model/Circle.php:595 src/Module/Circle.php:169 src/Module/Circle.php:191
+#: src/Module/Circle.php:266
 msgid "Circle Name: "
 msgstr ""
 
@@ -3949,7 +3947,7 @@ msgstr ""
 #: src/Module/Settings/Connectors.php:228
 #: src/Module/Settings/ContactImport.php:110
 #: src/Module/Settings/Delegation.php:179 src/Module/Settings/Display.php:393
-#: src/Module/Settings/Features.php:91
+#: src/Module/Settings/Features.php:90
 #: src/Module/Settings/Profile/Index.php:272
 msgid "Save Settings"
 msgstr ""
@@ -6002,7 +6000,7 @@ msgstr ""
 msgid "Could not create circle."
 msgstr ""
 
-#: src/Module/Circle.php:54 src/Module/Circle.php:203 src/Module/Circle.php:227
+#: src/Module/Circle.php:54 src/Module/Circle.php:204 src/Module/Circle.php:228
 msgid "Circle not found."
 msgstr ""
 
@@ -6056,47 +6054,47 @@ msgstr ""
 msgid "Bad request."
 msgstr ""
 
-#: src/Module/Circle.php:160
+#: src/Module/Circle.php:161
 msgid "Save Circle"
 msgstr ""
 
-#: src/Module/Circle.php:161
+#: src/Module/Circle.php:162
 msgid "Filter"
 msgstr ""
 
-#: src/Module/Circle.php:167
+#: src/Module/Circle.php:168
 msgid "Create a circle of contacts/friends."
 msgstr ""
 
-#: src/Module/Circle.php:208
+#: src/Module/Circle.php:209
 msgid "Unable to remove circle."
 msgstr ""
 
-#: src/Module/Circle.php:259
+#: src/Module/Circle.php:260
 msgid "Delete Circle"
 msgstr ""
 
-#: src/Module/Circle.php:269
+#: src/Module/Circle.php:270
 msgid "Edit Circle Name"
 msgstr ""
 
-#: src/Module/Circle.php:279
+#: src/Module/Circle.php:280
 msgid "Members"
 msgstr ""
 
-#: src/Module/Circle.php:282
+#: src/Module/Circle.php:283
 msgid "Circle is empty"
 msgstr ""
 
-#: src/Module/Circle.php:298
+#: src/Module/Circle.php:299
 msgid "Remove contact from circle"
 msgstr ""
 
-#: src/Module/Circle.php:321
+#: src/Module/Circle.php:322
 msgid "Click on a contact to add or remove."
 msgstr ""
 
-#: src/Module/Circle.php:338
+#: src/Module/Circle.php:339
 msgid "Add contact to circle"
 msgstr ""
 
@@ -8292,6 +8290,13 @@ msgstr ""
 msgid "Suggested by:"
 msgstr ""
 
+#: src/Module/Notifications/Introductions.php:127
+#: src/Module/Notifications/Introductions.php:164
+#: src/Module/Post/Tag/Remove.php:95
+#: src/Module/Settings/TwoFactor/Trusted.php:133
+msgid "Remove"
+msgstr ""
+
 #: src/Module/Notifications/Introductions.php:135
 msgid "Claims to be known to you: "
 msgstr ""
@@ -8319,12 +8324,6 @@ msgstr ""
 
 #: src/Module/Notifications/Introductions.php:150
 msgid "Follower"
-msgstr ""
-
-#: src/Module/Notifications/Introductions.php:164
-#: src/Module/Post/Tag/Remove.php:95
-#: src/Module/Settings/TwoFactor/Trusted.php:133
-msgid "Remove"
 msgstr ""
 
 #: src/Module/Notifications/Introductions.php:198
@@ -10018,12 +10017,12 @@ msgstr ""
 msgid "Timelines"
 msgstr ""
 
-#: src/Module/Settings/Display.php:402 src/Module/Settings/Features.php:84
+#: src/Module/Settings/Display.php:402 src/Module/Settings/Features.php:83
 msgid "Drag to reorder or tab to item with keyboard and move up/down with arrow keys"
 msgstr ""
 
 #: src/Module/Settings/Display.php:405 src/Module/Settings/Display.php:409
-#: src/Module/Settings/Features.php:88
+#: src/Module/Settings/Features.php:87
 msgid "Reset order"
 msgstr ""
 
@@ -10195,7 +10194,7 @@ msgstr ""
 msgid "Default calendar view:"
 msgstr ""
 
-#: src/Module/Settings/Features.php:83
+#: src/Module/Settings/Features.php:82
 msgid "Additional Features"
 msgstr ""
 
