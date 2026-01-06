@@ -563,7 +563,7 @@ header #banner #logo-img,
 	color: $font_color_darker;
 }
 #nav-notifications-menu {
-	margin-top: 4px;
+	margin-top: 0;
 	padding: 0;
 }
 #nav-notifications-mark-all {
@@ -580,7 +580,11 @@ header #banner #logo-img,
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
+	padding: 5px 0;
  }
+#notifications-mark-as-read {
+	padding: 0;
+}
  #notifications-title {
 	font-size: 17px;
 	font-weight: 500;
