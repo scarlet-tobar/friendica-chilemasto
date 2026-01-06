@@ -47,10 +47,15 @@ class ParseUrl
 
 	/**
 	 * Fetch the content type of the given url
-	 * @param string $url    URL of the page
-	 * @param string $accept content-type to accept
-	 * @param int    $timeout
-	 * @return array content type
+	 *
+	 * Performs a HEAD (fallback to GET) and returns the detected
+	 * content type split into main type and subtype (e.g. ['text', 'html']).
+	 *
+	 * @param string $url     URL of the page
+	 * @param string $accept  content-type to accept
+	 * @param int    $timeout request timeout in seconds
+	 *
+	 * @return string[] Array with the main type and subtype (e.g. ['text','html'])
 	 */
 	public static function getContentType(string $url, string $accept = HttpClientAccept::DEFAULT, int $timeout = 0): array
 	{
@@ -161,6 +166,7 @@ class ParseUrl
 	 * @param string $url      The url of the page which should be scraped
 	 * @param string $mimetype Optional mimetype that had already been detected for this page
 	 * @param int    $count    Internal counter to avoid endless loops
+	 * @param bool   $songlink Try to retrieve an alternative player via song.link (default: true)
 	 *
 	 * @return array which contains needed data for embedding
 	 *    string 'url'      => The url of the parsed page
@@ -185,7 +191,7 @@ class ParseUrl
 	 * </body>
 	 * @endverbatim
 	 */
-	public static function getSiteinfo(string $url, string $mimetype = '', int $count = 1): array
+	public static function getSiteinfo(string $url, string $mimetype = '', int $count = 1, bool $songlink = true): array
 	{
 		if (empty($url)) {
 			return [
@@ -518,6 +524,10 @@ class ParseUrl
 
 		$siteinfo = self::getOembedInfo($xpath, $siteinfo);
 
+		if ($songlink && isset($siteinfo['player']['embed']) && DI::config()->get('system', 'songlink')) {
+			$siteinfo = self::getSongLinkPlayer($siteinfo);
+		}
+
 		if (!empty($siteinfo['player']['stream'])) {
 			// Only add player data to media arrays if there is no duplicate
 			$content_urls = array_merge(array_column($siteinfo['audio'] ?? [], 'content'), array_column($siteinfo['video'] ?? [], 'content'));
@@ -752,10 +762,14 @@ class ParseUrl
 	/**
 	 * Parse the Json-Ld parts of a web page
 	 *
-	 * @param array $siteinfo
-	 * @param array $jsonld
+	 * Recursively parses JSON-LD structures and merges extracted information
+	 * into the given $siteinfo array.
 	 *
-	 * @return array siteinfo
+	 * @param array $siteinfo The current siteinfo to enrich
+	 * @param array $jsonld   The JSON-LD data to parse
+	 * @param bool  $root     Whether this call is the root element
+	 *
+	 * @return array The enriched siteinfo array
 	 */
 	private static function parseParts(array $siteinfo, array $jsonld, bool $root): array
 	{
@@ -1314,10 +1328,14 @@ class ParseUrl
 	/**
 	 * Fetch oEmbed data
 	 *
-	 * @param DOMXPath $xpath
-	 * @param string   $url
+	 * Attempts to discover an oEmbed endpoint from common providers, the
+	 * page's <link> tags, or falls back to Embera. Returns an associative
+	 * array following the oEmbed specification or an empty array on failure.
 	 *
-	 * @return array oEmbed data
+	 * @param DOMXPath $xpath DOMXPath for the parsed document
+	 * @param string   $url   The original URL
+	 *
+	 * @return array Associative array with oEmbed fields, or empty array if not found
 	 */
 	private static function getOembedData(DOMXPath $xpath, string $url): array
 	{
@@ -1440,6 +1458,17 @@ class ParseUrl
 		return null;
 	}
 
+	/**
+	 * Merge oEmbed data into the existing siteinfo array.
+	 *
+	 * Maps known oEmbed fields to siteinfo keys, converts dates and logs
+	 * unknown fields for debugging purposes.
+	 *
+	 * @param array $siteinfo Current siteinfo
+	 * @param array $data     The oEmbed data
+	 *
+	 * @return array Enriched siteinfo
+	 */
 	private static function getSiteinfoFromoEmbed(array $siteinfo, array $data): array
 	{
 		// Youtube provides only basic information to some IP ranges.
@@ -1498,6 +1527,17 @@ class ParseUrl
 		return $siteinfo;
 	}
 
+	/**
+	 * Retrieve oEmbed information for the page and merge it into siteinfo.
+	 *
+	 * This will request oEmbed JSON (or fall back to embera) and apply
+	 * any appropriate transformations before adding embed/player data.
+	 *
+	 * @param DOMXPath $xpath    XPath object of the parsed document
+	 * @param array    $siteinfo Current siteinfo to be augmented
+	 *
+	 * @return array Augmented siteinfo
+	 */
 	private static function getOembedInfo(DOMXPath $xpath, array $siteinfo): array
 	{
 		$data = self::getOembedData($xpath, $siteinfo['url']);
@@ -1593,6 +1633,70 @@ class ParseUrl
 		return $siteinfo;
 	}
 
+	/**
+	 * Try to obtain a better embed player using the song.link service.
+	 *
+	 * If a better player is available via song.link (e.g. a non-YouTube
+	 * provider), fetch and merge that player's embed information.
+	 *
+	 * @param array $siteinfo Current siteinfo
+	 *
+	 * @return array Possibly modified siteinfo with 'player' set if found
+	 */
+	private static function getSongLinkPlayer(array $siteinfo): array
+	{
+		$service    = 'https://api.song.link/v1-alpha.1/links?url=' . urlencode($siteinfo['url']);
+		$curlResult = DI::httpClient()->get($service, HttpClientAccept::HTML, [HttpClientOptions::REQUEST => HttpClientRequest::SITEINFO]);
+		if (!$curlResult->isSuccess()) {
+			DI::logger()->debug('No song.link data', ['url' => $siteinfo['url'], 'code' => $curlResult->getReturnCode(), 'message' => $curlResult->getBodyString()]);
+			return $siteinfo;
+		}
+
+		$data = json_decode($curlResult->getBodyString());
+		if (!isset($data->linksByPlatform->youtube)) {
+			DI::logger()->debug('No Youtube link in returned data', ['url' => $siteinfo['url']]);
+			return $siteinfo;
+		}
+
+		$data2 = json_decode(json_encode($data), true);
+		if (sizeof($data2['linksByPlatform']) <= 2) {
+			DI::logger()->debug('Only Youtube links in returned data', ['url' => $siteinfo['url']]);
+			return $siteinfo;
+		}
+
+		if (!isset($data->pageUrl)) {
+			DI::logger()->debug('No pageUrl in returned data', ['url' => $siteinfo['url']]);
+			return $siteinfo;
+		}
+
+		if ($data->pageUrl === $siteinfo['url']) {
+			DI::logger()->debug('ParseUrl is already pageUrl', ['url' => $siteinfo['url']]);
+			return $siteinfo;
+		}
+
+		$data = self::getSiteinfo($data->pageUrl, '', 1, false);
+		if (!isset($data['player']['embed'])) {
+			DI::logger()->debug('No embed player', ['url' => $siteinfo['url']]);
+			return $siteinfo;
+		}
+
+		$siteinfo['player'] = $data['player'];
+		DI::logger()->debug('Embed player found', ['url' => $siteinfo['url']]);
+
+		return $siteinfo;
+	}
+
+	/**
+	 * Decide whether an oEmbed rich response should be used for embedding.
+	 *
+	 * Uses schema type and page metadata to avoid embedding rich content
+	 * that does not add value (e.g. articles) while keeping media embeds.
+	 *
+	 * @param array $siteinfo Current siteinfo
+	 * @param array $data     The oEmbed data
+	 *
+	 * @return bool True if the embed should be used, false otherwise
+	 */
 	private static function isWantedEmbed(array $siteinfo, array $data): bool
 	{
 		if (isset($siteinfo['player'])) {

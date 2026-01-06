@@ -579,6 +579,10 @@ return [
 		// Show all themes including the unsupported ones.
 		'show_unsupported_themes' => false,
 
+		// songlink (Boolean)
+		// Use song.link (Odesli) to add multiple sources to embedded music
+		'songlink' => false,
+
 		// stats_key (String)
 		// A random string to be added to the /stats?key=... endpoint to enable the monitoring statistics
 		'stats_key' => '',
