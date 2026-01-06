@@ -524,7 +524,7 @@ class ParseUrl
 
 		$siteinfo = self::getOembedInfo($xpath, $siteinfo);
 
-		if ($songlink && !empty($siteinfo['player']['embed']) && DI::config()->get('system', 'songlink')) {
+		if ($songlink && isset($siteinfo['player']['embed']) && DI::config()->get('system', 'songlink')) {
 			$siteinfo = self::getSongLinkPlayer($siteinfo);
 		}
 
@@ -1653,7 +1653,7 @@ class ParseUrl
 		}
 
 		$data = json_decode($curlResult->getBodyString());
-		if (empty($data->linksByPlatform->youtube)) {
+		if (!isset($data->linksByPlatform->youtube)) {
 			DI::logger()->debug('No Youtube link in returned data', ['url' => $siteinfo['url']]);
 			return $siteinfo;
 		}
@@ -1664,18 +1664,18 @@ class ParseUrl
 			return $siteinfo;
 		}
 
-		if (empty($data->pageUrl)) {
+		if (!isset($data->pageUrl)) {
 			DI::logger()->debug('No pageUrl in returned data', ['url' => $siteinfo['url']]);
 			return $siteinfo;
 		}
 
-		if ($data->pageUrl == $siteinfo['url']) {
+		if ($data->pageUrl === $siteinfo['url']) {
 			DI::logger()->debug('ParseUrl is already pageUrl', ['url' => $siteinfo['url']]);
 			return $siteinfo;
 		}
 
 		$data = self::getSiteinfo($data->pageUrl, '', 1, false);
-		if (empty($data['player']['embed'])) {
+		if (!isset($data['player']['embed'])) {
 			DI::logger()->debug('No embed player', ['url' => $siteinfo['url']]);
 			return $siteinfo;
 		}
