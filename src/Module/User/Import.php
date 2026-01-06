@@ -35,6 +35,7 @@ use Psr\Log\LoggerInterface;
 class Import extends \Friendica\BaseModule
 {
 	const IMPORT_DEBUG = false;
+	const MEMORY_LIMIT = 67108864; // 64MB
 
 	/** @var IManageConfigValues */
 	private $config;
@@ -201,7 +202,7 @@ class Import extends \Friendica\BaseModule
 		*/
 
 		$available_memory = Strings::getBytesFromShorthand(ini_get('memory_limit'));
-		$available_memory = $available_memory > 0 ? ($available_memory / 2) : 67108864;
+		$available_memory = $available_memory > 0 ? ($available_memory / 2) : self::MEMORY_LIMIT;
 		if ($file['size'] > $available_memory) {
 			$this->systemMessages->addNotice($this->t('Account file size is too high'));
 			return;
