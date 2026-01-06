@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-04 19:01+0100\n"
+"POT-Creation-Date: 2026-01-04 20:49+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1708,7 +1708,7 @@ msgstr ""
 msgid "Display posts that have been created by accounts of the selected circle."
 msgstr ""
 
-#: src/Content/Feature.php:128 src/Content/GroupManager.php:128
+#: src/Content/Feature.php:128 src/Content/GroupManager.php:131
 #: src/Content/Nav.php:276 src/Content/Text/HTML.php:877
 #: src/Content/Widget.php:558 src/Model/User.php:1400
 msgid "Groups"
@@ -1817,21 +1817,25 @@ msgstr ""
 msgid "Allows anonymous visitors to consult your calendar and your public events. Contact birthday events are private to you."
 msgstr ""
 
-#: src/Content/GroupManager.php:130
+#: src/Content/GroupManager.php:133
 msgid "External link to group"
 msgstr ""
 
-#: src/Content/GroupManager.php:134 src/Content/Widget.php:533
+#: src/Content/GroupManager.php:137 src/Content/Widget.php:533
 msgid "show less"
 msgstr ""
 
-#: src/Content/GroupManager.php:135 src/Content/Widget.php:428
+#: src/Content/GroupManager.php:138 src/Content/Widget.php:428
 #: src/Content/Widget.php:534
 msgid "show more"
 msgstr ""
 
-#: src/Content/GroupManager.php:136
+#: src/Content/GroupManager.php:139
 msgid "Create new group"
+msgstr ""
+
+#: src/Content/GroupManager.php:141
+msgid "Find groups to join"
 msgstr ""
 
 #: src/Content/Item.php:336 src/Model/Item.php:2787
