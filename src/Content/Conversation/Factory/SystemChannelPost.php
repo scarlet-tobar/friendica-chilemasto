@@ -18,6 +18,15 @@ use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
 use Psr\Log\LoggerInterface;
 
+/**
+ * SystemChannelPost factory class.
+ *
+ * Evaluates posts and stores them into system channels (e.g. whatshot,
+ * foryou, discover) for users based on engagement, relations and
+ * repository thresholds.
+ *
+ * @package Friendica\Content\Conversation\Factory
+ */
 final class SystemChannelPost
 {
 	private LoggerInterface $logger;
@@ -25,6 +34,14 @@ final class SystemChannelPost
 	private Database $dba;
 	private IManageConfigValues $config;
 
+	/**
+	 * SystemChannelPost constructor.
+	 *
+	 * @param Database $dba Database access object.
+	 * @param UserDefinedChannel $channel Channel repository.
+	 * @param LoggerInterface $logger Logger instance.
+	 * @param IManageConfigValues $config Configuration manager.
+	 */
 	public function __construct(Database $dba, UserDefinedChannel $channel, LoggerInterface $logger, IManageConfigValues $config)
 	{
 		$this->dba               = $dba;
@@ -33,7 +50,20 @@ final class SystemChannelPost
 		$this->config            = $config;
 	}
 
-	public function add(int $uri_id, int $post_uid, string $network, int $reshare_id = 0)
+	/**
+	 * Add a post to matching system channels for one or many users.
+	 *
+	 * When system channel caching is enabled this computes whether a post
+	 * should be stored in various system channels for the given user(s)
+	 * and inserts cache entries into `system-channel-post`.
+	 *
+	 * @param int $uri_id URI id of the post.
+	 * @param int $post_uid User id context (0 for all users).
+	 * @param string $network Network identifier.
+	 * @param int $reshare_id Optional reshare id.
+	 * @return void
+	 */
+	public function add(int $uri_id, int $post_uid, string $network, int $reshare_id = 0): void
 	{
 		if (!$this->config->get('system', 'channel_cache')) {
 			return;
@@ -54,7 +84,7 @@ final class SystemChannelPost
 			return;
 		}
 
-		if ($post_uid != 0) {
+		if ($post_uid !== 0) {
 			$uids = [$post_uid];
 		} else {
 			$users = $this->dba->selectToArray('user', ['uid'], $this->channelRepository->getUserCondition());
