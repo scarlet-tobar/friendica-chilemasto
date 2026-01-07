@@ -47,7 +47,7 @@
 						{{/if}}
 						{{if $circle.edit}}
 							{{* if the circle is editable show a little pencil for editing *}}
-							<a id="edit-sidebar-circle-element-{{$circle.id}}" class="widget-action-top pull-right faded-icon" href="{{$circle.edit.href}}" data-toggle="tooltip" title="{{$edittext}}">
+							<a id="edit-sidebar-circle-element-{{$circle.id}}" class="circle-edit-tool pull-right faded-icon" href="{{$circle.edit.href}}" data-toggle="tooltip" title="{{$edittext}}">
 								<i class="fa fa-pencil" aria-hidden="true"></i>
 							</a>
 						{{/if}}
