@@ -190,7 +190,7 @@ final class SystemChannelPost
 						break;
 
 					case Channel::LANGUAGE:
-						$store = $engagement['language'] == User::getLanguageCode($uid);
+						$store = $engagement['language'] === User::getLanguageCode($uid);
 						break;
 				}
 

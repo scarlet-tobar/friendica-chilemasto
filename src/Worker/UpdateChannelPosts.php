@@ -11,10 +11,26 @@ use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
 
+/**
+ * Worker to update the posts of a user-defined channel.
+ *
+ * Responsible for rebuilding the `channel-post` cache for a given channel
+ * and user. The worker respects the system `channel_cache` configuration
+ * and uses repository conditions to select matching posts.
+ *
+ * @package Friendica\Worker
+ */
 final class UpdateChannelPosts
 {
 	/**
-	 * Update the posts of a given user defined channel
+	 * Update the posts of a given user defined channel.
+	 *
+	 * Deletes existing cached entries and repopulates the channel cache
+	 * based on the channel's matching condition.
+	 *
+	 * @param int $id Channel id.
+	 * @param int $uid User id the channel belongs to.
+	 * @return void
 	 */
 	public static function execute(int $id, int $uid)
 	{

@@ -1028,7 +1028,7 @@ class Item
 
 		DI::logger()->debug('Handle created item', ['id' => $post_user_id, 'uri-id' => $posted_item['uri-id'], 'uid' => $posted_item['uid']]);
 
-		if ($posted_item['origin'] && $posted_item['gravity'] == self::GRAVITY_PARENT) {
+		if ($posted_item['origin'] && $posted_item['gravity'] === self::GRAVITY_PARENT) {
 			$posts = (int)(DI::keyValue()->get('nodeinfo_local_posts') ?? 0);
 			DI::keyValue()->set('nodeinfo_local_posts', $posts + 1);
 		} elseif ($posted_item['origin'] && $posted_item['gravity'] == self::GRAVITY_COMMENT) {
@@ -1130,7 +1130,7 @@ class Item
 		}
 
 		if ($inserted) {
-			if ($posted_item['gravity'] == self::GRAVITY_PARENT) {
+			if ($posted_item['gravity'] === self::GRAVITY_PARENT) {
 				$posts = (int)(DI::keyValue()->get('nodeinfo_total_posts') ?? 0);
 				DI::keyValue()->set('nodeinfo_total_posts', $posts + 1);
 			} elseif ($posted_item['gravity'] == self::GRAVITY_COMMENT) {
@@ -1162,11 +1162,11 @@ class Item
 			}
 
 			if (DI::ChannelPost()->isValidChannelPostBase($posted_item['uid'], $posted_item['private'], $posted_item['network'])) {
-				if (($posted_item['gravity'] == self::GRAVITY_ACTIVITY) && ($posted_item['verb'] == Activity::ANNOUNCE) && ($posted_item['author-contact-type'] == Contact::TYPE_COMMUNITY) && ($posted_item['parent-uri-id'] == $posted_item['thr-parent-id'])) {
+				if (($posted_item['gravity'] === self::GRAVITY_ACTIVITY) && ($posted_item['verb'] === Activity::ANNOUNCE) && ($posted_item['author-contact-type'] === Contact::TYPE_COMMUNITY) && ($posted_item['parent-uri-id'] === $posted_item['thr-parent-id'])) {
 					DI::ChannelPost()->add($posted_item['thr-parent-id'], $posted_item['uid'], $posted_item['author-id']);
 					DI::SystemChannelPost()->add($posted_item['thr-parent-id'], $posted_item['uid'], $posted_item['network'], $posted_item['author-id']);
 				} else {
-					if ($posted_item['gravity'] == self::GRAVITY_PARENT) {
+					if ($posted_item['gravity'] === self::GRAVITY_PARENT) {
 						DI::ChannelPost()->add($posted_item['uri-id'], $posted_item['uid']);
 					}
 					DI::SystemChannelPost()->add($posted_item['thr-parent-id'], $posted_item['uid'], $posted_item['network']);

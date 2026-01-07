@@ -23,6 +23,14 @@ use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Repository for user-defined channels.
+ *
+ * Encapsulates selection, matching and statistics needed to evaluate
+ * user-defined channels for posts.
+ *
+ * @package Friendica\Content\Conversation\Repository
+ */
 class UserDefinedChannel extends BaseRepository
 {
 	protected static $table_name = 'channel';
@@ -33,6 +41,15 @@ class UserDefinedChannel extends BaseRepository
 	private ICanCache $cache;
 	private IManageConfigValues $config;
 
+	/**
+	 * UserDefinedChannel repository constructor.
+	 *
+	 * @param Database $database Database access layer.
+	 * @param LoggerInterface $logger Logger instance.
+	 * @param UserDefinedChannelFactory $factory Entity factory.
+	 * @param IManageConfigValues $config Configuration manager.
+	 * @param ICanCache $cache Cache capability.
+	 */
 	public function __construct(Database $database, LoggerInterface $logger, UserDefinedChannelFactory $factory, IManageConfigValues $config, ICanCache $cache)
 	{
 		parent::__construct($database, $logger, $factory);
@@ -59,6 +76,14 @@ class UserDefinedChannel extends BaseRepository
 		return $Entities;
 	}
 
+	/**
+	 * Select user defined channels matching a condition.
+	 *
+	 * @param array $condition Query condition.
+	 * @param array $params Additional parameters.
+	 * @return UserDefinedChannels
+	 * @throws \Exception
+	 */
 	public function select(array $condition, array $params = []): UserDefinedChannels
 	{
 		return $this->_select($condition, $params);
@@ -114,6 +139,14 @@ class UserDefinedChannel extends BaseRepository
 		return $this->_select(['uid' => $uid]);
 	}
 
+	/**
+	 * Persist a user defined channel.
+	 *
+	 * Inserts or updates the channel and returns the stored entity.
+	 *
+	 * @param UserDefinedChannelEntity $Channel Channel entity to save.
+	 * @return UserDefinedChannelEntity
+	 */
 	public function save(UserDefinedChannelEntity $Channel): UserDefinedChannelEntity
 	{
 		$fields = [
@@ -146,6 +179,12 @@ class UserDefinedChannel extends BaseRepository
 		return $Channel;
 	}
 
+	/**
+	 * Validate full-text search syntax by running a quick MATCH query.
+	 *
+	 * @param string $searchtext Search expression.
+	 * @return bool True when valid.
+	 */
 	private function isValid(string $searchtext): bool
 	{
 		if ($searchtext == '') {
@@ -271,11 +310,11 @@ class UserDefinedChannel extends BaseRepository
 			return null;
 		}
 
-		if ($uid == 0) {
+		if ($uid === 0) {
 			$condition = $this->getUserCondition();
 			$condition = DBA::mergeConditions($condition, ["NOT `account-type` IN (?, ?)", User::ACCOUNT_TYPE_RELAY, User::ACCOUNT_TYPE_COMMUNITY]);
 			$users     = $this->db->selectToArray('user', ['uid'], $condition);
-			if (empty($users)) {
+			if (!$users) {
 				return null;
 			}
 			$uids = array_column($users, 'uid');
@@ -325,6 +364,14 @@ class UserDefinedChannel extends BaseRepository
 		return $filteredChannels;
 	}
 
+	/**
+	 * Check whether a contact id belongs to a given circle for a user.
+	 *
+	 * @param int $circleId Circle id (group id).
+	 * @param int $uid Owner user id.
+	 * @param int $cid Contact public id (pid).
+	 * @return bool True when contact is member of the circle.
+	 */
 	private function inCircle(int $circleId, int $uid, int $cid): bool
 	{
 		if ($cid == 0) {
@@ -338,6 +385,13 @@ class UserDefinedChannel extends BaseRepository
 		return $this->db->exists('group_member', ['gid' => $circleId, 'contact-id' => $account['id']]);
 	}
 
+	/**
+	 * Check if any of the provided tags exist in a comma-separated tag list.
+	 *
+	 * @param string $tagList Comma-separated tags.
+	 * @param array $tags Tags to check (lowercased).
+	 * @return bool True when at least one tag matches.
+	 */
 	private function inTaglist(string $tagList, array $tags): bool
 	{
 		if (empty($tags)) {
@@ -354,6 +408,14 @@ class UserDefinedChannel extends BaseRepository
 		return false;
 	}
 
+	/**
+	 * Build a base condition for selecting valid users.
+	 *
+	 * Respects account verification, block and expiry flags and optional
+	 * abandonment days configured in the system.
+	 *
+	 * @return array Condition usable with the database layer.
+	 */
 	public function getUserCondition(): array
 	{
 		$condition = ["`verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired` AND `user`.`uid` > ?", 0];
@@ -365,6 +427,16 @@ class UserDefinedChannel extends BaseRepository
 		return $condition;
 	}
 
+	/**
+	 * Build a condition to find posts matching a user-defined channel.
+	 *
+	 * The returned condition can be passed to selects on the
+	 * `post-engagement`/`post` tables.
+	 *
+	 * @param UserDefinedChannelEntity $channel Channel definition.
+	 * @param int $uid User id context.
+	 * @return array Condition and parameters.
+	 */
 	public function getCondition(UserDefinedChannelEntity $channel, int $uid): array
 	{
 		$condition = [];
@@ -441,6 +513,12 @@ class UserDefinedChannel extends BaseRepository
 		return $condition;
 	}
 
+	/**
+	 * Convert include tag list into full-text search tag terms.
+	 *
+	 * @param string $includeTags Comma-separated include tags.
+	 * @return string Full-text search fragment or empty string.
+	 */
 	private function addIncludeTags(string $includeTags): string
 	{
 		$tagterms = '';
@@ -455,6 +533,12 @@ class UserDefinedChannel extends BaseRepository
 		}
 	}
 
+	/**
+	 * Convert media type flags into full-text search media terms.
+	 *
+	 * @param int $mediaType Media type bitmask.
+	 * @return string Full-text search fragment or empty string.
+	 */
 	private function addMediaTerms(int $mediaType): string
 	{
 		$mediaterms = '';
@@ -477,6 +561,13 @@ class UserDefinedChannel extends BaseRepository
 		}
 	}
 
+	/**
+	 * Build language search terms for full-text queries.
+	 *
+	 * @param int $uid User id for default wanted languages.
+	 * @param array|null $languages Optional explicit languages.
+	 * @return string Full-text language fragment or empty string.
+	 */
 	private function addLanguageSearchTerms(int $uid, $languages = null): string
 	{
 		$langterms = '';
@@ -491,6 +582,14 @@ class UserDefinedChannel extends BaseRepository
 		}
 	}
 
+	/**
+	 * Add language constraints to an existing condition array.
+	 *
+	 * @param int $uid User id for default wanted languages.
+	 * @param array $condition Existing condition array to extend.
+	 * @param array|null $languages Optional explicit languages.
+	 * @return array Modified condition array.
+	 */
 	public function addLanguageCondition(int $uid, array $condition, $languages = null): array
 	{
 		$conditions = [];
@@ -505,6 +604,15 @@ class UserDefinedChannel extends BaseRepository
 		return $condition;
 	}
 
+	/**
+	 * Compute a median-like post score for a contact id.
+	 *
+	 * Uses caching to avoid repeated heavy queries.
+	 *
+	 * @param int $cid Contact id.
+	 * @param int $divider Divider to compute the median index.
+	 * @return int Median post score.
+	 */
 	public function getMedianPostScore(int $cid, int $divider): int
 	{
 		$cache_key = 'Channel:getPostScore:' . $cid . ':' . $divider;
@@ -518,7 +626,7 @@ class UserDefinedChannel extends BaseRepository
 		$limit    = $this->db->count('contact-relation', $condition) / $divider;
 		$relation = $this->db->selectToArray('contact-relation', ['post-score'], $condition, ['order' => ['post-score' => true], 'limit' => [$limit, 1]]);
 		$score    = $relation[0]['post-score'] ?? 0;
-		if (empty($score)) {
+		if ($score === 0) {
 			return 0;
 		}
 
@@ -527,6 +635,14 @@ class UserDefinedChannel extends BaseRepository
 		return $score;
 	}
 
+	/**
+	 * Compute median comments for a user's wanted languages.
+	 *
+	 * @param int $uid User id.
+	 * @param int $divider Divider used to determine median index.
+	 * @param string $network Optional network filter.
+	 * @return int Median comments value.
+	 */
 	public function getMedianComments(int $uid, int $divider, string $network = ''): int
 	{
 		$languages = User::getWantedLanguages($uid);
@@ -555,6 +671,14 @@ class UserDefinedChannel extends BaseRepository
 		return $comments;
 	}
 
+	/**
+	 * Compute median activities for a user's wanted languages.
+	 *
+	 * @param int $uid User id.
+	 * @param int $divider Divider used to determine median index.
+	 * @param string $network Optional network filter.
+	 * @return int Median activities value.
+	 */
 	public function getMedianActivities(int $uid, int $divider, string $network = ''): int
 	{
 		$languages  = User::getWantedLanguages($uid);
@@ -583,6 +707,13 @@ class UserDefinedChannel extends BaseRepository
 		return $activities;
 	}
 
+	/**
+	 * Compute median relation thread score for a contact id.
+	 *
+	 * @param int $cid Contact id.
+	 * @param int $divider Divider to compute the median index.
+	 * @return int Median relation thread score.
+	 */
 	public function getMedianRelationThreadScore(int $cid, int $divider): int
 	{
 		$cache_key = 'Channel:getThreadScore:' . $cid . ':' . $divider;
@@ -596,7 +727,7 @@ class UserDefinedChannel extends BaseRepository
 		$limit    = $this->db->count('contact-relation', $condition) / $divider;
 		$relation = $this->db->selectToArray('contact-relation', ['relation-thread-score'], $condition, ['order' => ['relation-thread-score' => true], 'limit' => [$limit, 1]]);
 		$score    = $relation[0]['relation-thread-score'] ?? 0;
-		if (empty($score)) {
+		if ($score === 0) {
 			return 0;
 		}
 
