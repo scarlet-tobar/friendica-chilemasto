@@ -78,7 +78,7 @@ msgstr ""
 #: src/Module/Settings/UserExport.php:199
 #: src/Module/Settings/UserExport.php:219
 #: src/Module/Settings/UserExport.php:284 src/Module/User/Delegation.php:146
-#: src/Module/User/Import.php:71 src/Module/User/Import.php:78
+#: src/Module/User/Import.php:72 src/Module/User/Import.php:79
 msgid "Permission denied."
 msgstr ""
 
@@ -3737,6 +3737,7 @@ msgid "The nickname was blocked from registration by the nodes admin."
 msgstr ""
 
 #: src/Model/User.php:1290 src/Model/User.php:1296
+#: src/Module/User/Import.php:230
 msgid "Cannot use that email."
 msgstr ""
 
@@ -8745,7 +8746,7 @@ msgstr ""
 msgid "Only parent users can create additional accounts."
 msgstr ""
 
-#: src/Module/Register.php:96 src/Module/User/Import.php:98
+#: src/Module/Register.php:96 src/Module/User/Import.php:99
 msgid "This site has exceeded the number of allowed daily account registrations. Please try again tomorrow."
 msgstr ""
 
@@ -8816,7 +8817,7 @@ msgstr ""
 msgid "Choose a nickname: "
 msgstr ""
 
-#: src/Module/Register.php:178 src/Module/User/Import.php:104
+#: src/Module/Register.php:178 src/Module/User/Import.php:105
 msgid "Import"
 msgstr ""
 
@@ -10890,63 +10891,67 @@ msgstr ""
 msgid "Select an identity to manage: "
 msgstr ""
 
-#: src/Module/User/Import.php:90
+#: src/Module/User/Import.php:91
 msgid "User imports on closed servers can only be done by an administrator."
 msgstr ""
 
-#: src/Module/User/Import.php:106
+#: src/Module/User/Import.php:107
 msgid "Move account"
 msgstr ""
 
-#: src/Module/User/Import.php:107
+#: src/Module/User/Import.php:108
 msgid "You can import an account from another Friendica server."
 msgstr ""
 
-#: src/Module/User/Import.php:108
+#: src/Module/User/Import.php:109
 msgid "You need to export your account from the old server and upload it here. We will recreate your old account here with all your contacts. We will try also to inform your friends that you moved here."
 msgstr ""
 
-#: src/Module/User/Import.php:109
+#: src/Module/User/Import.php:110
 msgid "This feature is experimental. We can't import contacts from the OStatus network (GNU Social/Statusnet) or from Diaspora"
 msgstr ""
 
-#: src/Module/User/Import.php:110
+#: src/Module/User/Import.php:111
 msgid "Account file"
 msgstr ""
 
-#: src/Module/User/Import.php:110
+#: src/Module/User/Import.php:111
 msgid "To export your account, go to \"Settings->Export your personal data\" and select \"Export account\""
 msgstr ""
 
-#: src/Module/User/Import.php:204
+#: src/Module/User/Import.php:206
+msgid "Account file size is too high"
+msgstr ""
+
+#: src/Module/User/Import.php:212
 msgid "Error decoding account file"
 msgstr ""
 
-#: src/Module/User/Import.php:209
+#: src/Module/User/Import.php:217
 msgid "Error! No version data in file! This is not a Friendica account file?"
 msgstr ""
 
-#: src/Module/User/Import.php:217
+#: src/Module/User/Import.php:225
 #, php-format
 msgid "User '%s' already exists on this server!"
 msgstr ""
 
-#: src/Module/User/Import.php:254
+#: src/Module/User/Import.php:267
 msgid "User creation error"
 msgstr ""
 
-#: src/Module/User/Import.php:303
+#: src/Module/User/Import.php:316
 #, php-format
 msgid "%d contact not imported"
 msgid_plural "%d contacts not imported"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Module/User/Import.php:352
+#: src/Module/User/Import.php:365
 msgid "User profile creation error"
 msgstr ""
 
-#: src/Module/User/Import.php:403
+#: src/Module/User/Import.php:416
 msgid "Done. You can now login with your username and password"
 msgstr ""
 

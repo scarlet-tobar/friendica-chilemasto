@@ -563,7 +563,7 @@ header #banner #logo-img,
 	color: $font_color_darker;
 }
 #nav-notifications-menu {
-	margin-top: 4px;
+	margin-top: 0;
 	padding: 0;
 }
 #nav-notifications-mark-all {
@@ -580,7 +580,11 @@ header #banner #logo-img,
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
+	padding: 5px 0;
  }
+#notifications-mark-as-read {
+	padding: 0;
+}
  #notifications-title {
 	font-size: 17px;
 	font-weight: 500;
@@ -1306,7 +1310,7 @@ aside .vcard .icon {
 aside .vcard #subscribe-feed-link-button,
 aside .vcard #dfrn-request-link-button,
 aside .vcard #wallmessage-link-button {
-	width: 50%;
+	min-width: 119px;
 	margin: 0 0 0 -5px;
 	float: left;
 	padding: 0 5px;
@@ -1431,6 +1435,12 @@ aside .widget .widget-action.faded-icon:hover {
 }
 aside #circle-sidebar li .circle-checkbox {
 	margin: 6px 0 0;
+}
+aside #circle-sidebar li .circle-edit-tool {
+	padding-right: 10px;
+}
+aside #circle-sidebar li .circle-edit-tool:first-child {
+	padding-right: 0px;
 }
 
 /* contact block widget */

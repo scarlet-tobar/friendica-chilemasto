@@ -160,7 +160,7 @@ class Follow extends BaseModule
 			'$action'   => $requestUrl,
 			'$name'     => $contact['name'],
 			'$url'      => $contact['alias'] ?: $contact['url'],
-			'$zrl'      => OpenWebAuth::getZrlUrl($contact['url']),
+			'$zrl'      => OpenWebAuth::getZrlUrl($contact['alias'] ?: $contact['url']),
 			'$myaddr'   => $myaddr,
 			'$keywords' => $contact['keywords'],
 
