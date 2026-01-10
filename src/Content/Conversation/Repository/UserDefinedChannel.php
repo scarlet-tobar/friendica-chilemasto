@@ -205,7 +205,7 @@ class UserDefinedChannel extends BaseRepository
 	public function match(string $haystack, string $language): bool
 	{
 		$users = $this->db->selectToArray('user', ['uid'], $this->getUserCondition());
-		if (empty($users)) {
+		if (count($users) === 0) {
 			return false;
 		}
 
@@ -245,7 +245,7 @@ class UserDefinedChannel extends BaseRepository
 		$condition = $this->getUserCondition();
 		$condition = DBA::mergeConditions($condition, ["`account-type` IN (?, ?) AND `uid` != ?", User::ACCOUNT_TYPE_RELAY, User::ACCOUNT_TYPE_COMMUNITY, 0]);
 		$users     = $this->db->selectToArray('user', ['uid'], $condition);
-		if (empty($users)) {
+		if (count($users) === 0) {
 			return [];
 		}
 
