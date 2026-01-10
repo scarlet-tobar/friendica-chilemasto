@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // Copyright (C) 2010-2024, the Friendica project
 // SPDX-FileCopyrightText: 2010-2024 the Friendica project
 //
@@ -99,7 +101,7 @@ final class ChannelPost
 		}
 
 		$engagement = $this->dba->selectFirst('post-engagement', ['searchtext', 'media-type', 'owner-id', 'language'], ['uri-id' => $uri_id]);
-		if (!$engagement) {
+		if ($engagement === false || $engagement === []) {
 			$this->logger->debug('No engagement found', ['uri-id' => $uri_id]);
 			return;
 		}
@@ -108,12 +110,12 @@ final class ChannelPost
 		$tags     = array_column(Tag::getByURIId($uri_id, [Tag::HASHTAG]), 'name');
 
 		$channels = $this->channelRepository->getMatchingChannels($engagement['searchtext'], $language, $tags, $engagement['media-type'], $engagement['owner-id'], $reshare_id, $uid);
-		if (empty($channels) || $channels->count() == 0) {
+		if (!($channels instanceof \Friendica\Content\Conversation\Collection\UserDefinedChannels) || $channels->count() === 0) {
 			return;
 		}
 
 		$post = Post::selectFirstPost(['created', 'received', 'commented'], ['uri-id' => $uri_id]);
-		if (!$post) {
+		if ($post === false || $post === []) {
 			return;
 		}
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // Copyright (C) 2010-2024, the Friendica project
 // SPDX-FileCopyrightText: 2010-2024 the Friendica project
 //
@@ -72,7 +74,7 @@ final class SystemChannelPost
 		DI::logger()->debug('Adding system channel post', ['uri-id' => $uri_id, 'post_uid' => $post_uid, 'reshare_id' => $reshare_id]);
 
 		$engagement = $this->dba->selectFirst('post-engagement', ['searchtext', 'media-type', 'owner-id', 'language', 'activities', 'comments', 'contact-type', 'created'], ['uri-id' => $uri_id]);
-		if (!$engagement) {
+		if ($engagement === false || $engagement === []) {
 			$this->logger->debug('No engagement found', ['uri-id' => $uri_id, 'post-uid' => $post_uid, 'reshare_id' => $reshare_id]);
 			return;
 		}
@@ -80,7 +82,7 @@ final class SystemChannelPost
 		$owner = $reshare_id ?: $engagement['owner-id'];
 
 		$post = Post::selectFirstPost(['created', 'received', 'commented'], ['uri-id' => $uri_id]);
-		if (!$post) {
+		if ($post === false || $post === []) {
 			return;
 		}
 
@@ -88,7 +90,7 @@ final class SystemChannelPost
 			$uids = [$post_uid];
 		} else {
 			$users = $this->dba->selectToArray('user', ['uid'], $this->channelRepository->getUserCondition());
-			if (empty($users)) {
+			if (count($users) === 0) {
 				return;
 			}
 			$uids = array_column($users, 'uid');
