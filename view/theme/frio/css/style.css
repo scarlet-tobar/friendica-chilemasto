@@ -1699,7 +1699,7 @@ textarea.comment-edit-text:focus + .comment-edit-form .preview {
 	display: inline-block;
 }
 
-/* ALT badge for photos with descriptions in justified gallery */
+/* ALT badge for images with descriptions */
 .photo-top-image-wrapper:has(img.has-alt-description)::after {
 	background: rgba(0, 0, 0, 0.69);
 	border-radius: 4px;
@@ -1713,6 +1713,10 @@ textarea.comment-edit-text:focus + .comment-edit-form .preview {
 	right: 8px;
 	z-index: 1;
 	pointer-events: none;
+}
+/* ...omit alt tags on images in these cases: profile description */
+.profile-header a:has(img.has-alt-description)::after {
+	display: none;
 }
 
 .photo-top-image-wrapper .jg-caption,
