@@ -277,6 +277,11 @@ class Processor
 
 	private static function shouldCompleteThread(array $item): bool
 	{
+		if (!isset($item['parent-uri-id'])) {
+			DI::logger()->debug('No parent-uri-id set, no replies will be fetched');
+			return false;
+		}
+
 		switch (DI::config()->get('system', 'fetch_replies')) {
 			case self::FETCH_REPLIES_ALL:
 				DI::logger()->debug('Fetch all replies is enabled');
@@ -310,7 +315,7 @@ class Processor
 
 		if (!$child) {
 			$activity = DBA::selectFirst('post-activity', [], ['uri-id' => $uriId]);
-			$data = json_decode($activity['activity'] ?? '', true);
+			$data     = json_decode($activity['activity'] ?? '', true);
 			if ($data) {
 				$activity = JsonLD::compact($data);
 
