@@ -1018,7 +1018,7 @@ class Item
 
 	private static function handleCreatedItem(array $orig_item, int $post_user_id, int $uid, int $notify, bool $copy_permissions, $parent_origin, int $priority, string $notify_type, bool $inserted, $source): int
 	{
-		$posted_item = Post::selectFirst(self::ITEM_FIELDLIST, ['post-user-id' => $post_user_id]);
+		$posted_item = Post::selectFirst(array_merge(self::ITEM_FIELDLIST, ['author-contact-type']), ['post-user-id' => $post_user_id]);
 		if (!DBA::isResult($posted_item)) {
 			// On failure store the data into a spool file so that the "SpoolPost" worker can try again later.
 			DI::logger()->warning('Could not store item. it will be spooled', ['id' => $post_user_id]);
@@ -1026,7 +1026,9 @@ class Item
 			return 0;
 		}
 
-		if ($posted_item['origin'] && $posted_item['gravity'] == self::GRAVITY_PARENT) {
+		DI::logger()->debug('Handle created item', ['id' => $post_user_id, 'uri-id' => $posted_item['uri-id'], 'uid' => $posted_item['uid']]);
+
+		if ($posted_item['origin'] && $posted_item['gravity'] === self::GRAVITY_PARENT) {
 			$posts = (int)(DI::keyValue()->get('nodeinfo_local_posts') ?? 0);
 			DI::keyValue()->set('nodeinfo_local_posts', $posts + 1);
 		} elseif ($posted_item['origin'] && $posted_item['gravity'] == self::GRAVITY_COMMENT) {
@@ -1047,6 +1049,7 @@ class Item
 
 		if ($update_commented) {
 			$fields = ['commented' => $posted_item['received'], 'changed' => $posted_item['received']];
+			DBA::update('channel-post', ['commented' => $posted_item['received']], ['uri-id' => $posted_item['parent-uri-id']]);
 		} else {
 			$fields = ['changed' => $posted_item['received']];
 		}
@@ -1127,7 +1130,7 @@ class Item
 		}
 
 		if ($inserted) {
-			if ($posted_item['gravity'] == self::GRAVITY_PARENT) {
+			if ($posted_item['gravity'] === self::GRAVITY_PARENT) {
 				$posts = (int)(DI::keyValue()->get('nodeinfo_total_posts') ?? 0);
 				DI::keyValue()->set('nodeinfo_total_posts', $posts + 1);
 			} elseif ($posted_item['gravity'] == self::GRAVITY_COMMENT) {
@@ -1156,6 +1159,18 @@ class Item
 				self::reshareChannelPost($posted_item['thr-parent-id'], $posted_item['author-id']);
 			} elseif ($engagement_uri_id) {
 				self::reshareChannelPost($engagement_uri_id);
+			}
+
+			if (DI::ChannelPost()->isValidChannelPostBase($posted_item['uid'], $posted_item['private'], $posted_item['network'])) {
+				if (($posted_item['gravity'] === self::GRAVITY_ACTIVITY) && ($posted_item['verb'] === Activity::ANNOUNCE) && ($posted_item['author-contact-type'] === Contact::TYPE_COMMUNITY) && ($posted_item['parent-uri-id'] === $posted_item['thr-parent-id'])) {
+					DI::ChannelPost()->add($posted_item['thr-parent-id'], $posted_item['uid'], $posted_item['author-id']);
+					DI::SystemChannelPost()->add($posted_item['thr-parent-id'], $posted_item['uid'], $posted_item['network'], $posted_item['author-id']);
+				} else {
+					if ($posted_item['gravity'] === self::GRAVITY_PARENT) {
+						DI::ChannelPost()->add($posted_item['uri-id'], $posted_item['uid']);
+					}
+					DI::SystemChannelPost()->add($posted_item['thr-parent-id'], $posted_item['uid'], $posted_item['network']);
+				}
 			}
 		}
 

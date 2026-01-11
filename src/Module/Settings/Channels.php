@@ -15,6 +15,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Core\Worker;
 use Friendica\Model\Circle;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
@@ -82,6 +83,9 @@ class Channels extends BaseSettings
 			$saved = $this->channel->save($channel);
 			$this->logger->debug('New channel added', ['saved' => $saved]);
 			$this->enableTimeline($uid, $saved->code);
+			if ($this->config->get('system', 'channel_cache')) {
+				Worker::add(Worker::PRIORITY_MEDIUM, 'UpdateChannelPosts', $saved->code, $uid);
+			}
 			return;
 		}
 
@@ -115,6 +119,9 @@ class Channels extends BaseSettings
 			$saved = $this->channel->save($channel);
 			$this->logger->debug('Save channel', ['id' => $id, 'saved' => $saved]);
 			$this->enableTimeline($uid, $id);
+			if ($this->config->get('system', 'channel_cache')) {
+				Worker::add(Worker::PRIORITY_MEDIUM, 'UpdateChannelPosts', $id, $uid);
+			}
 		}
 	}
 
