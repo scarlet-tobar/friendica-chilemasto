@@ -933,7 +933,7 @@ nav.navbar .nav > li > button:focus {
 	font-size: 1.6em;
 }
 
-#nav-search-input-field {
+#search-box #nav-search-input-field {
 	width: 296px;
 }
 
@@ -3595,6 +3595,10 @@ li.addon {
 #adminpage h2 {
 	word-break: break-all;
 }
+#adminpage .form-group-search {
+	display: flex;
+	align-items: center;
+}
 #adminpage .table-logs thead tr {
 	display: grid;
 	grid-auto-flow: row;
@@ -3612,6 +3616,10 @@ li.addon {
 }
 #logdetail td.log-message {
 	width: 80%;
+}
+#adminpage #nav-search-input-field {
+	display: inline;
+	max-width: 296px;
 }
 @media (min-width: 600px) {
 	#adminpage .table-logs thead tr {

@@ -85,8 +85,8 @@ abstract class BaseAdmin extends BaseModule
 				'workerqueue' => ['admin/queue'       , DI::l10n()->t('Inspect worker Queue')    , 'workerqueue'],
 			]],
 			'logs' => [DI::l10n()->t('Logs'), [
-				'logsconfig' => ['admin/logs/', DI::l10n()->t('Logs')                           , 'logs'],
-				'logsview'   => ['admin/logs/view'    , DI::l10n()->t('View Logs')              , 'viewlogs'],
+				'logsconfig' => ['admin/logs/', DI::l10n()->t('Settings')                           , 'logs'],
+				'logsview'   => ['admin/logs/view'    , DI::l10n()->t('View')              , 'viewlogs'],
 			]],
 			'diagnostics' => [DI::l10n()->t('Diagnostics'), [
 				'phpinfo'   => ['admin/phpinfo?t=' . self::getFormSecurityToken('phpinfo'), DI::l10n()->t('PHP Info')                , 'phpinfo'],
