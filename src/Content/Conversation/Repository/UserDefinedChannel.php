@@ -327,7 +327,7 @@ class UserDefinedChannel extends BaseRepository
 		$filteredChannels = $this->select(['uid' => $uids, 'valid' => true])->filter(
 			function (UserDefinedChannelEntity $channel) use ($owner_id, $reshare_id, $language, $tags, $media_type, $disposableFullTextSearch, $searchtext) {
 				if (
-					($channel->circle ?? 0)
+					($channel->circle > 0)
 					&& !$this->inCircle($channel->circle, $channel->uid, $owner_id)
 					&& !$this->inCircle($channel->circle, $channel->uid, $reshare_id)
 				) {

@@ -14,6 +14,7 @@ use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Database\Database;
+use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Tag;
@@ -120,7 +121,7 @@ final class ChannelPost
 		}
 
 		foreach ($channels as $channel) {
-			if (in_array($channel->circle, [-3, -4, -5]) && !Post::exists(['uri-id' => $uri_id, 'uid' => $channel->uid])) {
+			if ($uid == 0 && in_array($channel->circle, [-3, -4, -5]) && !Contact::isSharing($engagement['owner-id'], $channel->uid)) {
 				continue;
 			}
 
