@@ -8,7 +8,7 @@
  *
  * Name: Gnome
  * Licence: AGPL
- * Author: Daniel Buck <tealk@rollenspiel.monster> tealk@friendica.rollenspiel.monster 
+ * Author: Daniel Buck <tealk@rollenspiel.monster> tealk@friendica.rollenspiel.monster
  * Overwrites: nav_bg, nav_icon_color, link_color, background_color, background_image, login_bg_color, contentbg_transp
  * Accented: yes
  */
