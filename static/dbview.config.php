@@ -61,24 +61,17 @@ return [
 			"received" => ["channel-post", "received"],
 			"created" => ["channel-post", "created"],
 			"network" => ["post-engagement", "network"],
-			"protocol" => ["post-user", "protocol"],
+			"contact-type" => ["ownercontact", "contact-type"],
 			"restricted" => ["post-engagement", "restricted"],
 			"comments" => "0",
 			"activities" => "0",
 		],
 		"query" => "FROM `channel-post`
 			INNER JOIN `post-engagement` ON `post-engagement`.`uri-id` = `channel-post`.`uri-id`
-			INNER JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `channel-post`.`uri-id` AND `post-thread-user`.`uid` = `channel-post`.`uid`
-			INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id`
-			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-thread-user`.`contact-id`
-			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread-user`.`author-id`
-			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread-user`.`owner-id`
-			WHERE `post-user`.`visible` AND NOT `post-user`.`deleted`
-			AND (NOT `contact`.`readonly` AND NOT `contact`.`blocked` AND NOT `contact`.`pending`)
-			AND (`post-thread-user`.`hidden` IS NULL OR NOT `post-thread-user`.`hidden`)
-			AND NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`
-			AND NOT EXISTS(SELECT `cid`  FROM `user-contact` WHERE `uid` = `channel-post`.`uid` AND `cid` IN (`post-thread-user`.`author-id`, `post-thread-user`.`owner-id`) AND (`blocked` OR `ignored` OR `is-blocked`))
-			AND NOT EXISTS(SELECT `gsid` FROM `user-gserver` WHERE `uid` = `channel-post`.`uid` AND `gsid` IN (`authorcontact`.`gsid`, `ownercontact`.`gsid`) AND `ignored`)"
+			INNER JOIN `post-thread` ON `post-thread`.`uri-id` = `channel-post`.`uri-id`
+			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread`.`author-id`
+			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread`.`owner-id`
+			WHERE NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`"
 	],
 	"system-channel-post-view" => [
 		"fields" => [
@@ -94,24 +87,17 @@ return [
 			"received" => ["system-channel-post", "received"],
 			"created" => ["system-channel-post", "created"],
 			"network" => ["post-engagement", "network"],
-			"protocol" => ["post-user", "protocol"],
+			"contact-type" => ["ownercontact", "contact-type"],
 			"restricted" => ["post-engagement", "restricted"],
 			"comments" => "0",
 			"activities" => "0",
 		],
 		"query" => "FROM `system-channel-post`
 			INNER JOIN `post-engagement` ON `post-engagement`.`uri-id` = `system-channel-post`.`uri-id`
-			INNER JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `system-channel-post`.`uri-id` AND `post-thread-user`.`uid` = `system-channel-post`.`uid`
-			INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id`
-			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-thread-user`.`contact-id`
-			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread-user`.`author-id`
-			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread-user`.`owner-id`
-			WHERE `post-user`.`visible` AND NOT `post-user`.`deleted`
-			AND (NOT `contact`.`readonly` AND NOT `contact`.`blocked` AND NOT `contact`.`pending`)
-			AND (`post-thread-user`.`hidden` IS NULL OR NOT `post-thread-user`.`hidden`)
-			AND NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`
-			AND NOT EXISTS(SELECT `cid`  FROM `user-contact` WHERE `uid` = `system-channel-post`.`uid` AND `cid` IN (`post-thread-user`.`author-id`, `post-thread-user`.`owner-id`) AND (`blocked` OR `ignored` OR `is-blocked`))
-			AND NOT EXISTS(SELECT `gsid` FROM `user-gserver` WHERE `uid` = `system-channel-post`.`uid` AND `gsid` IN (`authorcontact`.`gsid`, `ownercontact`.`gsid`) AND `ignored`)"
+			INNER JOIN `post-thread` ON `post-thread`.`uri-id` = `system-channel-post`.`uri-id`
+			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread`.`author-id`
+			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread`.`owner-id`
+			WHERE NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`"
 	],
 	"circle-member-view" => [
 		"fields" => [
