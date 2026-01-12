@@ -78,7 +78,7 @@
 	<dl id="aprofile-xmpp" class="row {{$basic_fields.xmpp.class|default:'aprofile'}}">
 		<hr class="profile-separator">
 		<dt class="col-lg-4 col-md-4 col-sm-4 col-xs-12 profile-label-name text-muted">{{$basic_fields.xmpp.label}}</dt>
-		<dd class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry">{{$basic_fields.xmpp.value nofilter}}</dd>
+		<dd class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry"><a href="xmpp:{{$basic_fields.xmpp.value nofilter}}">{{$basic_fields.xmpp.value nofilter}}</a></dd>
 	</dl>
 {{/if}}
 
