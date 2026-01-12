@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2025.07-rc (Interrupted Fern)
--- DB_UPDATE_VERSION 1585
+-- DB_UPDATE_VERSION 1586
 -- ------------------------------------------
 
 
@@ -2112,23 +2112,16 @@ CREATE VIEW `channel-post-view` AS SELECT
 	`channel-post`.`received` AS `received`,
 	`channel-post`.`created` AS `created`,
 	`post-engagement`.`network` AS `network`,
-	`post-user`.`protocol` AS `protocol`,
+	`ownercontact`.`contact-type` AS `contact-type`,
 	`post-engagement`.`restricted` AS `restricted`,
 	0 AS `comments`,
 	0 AS `activities`
 	FROM `channel-post`
 			INNER JOIN `post-engagement` ON `post-engagement`.`uri-id` = `channel-post`.`uri-id`
-			INNER JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `channel-post`.`uri-id` AND `post-thread-user`.`uid` = `channel-post`.`uid`
-			INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id`
-			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-thread-user`.`contact-id`
-			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread-user`.`author-id`
-			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread-user`.`owner-id`
-			WHERE `post-user`.`visible` AND NOT `post-user`.`deleted`
-			AND (NOT `contact`.`readonly` AND NOT `contact`.`blocked` AND NOT `contact`.`pending`)
-			AND (`post-thread-user`.`hidden` IS NULL OR NOT `post-thread-user`.`hidden`)
-			AND NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`
-			AND NOT EXISTS(SELECT `cid`  FROM `user-contact` WHERE `uid` = `channel-post`.`uid` AND `cid` IN (`post-thread-user`.`author-id`, `post-thread-user`.`owner-id`) AND (`blocked` OR `ignored` OR `is-blocked`))
-			AND NOT EXISTS(SELECT `gsid` FROM `user-gserver` WHERE `uid` = `channel-post`.`uid` AND `gsid` IN (`authorcontact`.`gsid`, `ownercontact`.`gsid`) AND `ignored`);
+			INNER JOIN `post-thread` ON `post-thread`.`uri-id` = `channel-post`.`uri-id`
+			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread`.`author-id`
+			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread`.`owner-id`
+			WHERE NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`;
 
 --
 -- VIEW system-channel-post-view
@@ -2147,23 +2140,16 @@ CREATE VIEW `system-channel-post-view` AS SELECT
 	`system-channel-post`.`received` AS `received`,
 	`system-channel-post`.`created` AS `created`,
 	`post-engagement`.`network` AS `network`,
-	`post-user`.`protocol` AS `protocol`,
+	`ownercontact`.`contact-type` AS `contact-type`,
 	`post-engagement`.`restricted` AS `restricted`,
 	0 AS `comments`,
 	0 AS `activities`
 	FROM `system-channel-post`
 			INNER JOIN `post-engagement` ON `post-engagement`.`uri-id` = `system-channel-post`.`uri-id`
-			INNER JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `system-channel-post`.`uri-id` AND `post-thread-user`.`uid` = `system-channel-post`.`uid`
-			INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id`
-			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-thread-user`.`contact-id`
-			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread-user`.`author-id`
-			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread-user`.`owner-id`
-			WHERE `post-user`.`visible` AND NOT `post-user`.`deleted`
-			AND (NOT `contact`.`readonly` AND NOT `contact`.`blocked` AND NOT `contact`.`pending`)
-			AND (`post-thread-user`.`hidden` IS NULL OR NOT `post-thread-user`.`hidden`)
-			AND NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`
-			AND NOT EXISTS(SELECT `cid`  FROM `user-contact` WHERE `uid` = `system-channel-post`.`uid` AND `cid` IN (`post-thread-user`.`author-id`, `post-thread-user`.`owner-id`) AND (`blocked` OR `ignored` OR `is-blocked`))
-			AND NOT EXISTS(SELECT `gsid` FROM `user-gserver` WHERE `uid` = `system-channel-post`.`uid` AND `gsid` IN (`authorcontact`.`gsid`, `ownercontact`.`gsid`) AND `ignored`);
+			INNER JOIN `post-thread` ON `post-thread`.`uri-id` = `system-channel-post`.`uri-id`
+			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread`.`author-id`
+			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread`.`owner-id`
+			WHERE NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`;
 
 --
 -- VIEW circle-member-view
