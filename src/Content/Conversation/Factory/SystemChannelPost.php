@@ -75,7 +75,7 @@ final class SystemChannelPost
 
 		$engagement = $this->dba->selectFirst('post-engagement', ['searchtext', 'media-type', 'owner-id', 'language', 'activities', 'comments', 'contact-type', 'created'], ['uri-id' => $uri_id]);
 		if ($engagement === false || $engagement === []) {
-			$this->logger->debug('No engagement found', ['uri-id' => $uri_id, 'post-uid' => $post_uid, 'reshare_id' => $reshare_id]);
+			$this->logger->debug('No engagement found', ['uri-id' => $uri_id, 'post-uid' => $post_uid, 'reshare_id' => $reshare_id, 'engagement' => $engagement]);
 			return;
 		}
 
