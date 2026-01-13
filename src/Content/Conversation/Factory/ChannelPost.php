@@ -103,7 +103,7 @@ final class ChannelPost
 
 		$engagement = $this->dba->selectFirst('post-engagement', ['searchtext', 'media-type', 'owner-id', 'language'], ['uri-id' => $uri_id]);
 		if ($engagement === false || $engagement === []) {
-			$this->logger->debug('No engagement found', ['uri-id' => $uri_id]);
+			$this->logger->debug('No engagement found', ['uri-id' => $uri_id, 'uid' => $uid, 'reshare_id' => $reshare_id, 'engagement' => $engagement]);
 			return;
 		}
 
@@ -121,7 +121,15 @@ final class ChannelPost
 		}
 
 		foreach ($channels as $channel) {
-			if ($uid == 0 && in_array($channel->circle, [-3, -4, -5]) && !Contact::isSharing($engagement['owner-id'], $channel->uid)) {
+			if ($uid === 0 && in_array($channel->circle, [-3, -4, -5]) && !Contact::isSharing($engagement['owner-id'], $channel->uid)) {
+				continue;
+			}
+
+			if ($channel->circle === -1 && !Contact::isSharing($engagement['owner-id'], $channel->uid)) {
+				continue;
+			}
+
+			if ($channel->circle === -2 && (!Contact::isFollower($engagement['owner-id'], $channel->uid) || Contact::isSharing($engagement['owner-id'], $channel->uid))) {
 				continue;
 			}
 
