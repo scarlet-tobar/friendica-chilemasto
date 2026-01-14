@@ -1304,21 +1304,18 @@ aside .vcard .icon {
 	width: 30px;
 }
 #profile-extra-links {
+	display: flex;
+	flex-direction: column;
+	gap: 7px;
 	overflow: auto;
 	margin-bottom: 10px;
 }
-aside .vcard #subscribe-feed-link-button,
-aside .vcard #dfrn-request-link-button,
-aside .vcard #wallmessage-link-button {
-	min-width: 119px;
-	margin: 0 0 0 -5px;
-	float: left;
-	padding: 0 5px;
-}
-aside .vcard #subscribe-feed-link,
-aside .vcard #dfrn-request-link,
-aside .vcard #wallmessage-link {
-	width: 100%;
+#profile-extra-links a, #profile-extra-links button {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	white-space: wrap;
+	width: 75%;
 }
 /* vcard-short-info */
 #vcard-short-info,
