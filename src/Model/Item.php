@@ -1161,15 +1161,18 @@ class Item
 				self::reshareChannelPost($engagement_uri_id);
 			}
 
-			if (DI::ChannelPost()->isValidChannelPostBase($posted_item['uid'], $posted_item['private'], $posted_item['network'])) {
-				if (($posted_item['gravity'] === self::GRAVITY_ACTIVITY) && ($posted_item['verb'] === Activity::ANNOUNCE) && ($posted_item['author-contact-type'] === Contact::TYPE_COMMUNITY) && ($posted_item['parent-uri-id'] === $posted_item['thr-parent-id'])) {
-					DI::ChannelPost()->add($posted_item['thr-parent-id'], $posted_item['uid'], $posted_item['author-id']);
-					DI::SystemChannelPost()->add($posted_item['thr-parent-id'], $posted_item['uid'], $posted_item['network'], $posted_item['author-id']);
-				} else {
-					if ($posted_item['gravity'] === self::GRAVITY_PARENT) {
-						DI::ChannelPost()->add($posted_item['uri-id'], $posted_item['uid']);
+			if ((DI::config()->get('system', 'channel_cache') || DI::config()->get('system', 'system_channel_cache')) && DI::ChannelPost()->isValidChannelPostBase($posted_item['uid'], $posted_item['private'], $posted_item['network'])) {
+				$engagement = DBA::selectFirst('post-engagement', [], ['uri-id' => $posted_item['parent-uri-id']]);
+				if (isset($engagement['uri-id'])) {
+					if (($posted_item['gravity'] === self::GRAVITY_ACTIVITY) && ($posted_item['verb'] === Activity::ANNOUNCE) && ($posted_item['author-contact-type'] === Contact::TYPE_COMMUNITY) && ($posted_item['parent-uri-id'] === $posted_item['thr-parent-id'])) {
+						DI::ChannelPost()->add($engagement, $posted_item['uid'], $posted_item['author-id']);
+						DI::SystemChannelPost()->add($engagement, $posted_item['uid'], $posted_item['network'], $posted_item['author-id']);
+					} else {
+						if ($posted_item['gravity'] === self::GRAVITY_PARENT) {
+							DI::ChannelPost()->add($engagement, $posted_item['uid']);
+						}
+						DI::SystemChannelPost()->add($engagement, $posted_item['uid'], $posted_item['network']);
 					}
-					DI::SystemChannelPost()->add($posted_item['thr-parent-id'], $posted_item['uid'], $posted_item['network']);
 				}
 			}
 		}
