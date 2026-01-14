@@ -306,7 +306,7 @@ class Timeline extends BaseModule
 	 */
 	private function getRawChannelItems(array $request, int $uid): array
 	{
-		$cache = $this->config->get('system', 'channel_cache');
+		$cache = $this->config->get('system', 'system_channel_cache');
 
 		if ($cache) {
 			$table     = 'system-channel-post-view';
@@ -393,7 +393,7 @@ class Timeline extends BaseModule
 				$condition = ["`language` = ?", User::getLanguageCode($uid)];
 			}
 		} elseif (is_numeric($this->selectedTab) && !empty($channel = $this->channelRepository->selectById($this->selectedTab, $uid))) {
-			if (!$cache) {
+			if (!$this->config->get('system', 'channel_cache')) {
 				$condition = $this->channelRepository->getCondition($channel, $uid);
 				if (in_array($channel->circle, [-3, -4, -5])) {
 					$table     = SearchIndex::getSearchView();

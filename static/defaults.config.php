@@ -591,6 +591,10 @@ return [
 		// A random string to be added to the /stats?key=... endpoint to enable the monitoring statistics
 		'stats_key' => '',
 
+		// system_channel_cache (Boolean)
+		// Pregenerate system channel posts.
+		'system_channel_cache' => false,
+
 		// throttle_limit_day (Integer)
 		// Maximum number of posts that a user can send per day with the API. 0 to disable daily throttling.
 		'throttle_limit_day' => 0,

@@ -90,33 +90,31 @@ final class ChannelPost
 	 * This will insert entries into the `channel-post` cache table when the
 	 * system's channel caching is enabled and matching channels are found.
 	 *
-	 * @param int $uri_id URI id of the post.
+	 * @param array $engagement post-engagement record
 	 * @param int $uid User id context.
 	 * @param int $reshare_id Optional reshare id.
 	 * @return void
 	 */
-	public function add(int $uri_id, int $uid, int $reshare_id = 0): void
+	public function add(array $engagement, int $uid, int $reshare_id = 0): void
 	{
 		if (!$this->config->get('system', 'channel_cache')) {
 			return;
 		}
 
-		$engagement = $this->dba->selectFirst('post-engagement', ['searchtext', 'media-type', 'owner-id', 'language'], ['uri-id' => $uri_id]);
-		if ($engagement === false || $engagement === []) {
-			$this->logger->debug('No engagement found', ['uri-id' => $uri_id, 'uid' => $uid, 'reshare_id' => $reshare_id, 'engagement' => $engagement]);
-			return;
-		}
+		$this->logger->debug('Adding channel post', ['uri-id' => $engagement['uri-id'], 'uid' => $uid, 'reshare_id' => $reshare_id]);
 
 		$language = $engagement['language'] !== L10n::UNDETERMINED_LANGUAGE ? $engagement['language'] : '';
-		$tags     = array_column(Tag::getByURIId($uri_id, [Tag::HASHTAG]), 'name');
+		$tags     = array_column(Tag::getByURIId($engagement['uri-id'], [Tag::HASHTAG]), 'name');
 
 		$channels = $this->channelRepository->getMatchingChannels($engagement['searchtext'], $language, $tags, $engagement['media-type'], $engagement['owner-id'], $reshare_id, $uid);
 		if (!($channels instanceof \Friendica\Content\Conversation\Collection\UserDefinedChannels) || $channels->count() === 0) {
+			$this->logger->debug('No channels found', ['uri-id' => $engagement['uri-id'], 'uid' => $uid, 'reshare_id' => $reshare_id]);
 			return;
 		}
 
-		$post = Post::selectFirstPost(['created', 'received', 'commented'], ['uri-id' => $uri_id]);
+		$post = Post::selectFirstPost(['created', 'received', 'commented'], ['uri-id' => $engagement['uri-id']]);
 		if ($post === false || $post === []) {
+			$this->logger->debug('Post not found', ['uri-id' => $engagement['uri-id'], 'uid' => $uid, 'reshare_id' => $reshare_id]);
 			return;
 		}
 
@@ -136,13 +134,13 @@ final class ChannelPost
 			$cache = [
 				'channel'   => (int)$channel->code,
 				'uid'       => $channel->uid,
-				'uri-id'    => $uri_id,
+				'uri-id'    => $engagement['uri-id'],
 				'created'   => $post['created'],
 				'received'  => $post['received'],
 				'commented' => $post['commented'],
 			];
 			$ret = $this->dba->insert('channel-post', $cache, Database::INSERT_UPDATE);
-			$this->logger->debug('Added channel post', ['uri-id' => $uri_id, 'cache' => $cache, 'ret' => $ret]);
+			$this->logger->debug('Added channel post', ['uri-id' => $engagement['uri-id'], 'cache' => $cache, 'ret' => $ret]);
 		}
 	}
 }

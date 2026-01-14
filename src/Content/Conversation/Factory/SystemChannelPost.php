@@ -13,7 +13,6 @@ use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Content\Conversation\Entity\Channel;
 use Friendica\Database\Database;
-use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Model\User;
@@ -59,30 +58,25 @@ final class SystemChannelPost
 	 * should be stored in various system channels for the given user(s)
 	 * and inserts cache entries into `system-channel-post`.
 	 *
-	 * @param int $uri_id URI id of the post.
+	 * @param array $engagement post-engagement record
 	 * @param int $post_uid User id context (0 for all users).
 	 * @param string $network Network identifier.
 	 * @param int $reshare_id Optional reshare id.
 	 * @return void
 	 */
-	public function add(int $uri_id, int $post_uid, string $network, int $reshare_id = 0): void
+	public function add(array $engagement, int $post_uid, string $network, int $reshare_id = 0): void
 	{
-		if (!$this->config->get('system', 'channel_cache')) {
+		if (!$this->config->get('system', 'system_channel_cache')) {
 			return;
 		}
 
-		DI::logger()->debug('Adding system channel post', ['uri-id' => $uri_id, 'post_uid' => $post_uid, 'reshare_id' => $reshare_id]);
-
-		$engagement = $this->dba->selectFirst('post-engagement', ['searchtext', 'media-type', 'owner-id', 'language', 'activities', 'comments', 'contact-type', 'created'], ['uri-id' => $uri_id]);
-		if ($engagement === false || $engagement === []) {
-			$this->logger->debug('No engagement found', ['uri-id' => $uri_id, 'post-uid' => $post_uid, 'reshare_id' => $reshare_id, 'engagement' => $engagement]);
-			return;
-		}
+		$this->logger->debug('Adding system channel post', ['uri-id' => $engagement['uri-id'], 'post_uid' => $post_uid, 'reshare_id' => $reshare_id]);
 
 		$owner = $reshare_id ?: $engagement['owner-id'];
 
-		$post = Post::selectFirstPost(['created', 'received', 'commented'], ['uri-id' => $uri_id]);
+		$post = Post::selectFirstPost(['created', 'received', 'commented'], ['uri-id' => $engagement['uri-id']]);
 		if ($post === false || $post === []) {
+			$this->logger->debug('Post not found', ['uri-id' => $engagement['uri-id'], 'post_uid' => $post_uid, 'reshare_id' => $reshare_id]);
 			return;
 		}
 
@@ -98,7 +92,7 @@ final class SystemChannelPost
 
 		foreach ($uids as $uid) {
 			foreach ([Channel::WHATSHOT, Channel::FORYOU, Channel::DISCOVER, Channel::FOLLOWERS, Channel::SHARERSOFSHARERS, Channel::QUIETSHARERS, Channel::IMAGE, Channel::VIDEO, Channel::AUDIO, Channel::LANGUAGE] as $channel) {
-				if ($this->dba->exists('system-channel-post', ['channel' => $channel, 'uid' => $uid, 'uri-id' => $uri_id])) {
+				if ($this->dba->exists('system-channel-post', ['channel' => $channel, 'uid' => $uid, 'uri-id' => $engagement['uri-id']])) {
 					continue;
 				}
 				$store = false;
@@ -203,13 +197,13 @@ final class SystemChannelPost
 				$cache = [
 					'channel'   => $channel,
 					'uid'       => $uid,
-					'uri-id'    => $uri_id,
+					'uri-id'    => $engagement['uri-id'],
 					'created'   => $post['created'],
 					'received'  => $post['received'],
 					'commented' => $post['commented'],
 				];
 				$ret = $this->dba->insert('system-channel-post', $cache, Database::INSERT_UPDATE);
-				$this->logger->debug('Added system channel post', ['uri-id' => $uri_id, 'cache' => $cache, 'ret' => $ret]);
+				$this->logger->debug('Added system channel post', ['uri-id' => $engagement['uri-id'], 'cache' => $cache, 'ret' => $ret]);
 			}
 		}
 	}
