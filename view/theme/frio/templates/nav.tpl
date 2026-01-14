@@ -24,6 +24,7 @@
 				<div class="topbar-nav">
 
 					{{* Buttons for the mobile view *}}
+					{{* Mobile user menu dropdown button *}}
 					<button type="button" class="navbar-toggle offcanvas-right-toggle pull-right"
 						aria-controls="offcanvasUsermenu" aria-haspopup="true">
 						<span class="sr-only">Toggle navigation</span>
@@ -34,7 +35,8 @@
 						<span class="sr-only">Toggle Search</span>
 						<i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i>
 					</button>
-					<button type="button" class="navbar-toggle collapsed pull-left visible-sm visible-xs"
+					{{* Mobile left menu dropdown button *}}
+					<button type="button" id="mobile-left-menu" class="navbar-toggle collapsed pull-left visible-sm visible-xs"
 						data-toggle="offcanvas" data-target="aside" aria-haspopup="true">
 						<span class="sr-only">Toggle navigation</span>
 						<i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i>
