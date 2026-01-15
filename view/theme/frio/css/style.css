@@ -4276,4 +4276,22 @@ div.login-form, .login-content-wrapper,
 		margin-top: 10px;
 		border: none;
 	}
+
+}/* Even smaller mobile displays */
+@media (width < 315px) {
+	/* Less topnav padding */
+	.navbar-left {
+		float: none!important;
+		display: flex;
+		justify-content: space-between;
+	}
+	.topbar-nav .nav-segment a.nav-menu {
+		padding-left: 0;
+		padding-right: 7px;
+	}
+	.topbar-nav .offcanvas-right-toggle,
+	.topbar-nav #mobile-left-menu {
+		padding-right: 3px;
+		padding-left: 3px;
+	}
 }
