@@ -507,6 +507,7 @@ $a->strings['External link to group'] = 'Lien externe vers le groupe';
 $a->strings['show less'] = 'voir moins';
 $a->strings['show more'] = 'montrer plus';
 $a->strings['Create new group'] = 'Créer un nouveau groupe';
+$a->strings['Find groups to join'] = 'Trouver des groupes à rejoindre';
 $a->strings['event'] = 'évènement';
 $a->strings['status'] = 'le statut';
 $a->strings['photo'] = 'photo';
@@ -2963,6 +2964,7 @@ $a->strings['You need to export your account from the old server and upload it h
 $a->strings['This feature is experimental. We can\'t import contacts from the OStatus network (GNU Social/Statusnet) or from Diaspora'] = 'Cette fonctionalité est expérimentale. Il n\'est pas possible d\'importer des contacts depuis le réseau OStatus (GNU Social/Statusnet) ou depuis Diaspora.';
 $a->strings['Account file'] = 'Fichier du compte';
 $a->strings['To export your account, go to "Settings->Export your personal data" and select "Export account"'] = 'Pour exporter votre compte, allez dans "Paramètres> Exporter vos données personnelles" et sélectionnez "exportation de compte"';
+$a->strings['Account file size is too high'] = 'Taille du fichier de compte trop grande';
 $a->strings['Error decoding account file'] = 'Une erreur a été détecté en décodant un fichier utilisateur';
 $a->strings['Error! No version data in file! This is not a Friendica account file?'] = 'Erreur ! Pas de ficher de version existant ! Êtes vous sur un compte Friendica ?';
 $a->strings['User \'%s\' already exists on this server!'] = 'L\'utilisateur \'%s\' existe déjà sur ce serveur!';
