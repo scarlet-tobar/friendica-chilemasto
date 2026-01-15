@@ -186,6 +186,15 @@ a {
   }
 }
 
+.desktop-view .wall-item-container .fakelink,
+.desktop-view .toplevel_item .fakelink {
+  color: var(--text-primary);
+}
+
+.media .time {
+  color: var(--text-secondary);
+}
+
 /* Buttons */
 .btn-default {
   background-color: var(--bg-secondary) !important;
@@ -227,6 +236,10 @@ button.btn-primary {
 
 .desktop-view .wall-item-container .wall-item-content a {
   color: var(--text-secondary);
+}
+
+.wall-item-container .wall-item-responses a {
+  color: var(--text-secondary) !important;
 }
 
 .wall-item-container:hover .wall-item-content a {
@@ -378,10 +391,24 @@ aside {
 .wall-item-name-link {
   color: var(--text-primary);
   font-weight: bold;
+
+  span.wall-item-name {
+    color: var(--text-primary);
+  }
 }
 
 .wall-item-ago {
-  color: var(--text-disabled);
+  color: var(--text-primary);
+
+  time {
+    color: var(--text-primary) !important;
+  }
+}
+
+.wall-item-actions {
+  button {
+    color: var(--text-primary);
+  }
 }
 
 .comment-edit-form .preview {
@@ -403,7 +430,6 @@ pre, code {
     background-color: var(--bg-tertiary) !important;
   }
 }
-
 
 .table-striped > tbody > tr:nth-of-type(2n+1) {
   background-color: var(--bg-tertiary);
