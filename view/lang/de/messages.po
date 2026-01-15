@@ -39,7 +39,7 @@
 # foss <oss@disr.it>, 2022
 # rabuzarus <rabuzarus@t-online.de>, 2016-2019
 # Ralf Thees <ralf@herrthees.de>, 2019
-# Raroun, 2023-2025
+# Raroun, 2023-2026
 # René Wagner <apollo@rw-net.de>, 2019-2020
 # a4e12f943b784a073d5fd49662354257_daaba5c <da976c603be9d2df7ac059be243a8d95_30746>, 2013
 # a4e12f943b784a073d5fd49662354257_daaba5c <da976c603be9d2df7ac059be243a8d95_30746>, 2012-2013
@@ -48,7 +48,7 @@
 # Steffen K9, 2019,2025
 # Tobias Diekershoff <tobias.diekershoff@gmx.net>, 2013-2016
 # Tobias Diekershoff <tobias.diekershoff@gmx.net>, 2011-2013
-# Tobias Diekershoff <tobias.diekershoff@gmx.net>, 2016-2025
+# Tobias Diekershoff <tobias.diekershoff@gmx.net>, 2016-2026
 # Tobias Quathamer, 2023-2024
 # zottel <transifex@zottel.net>, 2011-2012
 # tschlotfeldt <ts+transifex@ml.tschlotfeldt.de>, 2011
@@ -60,7 +60,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-04 20:49+0100\n"
 "PO-Revision-Date: 2011-05-05 10:19+0000\n"
-"Last-Translator: loma1 <m.ebers@web.de>, 2023,2025-2026\n"
+"Last-Translator: Tobias Diekershoff <tobias.diekershoff@gmx.net>, 2016-2026\n"
 "Language-Team: German (http://app.transifex.com/Friendica/friendica/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3188,7 +3188,7 @@ msgstr "Die Logdatei '%s' ist nicht beschreibbar. Derzeit ist keine Aufzeichnung
 msgid ""
 "Friendica can't display this page at the moment, please contact the "
 "administrator."
-msgstr "Friendica kann die Seite im Moment nicht darstellen. Bitte kontaktiere das Administratoren Team."
+msgstr "Friendica kann die Seite im Moment nicht darstellen. Bitte kontaktiere das Administrator:innen Team."
 
 #: src/Core/Renderer.php:131
 msgid "template engine cannot be registered without a name."
@@ -3909,7 +3909,7 @@ msgstr "Keine gültige E-Mail-Adresse."
 
 #: src/Model/User.php:1286
 msgid "The nickname was blocked from registration by the nodes admin."
-msgstr "Der Admin des Knotens hat den Spitznamen für die Registrierung gesperrt."
+msgstr "Die Administrator:innen des Knotens hat den Spitznamen für die Registrierung gesperrt."
 
 #: src/Model/User.php:1290 src/Model/User.php:1296
 #: src/Module/User/Import.php:230
@@ -4002,7 +4002,7 @@ msgid ""
 "\t\t\tLogin Name:\t\t%4$s\n"
 "\t\t\tPassword:\t\t%5$s\n"
 "\t\t"
-msgstr "\n\t\t\tHallo %1$s,\n\t\t\t\tdanke für deine Registrierung auf %2$s. Dein Account muss noch vom Admin des Knotens freigeschaltet werden.\n\n\t\t\tDeine Zugangsdaten lauten wie folgt:\n\n\t\t\tSeitenadresse:\t%3$s\n\t\t\tAnmeldename:\t\t%4$s\n\t\t\tPasswort:\t\t%5$s\n\t\t"
+msgstr "\n\t\t\tHallo %1$s,\n\t\t\t\tdanke für deine Registrierung auf %2$s. Dein Account muss noch von den Administrator:innen des Knotens freigeschaltet werden.\n\n\t\t\tDeine Zugangsdaten lauten wie folgt:\n\n\t\t\tSeitenadresse:\t%3$s\n\t\t\tAnmeldename:\t\t%4$s\n\t\t\tPasswort:\t\t%5$s\n\t\t"
 
 #: src/Model/User.php:1710
 #, php-format
@@ -5102,7 +5102,7 @@ msgstr "Email den Administratoren bei neuen Registrierungen"
 msgid ""
 "If enabled and the system is set to an open registration, an email for each "
 "new registration is sent to the administrators."
-msgstr "Wenn diese Option aktiviert ist und die Registrierung auf offen eingestellt ist, wird den Administratoren bei jeder neuen Registierung eine Email geschickt."
+msgstr "Wenn diese Option aktiviert ist und die Registrierung auf offen eingestellt ist, wird den Administrator:innen bei jeder neuen Registierung eine Email geschickt."
 
 #: src/Module/Admin/Site.php:534
 msgid "Community pages for visitors"
@@ -6781,8 +6781,8 @@ msgstr[1] "Gefolgte (%s)"
 #, php-format
 msgid "Friend (%s)"
 msgid_plural "Friends (%s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Freund (%s)"
+msgstr[1] "Freunde (%s)"
 
 #: src/Module/Contact/Contacts.php:111 src/Module/Profile/Contacts.php:131
 #, php-format
@@ -7254,7 +7254,7 @@ msgstr "Kontakt wurde erfolgreich entfolgt."
 
 #: src/Module/Contact/Unfollow.php:164
 msgid "Unable to unfollow this contact, please contact your administrator"
-msgstr "Konnte dem Kontakt nicht entfolgen. Bitte kontaktiere deinen Administrator."
+msgstr "Konnte dem Kontakt nicht entfolgen. Bitte kontaktiere deinen Administrator:innen."
 
 #: src/Module/Conversation/Channel.php:163
 msgid "Channel not available."
@@ -7596,7 +7596,7 @@ msgstr "Um Friendica installieren zu können, müssen wir wissen, wie wir mit De
 msgid ""
 "Please contact your hosting provider or site administrator if you have "
 "questions about these settings."
-msgstr "Bitte kontaktiere den Hosting-Provider oder den Administrator der Seite, falls du Fragen zu diesen Einstellungen haben solltest."
+msgstr "Bitte kontaktiere den Hosting-Provider oder die Administrator:innen der Seite, falls du Fragen zu diesen Einstellungen haben solltest."
 
 #: src/Module/Install.php:230
 msgid ""
@@ -7634,7 +7634,7 @@ msgstr "Server-Einstellungen"
 
 #: src/Module/Install.php:280
 msgid "Site administrator email address"
-msgstr "E-Mail-Adresse des Administrators"
+msgstr "E-Mail-Adresse der Administrator:innen"
 
 #: src/Module/Install.php:282
 msgid ""
@@ -7693,7 +7693,7 @@ msgstr "Ich lade dich zu unserem sozialen Netzwerk Friendica ein"
 
 #: src/Module/Invite.php:102
 msgid "Invitation limit exceeded. Please contact your site administrator."
-msgstr "Limit für Einladungen erreicht. Bitte kontaktiere des Administrator der Seite."
+msgstr "Limit für Einladungen erreicht. Bitte kontaktiere die Administrator:innen der Seite."
 
 #: src/Module/Invite.php:106
 #, php-format
@@ -7844,7 +7844,7 @@ msgid ""
 "This Friendica node is currently in maintenance mode, either automatically "
 "because it is self-updating or manually by the node administrator. This "
 "condition should be temporary, please come back in a few minutes."
-msgstr "Diese Friendica Instanz befindet sich derzeit im Wartungsmodus, entweder aufgrund von automatischen Updateprozessen oder weil die Administratoren der Instanz den Wartungsmodus aktiviert haben. Dies sollte ein vorübergehender Zustand sein. Bitte versuche es in ein paar Minuten erneut."
+msgstr "Diese Friendica Instanz befindet sich derzeit im Wartungsmodus, entweder aufgrund von automatischen Updateprozessen oder weil die Administrator:innen der Instanz den Wartungsmodus aktiviert haben. Dies sollte ein vorübergehender Zustand sein. Bitte versuche es in ein paar Minuten erneut."
 
 #: src/Module/Manifest.php:26
 msgid "A Decentralized Social Network"
@@ -8930,7 +8930,7 @@ msgstr "Behauptet, dich zu kennen: "
 #: src/Module/Notifications/Introductions.php:144
 #, php-format
 msgid "Accept %s as a friend or follower?"
-msgstr ""
+msgstr "Akzeptiere %s als Freund oder Folgenden? "
 
 #: src/Module/Notifications/Introductions.php:145
 msgid "Allows them to follow your posts."
@@ -9229,7 +9229,7 @@ msgstr "Bilddatei konnte nicht gefunden werden."
 msgid ""
 "Server can't accept new file upload at this time, please contact your "
 "administrator"
-msgstr "Der Server kann derzeit keine neuen Datei-Uploads akzeptieren. Bitte kontaktiere deinen Administrator."
+msgstr "Der Server kann derzeit keine neuen Datei-Uploads akzeptieren. Bitte kontaktiere deinen Administrator:innen."
 
 #: src/Module/Profile/Photos.php:237
 msgid "Image file is empty."
@@ -10820,7 +10820,7 @@ msgstr "Ziehen Sie die Elemente mit der Tabulatortaste oder Maus zum jeweiligen 
 #: src/Module/Settings/Display.php:405 src/Module/Settings/Display.php:409
 #: src/Module/Settings/Features.php:87
 msgid "Reset order"
-msgstr ""
+msgstr "Reihenfolge zurücksetzen"
 
 #: src/Module/Settings/Display.php:415
 msgid "Display theme"
@@ -11257,7 +11257,7 @@ msgstr "Es gab einen Überprüfungsfehler. Bitte vergewisser dich, dass du mit d
 
 #: src/Module/Settings/RemoveMe.php:62
 msgid "If this error persists, please contact your administrator."
-msgstr "Wenn dieser Fehler weiterhin besteht, wende dich bitte an den Administrator deiner Instanz."
+msgstr "Wenn dieser Fehler weiterhin besteht, wende dich bitte an die Administrator:innen deiner Instanz."
 
 #: src/Module/Settings/RemoveMe.php:76
 #: src/Navigation/Notifications/Repository/Notify.php:475
@@ -11784,7 +11784,7 @@ msgstr "Wähle eine Identität zum Verwalten aus: "
 
 #: src/Module/User/Import.php:91
 msgid "User imports on closed servers can only be done by an administrator."
-msgstr "Auf geschlossenen Servern können ausschließlich die Administratoren Benutzerkonten importieren."
+msgstr "Auf geschlossenen Servern können ausschließlich die Administratoren:innen Benutzerkonten importieren."
 
 #: src/Module/User/Import.php:107
 msgid "Move account"
@@ -11819,7 +11819,7 @@ msgstr "Um Deinen Account zu exportieren, rufe \"Einstellungen -> Persönliche D
 
 #: src/Module/User/Import.php:206
 msgid "Account file size is too high"
-msgstr ""
+msgstr "Die Dateigröße des Kontos ist zu groß."
 
 #: src/Module/User/Import.php:212
 msgid "Error decoding account file"
@@ -12812,20 +12812,20 @@ msgstr "Friendica-Benachrichtigung"
 #: src/Util/EMailer/SystemMailBuilder.php:40
 #, php-format
 msgid "%1$s, %2$s Administrator"
-msgstr "%1$s, %2$s Administrator"
+msgstr "%1$s, %2$s Administrator:innen"
 
 #: src/Util/EMailer/NotifyMailBuilder.php:66
 #: src/Util/EMailer/SystemMailBuilder.php:42
 #, php-format
 msgid "%s Administrator"
-msgstr "der Administrator von %s"
+msgstr "Die Administrator:innen von %s"
 
 #: src/Util/EMailer/NotifyMailBuilder.php:179
 #: src/Util/EMailer/NotifyMailBuilder.php:203
 #: src/Util/EMailer/SystemMailBuilder.php:87
 #: src/Util/EMailer/SystemMailBuilder.php:104
 msgid "thanks"
-msgstr "danke"
+msgstr "Danke"
 
 #: src/Util/Temporal.php:159
 msgid "YYYY-MM-DD or MM-DD"
