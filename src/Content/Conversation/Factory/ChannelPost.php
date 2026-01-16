@@ -76,11 +76,7 @@ final class ChannelPost
 			return true;
 		}
 
-		// For federated public/unlisted posts we only allow caching when uid = 0 to make them reachable to all users
-		if (in_array($network, Protocol::FEDERATED) && in_array($private, [Item::PUBLIC, Item::UNLISTED]) && $uid === 0) {
-			return true;
-		}
-
+		// Public federated public/unlisted posts don't need to be checked here, they are distributed elsewhere
 		return false;
 	}
 
@@ -119,8 +115,17 @@ final class ChannelPost
 		}
 
 		foreach ($channels as $channel) {
-			if ($uid === 0 && in_array($channel->circle, [-3, -4, -5]) && !Contact::isSharing($engagement['owner-id'], $channel->uid)) {
-				continue;
+			if (in_array($channel->circle, [-3, -4, -5])) {
+				if ($store = ($uid !== 0)) {
+					$this->logger->debug('Valid post for user. Post is stored for the user.', ['channel_code' => $channel->code, 'channel_uid' => $channel->uid, 'post_uri_id' => $engagement['uri-id'], 'owner_id' => $engagement['owner-id']]);
+				}
+				if (!$store && Post::exists(['parent-uri-id' => $engagement['uri-id'], 'uid' => $channel->uid])) {
+					$store = true;
+					$this->logger->debug('Valid post for user. The thread exists for the user.', ['channel_code' => $channel->code, 'channel_uid' => $channel->uid, 'post_uri_id' => $engagement['uri-id'], 'owner_id' => $engagement['owner-id']]);
+				}
+				if (!$store) {
+					continue;
+				}
 			}
 
 			if ($channel->circle === -1 && !Contact::isSharing($engagement['owner-id'], $channel->uid)) {
@@ -139,7 +144,7 @@ final class ChannelPost
 				'received'  => $post['received'],
 				'commented' => $post['commented'],
 			];
-			$ret = $this->dba->insert('channel-post', $cache, Database::INSERT_UPDATE);
+			$ret = $this->dba->insert('channel-post', $cache, Database::INSERT_IGNORE);
 			$this->logger->debug('Added channel post', ['uri-id' => $engagement['uri-id'], 'cache' => $cache, 'ret' => $ret]);
 		}
 	}
