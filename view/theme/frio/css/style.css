@@ -1282,11 +1282,9 @@ aside .vcard .fn {
 }
 aside .vcard .p-addr {
 	font-style: italic;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
 	padding-bottom: 2px;
 	text-align: center;
+	word-wrap: break-word;
 }
 aside .vcard .title {
 	margin-top: 10px;
