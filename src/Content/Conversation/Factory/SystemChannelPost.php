@@ -202,7 +202,7 @@ final class SystemChannelPost
 					'received'  => $post['received'],
 					'commented' => $post['commented'],
 				];
-				$ret = $this->dba->insert('system-channel-post', $cache, Database::INSERT_UPDATE);
+				$ret = $this->dba->insert('system-channel-post', $cache, Database::INSERT_IGNORE);
 				$this->logger->debug('Added system channel post', ['uri-id' => $engagement['uri-id'], 'cache' => $cache, 'ret' => $ret]);
 			}
 		}
