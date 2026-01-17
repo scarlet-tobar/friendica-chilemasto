@@ -116,7 +116,9 @@ final class ChannelPost
 
 		foreach ($channels as $channel) {
 			if (in_array($channel->circle, [-3, -4, -5])) {
-				if ($store = ($uid !== 0)) {
+				$store = false;
+				if ($uid !== 0) {
+					$store = true;
 					$this->logger->debug('Valid post for user. Post is stored for the user.', ['channel_code' => $channel->code, 'channel_uid' => $channel->uid, 'post_uri_id' => $engagement['uri-id'], 'owner_id' => $engagement['owner-id']]);
 				}
 				if (!$store && Post::exists(['parent-uri-id' => $engagement['uri-id'], 'uid' => $channel->uid])) {
