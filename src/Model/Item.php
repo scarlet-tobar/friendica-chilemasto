@@ -1182,7 +1182,13 @@ class Item
 		return $post_user_id;
 	}
 
-	public static function addPublicPostToChannel(int $uri_id)
+	/**
+	 * Add public posts to channel and system channel caches
+	 *
+	 * @param int $uri_id
+	 * @return void
+	 */
+	public static function addPublicPostToChannel(int $uri_id): void
 	{
 		if (!DI::config()->get('system', 'channel_cache') && !DI::config()->get('system', 'system_channel_cache')) {
 			return;
