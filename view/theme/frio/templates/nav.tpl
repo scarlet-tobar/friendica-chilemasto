@@ -199,20 +199,7 @@
 										<li>
 											<a role="menuitem" class="{{$usermenu.2}}" href="{{$usermenu.0}}"
 												title="{{$usermenu.3}}">
-
-												{{if $usermenu.0|str_ends_with:$nickname}}
-													<i class="fa fa-commenting"></i>
-												{{elseif $usermenu.0|str_ends_with:"/profile"}}
-													<i class="fa fa-user"></i>
-												{{elseif $usermenu.0|str_ends_with:"/photos"}}
-													<i class="fa fa-picture-o"></i>
-												{{elseif $usermenu.0|str_ends_with:"/media"}}
-													<i class="fa fa-edit"></i>
-												{{elseif $usermenu.0|str_ends_with:"calendar/"}}
-													<i class="fa fa-calendar"></i>
-												{{elseif $usermenu.0|str_ends_with:"notes/"}}
-													<i class="fa fa-book"></i>
-												{{/if}}
+												<i class="fa {{$usermenu.4}}"></i>
 												{{$usermenu.1}}
 											</a>
 										</li>
@@ -363,13 +350,15 @@
 							{{/if}}
 							<li class="list-group-item">
 								<img src="{{$userinfo.icon}}" alt="{{$userinfo.name}}"
-									style="max-width:15px; max-height:15px; min-width:15px; min-height:15px; width:15px; height:15px;">
+									style="max-width:15px; max-height:15px; min-width:15px; min-height:15px; width:15px; height:15px;">&nbsp;
 								{{$userinfo.name}}{{if $nav.remote}} ({{$nav.remote}}){{/if}}
 							</li>
 							{{foreach $nav.usermenu as $usermenu}}
 								<li class="list-group-item">
 									<a role="menuitem" class="{{$usermenu.2}}"
-										href="{{$usermenu.0}}" title="{{$usermenu.3}}">{{$usermenu.1}}
+										href="{{$usermenu.0}}" title="{{$usermenu.3}}">
+										<i class="fa {{$usermenu.4}}"></i>&nbsp;
+										{{$usermenu.1}}
 									</a>
 								</li>
 							{{/foreach}}
