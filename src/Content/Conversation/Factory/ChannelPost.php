@@ -12,12 +12,11 @@ namespace Friendica\Content\Conversation\Factory;
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
-use Friendica\Core\Protocol;
 use Friendica\Database\Database;
 use Friendica\Model\Contact;
-use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Tag;
+use Friendica\Model\User;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -52,35 +51,6 @@ final class ChannelPost
 	}
 
 	/**
-	 * Determine whether a post may be cached for a given channel.
-	 *
-	 * Private posts stored for specific users are allowed. Non-federated posts
-	 * stored for specific users are allowed. Federated public/unlisted posts
-	 * are only allowed when stored globally (uid = 0) so they're reachable
-	 * for all users.
-	 *
-	 * @param int $uid Owner user id (0 for global).
-	 * @param int $private Visibility constant (use values from `Item`).
-	 * @param string $network Network identifier.
-	 * @return bool True if caching is allowed for the given parameters.
-	 */
-	public function isValidChannelPostBase(int $uid, int $private, string $network): bool
-	{
-		// Private posts that are stored for specific users are okay
-		if ($private === Item::PRIVATE && $uid !== 0) {
-			return true;
-		}
-
-		// Non federated posts that are stored for specific users are okay
-		if (!in_array($network, Protocol::FEDERATED) && $uid !== 0) {
-			return true;
-		}
-
-		// Public federated public/unlisted posts don't need to be checked here, they are distributed elsewhere
-		return false;
-	}
-
-	/**
 	 * Add a post to matching user-defined channels.
 	 *
 	 * This will insert entries into the `channel-post` cache table when the
@@ -99,35 +69,28 @@ final class ChannelPost
 
 		$this->logger->debug('Adding channel post', ['uri-id' => $engagement['uri-id'], 'uid' => $uid, 'reshare_id' => $reshare_id]);
 
-		$language = $engagement['language'] !== L10n::UNDETERMINED_LANGUAGE ? $engagement['language'] : '';
-		$tags     = array_column(Tag::getByURIId($engagement['uri-id'], [Tag::HASHTAG]), 'name');
-
-		$channels = $this->channelRepository->getMatchingChannels($engagement['searchtext'], $language, $tags, $engagement['media-type'], $engagement['owner-id'], $reshare_id, $uid);
-		if (!($channels instanceof \Friendica\Content\Conversation\Collection\UserDefinedChannels) || $channels->count() === 0) {
-			$this->logger->debug('No channels found', ['uri-id' => $engagement['uri-id'], 'uid' => $uid, 'reshare_id' => $reshare_id]);
-			return;
-		}
-
-		$post = Post::selectFirstPost(['created', 'received', 'commented'], ['uri-id' => $engagement['uri-id']]);
+		$post = Post::selectFirstPost(['created', 'received', 'commented', 'network', 'private'], ['uri-id' => $engagement['uri-id']]);
 		if ($post === false || $post === []) {
 			$this->logger->debug('Post not found', ['uri-id' => $engagement['uri-id'], 'uid' => $uid, 'reshare_id' => $reshare_id]);
 			return;
 		}
 
+		$uids = $this->channelRepository->getUsersForPost($engagement['uri-id'], $uid, $post['network'], $post['private']);
+
+		$this->logger->debug('Found uids for channel post', ['uri-id' => $engagement['uri-id'], 'private' => $post['private'], 'network' => $post['network'], 'uids' => $uids]);
+
+		$language = $engagement['language'] !== L10n::UNDETERMINED_LANGUAGE ? $engagement['language'] : '';
+		$tags     = array_column(Tag::getByURIId($engagement['uri-id'], [Tag::HASHTAG]), 'name');
+
+		$channels = $this->channelRepository->getMatchingChannels($engagement['searchtext'], $language, $tags, $engagement['media-type'], $engagement['owner-id'], $reshare_id, $uids);
+		if (!($channels instanceof \Friendica\Content\Conversation\Collection\UserDefinedChannels) || $channels->count() === 0) {
+			$this->logger->debug('No channels found', ['uri-id' => $engagement['uri-id'], 'uids' => $uids, 'reshare_id' => $reshare_id]);
+			return;
+		}
+
 		foreach ($channels as $channel) {
-			if (in_array($channel->circle, [-3, -4, -5])) {
-				$store = false;
-				if ($uid !== 0) {
-					$store = true;
-					$this->logger->debug('Valid post for user. Post is stored for the user.', ['channel_code' => $channel->code, 'channel_uid' => $channel->uid, 'post_uri_id' => $engagement['uri-id'], 'owner_id' => $engagement['owner-id']]);
-				}
-				if (!$store && Post::exists(['parent-uri-id' => $engagement['uri-id'], 'uid' => $channel->uid])) {
-					$store = true;
-					$this->logger->debug('Valid post for user. The thread exists for the user.', ['channel_code' => $channel->code, 'channel_uid' => $channel->uid, 'post_uri_id' => $engagement['uri-id'], 'owner_id' => $engagement['owner-id']]);
-				}
-				if (!$store) {
-					continue;
-				}
+			if (in_array($channel->circle, [-3, -4, -5]) && !Post::exists(['parent-uri-id' => $engagement['uri-id'], 'uid' => $channel->uid])) {
+				continue;
 			}
 
 			if ($channel->circle === -1 && !Contact::isSharing($engagement['owner-id'], $channel->uid)) {

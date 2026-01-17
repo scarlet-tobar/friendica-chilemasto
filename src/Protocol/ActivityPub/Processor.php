@@ -1317,7 +1317,7 @@ class Processor
 				Worker::add(Worker::PRIORITY_MEDIUM, 'FetchMissingReplies', $item['uri-id'], $activity);
 			}
 		}
-		Item::addPublicPostToChannel($item['uri-id']);
+		Item::addPostToChannel($item['uri-id'], $item['uid'] ?? 0);
 	}
 
 	/**

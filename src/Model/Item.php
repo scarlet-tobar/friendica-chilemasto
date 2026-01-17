@@ -1161,45 +1161,30 @@ class Item
 				self::reshareChannelPost($engagement_uri_id);
 			}
 
-			if ((DI::config()->get('system', 'channel_cache') || DI::config()->get('system', 'system_channel_cache')) && (DI::ChannelPost()->isValidChannelPostBase($posted_item['uid'], $posted_item['private'], $posted_item['network']) || $posted_item['origin'])) {
-				$engagement = DBA::selectFirst('post-engagement', [], ['uri-id' => $posted_item['parent-uri-id']]);
-				if (isset($engagement['uri-id'])) {
-					if (($posted_item['gravity'] === self::GRAVITY_ACTIVITY) && ($posted_item['verb'] === Activity::ANNOUNCE) && ($posted_item['parent-uri-id'] === $posted_item['thr-parent-id'])) {
-						DI::ChannelPost()->add($engagement, $posted_item['uid'], $posted_item['author-id']);
-						DI::SystemChannelPost()->add($engagement, $posted_item['uid'], $posted_item['network'], $posted_item['author-id']);
-					} else {
-						if ($posted_item['origin']) {
-							DI::ChannelPost()->add($engagement, $posted_item['uid'], $posted_item['author-id']);
-						} elseif ($posted_item['gravity'] === self::GRAVITY_PARENT) {
-							DI::ChannelPost()->add($engagement, $posted_item['uid']);
-						}
-						DI::SystemChannelPost()->add($engagement, $posted_item['uid'], $posted_item['network']);
-					}
-				}
-			}
+		}
+
+		if ($posted_item['uid'] !== 0 && ($posted_item['origin'] || !in_array($posted_item['network'], Protocol::FEDERATED))) {
+			self::addPostToChannel($posted_item['uri-id'], $posted_item['uid']);
 		}
 
 		return $post_user_id;
 	}
 
 	/**
-	 * Add public posts to channel and system channel caches
+	 * Adds a post to the channel
 	 *
-	 * @param int $uri_id
+	 * @param int  $uri_id The URI ID of the post
+	 * @param int  $uid    The user ID
 	 * @return void
 	 */
-	public static function addPublicPostToChannel(int $uri_id): void
+	public static function addPostToChannel(int $uri_id, int $uid): void
 	{
 		if (!DI::config()->get('system', 'channel_cache') && !DI::config()->get('system', 'system_channel_cache')) {
 			return;
 		}
 
-		$item = Post::selectFirstPost(['parent-uri-id', 'thr-parent-id', 'private', 'gravity', 'verb', 'author-id', 'network'], ['uri-id' => $uri_id]);
+		$item = Post::selectFirst(['parent-uri-id', 'thr-parent-id', 'private', 'gravity', 'verb', 'author-id', 'network', 'origin'], ['uri-id' => $uri_id, 'uid' => $uid]);
 		if (!isset($item['parent-uri-id'])) {
-			return;
-		}
-
-		if ($item['private'] == Item::PRIVATE) {
 			return;
 		}
 
@@ -1208,15 +1193,18 @@ class Item
 			return;
 		}
 
+		DI::logger()->debug('Post accepted for channels', ['uri-id' => $uri_id, 'uid' => $uid, 'network' => $item['network']]);
 
 		if (($item['gravity'] === self::GRAVITY_ACTIVITY) && ($item['verb'] === Activity::ANNOUNCE) && ($item['parent-uri-id'] === $item['thr-parent-id'])) {
-			DI::ChannelPost()->add($engagement, 0, $item['author-id']);
-			DI::SystemChannelPost()->add($engagement, 0, $item['network'], $item['author-id']);
+			DI::ChannelPost()->add($engagement, $uid, $item['author-id']);
+			DI::SystemChannelPost()->add($engagement, $uid, $item['network'], $item['author-id']);
 		} else {
-			if ($item['gravity'] === self::GRAVITY_PARENT) {
-				DI::ChannelPost()->add($engagement, 0);
+			if ($item['origin']) {
+				DI::ChannelPost()->add($engagement, $uid, $item['author-id']);
+			} elseif ($item['gravity'] === self::GRAVITY_PARENT) {
+				DI::ChannelPost()->add($engagement, $uid);
 			}
-			DI::SystemChannelPost()->add($engagement, 0, $item['network']);
+			DI::SystemChannelPost()->add($engagement, $uid, $item['network']);
 		}
 	}
 
@@ -1499,7 +1487,6 @@ class Item
 			$item['post-reason'] = self::PR_DISTRIBUTE;
 			self::storeForUser($item, $uid);
 		}
-		self::addPublicPostToChannel($item['uri-id']);
 	}
 
 	/**
