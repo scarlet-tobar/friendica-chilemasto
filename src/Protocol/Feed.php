@@ -1092,6 +1092,7 @@ class Feed
 	{
 		$root = $doc->createElementNS(ActivityNamespace::ATOM1, 'feed');
 		$doc->appendChild($root);
+		$root->setAttribute("xmlns:thr", ActivityNamespace::THREAD);
 
 		$title   = '';
 		$selfUri = '/feed/' . $owner['nick'] . '/';
