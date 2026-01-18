@@ -251,6 +251,16 @@ button.btn-primary {
   border-top: 1px solid var(--border-color);
 }
 
+.event-card {
+  .event-card-title {
+    color: var(--text-primary);
+  }
+
+  .event-card-content {
+    color: var(--text-secondary);
+  }
+}
+
 /* Input Fields */
 input,
 textarea,
