@@ -49,6 +49,9 @@ class Inbox extends BaseApi
 				throw new \Friendica\Network\HTTPException\ForbiddenException();
 			}
 			$inbox = ActivityPub\ClientToServer::getInbox($uid, $page, $request['max_id'] ?? null);
+
+			// Relaxed CORS header already authorized
+			header('Access-Control-Allow-Origin: *');
 		} else {
 			$inbox = ActivityPub\ClientToServer::getPublicInbox($uid, $page, $request['max_id'] ?? null);
 		}
