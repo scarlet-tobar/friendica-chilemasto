@@ -14,10 +14,13 @@ use Friendica\Content\Conversation\Factory\UserDefinedChannel as UserDefinedChan
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Core\Protocol;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Database\DisposableFullTextSearch;
 use Friendica\Model\Contact;
+use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Model\Post\Engagement;
 use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
@@ -303,23 +306,23 @@ class UserDefinedChannel extends BaseRepository
 		return $filteredChannels->column('uid');
 	}
 
-	public function getMatchingChannels(string $searchtext, string $language, array $tags, int $media_type, int $owner_id, int $reshare_id, int $uid): ?UserDefinedChannels
+	/**
+	 * Get matching channels for a given post
+	 *
+	 * @param string $searchtext Search text for matching.
+	 * @param string $language Language of the post.
+	 * @param array  $tags Tags of the post.
+	 * @param int    $media_type Media type of the post.
+	 * @param int    $owner_id Owner contact id.
+	 * @param int    $reshare_id Reshare contact id.
+	 * @param array  $uids User IDs to filter channels.
+	 * @return UserDefinedChannels|null Collection of matching channels or null.
+	 */
+	public function getMatchingChannels(string $searchtext, string $language, array $tags, int $media_type, int $owner_id, int $reshare_id, array $uids): ?UserDefinedChannels
 	{
 		if (!in_array($language, User::getLanguages())) {
 			$this->logger->debug('Unwanted language found. No matched channel found.', ['language' => $language, 'searchtext' => $searchtext]);
 			return null;
-		}
-
-		if ($uid === 0) {
-			$condition = $this->getUserCondition();
-			$condition = DBA::mergeConditions($condition, ["NOT `account-type` IN (?, ?)", User::ACCOUNT_TYPE_RELAY, User::ACCOUNT_TYPE_COMMUNITY]);
-			$users     = $this->db->selectToArray('user', ['uid'], $condition);
-			if (!$users) {
-				return null;
-			}
-			$uids = array_column($users, 'uid');
-		} else {
-			$uids = $uid;
 		}
 
 		$disposableFullTextSearch = new DisposableFullTextSearch($this->db, $searchtext);
@@ -406,6 +409,39 @@ class UserDefinedChannel extends BaseRepository
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Get users for a given post based on network and privacy settings
+	 *
+	 * @param int    $uri_id  The URI ID of the post
+	 * @param int    $uid     The owner user ID
+	 * @param string $network The network protocol of the post
+	 * @param int    $private The privacy level of the post
+	 * @return array Array of user IDs
+	 */
+	public function getUsersForPost(int $uri_id, int $uid, string $network, int $private): array
+	{
+		if (in_array($network, Protocol::FEDERATED)) {
+			if ($private === Item::PRIVATE) {
+				$posts = Post::selectToArray(['uid'], ["`uri-id` = ? AND `uid` != ?", $uri_id, 0]);
+				if (!$posts) {
+					return [];
+				}
+				$uids = array_column($posts, 'uid');
+			} else {
+				$condition = $this->getUserCondition();
+				$condition = DBA::mergeConditions($condition, ["NOT `account-type` IN (?, ?)", User::ACCOUNT_TYPE_RELAY, User::ACCOUNT_TYPE_COMMUNITY]);
+				$users     = $this->db->selectToArray('user', ['uid'], $condition);
+				if (!$users) {
+					return [];
+				}
+				$uids = array_column($users, 'uid');
+			}
+		} else {
+			$uids = [$uid];
+		}
+		return $uids;
 	}
 
 	/**
