@@ -1197,14 +1197,14 @@ class Item
 
 		if (($item['gravity'] === self::GRAVITY_ACTIVITY) && ($item['verb'] === Activity::ANNOUNCE) && ($item['parent-uri-id'] === $item['thr-parent-id'])) {
 			DI::ChannelPost()->add($engagement, $uid, $item['author-id']);
-			DI::SystemChannelPost()->add($engagement, $uid, $item['network'], $item['author-id']);
+			DI::SystemChannelPost()->add($engagement, self::GRAVITY_PARENT, $uid, $item['network'], $item['author-id']);
 		} else {
 			if ($item['origin']) {
 				DI::ChannelPost()->add($engagement, $uid, $item['author-id']);
 			} elseif ($item['gravity'] === self::GRAVITY_PARENT) {
 				DI::ChannelPost()->add($engagement, $uid);
 			}
-			DI::SystemChannelPost()->add($engagement, $uid, $item['network']);
+			DI::SystemChannelPost()->add($engagement, $item['gravity'], $uid, $item['network']);
 		}
 	}
 

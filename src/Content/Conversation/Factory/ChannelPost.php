@@ -16,7 +16,6 @@ use Friendica\Database\Database;
 use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Model\Tag;
-use Friendica\Model\User;
 use Psr\Log\LoggerInterface;
 
 /**

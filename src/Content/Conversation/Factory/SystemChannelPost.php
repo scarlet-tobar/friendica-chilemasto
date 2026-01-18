@@ -14,6 +14,7 @@ use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Content\Conversation\Entity\Channel;
 use Friendica\Database\Database;
 use Friendica\Model\Contact;
+use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
@@ -59,12 +60,13 @@ final class SystemChannelPost
 	 * and inserts cache entries into `system-channel-post`.
 	 *
 	 * @param array $engagement post-engagement record
+	 * @param int $gravity Gravity of the post
 	 * @param int $post_uid User id context (0 for all users).
 	 * @param string $network Network identifier.
 	 * @param int $reshare_id Optional reshare id.
 	 * @return void
 	 */
-	public function add(array $engagement, int $post_uid, string $network, int $reshare_id = 0): void
+	public function add(array $engagement, int $gravity, int $post_uid, string $network, int $reshare_id = 0): void
 	{
 		if (!$this->config->get('system', 'system_channel_cache')) {
 			return;
@@ -80,10 +82,16 @@ final class SystemChannelPost
 			return;
 		}
 
+		if ($gravity === Item::GRAVITY_PARENT) {
+			$channels = [Channel::WHATSHOT, Channel::FORYOU, Channel::DISCOVER, Channel::FOLLOWERS, Channel::SHARERSOFSHARERS, Channel::QUIETSHARERS, Channel::IMAGE, Channel::VIDEO, Channel::AUDIO, Channel::LANGUAGE];
+		} else {
+			$channels = [Channel::WHATSHOT, Channel::FORYOU, Channel::DISCOVER];
+		}
+
 		$uids = $this->channelRepository->getUsersForPost($engagement['uri-id'], $post_uid, $post['network'], $post['private']);
 
 		foreach ($uids as $uid) {
-			foreach ([Channel::WHATSHOT, Channel::FORYOU, Channel::DISCOVER, Channel::FOLLOWERS, Channel::SHARERSOFSHARERS, Channel::QUIETSHARERS, Channel::IMAGE, Channel::VIDEO, Channel::AUDIO, Channel::LANGUAGE] as $channel) {
+			foreach ($channels as $channel) {
 				if ($this->dba->exists('system-channel-post', ['channel' => $channel, 'uid' => $uid, 'uri-id' => $engagement['uri-id']])) {
 					continue;
 				}
@@ -110,7 +118,7 @@ final class SystemChannelPost
 
 					case Channel::DISCOVER:
 						$cid = Contact::getPublicIdByUserId($uid);
-						if (!Contact::isSharing($owner, $uid)) {
+						if (!$this->dba->exists('account-user-view', ['pid' => $owner, 'uid' => $uid, 'rel' => [Contact::SHARING, Contact::FRIEND]])) {
 							$store = $this->dba->exists('contact-relation', ["`cid` = ? AND `relation-cid` = ? AND `relation-thread-score` > ?",
 								$owner, $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4)]);
 							if (!$store) {
@@ -140,7 +148,7 @@ final class SystemChannelPost
 						break;
 
 					case Channel::FOLLOWERS:
-						$store = Contact::isFollower($owner, $uid) && !Contact::isSharing($owner, $uid);
+						$store = $this->dba->exists('account-user-view', ['pid' => $owner, 'uid' => $uid, 'rel' => Contact::FOLLOWER]);
 						break;
 
 					case Channel::SHARERSOFSHARERS:
