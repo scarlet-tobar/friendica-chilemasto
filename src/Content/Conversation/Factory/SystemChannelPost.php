@@ -74,21 +74,13 @@ final class SystemChannelPost
 
 		$owner = $reshare_id ?: $engagement['owner-id'];
 
-		$post = Post::selectFirstPost(['created', 'received', 'commented'], ['uri-id' => $engagement['uri-id']]);
+		$post = Post::selectFirstPost(['created', 'received', 'commented', 'network', 'private'], ['uri-id' => $engagement['uri-id']]);
 		if ($post === false || $post === []) {
 			$this->logger->debug('Post not found', ['uri-id' => $engagement['uri-id'], 'post_uid' => $post_uid, 'reshare_id' => $reshare_id]);
 			return;
 		}
 
-		if ($post_uid !== 0) {
-			$uids = [$post_uid];
-		} else {
-			$users = $this->dba->selectToArray('user', ['uid'], $this->channelRepository->getUserCondition());
-			if (count($users) === 0) {
-				return;
-			}
-			$uids = array_column($users, 'uid');
-		}
+		$uids = $this->channelRepository->getUsersForPost($engagement['uri-id'], $post_uid, $post['network'], $post['private']);
 
 		foreach ($uids as $uid) {
 			foreach ([Channel::WHATSHOT, Channel::FORYOU, Channel::DISCOVER, Channel::FOLLOWERS, Channel::SHARERSOFSHARERS, Channel::QUIETSHARERS, Channel::IMAGE, Channel::VIDEO, Channel::AUDIO, Channel::LANGUAGE] as $channel) {
