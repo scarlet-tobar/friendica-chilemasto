@@ -7,6 +7,8 @@
 
 namespace Friendica\Worker;
 
+use Friendica\Core\Worker;
+use Friendica\DI;
 use Friendica\Model\Contact;
 
 class ContactDiscovery
@@ -18,5 +20,16 @@ class ContactDiscovery
 	public static function execute(string $url)
 	{
 		Contact\Relation::discoverByUrl($url);
+	}
+
+	/**
+	 * @param array|int $run_parameters Priority constant or array of options described in Worker::add
+	 * @param string    $url
+	 * @return int
+	 */
+	public static function add($run_parameters, string $url): int
+	{
+		DI::logger()->debug('Contact discovery', ['url' => $url]);
+		return Worker::add($run_parameters, 'ContactDiscovery', $url);
 	}
 }
