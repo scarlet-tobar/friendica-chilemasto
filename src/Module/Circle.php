@@ -213,6 +213,23 @@ class Circle extends BaseModule
 		}
 
 		// @TODO: Replace with parameter from router
+		if ((DI::args()->getArgc() == 3) && (DI::args()->getArgv()[1] === 'markread')) {
+			BaseModule::checkFormSecurityTokenRedirectOnError('/circle', 'circle_markread', 't');
+
+			$circle_id = intval(DI::args()->getArgv()[2]);
+			if ($circle_id && Model\Circle::exists($circle_id, DI::userSession()->getLocalUserId())) {
+				DBA::e("UPDATE `post-user` 
+					SET `unseen` = 0 
+					WHERE `uid` = ? AND `unseen` = 1 
+					AND `contact-id` IN (SELECT `contact-id` FROM `group_member` WHERE `gid` = ?)",
+					DI::userSession()->getLocalUserId(),
+					$circle_id
+				);
+			}
+			DI::baseUrl()->redirect('circle/' . $circle_id);
+		}
+
+		// @TODO: Replace with parameter from router
 		if ((DI::args()->getArgc() > 2) && intval(DI::args()->getArgv()[1]) && intval(DI::args()->getArgv()[2])) {
 			BaseModule::checkFormSecurityTokenForbiddenOnError('circle_member_change', 't');
 
@@ -267,7 +284,9 @@ class Circle extends BaseModule
 				'$gid' => $circle['id'],
 				'$drop' => $drop_txt,
 				'$form_security_token' => BaseModule::getFormSecurityToken('circle_edit'),
+				'$form_security_token_markread' => BaseModule::getFormSecurityToken('circle_markread'),
 				'$edit_name' => DI::l10n()->t('Edit Circle Name'),
+				'$markread_label' => DI::l10n()->t('Mark all as read'),
 				'$editable' => 1,
 			];
 		}
