@@ -412,7 +412,7 @@ class Contact
 		}
 
 		// Update the contact in the background if needed
-		if (UpdateContact::isUpdatable($contact['id'])) {
+		if (UpdateContact::isUpdatable($contact['id']) && !UpdateContact::workerLimitReached()) {
 			try {
 				UpdateContact::add(['priority' => Worker::PRIORITY_LOW, 'dont_fork' => true], $contact['id']);
 			} catch (\InvalidArgumentException $e) {
@@ -1384,7 +1384,7 @@ class Contact
 		if (!empty($contact)) {
 			$contact_id = $contact['id'];
 
-			if (UpdateContact::isUpdatable($contact['id'])) {
+			if (UpdateContact::isUpdatable($contact['id']) && !UpdateContact::workerLimitReached()) {
 				try {
 					UpdateContact::add(['priority' => Worker::PRIORITY_LOW, 'dont_fork' => true], $contact['id']);
 				} catch (\InvalidArgumentException $e) {
@@ -3006,7 +3006,7 @@ class Contact
 		if (!$update) {
 			self::updateContact($id, $uid, $uriid, $contact['url'], ['failed' => false, 'local-data' => $has_local_data, 'last-update' => $updated, 'next-update' => $success_next_update, 'success_update' => $updated]);
 
-			if (Contact\Relation::isDiscoverable($ret['url'])) {
+			if (Contact\Relation::isDiscoverable($ret['url']) && !ContactDiscovery::workerLimitReached()) {
 				ContactDiscovery::add(Worker::PRIORITY_LOW, $ret['url']);
 			}
 
@@ -3050,7 +3050,7 @@ class Contact
 
 		self::updateContact($id, $uid, $ret['uri-id'], $ret['url'], $ret);
 
-		if (Contact\Relation::isDiscoverable($ret['url'])) {
+		if (Contact\Relation::isDiscoverable($ret['url']) && !ContactDiscovery::workerLimitReached()) {
 			ContactDiscovery::add(Worker::PRIORITY_LOW, $ret['url']);
 		}
 

@@ -32,4 +32,19 @@ class ContactDiscovery
 		DI::logger()->debug('Contact discovery', ['url' => $url]);
 		return Worker::add($run_parameters, 'ContactDiscovery', $url);
 	}
+
+	/**
+	 * Checks if the maximum number of allowed workers for this task is reached
+	 *
+	 * @return boolean
+	 */
+	public static function workerLimitReached(): bool
+	{
+		$discovery_limit = (int)DI::config()->get('system', 'contact_discovery_limit');
+		$discovering     = Worker::countWorkersByCommand('ContactDiscovery');
+		if ($discovering >= $discovery_limit) {
+			DI::logger()->info('The number of currently running jobs exceed the limit', ['discovering' => $discovering, 'limit' => $discovery_limit]);
+		}
+		return ($discovering >= $discovery_limit);
+	}
 }
