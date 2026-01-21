@@ -49,7 +49,6 @@ class Inbox extends BaseApi
 				throw new \Friendica\Network\HTTPException\ForbiddenException();
 			}
 			$inbox = ActivityPub\ClientToServer::getInbox($uid, $page, $request['max_id'] ?? null);
-
 		} else {
 			$inbox = ActivityPub\ClientToServer::getPublicInbox($uid, $page, $request['max_id'] ?? null);
 		}
