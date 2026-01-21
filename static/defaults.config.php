@@ -147,6 +147,14 @@ return [
 		// Pregenerate channel posts.
 		'channel_cache' => false,
 
+		// contact_add_limit (Integer)
+		// How many contacts should be added at a time?
+		'contact_add_limit' => 10,
+
+		// contact_discovery_limit (Integer)
+		// How many contacts relations should be checked at a time?
+		'contact_discovery_limit' => 10,
+
 		// contact_update_limit (Integer)
 		// How many contacts should be checked at a time?
 		'contact_update_limit' => 100,

@@ -36,6 +36,9 @@ use Friendica\Util\Images;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy;
 use Friendica\Util\Strings;
+use Friendica\Worker\AddContact;
+use Friendica\Worker\ContactDiscovery;
+use Friendica\Worker\ContactDiscoveryForUser;
 use Friendica\Worker\UpdateContact;
 
 /**
@@ -409,7 +412,7 @@ class Contact
 		}
 
 		// Update the contact in the background if needed
-		if (UpdateContact::isUpdatable($contact['id'])) {
+		if (UpdateContact::isUpdatable($contact['id']) && !UpdateContact::workerLimitReached()) {
 			try {
 				UpdateContact::add(['priority' => Worker::PRIORITY_LOW, 'dont_fork' => true], $contact['id']);
 			} catch (\InvalidArgumentException $e) {
@@ -1381,7 +1384,7 @@ class Contact
 		if (!empty($contact)) {
 			$contact_id = $contact['id'];
 
-			if (UpdateContact::isUpdatable($contact['id'])) {
+			if (UpdateContact::isUpdatable($contact['id']) && !UpdateContact::workerLimitReached()) {
 				try {
 					UpdateContact::add(['priority' => Worker::PRIORITY_LOW, 'dont_fork' => true], $contact['id']);
 				} catch (\InvalidArgumentException $e) {
@@ -3003,8 +3006,8 @@ class Contact
 		if (!$update) {
 			self::updateContact($id, $uid, $uriid, $contact['url'], ['failed' => false, 'local-data' => $has_local_data, 'last-update' => $updated, 'next-update' => $success_next_update, 'success_update' => $updated]);
 
-			if (Contact\Relation::isDiscoverable($ret['url'])) {
-				Worker::add(Worker::PRIORITY_LOW, 'ContactDiscovery', $ret['url']);
+			if (Contact\Relation::isDiscoverable($ret['url']) && !ContactDiscovery::workerLimitReached()) {
+				ContactDiscovery::add(Worker::PRIORITY_LOW, $ret['url']);
 			}
 
 			// Update the public contact
@@ -3047,8 +3050,8 @@ class Contact
 
 		self::updateContact($id, $uid, $ret['uri-id'], $ret['url'], $ret);
 
-		if (Contact\Relation::isDiscoverable($ret['url'])) {
-			Worker::add(Worker::PRIORITY_LOW, 'ContactDiscovery', $ret['url']);
+		if (Contact\Relation::isDiscoverable($ret['url']) && !ContactDiscovery::workerLimitReached()) {
+			ContactDiscovery::add(Worker::PRIORITY_LOW, $ret['url']);
 		}
 
 		return true;
@@ -3512,7 +3515,7 @@ class Contact
 			return;
 		}
 
-		Worker::add(Worker::PRIORITY_LOW, 'ContactDiscoveryForUser', $contact['uid']);
+		ContactDiscoveryForUser::add(Worker::PRIORITY_LOW, $contact['uid']);
 
 		self::clearFollowerFollowingEndpointCache($contact['uid']);
 
@@ -3544,7 +3547,7 @@ class Contact
 			self::update(['rel' => self::FOLLOWER, 'pending' => false], ['id' => $contact['id']]);
 		}
 
-		Worker::add(Worker::PRIORITY_LOW, 'ContactDiscoveryForUser', $contact['uid']);
+		ContactDiscoveryForUser::add(Worker::PRIORITY_LOW, $contact['uid']);
 	}
 
 	/**
@@ -3846,7 +3849,7 @@ class Contact
 			}
 			$contact = self::getByURL($url, false, ['id', 'network', 'next-update']);
 			if (empty($contact['id']) && Network::isValidHttpUrl($url)) {
-				Worker::add(Worker::PRIORITY_LOW, 'AddContact', 0, $url);
+				AddContact::add(Worker::PRIORITY_LOW, 0, $url);
 				++$added;
 			} elseif (!empty($contact['network']) && Protocol::supportsProbe($contact['network']) && ($contact['next-update'] < DateTimeFormat::utcNow())) {
 				try {
