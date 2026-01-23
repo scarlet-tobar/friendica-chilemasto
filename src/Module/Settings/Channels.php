@@ -8,6 +8,7 @@
 namespace Friendica\Module\Settings;
 
 use Friendica\App;
+use Friendica\Content\Conversation\Entity\UserDefinedChannel as EntityUserDefinedChannel;
 use Friendica\Content\Conversation\Factory;
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -140,17 +141,17 @@ class Channels extends BaseSettings
 		if (in_array($account_type, [User::ACCOUNT_TYPE_COMMUNITY, User::ACCOUNT_TYPE_RELAY])) {
 			$intro   = $this->t('This page can be used to define the channels that will automatically be reshared by your account.');
 			$circles = [
-				0 => $this->l10n->t('Global Community')
+				EntityUserDefinedChannel::CIRCLE_GLOBAL => $this->l10n->t('Global Community')
 			];
 		} else {
 			$intro   = $this->t('This page can be used to define your own channels.');
 			$circles = [
-				0  => $this->l10n->t('Global Community'),
-				-5 => $this->l10n->t('Latest Activity'),
-				-4 => $this->l10n->t('Latest Posts'),
-				-3 => $this->l10n->t('Latest Creation'),
-				-1 => $this->l10n->t('Following'),
-				-2 => $this->l10n->t('Followers'),
+				EntityUserDefinedChannel::CIRCLE_GLOBAL    => $this->l10n->t('Global Community'),
+				EntityUserDefinedChannel::CIRCLE_ACTIVITY  => $this->l10n->t('Latest Activity'),
+				EntityUserDefinedChannel::CIRCLE_POSTS     => $this->l10n->t('Latest Posts'),
+				EntityUserDefinedChannel::CIRCLE_CREATION  => $this->l10n->t('Latest Creation'),
+				EntityUserDefinedChannel::CIRCLE_FOLLOWING => $this->l10n->t('Following'),
+				EntityUserDefinedChannel::CIRCLE_FOLLOWERS => $this->l10n->t('Followers'),
 			];
 		}
 

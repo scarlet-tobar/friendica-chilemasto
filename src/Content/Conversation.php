@@ -12,6 +12,9 @@ use Friendica\App\BaseURL;
 use Friendica\App\Mode;
 use Friendica\App\Page;
 use Friendica\BaseModule;
+use Friendica\Content\Conversation\Factory\Channel;
+use Friendica\Content\Conversation\Repository\UserDefinedChannel;
+use Friendica\Content\Conversation\Entity\Channel as ChannelEntity;
 use Friendica\Core\ACL;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
@@ -85,23 +88,27 @@ class Conversation
 	/** @var UserGServerRepository */
 	private $userGServer;
 	private EventDispatcherInterface $eventDispatcher;
+	private Channel $channel;
+	private UserDefinedChannel $userDefinedChannel;
 
-	public function __construct(UserGServerRepository $userGServer, LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, Item $item, Arguments $args, BaseURL $baseURL, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Page $page, Mode $mode, EventDispatcherInterface $eventDispatcher, IHandleUserSessions $session)
+	public function __construct(UserGServerRepository $userGServer, Channel $channel, UserDefinedChannel $userDefinedChannel, LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, Item $item, Arguments $args, BaseURL $baseURL, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Page $page, Mode $mode, EventDispatcherInterface $eventDispatcher, IHandleUserSessions $session)
 	{
-		$this->activity        = $activity;
-		$this->item            = $item;
-		$this->config          = $config;
-		$this->mode            = $mode;
-		$this->baseURL         = $baseURL;
-		$this->profiler        = $profiler;
-		$this->logger          = $logger;
-		$this->l10n            = $l10n;
-		$this->args            = $args;
-		$this->pConfig         = $pConfig;
-		$this->page            = $page;
-		$this->eventDispatcher = $eventDispatcher;
-		$this->session         = $session;
-		$this->userGServer     = $userGServer;
+		$this->activity           = $activity;
+		$this->item               = $item;
+		$this->config             = $config;
+		$this->mode               = $mode;
+		$this->baseURL            = $baseURL;
+		$this->profiler           = $profiler;
+		$this->logger             = $logger;
+		$this->l10n               = $l10n;
+		$this->args               = $args;
+		$this->pConfig            = $pConfig;
+		$this->page               = $page;
+		$this->eventDispatcher    = $eventDispatcher;
+		$this->session            = $session;
+		$this->userGServer        = $userGServer;
+		$this->channel            = $channel;
+		$this->userDefinedChannel = $userDefinedChannel;
 	}
 
 	/**
@@ -687,10 +694,13 @@ class Conversation
 	 * @param array   $row        Post row
 	 * @param array   $activity   Contact data of the resharer
 	 * @param array   $thr_parent Thread parent row
+	 * @param string  $channel    Channel information
+	 * @param int     $uid        User ID
+	 * @param array   $channels   Available channels for the user
 	 *
 	 * @return array items with parents and comments
 	 */
-	private function addRowInformation(array $row, array $activity, array $thr_parent): array
+	private function addRowInformation(array $row, array $activity, array $thr_parent, string $channel, int $uid, array $channels): array
 	{
 		$this->profiler->startRecording('rendering');
 
@@ -713,6 +723,11 @@ class Conversation
 			) {
 				return $row;
 			}
+		}
+
+		if ($channel) {
+			$row['channel']     = $channel;
+			$row['post-reason'] = ItemModel::PR_CHANNEL;
 		}
 
 		switch ($row['post-reason']) {
@@ -793,6 +808,16 @@ class Conversation
 			case ItemModel::PR_PUSHED:
 				$row['direction'] = ['direction' => 1, 'title' => $this->l10n->t('Pushed to us')];
 				break;
+			case ItemModel::PR_CHANNEL:
+				$title       = $channels[$channel]->label       ?? $channel;
+				$description = $channels[$channel]->description ?? '';
+
+				if ($description) {
+					$row['direction'] = ['direction' => 11, 'title' => $this->l10n->t('Channel "%s": %s', $title, $description)];
+				} else {
+					$row['direction'] = ['direction' => 11, 'title' => $this->l10n->t('Channel "%s"', $title)];
+				}
+				break;
 		}
 
 		$row['thr-parent-row'] = $thr_parent;
@@ -829,6 +854,7 @@ class Conversation
 		$uriids          = [];
 		$commentcounter  = [];
 		$activitycounter = [];
+		$postchannels    = [];
 
 		foreach ($parents as $parent) {
 			if (!empty($parent['thr-parent-id']) && !empty($parent['gravity']) && ($parent['gravity'] == ItemModel::GRAVITY_ACTIVITY)) {
@@ -848,6 +874,7 @@ class Conversation
 
 			$commentcounter[$uriid]  = 0;
 			$activitycounter[$uriid] = 0;
+			$postchannels[$uriid]    = $parent['channel'] ?? '';
 		}
 
 		$condition = ['parent-uri-id' => $uriids];
@@ -892,6 +919,16 @@ class Conversation
 
 		$thread_items = Post::select(array_merge(ItemModel::DISPLAY_FIELDLIST, ['featured', 'contact-uid', 'gravity', 'post-type', 'post-reason']), $condition, $params);
 
+		$channels = [];
+		foreach ($this->userDefinedChannel->selectByUid($uid) as $userchannel) {
+			$channels[$userchannel->code] = $userchannel;
+		}
+
+		/** @var ChannelEntity $systemchannel */
+		foreach ($this->channel->getTimelines($uid) as $systemchannel) {
+			$channels[$systemchannel->code] = $systemchannel;
+		}
+
 		$items         = [];
 		$quote_uri_ids = [];
 		$authors       = [];
@@ -934,7 +971,7 @@ class Conversation
 				];
 			}
 
-			$items[$row['uri-id']] = $this->addRowInformation($row, $activities[$row['uri-id']] ?? [], $thr_parent[$row['thr-parent-id']] ?? []);
+			$items[$row['uri-id']] = $this->addRowInformation($row, $activities[$row['uri-id']] ?? [], $thr_parent[$row['thr-parent-id']] ?? [], $postchannels[$row['thr-parent-id']] ?? '', $uid, $channels);
 		}
 
 		DBA::close($thread_items);
@@ -955,7 +992,7 @@ class Conversation
 			$authors[] = $row['author-id'];
 			$authors[] = $row['owner-id'];
 
-			$items[$row['uri-id']] = $this->addRowInformation($row, [], []);
+			$items[$row['uri-id']] = $this->addRowInformation($row, [], [], $postchannels[$row['thr-parent-id']] ?? '', $uid, $channels);
 		}
 		DBA::close($quotes);
 

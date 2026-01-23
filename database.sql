@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2026.04-dev (Blutwurz)
--- DB_UPDATE_VERSION 1586
+-- DB_UPDATE_VERSION 1587
 -- ------------------------------------------
 
 
@@ -1368,6 +1368,7 @@ CREATE TABLE IF NOT EXISTS `channel-post` (
 	`channel` int unsigned NOT NULL COMMENT 'Channel id',
 	`uri-id` int unsigned NOT NULL COMMENT 'Post engagement entry',
 	`uid` mediumint unsigned NOT NULL COMMENT 'User id',
+	`in-timeline` boolean NOT NULL DEFAULT '0' COMMENT 'If true, this post is in the user\'s main timeline',
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
 	`received` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
 	`commented` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
@@ -1389,13 +1390,14 @@ CREATE TABLE IF NOT EXISTS `system-channel-post` (
 	`channel` varchar(20) NOT NULL COMMENT 'System channel id',
 	`uid` mediumint unsigned NOT NULL COMMENT 'User id',
 	`uri-id` int unsigned NOT NULL COMMENT 'Post engagement entry',
+	`in-timeline` boolean NOT NULL DEFAULT '0' COMMENT 'If true, this post is in the user\'s main timeline',
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
 	`received` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
 	`commented` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
 	 PRIMARY KEY(`channel`,`uid`,`uri-id`),
 	 INDEX `uri-id` (`uri-id`),
 	 INDEX `uid` (`uid`),
-	 INDEX `channel_created` (`channel`,`uid`,`created`),
+	 INDEX `channel_uid_created` (`channel`,`uid`,`created`),
 	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE,
 	FOREIGN KEY (`uri-id`) REFERENCES `post-engagement` (`uri-id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Posts in a system channel';
@@ -2103,6 +2105,7 @@ CREATE VIEW `channel-post-view` AS SELECT
 	`channel-post`.`channel` AS `channel`,
 	`channel-post`.`uid` AS `uid`,
 	`channel-post`.`uri-id` AS `uri-id`,
+	`channel-post`.`in-timeline` AS `in-timeline`,
 	`post-engagement`.`owner-id` AS `owner-id`,
 	`post-engagement`.`media-type` AS `media-type`,
 	`post-engagement`.`language` AS `language`,
@@ -2131,6 +2134,7 @@ CREATE VIEW `system-channel-post-view` AS SELECT
 	`system-channel-post`.`channel` AS `channel`,
 	`system-channel-post`.`uid` AS `uid`,
 	`system-channel-post`.`uri-id` AS `uri-id`,
+	`system-channel-post`.`in-timeline` AS `in-timeline`,
 	`post-engagement`.`owner-id` AS `owner-id`,
 	`post-engagement`.`media-type` AS `media-type`,
 	`post-engagement`.`language` AS `language`,
@@ -3517,6 +3521,7 @@ CREATE VIEW `tag-view` AS SELECT
 --
 DROP VIEW IF EXISTS `network-thread-view`;
 CREATE VIEW `network-thread-view` AS SELECT 
+	'' AS `channel`,
 	`post-thread-user`.`uri-id` AS `uri-id`,
 	`post-thread-user`.`post-user-id` AS `parent`,
 	`post-thread-user`.`received` AS `received`,
@@ -3546,6 +3551,7 @@ CREATE VIEW `network-thread-view` AS SELECT
 --
 DROP VIEW IF EXISTS `network-thread-circle-view`;
 CREATE VIEW `network-thread-circle-view` AS SELECT 
+	'' AS `channel`,
 	`post-thread-user`.`uri-id` AS `uri-id`,
 	`post-thread-user`.`post-user-id` AS `parent`,
 	`post-thread-user`.`received` AS `received`,

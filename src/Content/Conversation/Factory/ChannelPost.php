@@ -92,27 +92,34 @@ final class ChannelPost
 		}
 
 		foreach ($channels as $channel) {
-			if (in_array($channel->circle, [-3, -4, -5]) && !Post::exists(['parent-uri-id' => $engagement['uri-id'], 'uid' => $channel->uid])) {
+			$in_timeline = Post::exists(['parent-uri-id' => $engagement['uri-id'], 'uid' => $channel->uid]);
+
+			if ($engagement['restricted'] && !$in_timeline) {
 				continue;
 			}
 
-			if ($channel->circle === -1 && !Contact::isSharing($engagement['owner-id'], $channel->uid)) {
+			if (in_array($channel->circle, [UserDefinedChannelEntity::CIRCLE_CREATION, UserDefinedChannelEntity::CIRCLE_POSTS, UserDefinedChannelEntity::CIRCLE_ACTIVITY]) && !$in_timeline) {
 				continue;
 			}
 
-			if ($channel->circle === -2 && (!Contact::isFollower($engagement['owner-id'], $channel->uid) || Contact::isSharing($engagement['owner-id'], $channel->uid))) {
+			if ($channel->circle === UserDefinedChannelEntity::CIRCLE_FOLLOWING && !Contact::isSharing($engagement['owner-id'], $channel->uid)) {
+				continue;
+			}
+
+			if ($channel->circle === UserDefinedChannelEntity::CIRCLE_FOLLOWERS && (!Contact::isFollower($engagement['owner-id'], $channel->uid) || Contact::isSharing($engagement['owner-id'], $channel->uid))) {
 				continue;
 			}
 
 			$cache = [
-				'channel'   => (int)$channel->code,
-				'uid'       => $channel->uid,
-				'uri-id'    => $engagement['uri-id'],
-				'created'   => $post['created'],
-				'received'  => $post['received'],
-				'commented' => $post['commented'],
+				'channel'     => (int)$channel->code,
+				'uid'         => $channel->uid,
+				'uri-id'      => $engagement['uri-id'],
+				'in-timeline' => $in_timeline,
+				'created'     => $post['created'],
+				'received'    => $post['received'],
+				'commented'   => $post['commented'],
 			];
-			$ret = $this->dba->insert('channel-post', $cache, Database::INSERT_IGNORE);
+			$ret = $this->dba->insert('channel-post', $cache, Database::INSERT_UPDATE);
 			$this->logger->debug('Added channel post', ['uri-id' => $engagement['uri-id'], 'cache' => $cache, 'ret' => $ret]);
 		}
 	}

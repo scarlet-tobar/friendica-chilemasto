@@ -1482,6 +1482,19 @@ class Database
 			return false;
 		}
 
+		$sql = $this->getSQL($table, $fields, $condition, $params);
+		DBA::buildCondition($condition);
+		$result = $this->p($sql, $condition);
+
+		if ($this->driver == self::PDO && !empty($result)) {
+			$this->currentTable = $table;
+		}
+
+		return $result;
+	}
+
+	public function getSQL(string $table, array $fields = [], array $condition = [], array $params = []): string
+	{
 		if (count($fields) > 0) {
 			$fields        = $this->escapeFields($fields, $params);
 			$select_string = implode(', ', $fields);
@@ -1495,15 +1508,7 @@ class Database
 
 		$param_string = DBA::buildParameter($params);
 
-		$sql = "SELECT " . $select_string . " FROM " . $table_string . $condition_string . $param_string;
-
-		$result = $this->p($sql, $condition);
-
-		if ($this->driver == self::PDO && !empty($result)) {
-			$this->currentTable = $table;
-		}
-
-		return $result;
+		return "SELECT " . $select_string . " FROM " . $table_string . $condition_string . $param_string;
 	}
 
 	/**

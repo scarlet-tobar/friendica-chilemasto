@@ -484,9 +484,9 @@ class UserDefinedChannel extends BaseRepository
 		$condition = [];
 
 		if (!empty($channel->circle)) {
-			if ($channel->circle == -1) {
+			if ($channel->circle == UserDefinedChannelEntity::CIRCLE_FOLLOWING) {
 				$condition = ["`owner-id` IN (SELECT `pid` FROM `account-user-view` WHERE `uid` = ? AND `rel` IN (?, ?))", $uid, Contact::SHARING, Contact::FRIEND];
-			} elseif ($channel->circle == -2) {
+			} elseif ($channel->circle == UserDefinedChannelEntity::CIRCLE_FOLLOWERS) {
 				$condition = ["`owner-id` IN (SELECT `pid` FROM `account-user-view` WHERE `uid` = ? AND `rel` = ?)", $uid, Contact::FOLLOWER];
 			} elseif ($channel->circle > 0) {
 				$condition = DBA::mergeConditions($condition, ["`owner-id` IN (SELECT `pid` FROM `group_member` INNER JOIN `account-user-view` ON `group_member`.`contact-id` = `account-user-view`.`id` WHERE `gid` = ? AND `account-user-view`.`uid` = ?)", $channel->circle, $uid]);
@@ -548,7 +548,7 @@ class UserDefinedChannel extends BaseRepository
 			$condition = DBA::mergeConditions($condition, ["`size` <= ?", $channel->maxSize]);
 		}
 
-		if (in_array($channel->circle, [-3, -4, -5])) {
+		if (in_array($channel->circle, [UserDefinedChannelEntity::CIRCLE_CREATION, UserDefinedChannelEntity::CIRCLE_POSTS, UserDefinedChannelEntity::CIRCLE_ACTIVITY])) {
 			$condition = DBA::mergeConditions($condition, ['uid' => $uid]);
 		}
 
