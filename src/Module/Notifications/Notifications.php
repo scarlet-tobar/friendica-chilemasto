@@ -64,7 +64,7 @@ class Notifications extends BaseNotifications
 			$notificationHeader = $this->t('Personal Notifications');
 			$notifications      = [
 				'ident'         => FormattedNotify::PERSONAL,
-				'notifications' => $factory->getPersonalList(true, $this->firstItemNum, self::ITEMS_PER_PAGE),
+				'notifications' => $factory->getPersonalList($this->showAll, $this->firstItemNum, self::ITEMS_PER_PAGE),
 			];
 		} elseif (($this->args->get(1) == 'home')) {
 			$notificationHeader = $this->t('Home Notifications');
