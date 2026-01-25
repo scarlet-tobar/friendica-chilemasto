@@ -363,8 +363,9 @@ class BaseApi extends BaseModule
 	 */
 	public static function appSupportsQuotes(): bool
 	{
-		$token = OAuth::getCurrentApplicationToken();
-		return (!empty($token['name']) && in_array($token['name'], ['Fedilab']));
+		// $token = OAuth::getCurrentApplicationToken();
+		// return (!empty($token['name']) && in_array($token['name'], ['Fedilab']));
+		return true;
 	}
 
 	/**
