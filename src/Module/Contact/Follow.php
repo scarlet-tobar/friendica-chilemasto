@@ -119,7 +119,7 @@ class Follow extends BaseModule
 
 			$this->sysMessages->addNotice($this->t('The network type couldn\'t be detected. Contact can\'t be added.'));
 			$submit  = '';
-			$contact = ['url' => $url, 'network' => Protocol::PHANTOM, 'name' => $url, 'keywords' => ''];
+			$contact = ['url' => $url, 'network' => Protocol::PHANTOM, 'name' => $url, 'alias' => '', 'keywords' => ''];
 		}
 
 		$protocol = Contact::getProtocol($contact['url'], $contact['network']);
