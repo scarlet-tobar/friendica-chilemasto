@@ -14,6 +14,7 @@ use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
+use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\APContact;
@@ -61,7 +62,7 @@ class Processor
 	private static function addActivityId(string $id)
 	{
 		DBA::delete('fetched-activity', ["`received` < ?", DateTimeFormat::utc('now - 5 minutes')]);
-		DBA::insert('fetched-activity', ['object-id' => $id, 'received' => DateTimeFormat::utcNow()]);
+		DBA::insert('fetched-activity', ['object-id' => $id, 'received' => DateTimeFormat::utcNow()], Database::INSERT_IGNORE);
 	}
 
 	/**
