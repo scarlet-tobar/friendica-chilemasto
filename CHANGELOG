@@ -2,7 +2,7 @@ Version 2026.01 (unreleased)
   Friendica Core
     Updates to the translations
     Updates to the themes (frio, vier) [annando, haheute, loma-one, mfxa, marcusxss, MarekBenjamin, MrPetovan, Raroun]
-    Updated to the documentation [Art4, MarekBenjamin, MrPetovan]
+    Updated to the documentation [Art4, MarekBenjamin, MrPetovan, tobiasd]
     Added the possibility to apply filter addons to the API (#15048) [annando]
     Added caching for system and user defined channels [annando]
     Added missing category to reports to the admin panel (#14525) [marcusxss]
@@ -68,7 +68,7 @@ Version 2026.01 (unreleased)
     Improved group RSS feeds by including shared items (#14433) [annando]
     Improved monitoring of Friendica, adding cache statistics [nupplaphil]
     Improved the installer for docker setups (PR 14784) [re20002]
-    Improved Mastodon API compatibility (PR 14835; #14978 #15114 #15165) [annando]
+    Improved Mastodon API compatibility (#14835; #14978 #15114 #15165 #15392) [annando]
     Improved ACL for images (#15008) [annando]
     Improved remote_self to include reshared posts [annando]
     Improved email notifications (#12504) [annando]
@@ -129,7 +129,8 @@ Version 2026.01 (unreleased)
     14850, 14851, 14879, 14881, 14890, 14914, 14978, 14998, 15004,
     15006, 15008, 15043, 15047, 15096, 15097, 15100, 15048, 15114,
     15128, 15154, 15155, 15165, 15181, 15191, 15216, 15253, 15262,
-    15263, 15291, 15302, 15321, 15344, 15350, 15362, 15413, 15423
+    15263, 15291, 15302, 15321, 15344, 15350, 15362, 15392, 15413,
+    15423
 
 Version 2024.12 (2024-12-31)
   Friendica Core
