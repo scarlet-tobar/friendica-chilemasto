@@ -382,7 +382,13 @@ class Status extends BaseFactory
 
 		if (!empty($quote_id) && ($quote_id != $item['uri-id'])) {
 			try {
-				$quote = $this->createFromUriId($quote_id, $uid, false, false, false)->toArray();
+				$quoted_status = $this->createFromUriId($quote_id, $uid, false, false, false)->toArray();
+				$quote         = [
+					'state'         => 'accepted',
+					'quoted_status' => $quoted_status,
+					'account'       => $quoted_status['account'],
+				];
+				$quote = array_merge($quote, $quoted_status);
 			} catch (\Exception $exception) {
 				DI::logger()->info('Quote not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'exception' => $exception]);
 				$quote = [];
