@@ -16,7 +16,7 @@ Version 2026.01 (unreleased)
     Deprecated bin/jetstream in favor of bin/console jetstream (PR 14655) [nupplaphil]
     Deprecated hooks in favor of EventDispatcher (PR 14640) [Art4]
     Deprecated Addon class in favor of AddonHelper (PR 14909) [Art4]
-    Deprecated OEmbed (PR 15160) [annando]
+    Deprecated OEmbed in favor of embed (PR 15160) [annando]
     Deprecated Friendica\Core\Logger (PR 14758) [Art4]
     General code cleanup [annando, Art4, nupplaphil, MrPetovan, Ramoonus, Raroun, Tealk]
     Fixed posts send to groups are not send via connectors anymore [annando]
@@ -41,7 +41,7 @@ Version 2026.01 (unreleased)
     Fixed a bug in contact suggestions (#15344) [annando]
     Improved compatibility with 32bit systems [annando]
     Improved the web app manifest by using the host name as short name (#15423) [annando]
-    Improved the performance of the background workers (#14609 #1509 #15434 #15435) [annando, Art4, ne20002]
+    Improved the performance of the background workers (#1509 #14609 #15434 #15435) [annando, Art4, ne20002]
     Improved YT preview embedding (#14223 #14621) [annando]
     Improved handling of YT URLs [haheute]
     Improved dependency handling (#8583 #14519; PR 14523) [Art4]
@@ -82,6 +82,7 @@ Version 2026.01 (unreleased)
 
   Friendica Addons
     Updated the translations
+    Update the addon to used the AddonHelper class (#14535) [Art4]
     blockbot
       Fixed a potential loop (#14692) [annando]
     bluesky
@@ -89,8 +90,6 @@ Version 2026.01 (unreleased)
       Fixed then fetching of pinned feeds (#14667) [annando]
       Fixed duplication of reshares [annando]
       Improve following of accounts [annando]
-    libravatar
-      Update the addon to used the AddonHelper class (#14535) [Art4]
     mailstream
       Improve mail threading [mexon]
     markdown
@@ -99,8 +98,6 @@ Version 2026.01 (unreleased)
       Fix registration of the logging factory [Art4]
     phpmailer
       Updated PHPMailer version [tobiasd]
-    pumpio
-      Update the addon to used the AddonHelper class (#14535) [Art4]
     ratioed
       Added statistics about "reply likes" and "reply guy" [mexon]
       Improved UI [haheute]
