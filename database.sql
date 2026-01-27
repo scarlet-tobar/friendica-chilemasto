@@ -1,5 +1,5 @@
 -- ------------------------------------------
--- Friendica 2025.07-rc (Interrupted Fern)
+-- Friendica 2026.01 (Blutwurz)
 -- DB_UPDATE_VERSION 1586
 -- ------------------------------------------
 
