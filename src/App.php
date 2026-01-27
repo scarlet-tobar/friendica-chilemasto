@@ -67,7 +67,7 @@ class App
 {
 	const PLATFORM = 'Friendica';
 	const CODENAME = 'Blutwurz';
-	const VERSION  = '2026.01';
+	const VERSION  = '2026.04-dev';
 
 	/**
 	 * @internal
