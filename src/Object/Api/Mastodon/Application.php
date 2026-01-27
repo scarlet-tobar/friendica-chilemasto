@@ -34,7 +34,6 @@ class Application extends BaseDataTransferObject
 	/**
 	 * Creates an application entry
 	 *
-	 * @param array   $item
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function __construct(string $name, string $client_id = null, string $client_secret = null, int $id = null, string $redirect_uri = null, string $website = null, string $vapid_key = null)
@@ -64,8 +63,8 @@ class Application extends BaseDataTransferObject
 			unset($application['redirect_uri']);
 		}
 
-		if (empty($application['website'])) {
-			unset($application['website']);
+		if (empty($application['vapid_key'])) {
+			unset($application['vapid_key']);
 		}
 
 		return $application;

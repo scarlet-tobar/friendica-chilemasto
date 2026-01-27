@@ -7,13 +7,13 @@
 
 namespace Friendica\Test\src\Module\Api\Twitter\Statuses;
 
-use Friendica\App\Router;
+use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Module\Api\Twitter\Statuses\Show;
 use Friendica\Network\HTTPException\BadRequestException;
-use Friendica\Test\src\Module\Api\ApiTest;
+use Friendica\Test\ApiTestCase;
 
-class ShowTest extends ApiTest
+class ShowTest extends ApiTestCase
 {
 	/**
 	 * Test the api_statuses_show() function.
@@ -25,7 +25,7 @@ class ShowTest extends ApiTest
 		$this->expectException(BadRequestException::class);
 
 
-		(new Show(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 	}
 
@@ -36,7 +36,7 @@ class ShowTest extends ApiTest
 	 */
 	public function testApiStatusesShowWithId()
 	{
-		$response = (new Show(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'id' => 1
 			]);
@@ -54,7 +54,10 @@ class ShowTest extends ApiTest
 	 */
 	public function testApiStatusesShowWithConversation()
 	{
-		$response = (new Show(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		// @todo: This call is needed for this test
+		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+
+		$response = (new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'id'           => 1,
 				'conversation' => 1

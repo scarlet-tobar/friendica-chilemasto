@@ -12,7 +12,6 @@ use Friendica\Capabilities\ICanHandleRequests;
 use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Model\User;
 use Friendica\Module\Response;
@@ -165,6 +164,19 @@ abstract class BaseModule implements ICanHandleRequests
 	}
 
 	/**
+	 * Module GET method to process submitted data
+	 *
+	 * Extend this method if the module is supposed to process GET requests.
+	 * Doesn't display any content
+	 *
+	 * @param string[] $request The $_REQUEST content
+	 * @return void
+	 */
+	protected function get(array $request = [])
+	{
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public function run(ModuleHTTPException $httpException, array $request = []): ResponseInterface
@@ -210,17 +222,20 @@ abstract class BaseModule implements ICanHandleRequests
 		switch ($this->args->getMethod()) {
 			case Router::DELETE:
 				$this->delete($request);
-				return $this->response->generate();
+				break;
 			case Router::PATCH:
 				$this->patch($request);
-				return $this->response->generate();
+				break;
 			case Router::POST:
 				Core\Hook::callAll($this->args->getModuleName() . '_mod_post', $request);
 				$this->post($request);
-				return $this->response->generate();
+				break;
 			case Router::PUT:
 				$this->put($request);
-				return $this->response->generate();
+				break;
+			case Router::GET:
+				$this->get($request);
+				break;
 		}
 
 		$timestamp = microtime(true);
@@ -245,9 +260,9 @@ abstract class BaseModule implements ICanHandleRequests
 
 			$this->response->setStatus($e->getCode(), $e->getMessage());
 			$this->response->addContent($httpException->content($e));
-		} finally {
-			$this->profiler->set(microtime(true) - $timestamp, 'content');
 		}
+
+		$this->profiler->set(microtime(true) - $timestamp, 'content');
 
 		return $this->response->generate();
 	}
@@ -269,7 +284,7 @@ abstract class BaseModule implements ICanHandleRequests
 			$request[$parameter] = $this->getRequestValue($input, $parameter, $defaultvalue);
 		}
 
-		foreach ($input ?? [] as $parameter => $value) {
+		foreach ($input as $parameter => $value) {
 			if ($parameter == 'pagename') {
 				continue;
 			}
@@ -396,8 +411,8 @@ abstract class BaseModule implements ICanHandleRequests
 	public static function checkFormSecurityTokenRedirectOnError(string $err_redirect, string $typename = '', string $formname = 'form_security_token')
 	{
 		if (!self::checkFormSecurityToken($typename, $formname)) {
-			Logger::notice('checkFormSecurityToken failed: user ' . DI::userSession()->getLocalUserNickname() . ' - form element ' . $typename);
-			Logger::debug('checkFormSecurityToken failed', ['request' => $_REQUEST]);
+			DI::logger()->notice('checkFormSecurityToken failed: user ' . DI::userSession()->getLocalUserNickname() . ' - form element ' . $typename);
+			DI::logger()->debug('checkFormSecurityToken failed', ['request' => $_REQUEST]);
 			DI::sysmsg()->addNotice(self::getFormSecurityStandardErrorMessage());
 			DI::baseUrl()->redirect($err_redirect);
 		}
@@ -406,8 +421,8 @@ abstract class BaseModule implements ICanHandleRequests
 	public static function checkFormSecurityTokenForbiddenOnError(string $typename = '', string $formname = 'form_security_token')
 	{
 		if (!self::checkFormSecurityToken($typename, $formname)) {
-			Logger::notice('checkFormSecurityToken failed: user ' . DI::userSession()->getLocalUserNickname() . ' - form element ' . $typename);
-			Logger::debug('checkFormSecurityToken failed', ['request' => $_REQUEST]);
+			DI::logger()->notice('checkFormSecurityToken failed: user ' . DI::userSession()->getLocalUserNickname() . ' - form element ' . $typename);
+			DI::logger()->debug('checkFormSecurityToken failed', ['request' => $_REQUEST]);
 
 			throw new \Friendica\Network\HTTPException\ForbiddenException();
 		}
@@ -432,7 +447,7 @@ abstract class BaseModule implements ICanHandleRequests
 				'sel'   => $current == 'following' ? 'active' : '',
 			],
 			[
-				'label' => DI::l10n()->t('Mutual friends'),
+				'label' => DI::l10n()->t('Friends'),
 				'url'   => $baseUrl . '/contacts/mutuals',
 				'sel'   => $current == 'mutuals' ? 'active' : '',
 			],
@@ -456,7 +471,7 @@ abstract class BaseModule implements ICanHandleRequests
 	 * @param string      $content
 	 * @param string      $type
 	 * @param string|null $content_type
-	 * @return void
+	 * @return never
 	 * @throws HTTPException\InternalServerErrorException
 	 */
 	public function httpExit(string $content, string $type = Response::TYPE_HTML, ?string $content_type = null)
@@ -493,11 +508,11 @@ abstract class BaseModule implements ICanHandleRequests
 	 * @param mixed  $content
 	 * @param string $content_type
 	 * @param int    $options A combination of json_encode() binary flags
-	 * @return void
+	 * @return never
 	 * @throws HTTPException\InternalServerErrorException
 	 * @see json_encode()
 	 */
-	public function jsonExit($content, string $content_type = 'application/json', int $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
+	public function jsonExit($content, string $content_type = 'application/json; charset=utf-8', int $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
 	{
 		$this->httpExit(json_encode($content, $options), ICanCreateResponses::TYPE_JSON, $content_type);
 	}
@@ -508,7 +523,7 @@ abstract class BaseModule implements ICanHandleRequests
 	 * @param int    $httpCode
 	 * @param mixed  $content
 	 * @param string $content_type
-	 * @return void
+	 * @return never
 	 * @throws HTTPException\InternalServerErrorException
 	 */
 	public function jsonError(int $httpCode, $content, string $content_type = 'application/json')

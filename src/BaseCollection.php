@@ -24,7 +24,7 @@ class BaseCollection extends \ArrayIterator
 	 * @param BaseEntity[] $entities
 	 * @param int|null     $totalCount
 	 */
-	public function __construct(array $entities = [], int $totalCount = null)
+	public function __construct(array $entities = [], ?int $totalCount = null)
 	{
 		parent::__construct($entities);
 
@@ -89,7 +89,9 @@ class BaseCollection extends \ArrayIterator
 	 */
 	public function map(callable $callback): BaseCollection
 	{
-		return new static(array_map($callback, $this->getArrayCopy()), $this->getTotalCount());
+		$class = get_class($this);
+
+		return new $class(array_map($callback, $this->getArrayCopy()), $this->getTotalCount());
 	}
 
 	/**
@@ -100,26 +102,27 @@ class BaseCollection extends \ArrayIterator
 	 * @return BaseCollection
 	 * @see array_filter()
 	 */
-	public function filter(callable $callback = null, int $flag = 0): BaseCollection
+	public function filter(?callable $callback = null, int $flag = 0): BaseCollection
 	{
-		return new static(array_filter($this->getArrayCopy(), $callback, $flag));
+		$class = get_class($this);
+
+		return new $class(array_filter($this->getArrayCopy(), $callback, $flag));
 	}
 
 	/**
 	 * Reverse the orders of the elements in the collection
-	 *
-	 * @return $this
 	 */
 	public function reverse(): BaseCollection
 	{
-		return new static(array_reverse($this->getArrayCopy()), $this->getTotalCount());
+		$class = get_class($this);
+
+		return new $class(array_reverse($this->getArrayCopy()), $this->getTotalCount());
 	}
 
 	/**
 	 * Split the collection in smaller collections no bigger than the provided length
 	 *
 	 * @param int $length
-	 * @return static[]
 	 */
 	public function chunk(int $length): array
 	{
@@ -127,9 +130,14 @@ class BaseCollection extends \ArrayIterator
 			throw new \RangeException('BaseCollection->chunk(): Size parameter expected to be greater than 0');
 		}
 
-		return array_map(function ($array) {
-			return new static($array);
-		}, array_chunk($this->getArrayCopy(), $length));
+		return array_map(
+			function ($array) {
+				$class = get_class($this);
+
+				return new $class($array);
+			},
+			array_chunk($this->getArrayCopy(), $length)
+		);
 	}
 
 

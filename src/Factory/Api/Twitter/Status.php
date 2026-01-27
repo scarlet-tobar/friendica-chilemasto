@@ -17,7 +17,8 @@ use Friendica\Factory\Api\Twitter\User as TwitterUser;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Verb;
-use Friendica\Network\HTTPException;
+use Friendica\Network\HTTPException\InternalServerErrorException;
+use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Protocol\Activity;
 use ImagickException;
 use Psr\Log\LoggerInterface;
@@ -38,7 +39,7 @@ class Status extends BaseFactory
 	private $mention;
 	/** @var Activities entity */
 	private $activities;
-	/** @var Activities entity */
+	/** @var Attachment entity */
 	private $attachment;
 	/** @var ContentItem */
 	private $contentItem;
@@ -58,13 +59,13 @@ class Status extends BaseFactory
 	}
 
 	/**
-	 * @param int $uriId Uri-ID of the item
+	 * @param int $id    Uri-ID of the item
 	 * @param int $uid   Item user
 	 * @param bool $include_entities Whether to include entities
 	 *
 	 * @return \Friendica\Object\Api\Twitter\Status
-	 * @throws HTTPException\InternalServerErrorException
-	 * @throws ImagickException|HTTPException\NotFoundException
+	 * @throws InternalServerErrorException
+	 * @throws ImagickException|NotFoundException
 	 */
 	public function createFromItemId(int $id, int $uid, bool $include_entities = false): \Friendica\Object\Api\Twitter\Status
 	{
@@ -73,7 +74,7 @@ class Status extends BaseFactory
 			'thr-parent-id', 'parent-author-id', 'parent-author-nick', 'uri', 'plink', 'private', 'vid', 'coord', 'quote-uri-id'];
 		$item = Post::selectFirst($fields, ['id' => $id], ['order' => ['uid' => true]]);
 		if (!$item) {
-			throw new HTTPException\NotFoundException('Item with ID ' . $id . ' not found.');
+			throw new NotFoundException('Item with ID ' . $id . ' not found.');
 		}
 		return $this->createFromArray($item, $uid, $include_entities);
 	}
@@ -84,8 +85,8 @@ class Status extends BaseFactory
 	 * @param bool $include_entities Whether to include entities
 	 *
 	 * @return \Friendica\Object\Api\Twitter\Status
-	 * @throws HTTPException\InternalServerErrorException
-	 * @throws ImagickException|HTTPException\NotFoundException
+	 * @throws InternalServerErrorException
+	 * @throws ImagickException|NotFoundException
 	 */
 	public function createFromUriId(int $uriId, int $uid = 0, bool $include_entities = false): \Friendica\Object\Api\Twitter\Status
 	{
@@ -94,7 +95,7 @@ class Status extends BaseFactory
 			'thr-parent-id', 'parent-author-id', 'parent-author-nick', 'uri', 'plink', 'private', 'vid', 'coord'];
 		$item = Post::selectFirst($fields, ['uri-id' => $uriId, 'uid' => [0, $uid]], ['order' => ['uid' => true]]);
 		if (!$item) {
-			throw new HTTPException\NotFoundException('Item with URI ID ' . $uriId . ' not found' . ($uid ? ' for user ' . $uid : '.'));
+			throw new NotFoundException('Item with URI ID ' . $uriId . ' not found' . ($uid ? ' for user ' . $uid : '.'));
 		}
 		return $this->createFromArray($item, $uid, $include_entities);
 	}
@@ -105,12 +106,12 @@ class Status extends BaseFactory
 	 * @param bool $include_entities Whether to include entities
 	 *
 	 * @return \Friendica\Object\Api\Twitter\Status
-	 * @throws HTTPException\InternalServerErrorException
-	 * @throws ImagickException|HTTPException\NotFoundException
+	 * @throws InternalServerErrorException
+	 * @throws ImagickException|NotFoundException
 	 */
 	private function createFromArray(array $item, int $uid, bool $include_entities): \Friendica\Object\Api\Twitter\Status
 	{
-		$item = Post\Media::addHTMLAttachmentToItem($item);
+		$item   = Post\Media::addHTMLAttachmentToItem($item);
 		$author = $this->twitterUser->createFromContactId($item['author-id'], $uid, true);
 
 		if (!empty($item['causer-id']) && ($item['post-reason'] == Item::PR_ANNOUNCEMENT)) {
@@ -161,10 +162,10 @@ class Status extends BaseFactory
 		if ($include_entities) {
 			$hashtags = $this->hashtag->createFromUriId($item['uri-id'], $text);
 			$medias   = $this->media->createFromUriId($item['uri-id'], $text);
-			$urls     = $this->url->createFromUriId($item['uri-id'], $text);
-			$mentions = $this->mention->createFromUriId($item['uri-id'], $text);
+			$urls     = $this->url->createFromUriId($item['uri-id']);
+			$mentions = $this->mention->createFromUriId($item['uri-id']);
 		} else {
-			$attachments = $this->attachment->createFromUriId($item['uri-id'], $text);
+			$attachments = $this->attachment->createFromUriId($item['uri-id']);
 		}
 
 		$friendica_activities = $this->activities->createFromUriId($item['uri-id'], $uid);
@@ -176,10 +177,10 @@ class Status extends BaseFactory
 			if ($include_entities) {
 				$hashtags = array_merge($hashtags, $this->hashtag->createFromUriId($shared_uri_id, $text));
 				$medias   = array_merge($medias, $this->media->createFromUriId($shared_uri_id, $text));
-				$urls     = array_merge($urls, $this->url->createFromUriId($shared_uri_id, $text));
-				$mentions = array_merge($mentions, $this->mention->createFromUriId($shared_uri_id, $text));
+				$urls     = array_merge($urls, $this->url->createFromUriId($shared_uri_id));
+				$mentions = array_merge($mentions, $this->mention->createFromUriId($shared_uri_id));
 			} else {
-				$attachments = array_merge($attachments, $this->attachment->createFromUriId($shared_uri_id, $text));
+				$attachments = array_merge($attachments, $this->attachment->createFromUriId($shared_uri_id));
 			}
 		}
 
@@ -202,6 +203,6 @@ class Status extends BaseFactory
 			$entities = [];
 		}
 
-		return new \Friendica\Object\Api\Twitter\Status($text, $statusnetHtml, $friendicaHtml, $item, $author, $owner, $retweeted, $quoted, $geo, $friendica_activities, $entities, $attachments,  $friendica_comments, $liked);
+		return new \Friendica\Object\Api\Twitter\Status($text, $statusnetHtml, $friendicaHtml, $item, $author, $owner, $retweeted, $quoted, $geo, $friendica_activities, $entities, $attachments, $friendica_comments, $liked);
 	}
 }

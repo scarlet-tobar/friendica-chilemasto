@@ -7,13 +7,11 @@
 
 namespace Friendica\App;
 
-use Dice\Dice;
 use FastRoute\DataGenerator\GroupCountBased;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std;
-use Friendica\Capabilities\ICanHandleRequests;
-use Friendica\Core\Addon;
+use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -21,6 +19,7 @@ use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Lock\Capability\ICanLock;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Event\CollectRoutesEvent;
 use Friendica\LegacyModule;
 use Friendica\Module\HTTPException\MethodNotAllowed;
 use Friendica\Module\HTTPException\PageNotFound;
@@ -30,6 +29,7 @@ use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Network\HTTPException\MethodNotAllowedException;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Util\Router\FriendicaGroupCountBased;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -86,14 +86,12 @@ class Router
 	/** @var LoggerInterface */
 	private $logger;
 
+	private EventDispatcherInterface $eventDispatcher;
+
+	private AddonHelper $addonHelper;
+
 	/** @var bool */
 	private $isLocalUser;
-
-	/** @var float */
-	private $dice_profiler_threshold;
-
-	/** @var Dice */
-	private $dice;
 
 	/** @var string */
 	private $baseRoutesFilepath;
@@ -113,23 +111,22 @@ class Router
 	 * @param IManageConfigValues $config
 	 * @param Arguments           $args
 	 * @param LoggerInterface     $logger
-	 * @param Dice                $dice
 	 * @param IHandleUserSessions $userSession
 	 * @param RouteCollector|null $routeCollector
 	 */
-	public function __construct(array $server, string $baseRoutesFilepath, L10n $l10n, ICanCache $cache, ICanLock $lock, IManageConfigValues $config, Arguments $args, LoggerInterface $logger, Dice $dice, IHandleUserSessions $userSession, RouteCollector $routeCollector = null)
+	public function __construct(array $server, string $baseRoutesFilepath, L10n $l10n, ICanCache $cache, ICanLock $lock, IManageConfigValues $config, Arguments $args, LoggerInterface $logger, EventDispatcherInterface $eventDispatcher, AddonHelper $addonHelper, IHandleUserSessions $userSession, RouteCollector $routeCollector = null)
 	{
-		$this->baseRoutesFilepath      = $baseRoutesFilepath;
-		$this->l10n                    = $l10n;
-		$this->cache                   = $cache;
-		$this->lock                    = $lock;
-		$this->args                    = $args;
-		$this->config                  = $config;
-		$this->dice                    = $dice;
-		$this->server                  = $server;
-		$this->logger                  = $logger;
-		$this->isLocalUser             = !empty($userSession->getLocalUserId());
-		$this->dice_profiler_threshold = $config->get('system', 'dice_profiler_threshold', 0);
+		$this->baseRoutesFilepath = $baseRoutesFilepath;
+		$this->l10n               = $l10n;
+		$this->cache              = $cache;
+		$this->lock               = $lock;
+		$this->args               = $args;
+		$this->config             = $config;
+		$this->server             = $server;
+		$this->logger             = $logger;
+		$this->eventDispatcher    = $eventDispatcher;
+		$this->addonHelper        = $addonHelper;
+		$this->isLocalUser        = !empty($userSession->getLocalUserId());
 
 		$this->routeCollector = $routeCollector ?? new RouteCollector(new Std(), new GroupCountBased());
 
@@ -156,10 +153,12 @@ class Router
 
 		$this->addRoutes($routeCollector, $routes);
 
-		$this->routeCollector = $routeCollector;
-
 		// Add routes from addons
-		Hook::callAll('route_collection', $this->routeCollector);
+		$routeCollector = $this->eventDispatcher->dispatch(
+			new CollectRoutesEvent(CollectRoutesEvent::COLLECT_ROUTES, $routeCollector),
+		)->getRouteCollector();
+
+		$this->routeCollector = $routeCollector;
 
 		return $this;
 	}
@@ -284,14 +283,14 @@ class Router
 		try {
 			// Check if the HTTP method is OPTIONS and return the special Options Module with the possible HTTP methods
 			if ($this->args->getMethod() === static::OPTIONS) {
-				$this->moduleClass = Options::class;
+				$this->moduleClass  = Options::class;
 				$this->parameters[] = ['AllowedMethods' => $dispatcher->getOptions($cmd)];
 			} else {
 				$routeInfo = $dispatcher->dispatch($this->args->getMethod(), $cmd);
 				if ($routeInfo[0] === Dispatcher::FOUND) {
-					$this->moduleClass = $routeInfo[1];
+					$this->moduleClass  = $routeInfo[1];
 					$this->parameters[] = $routeInfo[2];
-				} else if ($routeInfo[0] === Dispatcher::METHOD_NOT_ALLOWED) {
+				} elseif ($routeInfo[0] === Dispatcher::METHOD_NOT_ALLOWED) {
 					throw new HTTPException\MethodNotAllowedException($this->l10n->t('Method not allowed for this module. Allowed method(s): %s', implode(', ', $routeInfo[1])));
 				} else {
 					throw new HTTPException\NotFoundException($this->l10n->t('Page not found.'));
@@ -302,7 +301,7 @@ class Router
 		} catch (NotFoundException $e) {
 			$moduleName = $this->args->getModuleName();
 			// Then we try addon-provided modules that we wrap in the LegacyModule class
-			if (Addon::isEnabled($moduleName) && file_exists("addon/{$moduleName}/{$moduleName}.php")) {
+			if ($this->addonHelper->isAddonEnabled($moduleName) && file_exists("addon/{$moduleName}/{$moduleName}.php")) {
 				//Check if module is an app and if public access to apps is allowed or not
 				$privateapps = $this->config->get('config', 'private_addons', false);
 				if (!$this->isLocalUser && Hook::isAddonApp($moduleName) && $privateapps) {
@@ -328,23 +327,9 @@ class Router
 		}
 	}
 
-	public function getModule(?string $module_class = null): ICanHandleRequests
+	public function getParameters(): array
 	{
-		$moduleClass = $module_class ?? $this->getModuleClass();
-
-		$stamp = microtime(true);
-
-		try {
-			/** @var ICanHandleRequests $module */
-			return $this->dice->create($moduleClass, $this->parameters);
-		} finally {
-			if ($this->dice_profiler_threshold > 0) {
-				$dur = floatval(microtime(true) - $stamp);
-				if ($dur >= $this->dice_profiler_threshold) {
-					$this->logger->notice('Dice module creation lasts too long.', ['duration' => round($dur, 3), 'module' => $moduleClass, 'parameters' => $this->parameters]);
-				}
-			}
-		}
+		return $this->parameters;
 	}
 
 	/**

@@ -7,10 +7,12 @@
 
 namespace Friendica\Test\src\Core\Lock;
 
+use Friendica\Core\Lock\Capability\ICanLock;
 use Friendica\Core\Lock\Type\DatabaseLock;
+use Friendica\Test\LockTestCase;
 use Friendica\Test\Util\CreateDatabaseTrait;
 
-class DatabaseLockDriverTest extends LockTest
+class DatabaseLockDriverTest extends LockTestCase
 {
 	use CreateDatabaseTrait;
 
@@ -25,7 +27,7 @@ class DatabaseLockDriverTest extends LockTest
 		parent::setUp();
 	}
 
-	protected function getInstance()
+	protected function getInstance(): ICanLock
 	{
 		return new DatabaseLock($this->getDbInstance(), $this->pid);
 	}

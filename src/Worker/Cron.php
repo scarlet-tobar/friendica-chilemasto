@@ -7,9 +7,7 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Addon;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -21,7 +19,7 @@ class Cron
 {
 	public static function execute()
 	{
-		$a = DI::app();
+		$basepath = DI::appHelper()->getBasePath();
 
 		$last = DI::keyValue()->get('last_cron');
 
@@ -30,16 +28,15 @@ class Cron
 		if ($last) {
 			$next = $last + ($poll_interval * 60);
 			if ($next > time()) {
-				Logger::notice('cron interval not reached');
+				DI::logger()->notice('cron interval not reached');
 				return;
 			}
 		}
 
-		Logger::notice('start');
+		DI::logger()->notice('start');
 
 		// Ensure to have a .htaccess file.
 		// this is a precaution for systems that update automatically
-		$basepath = $a->getBasePath();
 		if (!file_exists($basepath . '/.htaccess') && is_writable($basepath)) {
 			copy($basepath . '/.htaccess-dist', $basepath . '/.htaccess');
 		}
@@ -91,6 +88,10 @@ class Cron
 			// Update interaction scores
 			Worker::add(Worker::PRIORITY_LOW, 'UpdateScores');
 
+			if (DI::config()->get('system', 'optimize_tables')) {
+				DBA::optimizeTable('check-full-text-search');
+			}
+
 			DI::keyValue()->set('last_cron_hourly', time());
 		}
 
@@ -124,6 +125,9 @@ class Cron
 
 			Worker::add(Worker::PRIORITY_LOW, 'UpdateAllSuggestions');
 
+			// add missing public contacts and account-user entries
+			Worker::add(Worker::PRIORITY_LOW, 'FixContacts');
+
 			if (DI::config()->get('system', 'optimize_tables')) {
 				Worker::add(Worker::PRIORITY_LOW, 'OptimizeTables');
 			}
@@ -137,7 +141,8 @@ class Cron
 			// Update contact relations for our users
 			$users = DBA::select('user', ['uid'], ["`verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired` AND `uid` > ?", 0]);
 			while ($user = DBA::fetch($users)) {
-				Worker::add(Worker::PRIORITY_LOW, 'ContactDiscoveryForUser', $user['uid']);
+				ContactDiscoveryForUser::add(Worker::PRIORITY_LOW, $user['uid']);
+
 			}
 			DBA::close($users);
 
@@ -147,12 +152,12 @@ class Cron
 			// Update "blocked" status of servers
 			Worker::add(Worker::PRIORITY_LOW, 'UpdateBlockedServers');
 
-			Addon::reload();
+			DI::addonHelper()->reloadAddons();
 
 			DI::keyValue()->set('last_cron_daily', time());
 		}
 
-		Logger::notice('end');
+		DI::logger()->notice('end');
 
 		DI::keyValue()->set('last_cron', time());
 	}
@@ -164,7 +169,7 @@ class Cron
 	 */
 	private static function deleteSleepingProcesses()
 	{
-		Logger::info('Looking for sleeping processes');
+		DI::logger()->info('Looking for sleeping processes');
 
 		DBA::deleteSleepingProcesses();
 	}

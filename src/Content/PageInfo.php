@@ -7,9 +7,8 @@
 
 namespace Friendica\Content;
 
-use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Network\HTTPException;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\Strings;
@@ -28,7 +27,7 @@ class PageInfo
 	 */
 	public static function searchAndAppendToBody(string $body, bool $searchNakedUrls = false, bool $no_photos = false)
 	{
-		Logger::debug('add_page_info_to_body: fetch page info for body', ['body' => $body]);
+		DI::logger()->debug('add_page_info_to_body: fetch page info for body', ['body' => $body]);
 
 		$url = self::getRelevantUrlFromBody($body, $searchNakedUrls);
 		if (!$url) {
@@ -60,7 +59,7 @@ class PageInfo
 			$body = substr_replace($body, "\n[bookmark=" . $data['url'] . ']' . $linkTitle . "[/bookmark]\n", $existingAttachmentPos, 0);
 		} else {
 			$footer = self::getFooterFromData($data, $no_photos);
-			$body = self::stripTrailingUrlFromBody($body, $data['url']);
+			$body   = self::stripTrailingUrlFromBody($body, $data['url']);
 			$body .= "\n" . $footer;
 		}
 
@@ -91,7 +90,12 @@ class PageInfo
 	 */
 	public static function getFooterFromData(array $data, bool $no_photos = false): string
 	{
-		Hook::callAll('page_info_data', $data);
+		$eventDispatcher = DI::eventDispatcher();
+
+		/** @var array<string,mixed> */
+		$data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PAGE_INFO, $data),
+		)->getArray();
 
 		if (empty($data['type'])) {
 			return '';
@@ -194,7 +198,7 @@ class PageInfo
 			}
 		}
 
-		Logger::debug('fetch page info for URL', ['url' => $url, 'data' => $data]);
+		DI::logger()->debug('fetch page info for URL', ['url' => $url, 'data' => $data]);
 
 		return $data;
 	}
@@ -216,8 +220,11 @@ class PageInfo
 
 		$taglist = [];
 		foreach ($data['keywords'] as $keyword) {
-			$hashtag = str_replace([' ', '+', '/', '.', '#', "'"],
-				['', '', '', '', '', ''], $keyword);
+			$hashtag = str_replace(
+				[' ', '+', '/', '.', '#', "'"],
+				['', '', '', '', '', ''],
+				$keyword
+			);
 
 			$taglist[] = $hashtag;
 		}
@@ -271,7 +278,7 @@ class PageInfo
 	protected static function stripTrailingUrlFromBody(string $body, string $url): string
 	{
 		$quotedUrl = preg_quote($url, '#');
-		$body = preg_replace_callback("#(?:
+		$body      = preg_replace_callback("#(?:
 			\[url]$quotedUrl\[/url]|
 			\[url=$quotedUrl]$quotedUrl\[/url]|
 			\[url=$quotedUrl]([^[]*?)\[/url]|

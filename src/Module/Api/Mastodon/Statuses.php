@@ -7,9 +7,14 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\AppHelper;
+use Friendica\Content\Item as ContentItem;
 use Friendica\Content\PageInfo;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\Markdown;
+use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -22,17 +27,37 @@ use Friendica\Model\Photo;
 use Friendica\Model\Post;
 use Friendica\Model\Tag;
 use Friendica\Model\User;
+use Friendica\Module\Api\ApiResponse;
 use Friendica\Module\BaseApi;
+use Friendica\Navigation\Notifications\Repository\Notification;
+use Friendica\Navigation\Notifications\Repository\Notify;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
+use Friendica\Util\Profiler;
+use Psr\Log\LoggerInterface;
 
 /**
  * @see https://docs.joinmastodon.org/methods/statuses/
  */
 class Statuses extends BaseApi
 {
+	/** @var Notification */
+	protected $notification;
+	/** @var Notify */
+	protected $notify;
+	/** @var ContentItem */
+	protected $item;
+
+	public function __construct(ContentItem $item, Notify $notify, Notification $notification, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	{
+		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+		$this->notification = $notification;
+		$this->notify       = $notify;
+		$this->item         = $item;
+	}
+
 	public function put(array $request = [])
 	{
 		$this->checkAllowedScope(self::SCOPE_WRITE);
@@ -64,18 +89,18 @@ class Statuses extends BaseApi
 			throw new HTTPException\NotFoundException('Item with URI ID ' . $this->parameters['id'] . ' not found for user ' . $uid . '.');
 		}
 
-		$item['title']      = '';
-		$item['uid']        = $post['uid'];
-		$item['body']       = $this->formatStatus($request['status'], $uid);
-		$item['network']    = $post['network'];
-		$item['gravity']    = $post['gravity'];
-		$item['verb']       = $post['verb'];
-		$item['allow_cid']  = $post['allow_cid'];
-		$item['allow_gid']  = $post['allow_gid'];
-		$item['deny_cid']   = $post['deny_cid'];
-		$item['deny_gid']   = $post['deny_gid'];
-		$item['app']        = $this->getApp();
-		$item['sensitive']  = $request['sensitive'];
+		$item['title']     = '';
+		$item['uid']       = $post['uid'];
+		$item['body']      = $this->formatStatus($request['status'], $uid);
+		$item['network']   = $post['network'];
+		$item['gravity']   = $post['gravity'];
+		$item['verb']      = $post['verb'];
+		$item['allow_cid'] = $post['allow_cid'];
+		$item['allow_gid'] = $post['allow_gid'];
+		$item['deny_cid']  = $post['deny_cid'];
+		$item['deny_gid']  = $post['deny_gid'];
+		$item['app']       = $this->getApp();
+		$item['sensitive'] = $request['sensitive'];
 
 		if (!empty($request['language'])) {
 			$item['language'] = json_encode([$request['language'] => 1]);
@@ -91,7 +116,7 @@ class Statuses extends BaseApi
 			if (!isset($request['friendica']['title']) && $post['gravity'] == Item::GRAVITY_PARENT && DI::pConfig()->get($uid, 'system', 'api_spoiler_title', true)) {
 				$item['title'] = $spoiler_text;
 			} else {
-				$item['body'] = '[abstract=' . Protocol::ACTIVITYPUB . ']' . $spoiler_text . "[/abstract]\n" . $item['body'];
+				$item['body']            = '[abstract=' . Protocol::ACTIVITYPUB . ']' . $spoiler_text . "[/abstract]\n" . $item['body'];
 				$item['content-warning'] = BBCode::toPlaintext($spoiler_text);
 			}
 		}
@@ -112,7 +137,7 @@ class Statuses extends BaseApi
 		We can't do anything about this, but the probability for this is extremely low.
 		*/
 		$media_ids      = [];
-		$existing_media = array_column(Post\Media::getByURIId($post['uri-id'], [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE]), 'id');
+		$existing_media = array_column(Post\Media::getByURIId($post['uri-id'], [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE, Post\Media::HLS]), 'id');
 
 		foreach ($request['media_attributes'] as $attributes) {
 			if (!empty($attributes['id']) && in_array($attributes['id'], $existing_media)) {
@@ -306,8 +331,9 @@ class Statuses extends BaseApi
 		}
 
 		if (!empty($request['scheduled_at'])) {
-			$item['guid'] = Item::guid($item, true);
-			$item['uri'] = Item::newURI($item['guid']);
+			$item['guid'] = $this->item->guid($item, true);
+			$item['uri']  = Item::newURI($item['guid']);
+
 			$id = Post\Delayed::add($item['uri'], $item, Worker::PRIORITY_HIGH, Post\Delayed::PREPARED, DateTimeFormat::utc($request['scheduled_at']));
 			if (empty($id)) {
 				$this->logAndJsonError(500, $this->errorFactory->InternalError());
@@ -350,12 +376,24 @@ class Statuses extends BaseApi
 	/**
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	protected function rawContent(array $request = [])
+	protected function get(array $request = [])
 	{
 		$uid = self::getCurrentUserID();
 
 		if (empty($this->parameters['id'])) {
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
+		}
+
+		if ($uid != 0) {
+			if ($this->notification->existsForUser($uid, ['target-uri-id' => $this->parameters['id'], 'seen' => false])) {
+				$this->notification->setAllSeenForUser($uid, ['target-uri-id' => $this->parameters['id']]);
+			}
+			if ($this->notify->existsForUser($uid, ['uri-id' => $this->parameters['id'], 'seen' => false])) {
+				$this->notify->setAllSeenForUser($uid, ['uri-id' => $this->parameters['id']]);
+			}
+			if (Post::exists(['uri-id' => $this->parameters['id'], 'uid' => $uid, 'unseen' => true])) {
+				Post::update(['unseen' => false], ['uri-id' => $this->parameters['id'], 'uid' => $uid, 'unseen' => true]);
+			}
 		}
 
 		$this->jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, self::appSupportsQuotes(), false));
@@ -385,7 +423,7 @@ class Statuses extends BaseApi
 
 		foreach ($media_ids as $id) {
 			if (DI::mstdnAttachment()->isAttach($id) && Attach::exists(['id' => substr($id, 7)])) {
-				$attach = Attach::selectFirst([], ['id' => substr($id, 7)]);
+				$attach     = Attach::selectFirst([], ['id' => substr($id, 7)]);
 				$attachment = [
 					'type'     => Post\Media::getType($attach['filetype']),
 					'mimetype' => $attach['filetype'],
@@ -422,8 +460,8 @@ class Statuses extends BaseApi
 			];
 
 			if (count($media) > 1) {
-				$attachment['preview'] = DI::baseUrl() . '/photo/' . $media[1]['resource-id'] . '-' . $media[1]['scale'] . $ext;
-				$attachment['preview-width'] = $media[1]['width'];
+				$attachment['preview']        = DI::baseUrl() . '/photo/' . $media[1]['resource-id'] . '-' . $media[1]['scale'] . $ext;
+				$attachment['preview-width']  = $media[1]['width'];
 				$attachment['preview-height'] = $media[1]['height'];
 			}
 			$item['attachments'][] = $attachment;

@@ -8,7 +8,6 @@
 namespace Friendica\Core\Storage\Repository;
 
 use Exception;
-use Friendica\Core\Addon;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
@@ -20,7 +19,10 @@ use Friendica\Core\Storage\Capability\ICanConfigureStorage;
 use Friendica\Core\Storage\Capability\ICanWriteToStorage;
 use Friendica\Database\Database;
 use Friendica\Core\Storage\Type;
+use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Network\HTTPException\InternalServerErrorException;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -55,6 +57,7 @@ class StorageManager
 	private $config;
 	/** @var LoggerInterface */
 	private $logger;
+	private EventDispatcherInterface $eventDispatcher;
 	/** @var L10n */
 	private $l10n;
 
@@ -71,20 +74,21 @@ class StorageManager
 	 * @throws InvalidClassStorageException in case the active backend class is invalid
 	 * @throws StorageException in case of unexpected errors during the active backend class loading
 	 */
-	public function __construct(Database $dba, IManageConfigValues $config, LoggerInterface $logger, L10n $l10n, bool $includeAddon = true)
+	public function __construct(Database $dba, IManageConfigValues $config, LoggerInterface $logger, EventDispatcherInterface $eventDispatcher, L10n $l10n, bool $includeAddon = true)
 	{
-		$this->dba           = $dba;
-		$this->config        = $config;
-		$this->logger        = $logger;
-		$this->l10n          = $l10n;
-		$this->validBackends = $config->get('storage', 'backends', self::DEFAULT_BACKENDS);
+		$this->dba             = $dba;
+		$this->config          = $config;
+		$this->logger          = $logger;
+		$this->eventDispatcher = $eventDispatcher;
+		$this->l10n            = $l10n;
+		$this->validBackends   = $config->get('storage', 'backends', self::DEFAULT_BACKENDS);
 
 		$currentName = $this->config->get('storage', 'name');
 
 		/// @fixme Loading the addons & hooks here is really bad practice, but solves https://github.com/friendica/friendica/issues/11178
 		/// clean solution = Making Addon & Hook dynamic and load them inside the constructor, so there's no custom load logic necessary anymore
 		if ($includeAddon) {
-			Addon::loadAddons();
+			DI::addonHelper()->loadAddons();
 			Hook::loadHooks();
 		}
 
@@ -138,7 +142,7 @@ class StorageManager
 			// Try the filesystem backend
 			case Type\Filesystem::getName():
 				return new Type\FilesystemConfig($this->config, $this->l10n);
-			// try the database backend
+				// try the database backend
 			case Type\Database::getName():
 				return false;
 			default:
@@ -146,8 +150,12 @@ class StorageManager
 					'name'           => $name,
 					'storage_config' => null,
 				];
+
 				try {
-					Hook::callAll('storage_config', $data);
+					$data = $this->eventDispatcher->dispatch(
+						new ArrayFilterEvent(ArrayFilterEvent::STORAGE_CONFIG, $data),
+					)->getArray();
+
 					if (!($data['storage_config'] ?? null) instanceof ICanConfigureStorage) {
 						throw new InvalidClassStorageException(sprintf('Configuration for backend %s was not found', $name));
 					}
@@ -185,11 +193,11 @@ class StorageManager
 					$storageConfig                 = new Type\FilesystemConfig($this->config, $this->l10n);
 					$this->backendInstances[$name] = new Type\Filesystem($storageConfig->getStoragePath());
 					break;
-				// try the database backend
+					// try the database backend
 				case Type\Database::getName():
 					$this->backendInstances[$name] = new Type\Database($this->dba);
 					break;
-				// at least, try if there's an addon for the backend
+					// at least, try if there's an addon for the backend
 				case Type\SystemResource::getName():
 					$this->backendInstances[$name] = new Type\SystemResource();
 					break;
@@ -201,8 +209,12 @@ class StorageManager
 						'name'    => $name,
 						'storage' => null,
 					];
+
 					try {
-						Hook::callAll('storage_instance', $data);
+						$data = $this->eventDispatcher->dispatch(
+							new ArrayFilterEvent(ArrayFilterEvent::STORAGE_INSTANCE, $data),
+						)->getArray();
+
 						if (!($data['storage'] ?? null) instanceof ICanReadFromStorage) {
 							throw new InvalidClassStorageException(sprintf('Backend %s was not found', $name));
 						}
@@ -228,11 +240,13 @@ class StorageManager
 	 */
 	public function isValidBackend(string $name = null, array $validBackends = null): bool
 	{
-		$validBackends = $validBackends ?? array_merge($this->validBackends,
-				[
-					Type\SystemResource::getName(),
-					Type\ExternalResource::getName(),
-				]);
+		$validBackends = $validBackends ?? array_merge(
+			$this->validBackends,
+			[
+				Type\SystemResource::getName(),
+				Type\ExternalResource::getName(),
+			]
+		);
 		return in_array($name, $validBackends);
 	}
 
@@ -274,24 +288,24 @@ class StorageManager
 	 */
 	public function register(string $class): bool
 	{
-		if (is_subclass_of($class, ICanReadFromStorage::class)) {
-			/** @var ICanReadFromStorage $class */
-			if ($this->isValidBackend($class::getName(), $this->validBackends)) {
-				return true;
-			}
-
-			$backends   = $this->validBackends;
-			$backends[] = $class::getName();
-
-			if ($this->config->set('storage', 'backends', $backends)) {
-				$this->validBackends = $backends;
-				return true;
-			} else {
-				return false;
-			}
-		} else {
+		if (!is_subclass_of($class, ICanReadFromStorage::class)) {
 			return false;
 		}
+
+		/** @var class-string<ICanReadFromStorage> $class */
+		if ($this->isValidBackend($class::getName(), $this->validBackends)) {
+			return true;
+		}
+
+		$backends   = $this->validBackends;
+		$backends[] = $class::getName();
+
+		if ($this->config->set('storage', 'backends', $backends)) {
+			$this->validBackends = $backends;
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -305,30 +319,31 @@ class StorageManager
 	 */
 	public function unregister(string $class): bool
 	{
-		if (is_subclass_of($class, ICanReadFromStorage::class)) {
-			/** @var ICanReadFromStorage $class */
-			if ($this->currentBackend::getName() == $class::getName()) {
-				throw new StorageException(sprintf('Cannot unregister %s, because it\'s currently active.', $class::getName()));
-			}
-
-			$key = array_search($class::getName(), $this->validBackends);
-
-			if ($key !== false) {
-				$backends = $this->validBackends;
-				unset($backends[$key]);
-				$backends = array_values($backends);
-				if ($this->config->set('storage', 'backends', $backends)) {
-					$this->validBackends = $backends;
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				return true;
-			}
-		} else {
+		if (!is_subclass_of($class, ICanReadFromStorage::class)) {
 			return false;
 		}
+
+		/** @var class-string<ICanReadFromStorage> $class */
+		if ($this->currentBackend::getName() == $class::getName()) {
+			throw new StorageException(sprintf('Cannot unregister %s, because it\'s currently active.', $class::getName()));
+		}
+
+		$key = array_search($class::getName(), $this->validBackends);
+
+		if ($key === false) {
+			return true;
+		}
+
+		$backends = $this->validBackends;
+		unset($backends[$key]);
+		$backends = array_values($backends);
+
+		if ($this->config->set('storage', 'backends', $backends)) {
+			$this->validBackends = $backends;
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

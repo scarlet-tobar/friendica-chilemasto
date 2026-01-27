@@ -7,7 +7,7 @@
 
 namespace Friendica\Network\HTTPClient\Response;
 
-use Friendica\Core\Logger;
+use Friendica\DI;
 use Friendica\Network\HTTPClient\Capability\ICanHandleHttpResponses;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RedirectMiddleware;
@@ -65,7 +65,7 @@ class GuzzleResponse extends Response implements ICanHandleHttpResponses, Respon
 		}
 
 		if (!$this->isSuccess) {
-			Logger::debug('debug', ['info' => $this->getHeaders()]);
+			DI::logger()->debug('debug', ['info' => $this->getHeaders()]);
 		}
 
 		if (!$this->isSuccess && $this->errorNumber == CURLE_OPERATION_TIMEDOUT) {
@@ -100,7 +100,7 @@ class GuzzleResponse extends Response implements ICanHandleHttpResponses, Respon
 	/** {@inheritDoc} */
 	public function getReturnCode(): string
 	{
-		return $this->getStatusCode();
+		return (string) $this->getStatusCode();
 	}
 
 	/** {@inheritDoc} */

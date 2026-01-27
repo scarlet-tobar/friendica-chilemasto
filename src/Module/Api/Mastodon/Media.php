@@ -7,13 +7,13 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Model\Attach;
 use Friendica\Model\Contact;
 use Friendica\Model\Photo;
 use Friendica\Model\Post;
 use Friendica\Module\BaseApi;
+use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\Strings;
 
 /**
@@ -33,10 +33,10 @@ class Media extends BaseApi
 			'focus'       => '', // Two floating points (x,y), comma-delimited ranging from -1.0 to 1.0
 		], $request);
 
-		Logger::info('Photo post', ['request' => $request, 'files' => $_FILES]);
+		$this->logger->info('Photo post', ['request' => $request, 'files' => $_FILES]);
 
 		if (empty($request['file'])) {
-			Logger::notice('Upload is invalid', ['request' => $request]);
+			$this->logger->notice('Upload is invalid', ['request' => $request]);
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
@@ -44,12 +44,13 @@ class Media extends BaseApi
 
 		if (in_array($type, [Post\Media::IMAGE, Post\Media::UNKNOWN, Post\Media::APPLICATION])) {
 			$media = Photo::upload($uid, $request['file'], '', null, null, '', '', $request['description']);
-			if (!empty($media)) {
-				Logger::info('Uploaded photo', ['media' => $media]);
-				$this->jsonExit(DI::mstdnAttachment()->createFromPhoto($media['id']));
-			} elseif ($type == Post\Media::IMAGE) {
-				$this->jsonExit(DI::mstdnAttachment()->createFromPhoto($media['id']));
+
+			if (empty($media)) {
+				$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity('Error while uploading media.'));
 			}
+
+			$this->logger->info('Uploaded photo', ['media' => $media]);
+			$this->jsonExit(DI::mstdnAttachment()->createFromPhoto($media['id']));
 		}
 
 		$tempFileName = $request['file']['tmp_name'];
@@ -58,20 +59,20 @@ class Media extends BaseApi
 		$maxFileSize  = Strings::getBytesFromShorthand(DI::config()->get('system', 'maxfilesize'));
 
 		if ($fileSize <= 0) {
-			Logger::notice('Filesize is invalid', ['size' => $fileSize, 'request' => $request]);
+			$this->logger->notice('Filesize is invalid', ['size' => $fileSize, 'request' => $request]);
 			@unlink($tempFileName);
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
 		if ($maxFileSize && $fileSize > $maxFileSize) {
-			Logger::notice('Filesize is too large', ['size' => $fileSize, 'max' => $maxFileSize, 'request' => $request]);
+			$this->logger->notice('Filesize is too large', ['size' => $fileSize, 'max' => $maxFileSize, 'request' => $request]);
 			@unlink($tempFileName);
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
 		$id = Attach::storeFile($tempFileName, self::getCurrentUserID(), $fileName, $request['file']['type'], '<' . Contact::getPublicIdByUserId(self::getCurrentUserID()) . '>');
 		@unlink($tempFileName);
-		Logger::info('Uploaded media', ['id' => $id]);
+		$this->logger->info('Uploaded media', ['id' => $id]);
 		$this->jsonExit(DI::mstdnAttachment()->createFromAttach($id));
 	}
 
@@ -98,14 +99,24 @@ class Media extends BaseApi
 		$photo = Photo::selectFirst(['resource-id'], ['id' => $this->parameters['id'], 'uid' => $uid]);
 		if (empty($photo['resource-id'])) {
 			$media = Post\Media::getById($this->parameters['id']);
+
 			if (empty($media['uri-id'])) {
 				$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 			}
+
 			if (!Post::exists(['uri-id' => $media['uri-id'], 'uid' => $uid, 'origin' => true])) {
 				$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 			}
+
 			Post\Media::updateById(['description' => $request['description']], $this->parameters['id']);
-			$this->jsonExit(DI::mstdnAttachment()->createFromId($this->parameters['id']));
+
+			try {
+				$attachment = DI::mstdnAttachment()->createFromId($this->parameters['id'] . '1');
+			} catch (InternalServerErrorException $th) {
+				$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
+			}
+
+			$this->jsonExit($attachment);
 		}
 
 		Photo::update(['desc' => $request['description']], ['resource-id' => $photo['resource-id']]);
@@ -116,7 +127,7 @@ class Media extends BaseApi
 	/**
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	protected function rawContent(array $request = [])
+	protected function get(array $request = [])
 	{
 		$this->checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();

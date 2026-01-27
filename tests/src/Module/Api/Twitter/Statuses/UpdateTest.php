@@ -10,9 +10,9 @@ namespace Friendica\Test\src\Module\Api\Twitter\Statuses;
 use Friendica\App\Router;
 use Friendica\DI;
 use Friendica\Module\Api\Twitter\Statuses\Update;
-use Friendica\Test\src\Module\Api\ApiTest;
+use Friendica\Test\ApiTestCase;
 
-class UpdateTest extends ApiTest
+class UpdateTest extends ApiTestCase
 {
 	protected function setUp(): void
 	{
@@ -40,7 +40,7 @@ class UpdateTest extends ApiTest
 			]
 		];
 
-		$response = (new Update(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'status'                => 'Status content #friendica',
 				'in_reply_to_status_id' => 0,
@@ -62,7 +62,7 @@ class UpdateTest extends ApiTest
 	 */
 	public function testApiStatusesUpdateWithHtml()
 	{
-		$response = (new Update(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'htmlstatus' => '<b>Status content</b>',
 			]);

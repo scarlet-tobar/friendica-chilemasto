@@ -7,7 +7,6 @@
 
 namespace Friendica\Core;
 
-use Friendica\App;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Util\Strings;
@@ -41,7 +40,7 @@ class Hook
 	public static function loadHooks()
 	{
 		self::$hooks = [];
-		$stmt = DBA::select('hook', ['hook', 'file', 'function'], [], ['order' => ['priority' => 'desc', 'file']]);
+		$stmt        = DBA::select('hook', ['hook', 'file', 'function'], [], ['order' => ['priority' => 'desc', 'file']]);
 
 		while ($hook = DBA::fetch($stmt)) {
 			self::add($hook['hook'], $hook['file'], $hook['function']);
@@ -81,7 +80,7 @@ class Hook
 	 */
 	public static function register(string $hook, string $file, string $function, int $priority = 0)
 	{
-		$file = str_replace(DI::app()->getBasePath() . DIRECTORY_SEPARATOR, '', $file);
+		$file = str_replace(DI::appHelper()->getBasePath() . DIRECTORY_SEPARATOR, '', $file);
 
 		$condition = ['hook' => $hook, 'file' => $file, 'function' => $function];
 		if (DBA::exists('hook', $condition)) {
@@ -102,7 +101,7 @@ class Hook
 	 */
 	public static function unregister(string $hook, string $file, string $function): bool
 	{
-		$relative_file = str_replace(DI::app()->getBasePath() . DIRECTORY_SEPARATOR, '', $file);
+		$relative_file = str_replace(DI::appHelper()->getBasePath() . DIRECTORY_SEPARATOR, '', $file);
 
 		// This here is only needed for fixing a problem that existed on the develop branch
 		$condition = ['hook' => $hook, 'file' => $file, 'function' => $function];
@@ -172,8 +171,8 @@ class Hook
 	 * Use this function when you want to be able to allow a hook to manipulate
 	 * the provided data.
 	 *
-	 * @param string        $name of the hook to call
-	 * @param string|array &$data to transmit to the callback handler
+	 * @param string                $name of the hook to call
+	 * @param int|string|array|null $data to transmit to the callback handler
 	 * @return void
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
@@ -198,7 +197,7 @@ class Hook
 	public static function callSingle(string $name, array $hook, &$data = null)
 	{
 		// Don't run a theme's hook if the user isn't using the theme
-		if (strpos($hook[0], 'view/theme/') !== false && strpos($hook[0], 'view/theme/' . DI::app()->getCurrentTheme()) === false) {
+		if (strpos($hook[0], 'view/theme/') !== false && strpos($hook[0], 'view/theme/' . DI::appHelper()->getCurrentTheme()) === false) {
 			return;
 		}
 

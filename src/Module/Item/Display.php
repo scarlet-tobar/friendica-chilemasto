@@ -8,6 +8,7 @@
 namespace Friendica\Module\Item;
 
 use Friendica\App;
+use Friendica\AppHelper;
 use Friendica\BaseModule;
 use Friendica\Content\Conversation;
 use Friendica\Content\Item as ContentItem;
@@ -27,10 +28,11 @@ use Friendica\Module\Special\DisplayNotFound;
 use Friendica\Navigation\Notifications\Repository\Notification;
 use Friendica\Navigation\Notifications\Repository\Notify;
 use Friendica\Protocol\ActivityPub;
-use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Network\HTTPException;
 use Friendica\Content\Widget;
+use Friendica\Core\System;
+use Friendica\DI;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -46,8 +48,8 @@ class Display extends BaseModule
 	protected $pConfig;
 	/** @var IHandleUserSessions */
 	protected $session;
-	/** @var App */
-	protected $app;
+	/** @var AppHelper */
+	protected $appHelper;
 	/** @var ContentItem */
 	protected $contentItem;
 	/** @var Conversation */
@@ -57,7 +59,7 @@ class Display extends BaseModule
 	/** @var Notify */
 	protected $notify;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, IHandleUserSessions $session, App $app, App\Page $page, ContentItem $contentItem, Conversation $conversation, Notification $notification, Notify $notify, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, IHandleUserSessions $session, AppHelper $appHelper, App\Page $page, ContentItem $contentItem, Conversation $conversation, Notification $notification, Notify $notify, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -65,7 +67,7 @@ class Display extends BaseModule
 		$this->config       = $config;
 		$this->pConfig      = $pConfig;
 		$this->session      = $session;
-		$this->app          = $app;
+		$this->appHelper    = $appHelper;
 		$this->contentItem  = $contentItem;
 		$this->conversation = $conversation;
 		$this->notification = $notification;
@@ -87,7 +89,9 @@ class Display extends BaseModule
 		$item    = null;
 		$itemUid = $this->session->getLocalUserId();
 
-		$fields = ['uri-id', 'parent-uri-id', 'author-id', 'author-link', 'body', 'uid', 'guid', 'gravity'];
+		$fields = ['uri-id', 'parent-uri-id', 'author-id', 'author-link', 'contact-id', 'contact-contact-type', 'body', 'uid', 'guid', 'gravity',
+			'plink', 'origin', 'uri', 'post-reason', 'owner-contact-type', 'owner-network', 'owner-id', 'guid',
+			'author-network', 'author-alias', 'private'];
 
 		// Does the local user have this item?
 		if ($this->session->getLocalUserId()) {
@@ -120,8 +124,14 @@ class Display extends BaseModule
 
 		if (empty($item)) {
 			$this->page['aside'] = '';
-			$displayNotFound = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
+			$displayNotFound     = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
 			return $displayNotFound->content();
+		}
+
+		$plink = Item::getPlink($item);
+
+		if (!$this->session->getLocalUserId() && isset($plink['href']) && !DI::baseUrl()->isLocalUrl($plink['href'])) {
+			System::externalRedirect($plink['href']);
 		}
 
 		if ($item['gravity'] != Item::GRAVITY_PARENT) {
@@ -150,6 +160,9 @@ class Display extends BaseModule
 
 		$output .= $this->getDisplayData($item);
 
+		$author              = Contact::getByURLForUser($item['author-link'], $this->session->getLocalUserId());
+		$this->page['title'] = $this->l10n->t("Post by %s", $author['name']);
+
 		return $output;
 	}
 
@@ -165,22 +178,27 @@ class Display extends BaseModule
 	 */
 	protected function displaySidebar(array $item)
 	{
+		$author = [];
 		$shared = $this->contentItem->getSharedPost($item, ['author-link']);
-		if (!empty($shared) && empty($shared['comment'])) {
+		if (array_key_exists('comment', $shared) && strval($shared['comment']) === '') {
 			$author = Contact::getByURLForUser($shared['post']['author-link'], $this->session->getLocalUserId());
 		}
 
-		if (empty($contact)) {
-			$author = Contact::getById($item['author-id']);
+		if ($author === []) {
+			if ($item['contact-contact-type'] == Contact::TYPE_COMMUNITY) {
+				$author = Contact::getById($item['contact-id']);
+			} else {
+				$author = Contact::getById($item['author-id']);
+			}
 		}
 
 		if ($this->baseUrl->isLocalUrl($author['url'])) {
-			Profile::load($this->app, $author['nick'], false);
+			Profile::load($this->appHelper, $author['nick'], false);
 		} else {
 			$this->page['aside'] = Widget\VCard::getHTML($author);
 		}
 
-		$this->app->setProfileOwner($item['uid']);
+		$this->appHelper->setProfileOwner($item['uid']);
 	}
 
 	protected function getDisplayData(array $item, bool $update = false, int $updateUid = 0, bool $force = false): string
@@ -193,7 +211,7 @@ class Display extends BaseModule
 		}
 
 		if (!empty($parent)) {
-			$pageUid         = $parent['uid'];
+			$pageUid = $parent['uid'];
 			if ($this->session->getRemoteContactID($pageUid)) {
 				$itemUid = $parent['uid'];
 			}
@@ -235,7 +253,7 @@ class Display extends BaseModule
 
 		if (empty($item)) {
 			$this->page['aside'] = '';
-			$displayNotFound = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
+			$displayNotFound     = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
 			return $displayNotFound->content();
 		}
 

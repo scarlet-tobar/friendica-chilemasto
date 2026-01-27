@@ -74,13 +74,13 @@ class Community extends Timeline
 
 		$t = Renderer::getMarkupTemplate("community.tpl");
 		$o = Renderer::replaceMacros($t, [
-			'$content' => '',
-			'$header' => '',
+			'$content'                    => '',
+			'$header'                     => '',
 			'$show_global_community_hint' => ($this->selectedTab == CommunityEntity::GLOBAL) && $this->config->get('system', 'show_global_community_hint'),
-			'$global_community_hint' => $this->l10n->t("This community stream shows all public posts received by this node. They may not reflect the opinions of this node’s users.")
+			'$global_community_hint'      => $this->l10n->t("This community stream shows all public posts received by this node. They may not reflect the opinions of this node’s users.")
 		]);
 
-		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll')) {
+		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
 			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
 			$o .= Renderer::replaceMacros($tpl, ['$reload_uri' => $this->args->getQueryString()]);
 		}
@@ -88,7 +88,7 @@ class Community extends Timeline
 		if (!$this->raw) {
 			$tabs    = $this->getTabArray($this->community->getTimelines($this->session->isAuthenticated()), 'community');
 			$tab_tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
-			$o .= Renderer::replaceMacros($tab_tpl, ['$tabs' => $tabs]);
+			$o .= Renderer::replaceMacros($tab_tpl, ['$tabs' => $tabs, '$more' => $this->l10n->t('More')]);
 
 			Nav::setSelected('community');
 
@@ -111,7 +111,9 @@ class Community extends Timeline
 		$items = $this->getCommunityItems();
 
 		if (!$this->database->isResult($items)) {
-			$this->systemMessages->addNotice($this->l10n->t('No results.'));
+			$o .= Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
+				'$title' => $this->l10n->t('No results.')
+			]);
 			return $o;
 		}
 
@@ -125,7 +127,7 @@ class Community extends Timeline
 			$this->itemsPerPage
 		);
 
-		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll')) {
+		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
 			$o .= HTML::scrollLoader();
 		} else {
 			$o .= $pager->renderMinimal(count($items));
@@ -185,7 +187,7 @@ class Community extends Timeline
 			}
 		}
 
-		$this->maxId = $request['last_received'] ?? $this->maxId;
+		$this->maxId = $request['last_received']  ?? $this->maxId;
 		$this->minId = $request['first_received'] ?? $this->minId;
 	}
 }

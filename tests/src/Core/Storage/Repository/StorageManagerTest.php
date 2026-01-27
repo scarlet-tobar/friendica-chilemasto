@@ -21,29 +21,24 @@ use Friendica\Core\Storage\Repository\StorageManager;
 use Friendica\Core\Storage\Type\Filesystem;
 use Friendica\Core\Storage\Type\SystemResource;
 use Friendica\Database\Database;
-use Friendica\Database\Definition\DbaDefinition;
-use Friendica\Database\Definition\ViewDefinition;
 use Friendica\DI;
 use Friendica\Core\Config\Factory\Config;
+use Friendica\Core\Hooks\HookEventBridge;
 use Friendica\Core\Storage\Type;
-use Friendica\Test\DatabaseTest;
+use Friendica\Test\DatabaseTestCase;
 use Friendica\Test\Util\CreateDatabaseTrait;
 use Friendica\Test\Util\Database\StaticDatabase;
-use Friendica\Test\Util\VFSTrait;
-use Friendica\Util\Profiler;
+use Friendica\Test\Util\FakeEventDispatcher;
 use org\bovigo\vfs\vfsStream;
-use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Friendica\Test\Util\SampleStorageBackend;
 
-class StorageManagerTest extends DatabaseTest
+class StorageManagerTest extends DatabaseTestCase
 {
 	use CreateDatabaseTrait;
 
 	/** @var IManageConfigValues */
 	private $config;
-	/** @var LoggerInterface */
-	private $logger;
 	/** @var L10n */
 	private $l10n;
 
@@ -60,12 +55,14 @@ class StorageManagerTest extends DatabaseTest
 
 		vfsStream::newDirectory(Type\FilesystemConfig::DEFAULT_BASE_FOLDER, 0777)->at($this->root);
 
-		$this->logger = new NullLogger();
 		$this->database = $this->getDbInstance();
 
 		$configFactory     = new Config();
-		$configFileManager = $configFactory->createConfigFileManager($this->root->url());
-		$configCache       = $configFactory->createCache($configFileManager);
+		$configFileManager = $configFactory->createConfigFileManager(
+			$this->root->url(),
+			$this->root->url() . '/addon',
+		);
+		$configCache = $configFactory->createCache($configFileManager);
 
 		$this->config = new \Friendica\Core\Config\Model\DatabaseConfig($this->database, $configCache);
 		$this->config->set('storage', 'name', 'Database');
@@ -88,7 +85,14 @@ class StorageManagerTest extends DatabaseTest
 	 */
 	public function testInstance()
 	{
-		$storageManager = new StorageManager($this->database, $this->config, $this->logger, $this->l10n, false);
+		$storageManager = new StorageManager(
+			$this->database,
+			$this->config,
+			new NullLogger(),
+			new FakeEventDispatcher(),
+			$this->l10n,
+			false
+		);
 
 		self::assertInstanceOf(StorageManager::class, $storageManager);
 	}
@@ -96,21 +100,21 @@ class StorageManagerTest extends DatabaseTest
 	public function dataStorages()
 	{
 		return [
-			'empty'          => [
+			'empty' => [
 				'name'       => '',
 				'valid'      => false,
 				'interface'  => ICanReadFromStorage::class,
 				'assert'     => null,
 				'assertName' => '',
 			],
-			'database'       => [
+			'database' => [
 				'name'       => Type\Database::NAME,
 				'valid'      => true,
 				'interface'  => ICanWriteToStorage::class,
 				'assert'     => Type\Database::class,
 				'assertName' => Type\Database::NAME,
 			],
-			'filesystem'     => [
+			'filesystem' => [
 				'name'       => Filesystem::NAME,
 				'valid'      => true,
 				'interface'  => ICanWriteToStorage::class,
@@ -124,7 +128,7 @@ class StorageManagerTest extends DatabaseTest
 				'assert'     => SystemResource::class,
 				'assertName' => SystemResource::NAME,
 			],
-			'invalid'        => [
+			'invalid' => [
 				'name'        => 'invalid',
 				'valid'       => false,
 				'interface'   => null,
@@ -150,7 +154,14 @@ class StorageManagerTest extends DatabaseTest
 			$this->config->set('storage', 'name', $name);
 		}
 
-		$storageManager = new StorageManager($this->database, $this->config, $this->logger, $this->l10n, false);
+		$storageManager = new StorageManager(
+			$this->database,
+			$this->config,
+			new NullLogger(),
+			new FakeEventDispatcher(),
+			$this->l10n,
+			false
+		);
 
 		if ($interface === ICanWriteToStorage::class) {
 			$storage = $storageManager->getWritableStorageByName($name);
@@ -170,7 +181,14 @@ class StorageManagerTest extends DatabaseTest
 	 */
 	public function testIsValidBackend($name, $valid, $interface, $assert, $assertName)
 	{
-		$storageManager = new StorageManager($this->database, $this->config, $this->logger, $this->l10n, false);
+		$storageManager = new StorageManager(
+			$this->database,
+			$this->config,
+			new NullLogger(),
+			new FakeEventDispatcher(),
+			$this->l10n,
+			false
+		);
 
 		// true in every of the backends
 		self::assertEquals(!empty($assertName), $storageManager->isValidBackend($name));
@@ -184,7 +202,14 @@ class StorageManagerTest extends DatabaseTest
 	 */
 	public function testListBackends()
 	{
-		$storageManager = new StorageManager($this->database, $this->config, $this->logger, $this->l10n, false);
+		$storageManager = new StorageManager(
+			$this->database,
+			$this->config,
+			new NullLogger(),
+			new FakeEventDispatcher(),
+			$this->l10n,
+			false
+		);
 
 		self::assertEquals(StorageManager::DEFAULT_BACKENDS, $storageManager->listBackends());
 	}
@@ -200,7 +225,14 @@ class StorageManagerTest extends DatabaseTest
 			static::markTestSkipped('only works for ICanWriteToStorage');
 		}
 
-		$storageManager = new StorageManager($this->database, $this->config, $this->logger, $this->l10n, false);
+		$storageManager = new StorageManager(
+			$this->database,
+			$this->config,
+			new NullLogger(),
+			new FakeEventDispatcher(),
+			$this->l10n,
+			false
+		);
 
 		$selBackend = $storageManager->getWritableStorageByName($name);
 		$storageManager->setBackend($selBackend);
@@ -220,7 +252,14 @@ class StorageManagerTest extends DatabaseTest
 			$this->expectException(InvalidClassStorageException::class);
 		}
 
-		$storageManager = new StorageManager($this->database, $this->config, $this->logger, $this->l10n, false);
+		$storageManager = new StorageManager(
+			$this->database,
+			$this->config,
+			new NullLogger(),
+			new FakeEventDispatcher(),
+			$this->l10n,
+			false
+		);
 
 		self::assertInstanceOf($assert, $storageManager->getBackend());
 	}
@@ -241,7 +280,14 @@ class StorageManagerTest extends DatabaseTest
 			->addRule(IHandleSessions::class, ['instanceOf' => Memory::class, 'shared' => true, 'call' => null]);
 		DI::init($dice);
 
-		$storageManager = new StorageManager($this->database, $this->config, $this->logger, $this->l10n, false);
+		$storageManager = new StorageManager(
+			$this->database,
+			$this->config,
+			new NullLogger(),
+			new FakeEventDispatcher(),
+			$this->l10n,
+			false
+		);
 
 		self::assertTrue($storageManager->register(SampleStorageBackend::class));
 
@@ -269,7 +315,21 @@ class StorageManagerTest extends DatabaseTest
 			->addRule(IHandleSessions::class, ['instanceOf' => Memory::class, 'shared' => true, 'call' => null]);
 		DI::init($dice);
 
-		$storageManager = new StorageManager($this->database, $this->config, $this->logger, $this->l10n, false);
+		/** @var \Friendica\Event\EventDispatcher */
+		$eventDispatcher = DI::eventDispatcher();
+
+		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {
+			$eventDispatcher->addListener($eventName, [HookEventBridge::class, $methodName]);
+		}
+
+		$storageManager = new StorageManager(
+			$this->database,
+			$this->config,
+			new NullLogger(),
+			$eventDispatcher,
+			$this->l10n,
+			false
+		);
 
 		self::assertTrue($storageManager->register(SampleStorageBackend::class));
 
@@ -308,8 +368,15 @@ class StorageManagerTest extends DatabaseTest
 
 		$this->loadFixture(__DIR__ . '/../../../../datasets/storage/database.fixture.php', $this->database);
 
-		$storageManager = new StorageManager($this->database, $this->config, $this->logger, $this->l10n, false);
-		$storage        = $storageManager->getWritableStorageByName($name);
+		$storageManager = new StorageManager(
+			$this->database,
+			$this->config,
+			new NullLogger(),
+			new FakeEventDispatcher(),
+			$this->l10n,
+			false
+		);
+		$storage = $storageManager->getWritableStorageByName($name);
 		$storageManager->move($storage);
 
 		$photos = $this->database->select('photo', ['backend-ref', 'backend-class', 'id', 'data']);
@@ -332,8 +399,15 @@ class StorageManagerTest extends DatabaseTest
 		$this->expectException(InvalidClassStorageException::class);
 		$this->expectExceptionMessage('Backend SystemResource is not valid');
 
-		$storageManager = new StorageManager($this->database, $this->config, $this->logger, $this->l10n, false);
-		$storage        = $storageManager->getWritableStorageByName(SystemResource::getName());
+		$storageManager = new StorageManager(
+			$this->database,
+			$this->config,
+			new NullLogger(),
+			new FakeEventDispatcher(),
+			$this->l10n,
+			false
+		);
+		$storage = $storageManager->getWritableStorageByName(SystemResource::getName());
 		$storageManager->move($storage);
 	}
 }

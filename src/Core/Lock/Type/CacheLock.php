@@ -7,7 +7,6 @@
 
 namespace Friendica\Core\Lock\Type;
 
-use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Cache\Capability\ICanCacheInMemory;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Cache\Exception\CachePersistenceException;
@@ -16,12 +15,14 @@ use Friendica\Core\Lock\Exception\LockPersistenceException;
 class CacheLock extends AbstractLock
 {
 	/**
-	 * @var string The static prefix of all locks inside the cache
+	 * The static prefix of all locks inside the cache
+	 *
+	 * @var string
 	 */
 	const CACHE_PREFIX = 'lock:';
 
 	/**
-	 * @var ICanCache;
+	 * @var ICanCacheInMemory
 	 */
 	private $cache;
 
@@ -152,6 +153,16 @@ class CacheLock extends AbstractLock
 		}
 
 		return $success;
+	}
+
+	/**
+	 * Returns stats about the cache provider
+	 *
+	 * @return array
+	 */
+	public function getCacheStats(): array
+	{
+		return $this->cache->getStats();
 	}
 
 	/**

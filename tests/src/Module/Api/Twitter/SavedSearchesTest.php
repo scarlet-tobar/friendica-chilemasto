@@ -10,13 +10,13 @@ namespace Friendica\Test\src\Module\Api\Twitter;
 use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\DI;
 use Friendica\Module\Api\Twitter\SavedSearches;
-use Friendica\Test\src\Module\Api\ApiTest;
+use Friendica\Test\ApiTestCase;
 
-class SavedSearchesTest extends ApiTest
+class SavedSearchesTest extends ApiTestCase
 {
 	public function test()
 	{
-		$response = (new SavedSearches(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		$response = (new SavedSearches(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
 			->run($this->httpExceptionMock);
 
 		$result = $this->toJson($response);

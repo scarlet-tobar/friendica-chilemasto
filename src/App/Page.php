@@ -11,23 +11,24 @@ use ArrayAccess;
 use DOMDocument;
 use DOMXPath;
 use Friendica\App;
+use Friendica\AppHelper;
 use Friendica\Content\Nav;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Model\UserSession;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
-use Friendica\Module\Response;
+use Friendica\DI;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Images;
 use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
 use GuzzleHttp\Psr7\Utils;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -70,6 +71,8 @@ class Page implements ArrayAccess
 	 */
 	private $basePath;
 
+	private EventDispatcherInterface $eventDispatcher;
+
 	private $timestamp = 0;
 	private $method    = '';
 	private $module    = '';
@@ -78,10 +81,11 @@ class Page implements ArrayAccess
 	/**
 	 * @param string $basepath The Page basepath
 	 */
-	public function __construct(string $basepath)
+	public function __construct(string $basepath, EventDispatcherInterface $eventDispatcher)
 	{
-		$this->timestamp = microtime(true);
-		$this->basePath = $basepath;
+		$this->timestamp       = microtime(true);
+		$this->basePath        = $basepath;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	public function setLogging(string $method, string $module, string $command)
@@ -102,7 +106,7 @@ class Page implements ArrayAccess
 		$load      = number_format(System::currentLoad(), 2);
 		$runtime   = number_format(microtime(true) - $this->timestamp, 3);
 		if ($runtime > $config->get('system', 'runtime_loglimit')) {
-			Logger::debug('Runtime', ['method' => $this->method, 'module' => $this->module, 'runtime' => $runtime, 'load' => $load, 'origin' => $origin, 'signature' => $signature, 'request' => $_SERVER['REQUEST_URI'] ?? '']);
+			DI::logger()->debug('Runtime', ['method' => $this->method, 'module' => $this->module, 'runtime' => $runtime, 'load' => $load, 'origin' => $origin, 'signature' => $signature, 'request' => $_SERVER['REQUEST_URI'] ?? '']);
 		}
 	}
 
@@ -176,40 +180,34 @@ class Page implements ArrayAccess
 	 * - Infinite scroll data
 	 * - head.tpl template
 	 *
-	 * @param App                         $app      The Friendica App instance
-	 * @param Arguments                   $args     The Friendica App Arguments
-	 * @param L10n                        $l10n     The l10n language instance
-	 * @param IManageConfigValues         $config   The Friendica configuration
-	 * @param IManagePersonalConfigValues $pConfig  The Friendica personal configuration (for user)
-	 * @param int                         $localUID The local user id
+	 * @param Arguments                   $args      The Friendica App Arguments
+	 * @param L10n                        $l10n      The l10n language instance
+	 * @param IManageConfigValues         $config    The Friendica configuration
+	 * @param IManagePersonalConfigValues $pConfig   The Friendica personal configuration (for user)
+	 * @param int                         $localUID  The local user id
 	 *
 	 * @throws HTTPException\InternalServerErrorException
 	 */
-	private function initHead(App $app, Arguments $args, L10n $l10n, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, int $localUID)
-	{
-		$interval = ($localUID ? $pConfig->get($localUID, 'system', 'update_interval') : 40000);
-
-		// If the update is 'deactivated' set it to the highest integer number (~24 days)
-		if ($interval < 0) {
-			$interval = 2147483647;
-		}
-
-		if ($interval < 10000) {
-			$interval = 40000;
-		}
-
+	private function initHead(
+		AppHelper $appHelper,
+		Arguments $args,
+		L10n $l10n,
+		IManageConfigValues $config,
+		IManagePersonalConfigValues $pConfig,
+		int $localUID
+	) {
 		// Default title: current module called
 		if (empty($this->page['title']) && $args->getModuleName()) {
-			$this->page['title'] = ucfirst($args->getModuleName());
+			$this->page['title'] = $l10n->t(ucfirst($args->getModuleName()));
 		}
 
-		// Prepend the sitename to the page title
-		$this->page['title'] = $config->get('config', 'sitename', '') . (!empty($this->page['title']) ? ' | ' . $this->page['title'] : '');
+		// Append the sitename to the page title
+		$this->page['title'] = (!empty($this->page['title']) ? $this->page['title'] . ' | ' : '') . $config->get('config', 'sitename', '');
 
 		if (!empty(Renderer::$theme['stylesheet'])) {
 			$stylesheet = Renderer::$theme['stylesheet'];
 		} else {
-			$stylesheet = $app->getCurrentThemeStylesheetPath();
+			$stylesheet = $appHelper->getCurrentThemeStylesheetPath();
 		}
 
 		$this->registerStylesheet($stylesheet);
@@ -224,7 +222,9 @@ class Page implements ArrayAccess
 			$touch_icon = 'images/friendica-192.png';
 		}
 
-		Hook::callAll('head', $this->page['htmlhead']);
+		$this->page['htmlhead'] = $this->eventDispatcher->dispatch(
+			new HtmlFilterEvent(HtmlFilterEvent::HEAD, $this->page['htmlhead'])
+		)->getHtml();
 
 		$tpl = Renderer::getMarkupTemplate('head.tpl');
 		/* put the head template at the beginning of page['htmlhead']
@@ -261,13 +261,13 @@ class Page implements ArrayAccess
 				'dictMaxFilesExceeded'         => $l10n->t("You can't upload any more files."),
 			],
 
-			'$local_user'      => $localUID,
-			'$generator'       => 'Friendica' . ' ' . App::VERSION,
-			'$update_interval' => $interval,
-			'$shortcut_icon'   => $shortcut_icon,
-			'$touch_icon'      => $touch_icon,
-			'$block_public'    => intval($config->get('system', 'block_public')),
-			'$stylesheets'     => $this->stylesheets,
+			'$local_user'     => $localUID,
+			'$generator'      => 'Friendica' . ' ' . App::VERSION,
+			'$update_content' => (int)$pConfig->get($localUID, 'system', 'update_content'),
+			'$shortcut_icon'  => $shortcut_icon,
+			'$touch_icon'     => $touch_icon,
+			'$block_public'   => intval($config->get('system', 'block_public')),
+			'$stylesheets'    => $this->stylesheets,
 
 			// Dropzone
 			'$max_imagesize' => round(Images::getMaxUploadBytes() / 1000000, 0),
@@ -313,7 +313,6 @@ class Page implements ArrayAccess
 	 * - Registered footer scripts (through App->registerFooterScript())
 	 * - footer.tpl template
 	 *
-	 * @param App  $app  The Friendica App instance
 	 * @param Mode $mode The Friendica runtime mode
 	 * @param L10n $l10n The l10n instance
 	 *
@@ -347,11 +346,14 @@ class Page implements ArrayAccess
 			]);
 		}
 
-		Hook::callAll('footer', $this->page['footer']);
+		$this->page['footer'] = $this->eventDispatcher->dispatch(
+			new HtmlFilterEvent(HtmlFilterEvent::FOOTER, $this->page['footer'])
+		)->getHtml();
 
 		$tpl                  = Renderer::getMarkupTemplate('footer.tpl');
 		$this->page['footer'] = Renderer::replaceMacros($tpl, [
 			'$footerScripts' => array_unique($this->footerScripts),
+			'$close'         => $l10n->t('Close'),
 		]) . $this->page['footer'];
 	}
 
@@ -371,7 +373,9 @@ class Page implements ArrayAccess
 	{
 		// initialise content region
 		if ($mode->isNormal()) {
-			Hook::callAll('page_content_top', $this->page['content']);
+			$this->page['content'] = $this->eventDispatcher->dispatch(
+				new HtmlFilterEvent(HtmlFilterEvent::PAGE_CONTENT_TOP, $this->page['content'])
+			)->getHtml();
 		}
 
 		$this->page['content'] .= (string)$response->getBody();
@@ -399,23 +403,34 @@ class Page implements ArrayAccess
 	/**
 	 * Executes the creation of the current page and prints it to the screen
 	 *
-	 * @param App                         $app      The Friendica App
-	 * @param BaseURL                     $baseURL  The Friendica Base URL
-	 * @param Arguments                   $args     The Friendica App arguments
-	 * @param Mode                        $mode     The current node mode
-	 * @param ResponseInterface           $response The Response of the module class, including type, content & headers
-	 * @param L10n                        $l10n     The l10n language class
+	 * @param BaseURL                     $baseURL   The Friendica Base URL
+	 * @param Arguments                   $args      The Friendica App arguments
+	 * @param Mode                        $mode      The current node mode
+	 * @param ResponseInterface           $response  The Response of the module class, including type, content & headers
+	 * @param L10n                        $l10n      The l10n language class
 	 * @param Profiler                    $profiler
-	 * @param IManageConfigValues         $config   The Configuration of this node
-	 * @param IManagePersonalConfigValues $pconfig  The personal/user configuration
+	 * @param IManageConfigValues         $config    The Configuration of this node
+	 * @param IManagePersonalConfigValues $pconfig   The personal/user configuration
 	 * @param Nav                         $nav
 	 * @param int                         $localUID
 	 * @throws HTTPException\MethodNotAllowedException
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws HTTPException\ServiceUnavailableException
 	 */
-	public function run(App $app, UserSession $session, BaseURL $baseURL, Arguments $args, Mode $mode, ResponseInterface $response, L10n $l10n, Profiler $profiler, IManageConfigValues $config, IManagePersonalConfigValues $pconfig, Nav $nav, int $localUID)
-	{
+	public function run(
+		AppHelper $appHelper,
+		UserSession $session,
+		BaseURL $baseURL,
+		Arguments $args,
+		Mode $mode,
+		ResponseInterface $response,
+		L10n $l10n,
+		Profiler $profiler,
+		IManageConfigValues $config,
+		IManagePersonalConfigValues $pconfig,
+		Nav $nav,
+		int $localUID
+	) {
 		$moduleName = $args->getModuleName();
 
 		$this->command = $moduleName;
@@ -430,7 +445,7 @@ class Page implements ArrayAccess
 		$this->initContent($response, $mode);
 
 		// Load current theme info after module has been initialized as theme could have been set in module
-		$currentTheme = $app->getCurrentTheme();
+		$currentTheme    = $appHelper->getCurrentTheme();
 		$theme_info_file = 'view/theme/' . $currentTheme . '/theme.php';
 		if (file_exists($theme_info_file)) {
 			require_once $theme_info_file;
@@ -438,7 +453,7 @@ class Page implements ArrayAccess
 
 		if (function_exists(str_replace('-', '_', $currentTheme) . '_init')) {
 			$func = str_replace('-', '_', $currentTheme) . '_init';
-			$func($app);
+			$func($appHelper);
 		}
 
 		/* Create the page head after setting the language
@@ -448,7 +463,7 @@ class Page implements ArrayAccess
 		 * all the module functions have executed so that all
 		 * theme choices made by the modules can take effect.
 		 */
-		$this->initHead($app, $args, $l10n, $config, $pconfig, $localUID);
+		$this->initHead($appHelper, $args, $l10n, $config, $pconfig, $localUID);
 
 		/* Build the page ending -- this is stuff that goes right before
 		 * the closing </body> tag
@@ -458,13 +473,15 @@ class Page implements ArrayAccess
 		$profiler->set(microtime(true) - $timestamp, 'aftermath');
 
 		if (!$mode->isAjax()) {
-			Hook::callAll('page_end', $this->page['content']);
+			$this->page['content'] = $this->eventDispatcher->dispatch(
+				new HtmlFilterEvent(HtmlFilterEvent::PAGE_END, $this->page['content'])
+			)->getHtml();
 		}
 
 		// Add the navigation (menu) template
 		if ($moduleName != 'install' && $moduleName != 'maintenance') {
 			$this->page['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('nav_head.tpl'), []);
-			$this->page['nav']      = $nav->getHtml();
+			$this->page['nav'] = $nav->getHtml();
 		}
 
 		// Build the page - now that we have all the components
@@ -497,7 +514,7 @@ class Page implements ArrayAccess
 			}
 		}
 
-		$page    = $this->page;
+		$page = $this->page;
 
 		// add and escape some common but crucial content for direct "echo" in HTML (security)
 		$page['title']   = htmlspecialchars($page['title'] ?? '');
@@ -534,7 +551,7 @@ class Page implements ArrayAccess
 		}
 
 		// Theme templates expect $a as an App instance
-		$a = $app;
+		$a = $appHelper;
 
 		// Used as is in view/php/default.php
 		$lang = $l10n->getCurrentLang();

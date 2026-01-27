@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (C) 2010-2024, the Friendica project
  * SPDX-FileCopyrightText: 2010-2024 the Friendica project
@@ -7,7 +8,6 @@
  *
  */
 
-use Friendica\App;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -15,7 +15,7 @@ use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
 
-function lostpass_post(App $a)
+function lostpass_post()
 {
 	$loginame = trim($_POST['login-name']);
 	if (!$loginame) {
@@ -23,7 +23,7 @@ function lostpass_post(App $a)
 	}
 
 	$condition = ['(`email` = ? OR `nickname` = ?) AND `verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired`', $loginame, $loginame];
-	$user = DBA::selectFirst('user', ['uid', 'username', 'nickname', 'email', 'language'], $condition);
+	$user      = DBA::selectFirst('user', ['uid', 'username', 'nickname', 'email', 'language'], $condition);
 	if (!DBA::isResult($user)) {
 		DI::sysmsg()->addNotice(DI::l10n()->t('No valid account found.'));
 		DI::baseUrl()->redirect();
@@ -32,7 +32,7 @@ function lostpass_post(App $a)
 	$pwdreset_token = Strings::getRandomHex(32);
 
 	$fields = [
-		'pwdreset' => hash('sha256', $pwdreset_token),
+		'pwdreset'      => hash('sha256', $pwdreset_token),
 		'pwdreset_time' => DateTimeFormat::utcNow()
 	];
 	$result = DBA::update('user', $fields, ['uid' => $user['uid']]);
@@ -40,7 +40,7 @@ function lostpass_post(App $a)
 		DI::sysmsg()->addInfo(DI::l10n()->t('Password reset request issued. Check your email.'));
 	}
 
-	$sitename = DI::config()->get('config', 'sitename');
+	$sitename  = DI::config()->get('config', 'sitename');
 	$resetlink = DI::baseUrl() . '/lostpass/' . $pwdreset_token;
 
 	$preamble = Strings::deindent(DI::l10n()->t('
@@ -78,7 +78,7 @@ function lostpass_post(App $a)
 	DI::baseUrl()->redirect();
 }
 
-function lostpass_content(App $a)
+function lostpass_content()
 {
 	if (DI::args()->getArgc() > 1) {
 		$pwdreset_token = DI::args()->getArgv()[1];
@@ -93,7 +93,7 @@ function lostpass_content(App $a)
 		// Password reset requests expire in 60 minutes
 		if ($user['pwdreset_time'] < DateTimeFormat::utc('now - 1 hour')) {
 			$fields = [
-				'pwdreset' => null,
+				'pwdreset'      => null,
 				'pwdreset_time' => null
 			];
 			DBA::update('user', $fields, ['uid' => $user['uid']]);
@@ -112,11 +112,11 @@ function lostpass_content(App $a)
 function lostpass_form()
 {
 	$tpl = Renderer::getMarkupTemplate('lostpass.tpl');
-	$o = Renderer::replaceMacros($tpl, [
-		'$title' => DI::l10n()->t('Forgot your Password?'),
-		'$desc' => DI::l10n()->t('Enter your email address and submit to have your password reset. Then check your email for further instructions.'),
-		'$name' => DI::l10n()->t('Nickname or Email: '),
-		'$submit' => DI::l10n()->t('Reset')
+	$o   = Renderer::replaceMacros($tpl, [
+		'$title'  => DI::l10n()->t('Forgot your Password?'),
+		'$desc'   => DI::l10n()->t('Enter your email address and submit to have your password reset. Then check your email for further instructions.'),
+		'$name'   => DI::l10n()->t('Nickname or email'),
+		'$submit' => DI::l10n()->t('Reset my password')
 	]);
 
 	return $o;
@@ -127,7 +127,7 @@ function lostpass_generate_password($user)
 	$o = '';
 
 	$new_password = User::generateNewPassword();
-	$result = User::updatePassword($user['uid'], $new_password);
+	$result       = User::updatePassword($user['uid'], $new_password);
 	if (DBA::isResult($result)) {
 		$tpl = Renderer::getMarkupTemplate('pwdreset.tpl');
 		$o .= Renderer::replaceMacros($tpl, [

@@ -8,7 +8,6 @@
 namespace Friendica\Module;
 
 use Friendica\Contact\Header;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -27,6 +26,7 @@ use Friendica\Network\HTTPException;
 use Friendica\Network\HTTPException\NotModifiedException;
 use Friendica\Object\Image;
 use Friendica\Security\OpenWebAuth;
+use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\Proxy;
@@ -64,19 +64,19 @@ class Photo extends BaseApi
 
 		OpenWebAuth::addVisitorCookieForHTTPSigner($this->server);
 
-		$customsize = 0;
+		$customsize    = 0;
 		$square_resize = true;
-		$scale = null;
-		$stamp = microtime(true);
+		$scale         = null;
+		$stamp         = microtime(true);
 		// User avatar
 		if (!empty($this->parameters['type'])) {
 			if (!empty($this->parameters['customsize'])) {
-				$customsize = intval($this->parameters['customsize']);
+				$customsize    = intval($this->parameters['customsize']);
 				$square_resize = !in_array($this->parameters['type'], ['media', 'preview']);
 			}
 
 			if (!empty($this->parameters['guid'])) {
-				$guid = $this->parameters['guid'];
+				$guid    = $this->parameters['guid'];
 				$account = DBA::selectFirst('account-user-view', ['id'], ['guid' => $guid], ['order' => ['uid' => true]]);
 				if (empty($account)) {
 					throw new HTTPException\NotFoundException();
@@ -91,7 +91,7 @@ class Photo extends BaseApi
 
 			if (!empty($this->parameters['nickname_ext'])) {
 				$nickname = pathinfo($this->parameters['nickname_ext'], PATHINFO_FILENAME);
-				$user = User::getByNickname($nickname, ['uid']);
+				$user     = User::getByNickname($nickname, ['uid']);
 				if (empty($user)) {
 					throw new HTTPException\NotFoundException();
 				}
@@ -104,16 +104,16 @@ class Photo extends BaseApi
 			}
 
 			if (empty($id)) {
-				Logger::notice('No picture id was detected', ['parameters' => $this->parameters, 'query' => DI::args()->getQueryString()]);
+				$this->logger->notice('No picture id was detected', ['parameters' => $this->parameters, 'query' => DI::args()->getQueryString()]);
 				throw new HTTPException\NotFoundException(DI::l10n()->t('The Photo is not available.'));
 			}
 
-			$photo = self::getPhotoById($id, $this->parameters['type'], $customsize ?: Proxy::PIXEL_SMALL);
+			$photo = $this->getPhotoById($id, $this->parameters['type'], $customsize ?: Proxy::PIXEL_SMALL);
 		} else {
 			$photoid = pathinfo($this->parameters['name'], PATHINFO_FILENAME);
-			$scale = 0;
+			$scale   = 0;
 			if (substr($photoid, -2, 1) == '-') {
-				$scale = intval(substr($photoid, -1, 1));
+				$scale   = intval(substr($photoid, -1, 1));
 				$photoid = substr($photoid, 0, -2);
 			}
 
@@ -130,6 +130,7 @@ class Photo extends BaseApi
 
 			$photo = MPhoto::getPhoto($photoid, $scale, self::getCurrentUserID());
 			if ($photo === false) {
+				$this->logger->notice('Photo was not loaded', ['parameters' => $this->parameters, 'id' => $photoid]);
 				throw new HTTPException\NotFoundException(DI::l10n()->t('The Photo with id %s is not available.', $photoid));
 			}
 		}
@@ -137,20 +138,26 @@ class Photo extends BaseApi
 		$fetch = microtime(true) - $stamp;
 
 		if ($photo === false) {
+			$this->logger->notice('Photo was not loaded', ['parameters' => $this->parameters]);
 			throw new HTTPException\NotFoundException();
 		}
 
 		$cacheable = ($photo['allow_cid'] . $photo['allow_gid'] . $photo['deny_cid'] . $photo['deny_gid'] === '') && (isset($photo['cacheable']) ? $photo['cacheable'] : true);
 
-		$stamp = microtime(true);
+		$stamp    = microtime(true);
+		$imgdata  = '';
+		$mimetype = false;
 
 		if (empty($request['blur']) || empty($photo['blurhash'])) {
 			$imgdata  = MPhoto::getImageDataForPhoto($photo);
 			$mimetype = $photo['type'];
 		}
 		if (empty($imgdata) && empty($photo['blurhash'])) {
+			$this->logger->notice('Image data was not loaded', ['parameters' => $this->parameters, 'class' => $photo['backend-class'], 'ref' => $photo['backend-ref']]);
 			throw new HTTPException\NotFoundException();
-		} elseif (empty($imgdata) && !empty($photo['blurhash'])) {
+		}
+
+		if (empty($imgdata) && !empty($photo['blurhash'])) {
 			$image = new Image('', image_type_to_mime_type(IMAGETYPE_WEBP));
 			$image->getFromBlurHash($photo['blurhash'], $photo['width'], $photo['height']);
 			$imgdata  = $image->asString();
@@ -168,10 +175,10 @@ class Photo extends BaseApi
 		$data = microtime(true) - $stamp;
 
 		if (empty($imgdata)) {
-			Logger::warning('Invalid photo', ['id' => $photo['id']]);
+			$this->logger->warning('Invalid photo', ['id' => $photo['id']]);
 			if (in_array($photo['backend-class'], [ExternalResource::NAME])) {
 				$reference = json_decode($photo['backend-ref'], true);
-				$error = DI::l10n()->t('Invalid external resource with url %s.', $reference['url']);
+				$error     = DI::l10n()->t('Invalid external resource with url %s.', $reference['url']);
 			} else {
 				$error = DI::l10n()->t('Invalid photo with id %s.', $photo['id']);
 			}
@@ -225,13 +232,13 @@ class Photo extends BaseApi
 		$output = microtime(true) - $stamp;
 
 		$total = microtime(true) - $totalstamp;
-		$rest = $total - ($fetch + $data + $checksum + $output);
+		$rest  = $total - ($fetch + $data + $checksum + $output);
 
 		if (!is_null($scale) && ($scale < 4)) {
-			Logger::debug('Performance:', [
-				'scale' => $scale, 'resource' => $photo['resource-id'],
-				'total' => number_format($total, 3), 'fetch' => number_format($fetch, 3),
-				'data' => number_format($data, 3), 'checksum' => number_format($checksum, 3),
+			$this->logger->debug('Performance:', [
+				'scale'  => $scale, 'resource' => $photo['resource-id'],
+				'total'  => number_format($total, 3), 'fetch' => number_format($fetch, 3),
+				'data'   => number_format($data, 3), 'checksum' => number_format($checksum, 3),
 				'output' => number_format($output, 3), 'rest' => number_format($rest, 3)
 			]);
 		}
@@ -247,7 +254,7 @@ class Photo extends BaseApi
 	 * @param int $customsize Custom size (?)
 	 * @return array|bool Array on success, false on error
 	 */
-	private static function getPhotoById(int $id, string $type, int $customsize)
+	private function getPhotoById(int $id, string $type, int $customsize)
 	{
 		switch ($type) {
 			case 'preview':
@@ -263,6 +270,20 @@ class Photo extends BaseApi
 					$url    = $media['url'];
 					$width  = $media['width'];
 					$height = $media['height'];
+				}
+
+				if (empty($url) && ($media['type'] == Post\Media::VIDEO) && DI::config()->get('system', 'ffmpeg_installed')) {
+					$image = new Image('', image_type_to_mime_type(IMAGETYPE_JPEG));
+					$image->getFromVideoUrl($media['url']);
+					if ($image->isValid()) {
+						return MPhoto::createPhotoForImageData($image->asString());
+					}
+				}
+
+				if (empty($url) && isset($media['blurhash']) && isset($media['width']) && isset($media['height'])) {
+					$image = new Image('', image_type_to_mime_type(IMAGETYPE_WEBP));
+					$image->getFromBlurHash($media['blurhash'], $media['width'], $media['height']);
+					return MPhoto::createPhotoForImageData($image->asString());
 				}
 
 				if (empty($url)) {
@@ -293,7 +314,7 @@ class Photo extends BaseApi
 
 				return MPhoto::createPhotoForExternalResource($link['url'], (int)DI::userSession()->getLocalUserId(), $link['mimetype'] ?? '', $link['blurhash'] ?? '', $link['width'] ?? 0, $link['height'] ?? 0);
 			case 'contact':
-				$fields = ['uid', 'uri-id', 'url', 'nurl', 'avatar', 'photo', 'blurhash', 'xmpp', 'addr', 'network', 'failed', 'updated'];
+				$fields  = ['uid', 'uri-id', 'url', 'nurl', 'avatar', 'photo', 'blurhash', 'xmpp', 'addr', 'network', 'failed', 'updated', 'next-update'];
 				$contact = Contact::getById($id, $fields);
 				if (empty($contact)) {
 					return false;
@@ -301,7 +322,9 @@ class Photo extends BaseApi
 
 				// For local users directly use the photo record that is marked as the profile
 				if (DI::baseUrl()->isLocalUrl($contact['url'])) {
-					$contact = Contact::selectFirst($fields, ['nurl' => $contact['nurl'], 'self' => true]);
+					$nurl    = $contact['nurl'];
+					$contact = Contact::selectFirst($fields, ['nurl' => $nurl, 'self' => true]);
+
 					if (!empty($contact)) {
 						if ($customsize <= Proxy::PIXEL_MICRO) {
 							$scale = 6;
@@ -313,7 +336,11 @@ class Photo extends BaseApi
 						$photo = MPhoto::selectFirst([], ['scale' => $scale, 'uid' => $contact['uid'], 'profile' => 1]);
 						if (!empty($photo)) {
 							return $photo;
+						} else {
+							$this->logger->notice('Profile photo was not loaded', ['scale' => $scale, 'uid' => $contact['uid']]);
 						}
+					} else {
+						$this->logger->notice('Local Contact was not found', ['url' => $nurl]);
 					}
 				}
 
@@ -329,6 +356,7 @@ class Photo extends BaseApi
 						if (!empty($photo)) {
 							return $photo;
 						} else {
+							$this->logger->notice('Photo was not loaded', ['resource-id' => $resourceid]);
 							$url = $contact['avatar'];
 						}
 					} else {
@@ -336,6 +364,8 @@ class Photo extends BaseApi
 					}
 				} elseif (!empty($contact['avatar'])) {
 					$url = $contact['avatar'];
+				} else {
+					$url = '';
 				}
 
 				// If it is a local link, we save resources by just redirecting to it.
@@ -351,31 +381,32 @@ class Photo extends BaseApi
 					} else {
 						// Only update federated accounts that hadn't failed before and hadn't been updated recently
 						$update = in_array($contact['network'], Protocol::FEDERATED) && !$contact['failed']
-							&& ((time() - strtotime($contact['updated']) > 86400));
+							&& ($contact['next-update'] < DateTimeFormat::utcNow());
 						if ($update) {
 							$curlResult = DI::httpClient()->head($url, [HttpClientOptions::ACCEPT_CONTENT => HttpClientAccept::IMAGE, HttpClientOptions::REQUEST => HttpClientRequest::CONTENTTYPE]);
-							$update = !$curlResult->isSuccess() && ($curlResult->getReturnCode() == 404);
-							Logger::debug('Got return code for avatar', ['return code' => $curlResult->getReturnCode(), 'cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
+							$update     = !$curlResult->isSuccess() && ($curlResult->getReturnCode() == 404);
+							$this->logger->debug('Got return code for avatar', ['return code' => $curlResult->getReturnCode(), 'cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
 						}
 						if ($update) {
 							try {
 								UpdateContact::add(Worker::PRIORITY_LOW, $id);
-								Logger::info('Invalid file, contact update initiated', ['cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
+								$this->logger->info('Invalid file, contact update initiated', ['cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
 							} catch (\InvalidArgumentException $e) {
-								Logger::notice($e->getMessage(), ['id' => $id, 'contact' => $contact]);
+								$this->logger->notice($e->getMessage(), ['id' => $id, 'contact' => $contact]);
 							}
 						} else {
-							Logger::info('Invalid file', ['cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
+							$this->logger->info('Invalid file', ['cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
 						}
 					}
 					if (!empty($mimetext) && ($mime[0] != 'image') && ($mimetext != 'application/octet-stream')) {
-						Logger::info('Unexpected Content-Type', ['mime' => $mimetext, 'url' => $url]);
+						$this->logger->info('Unexpected Content-Type', ['mime' => $mimetext, 'url' => $url]);
 						$mimetext = '';
 					}
 					if (!empty($mimetext)) {
-						Logger::debug('Expected Content-Type', ['mime' => $mimetext, 'url' => $url]);
+						$this->logger->debug('Expected Content-Type', ['mime' => $mimetext, 'url' => $url]);
 					}
 				}
+
 				if (empty($mimetext) && !empty($contact['blurhash'])) {
 					$image = new Image('', image_type_to_mime_type(IMAGETYPE_WEBP));
 					$image->getFromBlurHash($contact['blurhash'], $customsize, $customsize);
@@ -394,7 +425,7 @@ class Photo extends BaseApi
 				}
 				return MPhoto::createPhotoForExternalResource($url, 0, $mimetext, $contact['blurhash'] ?? null, $customsize, $customsize);
 			case 'header':
-				$fields = ['uid', 'url', 'header', 'network', 'gsid'];
+				$fields  = ['uid', 'url', 'header', 'network', 'gsid'];
 				$contact = Contact::getById($id, $fields);
 				if (empty($contact)) {
 					return false;

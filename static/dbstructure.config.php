@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1576);
+	define('DB_UPDATE_VERSION', 1586);
 }
 
 return [
@@ -85,12 +85,14 @@ return [
 			"blocked" => ["type" => "boolean", "comment" => "Server is blocked"],
 			"failed" => ["type" => "boolean", "comment" => "Connection failed"],
 			"next_contact" => ["type" => "datetime", "default" => DBA::NULL_DATETIME, "comment" => "Next connection request"],
+			"redirect-gsid" => ["type" => "int unsigned", "foreign" => ["gserver" => "id"], "comment" => "Target Gserver id in case of a redirect"],
 		],
 		"indexes" => [
 			"PRIMARY" => ["id"],
 			"nurl" => ["UNIQUE", "nurl(190)"],
 			"next_contact" => ["next_contact"],
 			"network" => ["network"],
+			"redirect-gsid" => ["redirect-gsid"],
 		]
 	],
 	"user" => [
@@ -1099,19 +1101,6 @@ return [
 			"notify-id" => ["notify-id"],
 		]
 	],
-	"oembed" => [
-		"comment" => "cache for OEmbed queries",
-		"fields" => [
-			"url" => ["type" => "varbinary(383)", "not null" => "1", "primary" => "1", "comment" => "page url"],
-			"maxwidth" => ["type" => "mediumint unsigned", "not null" => "1", "primary" => "1", "comment" => "Maximum width passed to Oembed"],
-			"content" => ["type" => "mediumtext", "comment" => "OEmbed data of the page"],
-			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "datetime of creation"],
-		],
-		"indexes" => [
-			"PRIMARY" => ["url", "maxwidth"],
-			"created" => ["created"],
-		]
-	],
 	"openwebauth-token" => [
 		"comment" => "Store OpenWebAuth token to verify contacts",
 		"fields" => [
@@ -1132,7 +1121,7 @@ return [
 		"fields" => [
 			"url_hash" => ["type" => "binary(64)", "not null" => "1", "primary" => "1", "comment" => "page url hash"],
 			"guessing" => ["type" => "boolean", "not null" => "1", "default" => "0", "primary" => "1", "comment" => "is the 'guessing' mode active?"],
-			"oembed" => ["type" => "boolean", "not null" => "1", "default" => "0", "primary" => "1", "comment" => "is the data the result of oembed?"],
+			"oembed" => ["type" => "boolean", "not null" => "1", "default" => "0", "primary" => "1", "comment" => "is the data the result of oembed? - Obsolete field."],
 			"url" => ["type" => "text", "not null" => "1", "comment" => "page url"],
 			"content" => ["type" => "mediumtext", "comment" => "page data"],
 			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "datetime of creation"],
@@ -1295,7 +1284,7 @@ return [
 		"fields" => [
 			"uri-id" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the item uri"],
 			"title" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "item title"],
-			"content-warning" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
+			"content-warning" => ["type" => "varchar(500)", "not null" => "1", "default" => "", "comment" => ""],
 			"body" => ["type" => "mediumtext", "comment" => "item body content"],
 			"raw-body" => ["type" => "mediumtext", "comment" => "Body without embedded media links"],
 			"quote-uri-id" => ["type" => "int unsigned", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table that contains the quoted uri"],
@@ -1378,18 +1367,56 @@ return [
 			"searchtext" => ["FULLTEXT", "searchtext"],
 		]
 	],
+	"channel-post" => [
+		"comment" => "Posts in a user defined channel",
+		"fields" => [
+			"channel" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["channel" => "id"], "comment" => "Channel id"],
+			"uri-id" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["post-engagement" => "uri-id"], "comment" => "Post engagement entry"],
+			"uid" => ["type" => "mediumint unsigned", "not null" => "1", "foreign" => ["user" => "uid"], "comment" => "User id"],
+			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
+			"received" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
+			"commented" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""]
+		],
+		"indexes" => [
+			"PRIMARY" => ["channel", "uri-id"],
+			"uri-id" => ["uri-id"],
+			"uid" => ["uid"],
+			"channel_created" => ["channel", "created"],
+			"channel_received" => ["channel", "received"],
+			"channel_commented" => ["channel", "commented"],
+		]
+	],
+	"system-channel-post" => [
+		"comment" => "Posts in a system channel",
+		"fields" => [
+			"channel" => ["type" => "varchar(20)", "not null" => "1", "primary" => "1", "comment" => "System channel id"],
+			"uid" => ["type" => "mediumint unsigned", "not null" => "1", "primary" => "1", "foreign" => ["user" => "uid"], "comment" => "User id"],
+			"uri-id" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["post-engagement" => "uri-id"], "comment" => "Post engagement entry"],
+			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
+			"received" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
+			"commented" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""]
+		],
+		"indexes" => [
+			"PRIMARY" => ["channel", "uid", "uri-id"],
+			"uri-id" => ["uri-id"],
+			"uid" => ["uid"],
+			"channel_created" => ["channel", "uid", "created"],
+		]
+	],
 	"post-history" => [
 		"comment" => "Post history",
 		"fields" => [
 			"uri-id" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the item uri"],
 			"edited" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "primary" => "1", "comment" => "Date of edit"],
 			"title" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "item title"],
-			"content-warning" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
+			"content-warning" => ["type" => "varchar(500)", "not null" => "1", "default" => "", "comment" => ""],
 			"body" => ["type" => "mediumtext", "comment" => "item body content"],
 			"raw-body" => ["type" => "mediumtext", "comment" => "Body without embedded media links"],
+			"quote-uri-id" => ["type" => "int unsigned", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table that contains the quoted uri"],
 			"location" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "text location where this item originated"],
 			"coord" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "longitude/latitude pair representing location where this item originated"],
 			"language" => ["type" => "text", "comment" => "Language information about this post"],
+			"sensitive" => ["type" => "boolean", "comment" => "If true, this post contains sensitive content"],
 			"app" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "application which generated this item"],
 			"rendered-hash" => ["type" => "varchar(32)", "not null" => "1", "default" => "", "comment" => ""],
 			"rendered-html" => ["type" => "mediumtext", "comment" => "item.body converted to html"],
@@ -1402,6 +1429,7 @@ return [
 		],
 		"indexes" => [
 			"PRIMARY" => ["uri-id", "edited"],
+			"quote-uri-id" => ["quote-uri-id"],
 		]
 	],
 	"post-link" => [
@@ -1445,6 +1473,18 @@ return [
 			"publisher-url" => ["type" => "varbinary(383)", "comment" => "URL of the publisher of the media"],
 			"publisher-name" => ["type" => "varchar(255)", "comment" => "Name of the publisher of the media"],
 			"publisher-image" => ["type" => "varbinary(383)", "comment" => "Image of the publisher of the media"],
+			"player-url" => ["type" => "varbinary(383)", "comment" => "URL of the embedded player for this media"],
+			"player-height" => ["type" => "smallint unsigned", "comment" => "Height of the embedded player"],
+			"player-width" => ["type" => "smallint unsigned", "comment" => "Width of the embedded player"],
+			"embed-type" => ["type" => "varchar(10)", "comment" => "Type of the embed (e.g. rich or video)"],
+			"embed-html" => ["type" => "text", "comment" => "HTML embed code for this media"],
+			"embed-height" => ["type" => "smallint unsigned", "comment" => "Height of the embed"],
+			"embed-width" => ["type" => "smallint unsigned", "comment" => "Width of the embed"],
+			"page-type" => ["type" => "varchar(30)", "comment" => "Type of the page (e.g. article, website)"],
+			"schematypes" => ["type" => "varchar(255)", "comment" => "Schema types of the page as JSON string"],
+			"language" => ["type" => "char(3)", "comment" => "Language information about this media in the ISO 639 format"],
+			"published" => ["type" => "datetime", "comment" => "Publification date of this media"],
+			"modified" => ["type" => "datetime", "comment" => "Modification date of this media"],
 		],
 		"indexes" => [
 			"PRIMARY" => ["id"],
@@ -1604,7 +1644,7 @@ return [
 		"indexes" => [
 			"PRIMARY" => ["id"],
 			"uid_uri-id" => ["UNIQUE", "uid", "uri-id"],
-			"uri-id" => ["uri-id"],
+			"uri-id_origin_deleted" => ["uri-id", "origin", "deleted"],
 			"parent-uri-id" => ["parent-uri-id"],
 			"thr-parent-id" => ["thr-parent-id"],
 			"external-id" => ["external-id"],

@@ -16,10 +16,9 @@ use Friendica\Core\Cache\Exception\InvalidCacheDriverException;
  */
 class APCuCache extends AbstractCache implements ICanCacheInMemory
 {
-	const NAME = 'apcu';
-
 	use CompareSetTrait;
 	use CompareDeleteTrait;
+	const NAME = 'apcu';
 
 	/**
 	 * @throws InvalidCacheDriverException
@@ -41,11 +40,7 @@ class APCuCache extends AbstractCache implements ICanCacheInMemory
 		$ns = $this->getCacheKey($prefix ?? '');
 		$ns = preg_quote($ns, '/');
 
-		if (class_exists('\APCIterator')) {
-			$iterator = new \APCIterator('user', '/^' . $ns. '/', APC_ITER_KEY);
-		} else {
-			$iterator = new \APCUIterator('/^' . $ns . '/', APC_ITER_KEY);
-		}
+		$iterator = new \APCUIterator('/^' . $ns . '/', APC_ITER_KEY);
 
 		$keys = [];
 		foreach ($iterator as $item) {
@@ -122,11 +117,7 @@ class APCuCache extends AbstractCache implements ICanCacheInMemory
 			$prefix = $this->getPrefix();
 			$prefix = preg_quote($prefix, '/');
 
-			if (class_exists('\APCIterator')) {
-				$iterator = new \APCIterator('user', '/^' . $prefix . '/', APC_ITER_KEY);
-			} else {
-				$iterator = new \APCUIterator('/^' . $prefix . '/', APC_ITER_KEY);
-			}
+			$iterator = new \APCUIterator('/^' . $prefix . '/', APC_ITER_KEY);
 
 			return apcu_delete($iterator);
 		}
@@ -149,13 +140,25 @@ class APCuCache extends AbstractCache implements ICanCacheInMemory
 			return false;
 		} elseif (!ini_get('apc.enabled') && !ini_get('apc.enable_cli')) {
 			return false;
-		} elseif (
-			version_compare(phpversion('apc') ?: '0.0.0', '4.0.6') === -1 &&
-			version_compare(phpversion('apcu') ?: '0.0.0', '5.1.0') === -1
-		) {
+		} elseif (version_compare(phpversion('apcu') ?: '0.0.0', '5.1.0', '<')) {
 			return false;
 		}
 
 		return true;
+	}
+
+	/** {@inheritDoc} */
+	public function getStats(): array
+	{
+		$apcu = apcu_cache_info();
+		$sma  = apcu_sma_info();
+
+		return [
+			'entries'     => $apcu['num_entries'] ?? null,
+			'used_memory' => $apcu['mem_size']    ?? null,
+			'hits'        => $apcu['num_hits']    ?? null,
+			'misses'      => $apcu['num_misses']  ?? null,
+			'avail_mem'   => $sma['avail_mem']    ?? null,
+		];
 	}
 }

@@ -8,9 +8,11 @@
 namespace Friendica\Module\Admin\Addons;
 
 use Friendica\Content\Text\Markdown;
-use Friendica\Core\Addon;
+use Friendica\Core\Addon\AddonInfo;
+use Friendica\Core\Addon\Exception\InvalidAddonException;
 use Friendica\Core\Renderer;
 use Friendica\DI;
+use Friendica\Model\Contact;
 use Friendica\Module\BaseAdmin;
 use Friendica\Util\Strings;
 
@@ -31,7 +33,7 @@ class Details extends BaseAdmin
 				self::checkFormSecurityTokenRedirectOnError($redirect, 'admin_addons_details');
 
 				$func = $addon . '_addon_admin_post';
-				$func(DI::app());
+				$func();
 			}
 		}
 
@@ -42,14 +44,13 @@ class Details extends BaseAdmin
 	{
 		parent::content();
 
-		$a = DI::app();
-
-		$addons_admin = Addon::getAdminList();
+		$addonHelper = DI::addonHelper();
 
 		$addon = Strings::sanitizeFilePathItem($this->parameters['addon']);
+
 		if (!is_file("addon/$addon/$addon.php")) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('Addon not found.'));
-			Addon::uninstall($addon);
+			$addonHelper->uninstallAddon($addon);
 			DI::baseUrl()->redirect('admin/addons');
 		}
 
@@ -57,11 +58,11 @@ class Details extends BaseAdmin
 			self::checkFormSecurityTokenRedirectOnError('/admin/addons', 'admin_addons_details', 't');
 
 			// Toggle addon status
-			if (Addon::isEnabled($addon)) {
-				Addon::uninstall($addon);
+			if ($addonHelper->isAddonEnabled($addon)) {
+				$addonHelper->uninstallAddon($addon);
 				DI::sysmsg()->addInfo(DI::l10n()->t('Addon %s disabled.', $addon));
 			} else {
-				Addon::install($addon);
+				$addonHelper->installAddon($addon);
 				DI::sysmsg()->addInfo(DI::l10n()->t('Addon %s enabled.', $addon));
 			}
 
@@ -69,7 +70,7 @@ class Details extends BaseAdmin
 		}
 
 		// display addon details
-		if (Addon::isEnabled($addon)) {
+		if ($addonHelper->isAddonEnabled($addon)) {
 			$status = 'on';
 			$action = DI::l10n()->t('Disable');
 		} else {
@@ -84,32 +85,77 @@ class Details extends BaseAdmin
 			$readme = '<pre>' . file_get_contents("addon/$addon/README") . '</pre>';
 		}
 
+		$addons_admin = $addonHelper->getEnabledAddonsWithAdminSettings();
+
 		$admin_form = '';
-		if (array_key_exists($addon, $addons_admin)) {
+		if (in_array($addon, $addons_admin)) {
 			require_once "addon/$addon/$addon.php";
 			$func = $addon . '_addon_admin';
 			$func($admin_form);
 		}
 
+		try {
+			$addonInfo = $addonHelper->getAddonInfo($addon);
+		} catch (InvalidAddonException $th) {
+			$this->logger->error('Invalid addon found: ' . $addon, ['exception' => $th]);
+			DI::sysmsg()->addNotice(DI::l10n()->t('Invalid Addon found.'));
+
+			$addonInfo = AddonInfo::fromArray(['id' => $addon, 'name' => $addon]);
+		}
+
+		$addonAuthors = [];
+
+		foreach ($addonInfo->getAuthors() as $addonAuthor) {
+			if (array_key_exists('link', $addonAuthor) && empty(parse_url($addonAuthor['link'], PHP_URL_SCHEME))) {
+				$contact = Contact::getByURL($addonAuthor['link'], false);
+
+				if (!empty($contact['url'])) {
+					$addonAuthor['link'] = $contact['url'];
+				}
+			}
+
+			$addonAuthors[] = $addonAuthor;
+		}
+
+		$addonMaintainers = [];
+
+		foreach ($addonInfo->getMaintainers() as $addonMaintainer) {
+			if (array_key_exists('link', $addonMaintainer) && empty(parse_url($addonMaintainer['link'], PHP_URL_SCHEME))) {
+				$contact = Contact::getByURL($addonMaintainer['link'], false);
+
+				if (!empty($contact['url'])) {
+					$addonMaintainer['link'] = $contact['url'];
+				}
+			}
+
+			$addonMaintainers[] = $addonMaintainer;
+		}
+
 		$t = Renderer::getMarkupTemplate('admin/addons/details.tpl');
 
 		return Renderer::replaceMacros($t, [
-			'$title' => DI::l10n()->t('Administration'),
-			'$page' => DI::l10n()->t('Addons'),
-			'$toggle' => DI::l10n()->t('Toggle'),
+			'$title'    => DI::l10n()->t('Administration'),
+			'$page'     => DI::l10n()->t('Addons'),
+			'$toggle'   => DI::l10n()->t('Toggle'),
 			'$settings' => DI::l10n()->t('Settings'),
 
-			'$addon' => $addon,
+			'$addon'  => $addon,
 			'$status' => $status,
 			'$action' => $action,
-			'$info' => Addon::getInfo($addon),
-			'$str_author' => DI::l10n()->t('Author: '),
+			'$info'   => [
+				'name'        => $addonInfo->getName(),
+				'version'     => $addonInfo->getVersion(),
+				'description' => $addonInfo->getDescription(),
+				'author'      => $addonAuthors,
+				'maintainer'  => $addonMaintainers,
+			],
+			'$str_author'     => DI::l10n()->t('Author: '),
 			'$str_maintainer' => DI::l10n()->t('Maintainer: '),
 
 			'$admin_form' => $admin_form,
-			'$function' => 'addons',
+			'$function'   => 'addons',
 			'$screenshot' => '',
-			'$readme' => $readme,
+			'$readme'     => $readme,
 
 			'$form_security_token' => self::getFormSecurityToken('admin_addons_details'),
 		]);

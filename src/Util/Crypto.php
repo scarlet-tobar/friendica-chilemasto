@@ -8,7 +8,6 @@
 namespace Friendica\Util;
 
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\DI;
 use phpseclib3\Crypt\PublicKeyLoader;
 
@@ -27,7 +26,7 @@ class Crypto
 	public static function rsaSign($data, $key, $alg = 'sha256')
 	{
 		if (empty($key)) {
-			Logger::warning('Empty key parameter');
+			DI::logger()->warning('Empty key parameter');
 		}
 		openssl_sign($data, $sig, $key, (($alg == 'sha1') ? OPENSSL_ALGO_SHA1 : $alg));
 		return $sig;
@@ -43,7 +42,7 @@ class Crypto
 	public static function rsaVerify($data, $sig, $key, $alg = 'sha256')
 	{
 		if (empty($key)) {
-			Logger::warning('Empty key parameter');
+			DI::logger()->warning('Empty key parameter');
 		}
 		return openssl_verify($data, $sig, $key, (($alg == 'sha1') ? OPENSSL_ALGO_SHA1 : $alg));
 	}
@@ -80,7 +79,7 @@ class Crypto
 		$result = openssl_pkey_new($openssl_options);
 
 		if (empty($result)) {
-			Logger::notice('new_keypair: failed');
+			DI::logger()->notice('new_keypair: failed');
 			return false;
 		}
 
@@ -90,7 +89,7 @@ class Crypto
 		openssl_pkey_export($result, $response['prvkey']);
 
 		// Get public key
-		$pkey = openssl_pkey_get_details($result);
+		$pkey               = openssl_pkey_get_details($result);
 		$response['pubkey'] = $pkey["key"];
 
 		return $response;
@@ -161,19 +160,19 @@ class Crypto
 	private static function encapsulateOther($data, $pubkey, $alg)
 	{
 		if (!$pubkey) {
-			Logger::notice('no key. data: '.$data);
+			DI::logger()->notice('no key. data: '.$data);
 		}
 		$fn = 'encrypt' . strtoupper($alg);
 		if (method_exists(__CLASS__, $fn)) {
-			$result = ['encrypted' => true];
-			$key = random_bytes(256);
-			$iv  = random_bytes(256);
+			$result         = ['encrypted' => true];
+			$key            = random_bytes(256);
+			$iv             = random_bytes(256);
 			$result['data'] = Strings::base64UrlEncode(self::$fn($data, $key, $iv), true);
 
 			// log the offending call so we can track it down
 			if (!openssl_public_encrypt($key, $k, $pubkey)) {
 				$x = debug_backtrace();
-				Logger::notice('RSA failed', ['trace' => $x[0]]);
+				DI::logger()->notice('RSA failed', ['trace' => $x[0]]);
 			}
 
 			$result['alg'] = $alg;
@@ -203,18 +202,18 @@ class Crypto
 	private static function encapsulateAes($data, $pubkey)
 	{
 		if (!$pubkey) {
-			Logger::notice('aes_encapsulate: no key. data: ' . $data);
+			DI::logger()->notice('aes_encapsulate: no key. data: ' . $data);
 		}
 
-		$key = random_bytes(32);
-		$iv  = random_bytes(16);
-		$result = ['encrypted' => true];
+		$key            = random_bytes(32);
+		$iv             = random_bytes(16);
+		$result         = ['encrypted' => true];
 		$result['data'] = Strings::base64UrlEncode(self::encryptAES256CBC($data, $key, $iv), true);
 
 		// log the offending call so we can track it down
 		if (!openssl_public_encrypt($key, $k, $pubkey)) {
 			$x = debug_backtrace();
-			Logger::notice('aes_encapsulate: RSA failed.', ['data' => $x[0]]);
+			DI::logger()->notice('aes_encapsulate: RSA failed.', ['data' => $x[0]]);
 		}
 
 		$result['alg'] = 'aes256cbc';
@@ -226,19 +225,18 @@ class Crypto
 	}
 
 	/**
-	 *
 	 * Ported from Hubzilla: https://framagit.org/hubzilla/core/blob/master/include/crypto.php
 	 *
 	 * @param array $data ['iv' => $iv, 'key' => $key, 'alg' => $alg, 'data' => $data]
 	 * @param string $prvkey The private key used for decryption.
 	 *
-	 * @return string|boolean The decrypted string or false on failure.
+	 * @return string|false The decrypted string or false on failure.
 	 * @throws \Exception
 	 */
 	public static function unencapsulate(array $data, $prvkey)
 	{
 		if (!$data) {
-			return;
+			return false;
 		}
 
 		$alg = $data['alg'] ?? 'aes256cbc';
@@ -300,11 +298,11 @@ class Crypto
 	 * Creates cryptographic secure random digits
 	 *
 	 * @param string $digits The count of digits
-	 * @return int The random Digits
+	 * @return string The random Digits
 	 *
 	 * @throws \Exception In case 'random_int' isn't usable
 	 */
-	public static function randomDigits($digits)
+	public static function randomDigits($digits): string
 	{
 		$rn = '';
 

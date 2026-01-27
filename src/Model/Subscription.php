@@ -7,13 +7,11 @@
 
 namespace Friendica\Model;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Factory\Api\Mastodon\Notification as NotificationFactory;
-use Friendica\Navigation\Notifications\Entity;
-use Friendica\Object\Api\Mastodon\Notification;
+use Friendica\Navigation\Notifications\Entity\Notification as NotificationEntity;
 use Minishlink\WebPush\VAPID;
 
 class Subscription
@@ -21,9 +19,6 @@ class Subscription
 	/**
 	 * Select a subscription record exists
 	 *
-	 * @param int   $applicationid
-	 * @param int   $uid
-	 * @param array $fields
 	 * @return array|bool Array on success, false on failure
 	 */
 	public static function select(int $applicationid, int $uid, array $fields = [])
@@ -120,15 +115,14 @@ class Subscription
 	/**
 	 * Prepare push notification
 	 *
-	 * @param Notification $Notification
 	 * @return void
 	 */
-	public static function pushByNotification(Entity\Notification $notification)
+	public static function pushByNotification(NotificationEntity $notification)
 	{
 		$type = NotificationFactory::getType($notification);
 
 		if (DI::notify()->shouldShowOnDesktop($notification, $type)) {
-			DI::notify()->createFromNotification($notification);
+			DI::notify()->createFromNotification($notification, $type);
 		}
 
 		if (empty($type)) {
@@ -137,7 +131,7 @@ class Subscription
 
 		$subscriptions = DBA::select('subscription', [], ['uid' => $notification->uid, $type => true]);
 		while ($subscription = DBA::fetch($subscriptions)) {
-			Logger::info('Push notification', ['id' => $subscription['id'], 'uid' => $subscription['uid'], 'type' => $type]);
+			DI::logger()->info('Push notification', ['id' => $subscription['id'], 'uid' => $subscription['uid'], 'type' => $type]);
 			Worker::add(Worker::PRIORITY_HIGH, 'PushSubscription', $subscription['id'], $notification->id);
 		}
 		DBA::close($subscriptions);

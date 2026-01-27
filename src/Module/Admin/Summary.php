@@ -8,8 +8,6 @@
 namespace Friendica\Module\Admin;
 
 use Friendica\App;
-use Friendica\Core\Addon;
-use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Renderer;
 use Friendica\Core\Update;
@@ -19,7 +17,6 @@ use Friendica\DI;
 use Friendica\Core\Config\Factory\Config;
 use Friendica\Module\BaseAdmin;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
-use Friendica\Network\HTTPException\ServiceUnavailableException;
 use Friendica\Network\Probe;
 use Friendica\Util\DateTimeFormat;
 
@@ -29,13 +26,14 @@ class Summary extends BaseAdmin
 	{
 		parent::content();
 
-		$a = DI::app();
+		$basePath  = DI::appHelper()->getBasePath();
+		$addonPath = DI::addonHelper()->getAddonPath();
 
 		// are there MyISAM tables in the DB? If so, trigger a warning message
 		$warningtext = [];
 
 		$templateEngine = Renderer::getTemplateEngine();
-		$errors = [];
+		$errors         = [];
 		$templateEngine->testInstall($errors);
 		foreach ($errors as $error) {
 			$warningtext[] = DI::l10n()->t('Template engine (%s) error: %s', $templateEngine::$name, $error);
@@ -53,9 +51,9 @@ class Summary extends BaseAdmin
 		// Avoid the database error 1615 "Prepared statement needs to be re-prepared", see https://github.com/friendica/friendica/issues/8550
 		if (!DI::config()->get('database', 'pdo_emulate_prepares')) {
 			$table_definition_cache = DBA::getVariable('table_definition_cache');
-			$table_open_cache = DBA::getVariable('table_open_cache');
+			$table_open_cache       = DBA::getVariable('table_open_cache');
 			if (!empty($table_definition_cache) && !empty($table_open_cache)) {
-				$suggested_definition_cache = min(400 + round($table_open_cache / 2, 1), 2000);
+				$suggested_definition_cache = min(400 + round((int) $table_open_cache / 2, 1), 2000);
 				if ($suggested_definition_cache > $table_definition_cache) {
 					$warningtext[] = DI::l10n()->t('Your table_definition_cache is too low (%d). This can lead to the database error "Prepared statement needs to be re-prepared". Please set it at least to %d. See <a href="%s">here</a> for more information.<br />', $table_definition_cache, $suggested_definition_cache, 'https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_table_definition_cache');
 				}
@@ -93,18 +91,22 @@ class Summary extends BaseAdmin
 
 		// Legacy config file warning
 		if (file_exists('.htconfig.php')) {
-			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl() . '/help/Config');
+			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl() . '/help/admin/config');
 		}
 
 		if (file_exists('config/local.ini.php')) {
-			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>config/local.ini.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl() . '/help/Config');
+			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>config/local.ini.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl() . '/help/admin/config');
 		}
 
 		// Check server vitality
 		if (!self::checkSelfHostMeta()) {
-			$well_known = DI::baseUrl() . Probe::HOST_META;
-			$warningtext[] = DI::l10n()->t('<a href="%s">%s</a> is not reachable on your system. This is a severe configuration issue that prevents server to server communication. See <a href="%s">the installation page</a> for help.',
-				$well_known, $well_known, DI::baseUrl() . '/help/Install');
+			$well_known    = DI::baseUrl() . Probe::HOST_META;
+			$warningtext[] = DI::l10n()->t(
+				'<a href="%s">%s</a> is not reachable on your system. This is a severe configuration issue that prevents server to server communication. See <a href="%s">the installation page</a> for help.',
+				$well_known,
+				$well_known,
+				DI::baseUrl() . '/help/admin/install'
+			);
 		}
 
 		// Check logfile permission
@@ -116,8 +118,8 @@ class Summary extends BaseAdmin
 		}
 
 		// check legacy basepath settings
-		$configLoader = (new Config())->createConfigFileManager($a->getBasePath(), $_SERVER);
-		$configCache = new Cache();
+		$configLoader = (new Config())->createConfigFileManager($basePath, $addonPath, $_SERVER);
+		$configCache  = new Cache();
 		$configLoader->setupCache($configCache);
 		$confBasepath = $configCache->get('system', 'basepath');
 		$currBasepath = DI::config()->get('system', 'basepath');
@@ -127,25 +129,31 @@ class Summary extends BaseAdmin
 					'from' => $currBasepath,
 					'to'   => $confBasepath,
 				]);
-				$warningtext[] = DI::l10n()->t('Friendica\'s system.basepath was updated from \'%s\' to \'%s\'. Please remove the system.basepath from your db to avoid differences.',
+				$warningtext[] = DI::l10n()->t(
+					'Friendica\'s system.basepath was updated from \'%s\' to \'%s\'. Please remove the system.basepath from your db to avoid differences.',
 					$currBasepath,
-					$confBasepath);
+					$confBasepath
+				);
 			} elseif (!is_dir($currBasepath)) {
 				DI::logger()->alert('Friendica\'s system.basepath is wrong.', [
 					'from' => $currBasepath,
 					'to'   => $confBasepath,
 				]);
-				$warningtext[] = DI::l10n()->t('Friendica\'s current system.basepath \'%s\' is wrong and the config file \'%s\' isn\'t used.',
+				$warningtext[] = DI::l10n()->t(
+					'Friendica\'s current system.basepath \'%s\' is wrong and the config file \'%s\' isn\'t used.',
 					$currBasepath,
-					$confBasepath);
+					$confBasepath
+				);
 			} else {
 				DI::logger()->alert('Friendica\'s system.basepath is wrong.', [
 					'from' => $currBasepath,
 					'to'   => $confBasepath,
 				]);
-				$warningtext[] = DI::l10n()->t('Friendica\'s current system.basepath \'%s\' is not equal to the config file \'%s\'. Please fix your configuration.',
+				$warningtext[] = DI::l10n()->t(
+					'Friendica\'s current system.basepath \'%s\' is not equal to the config file \'%s\'. Please fix your configuration.',
 					$currBasepath,
-					$confBasepath);
+					$confBasepath
+				);
 			}
 		}
 
@@ -179,7 +187,7 @@ class Summary extends BaseAdmin
 			'$platform'       => App::PLATFORM,
 			'$codename'       => App::CODENAME,
 			'$build'          => DI::config()->get('system', 'build'),
-			'$addons'         => [DI::l10n()->t('Active addons'), Addon::getEnabledList()],
+			'$addons'         => [DI::l10n()->t('Active addons'), DI::addonHelper()->getEnabledAddons()],
 			'$serversettings' => $server_settings,
 			'$warningtext'    => $warningtext,
 		]);

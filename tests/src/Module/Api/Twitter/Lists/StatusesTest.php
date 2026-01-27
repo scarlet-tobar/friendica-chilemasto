@@ -7,13 +7,13 @@
 
 namespace Friendica\Test\src\Module\Api\Twitter\Lists;
 
-use Friendica\App\Router;
+use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Module\Api\Twitter\Lists\Statuses;
 use Friendica\Network\HTTPException\BadRequestException;
-use Friendica\Test\src\Module\Api\ApiTest;
+use Friendica\Test\ApiTestCase;
 
-class StatusesTest extends ApiTest
+class StatusesTest extends ApiTestCase
 {
 	/**
 	 * Test the api_lists_statuses() function.
@@ -24,7 +24,7 @@ class StatusesTest extends ApiTest
 	{
 		$this->expectException(BadRequestException::class);
 
-		(new Statuses(DI::dba(), DI::twitterStatus(), DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Statuses(DI::dba(), DI::twitterStatus(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 	}
 
@@ -33,7 +33,10 @@ class StatusesTest extends ApiTest
 	 */
 	public function testApiListsStatusesWithListId()
 	{
-		$response = (new Statuses(DI::dba(), DI::twitterStatus(), DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		// @todo: This call is needed for this test
+		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+
+		$response = (new Statuses(DI::dba(), DI::twitterStatus(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'list_id' => 1,
 				'page'    => -1,
@@ -53,7 +56,10 @@ class StatusesTest extends ApiTest
 	 */
 	public function testApiListsStatusesWithListIdAndRss()
 	{
-		$response = (new Statuses(DI::dba(), DI::twitterStatus(), DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'rss']))
+		// @todo: This call is needed for this test
+		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+
+		$response = (new Statuses(DI::dba(), DI::twitterStatus(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'rss']))
 			->run($this->httpExceptionMock, [
 				'list_id' => 1
 			]);

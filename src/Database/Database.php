@@ -60,17 +60,17 @@ class Database
 	protected $syslock = null;
 
 	protected $server_info = '';
-	/** @var PDO|mysqli */
+	/** @var PDO|mysqli|null */
 	protected $connection;
-	protected $driver = '';
+	protected $driver               = '';
 	protected $pdo_emulate_prepares = false;
-	private $error = '';
-	private $errorno = 0;
-	private $affected_rows = 0;
-	protected $in_transaction = false;
-	protected $in_retrial = false;
-	protected $testmode = false;
-	private $relation = [];
+	private $error                  = '';
+	private $errorno                = 0;
+	private $affected_rows          = 0;
+	protected $in_transaction       = false;
+	protected $in_retrial           = false;
+	protected $testmode             = false;
+	private $relation               = [];
 	/** @var DbaDefinition */
 	protected $dbaDefinition;
 	/** @var ViewDefinition */
@@ -86,7 +86,7 @@ class Database
 		$this->viewDefinition = $viewDefinition;
 
 		// Use dummy values - necessary for the first factory call of the logger itself
-		$this->logger = new NullLogger();
+		$this->logger   = new NullLogger();
 		$this->profiler = new Profiler($config);
 
 		$this->connect();
@@ -253,7 +253,7 @@ class Database
 	/**
 	 * Return the database object.
 	 *
-	 * @return PDO|mysqli
+	 * @return PDO|mysqli|null
 	 */
 	public function getConnection()
 	{
@@ -474,7 +474,7 @@ class Database
 	 *
 	 * @param string $sql SQL statement
 	 *
-	 * @return bool|object statement object or result object
+	 * @return bool|mysqli_result|mysqli_stmt|object|PDOStatement statement object or result object
 	 * @throws \Exception
 	 */
 	public function p(string $sql)
@@ -534,6 +534,8 @@ class Database
 			throw new ServiceUnavailableException('The Connection is empty, although connected is set true.');
 		}
 
+		$retval = false;
+
 		switch ($this->driver) {
 			case self::PDO:
 				// If there are no arguments we use "query"
@@ -550,8 +552,10 @@ class Database
 					break;
 				}
 
-				/** @var $stmt mysqli_stmt|PDOStatement */
-				if (!$stmt = $this->connection->prepare($sql)) {
+				/** @var mysqli_stmt|PDOStatement $stmt */
+				$stmt = $this->connection->prepare($sql);
+
+				if (!$stmt) {
 					$errorInfo     = $this->connection->errorInfo();
 					$this->error   = (string)$errorInfo[2];
 					$this->errorno = (int)$errorInfo[1];
@@ -626,7 +630,7 @@ class Database
 					} elseif (is_string($args[$param])) {
 						$param_types .= 's';
 					} elseif (is_object($args[$param]) && method_exists($args[$param], '__toString')) {
-						$param_types  .= 's';
+						$param_types .= 's';
 						$args[$param] = (string)$args[$param];
 					} else {
 						$param_types .= 'b';
@@ -673,9 +677,9 @@ class Database
 			}
 
 			$this->logger->error('DB Error', [
-				'code'      => $errorno,
-				'error'     => $error,
-				'params'    => $this->replaceParameters($sql, $args),
+				'code'   => $errorno,
+				'error'  => $error,
+				'params' => $this->replaceParameters($sql, $args),
 			]);
 
 			// On a lost connection we try to reconnect - but only once.
@@ -719,13 +723,13 @@ class Database
 
 			if (($duration > $this->config->get('system', 'db_loglimit'))) {
 				$duration  = round($duration, 3);
-				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+				$backtrace = System::getCallstack();
 
 				@file_put_contents(
 					$this->config->get('system', 'db_log'),
 					DateTimeFormat::utcNow() . "\t" . $duration . "\t" .
-					basename($backtrace[1]['file']) . "\t" .
-					$backtrace[1]['line'] . "\t" . $backtrace[2]['function'] . "\t" .
+					basename($backtrace[0]['file']) . "\t" .
+					$backtrace[0]['line'] . "\t" . $backtrace[0]['function'] . "\t" .
 					substr($this->replaceParameters($sql, $args), 0, 4000) . "\n",
 					FILE_APPEND
 				);
@@ -780,9 +784,9 @@ class Database
 			}
 
 			$this->logger->error('DB Error', [
-				'code'      => $errorno,
-				'error'     => $error,
-				'params'    => $this->replaceParameters($sql, $params),
+				'code'   => $errorno,
+				'error'  => $error,
+				'params' => $this->replaceParameters($sql, $params),
 			]);
 
 			// On a lost connection we simply quit.
@@ -887,7 +891,7 @@ class Database
 	/**
 	 * Returns the number of columns of a statement
 	 *
-	 * @param object Statement object
+	 * @param object $stmt Statement object
 	 *
 	 * @return int Number of columns
 	 */
@@ -908,7 +912,7 @@ class Database
 	/**
 	 * Returns the number of rows of a statement
 	 *
-	 * @param PDOStatement|mysqli_result|mysqli_stmt Statement object
+	 * @param PDOStatement|mysqli_result|mysqli_stmt $stmt Statement object
 	 *
 	 * @return int Number of rows
 	 */
@@ -1074,6 +1078,8 @@ class Database
 	 */
 	public function lastInsertId(): int
 	{
+		$id = 0;
+
 		switch ($this->driver) {
 			case self::PDO:
 				$id = $this->connection->lastInsertId();
@@ -1329,7 +1335,7 @@ class Database
 			return true;
 		}
 
-		$fields = $this->castFields($table, $fields);
+		$fields        = $this->castFields($table, $fields);
 		$direct_fields = [];
 
 		foreach ($fields as $key => $value) {
@@ -1648,7 +1654,7 @@ class Database
 	/**
 	 * Returns the error number of the last query
 	 *
-	 * @return string Error number (0 if no error)
+	 * @return int Error number (0 if no error)
 	 */
 	public function errorNo(): int
 	{
@@ -1681,6 +1687,8 @@ class Database
 			return false;
 		}
 
+		$ret = false;
+
 		switch ($this->driver) {
 			case self::PDO:
 				$ret = $stmt->closeCursor();
@@ -1695,8 +1703,6 @@ class Database
 				} elseif ($stmt instanceof mysqli_result) {
 					$stmt->free();
 					$ret = true;
-				} else {
-					$ret = false;
 				}
 				break;
 		}
@@ -1716,19 +1722,35 @@ class Database
 	 */
 	public function processlist(): array
 	{
+		$database = trim($this->config->get('database', 'database'));
+
 		$ret  = $this->p('SHOW PROCESSLIST');
 		$data = $this->toArray($ret);
 
 		$processes = 0;
+		$max_time  = 0;
+		$max_query = '';
 		$states    = [];
 		foreach ($data as $process) {
-			$state = trim($process['State']);
+			if ($process['db'] != $database) {
+				continue;
+			}
 
 			// Filter out all non blocking processes
-			if (!in_array($state, ['', 'init', 'statistics', 'updating'])) {
-				++$states[$state];
-				++$processes;
+			$state = trim($process['State']);
+			if (in_array($state, ['', 'init', 'statistics', 'updating'])) {
+				continue;
 			}
+
+			if ($process['Time'] > $max_time) {
+				$max_time  = $process['Time'];
+				$max_query = $process['Info'];
+			}
+			if (!isset($states[$state])) {
+				$states[$state] = 0;
+			}
+			++$states[$state];
+			++$processes;
 		}
 
 		$statelist = '';
@@ -1738,7 +1760,7 @@ class Database
 			}
 			$statelist .= $state . ': ' . $usage;
 		}
-		return (['list' => $statelist, 'amount' => $processes]);
+		return (['list' => $statelist, 'amount' => $processes, 'states' => $states, 'max_time' => $max_time, 'max_query' => $max_query]);
 	}
 
 	/**
@@ -1770,8 +1792,8 @@ class Database
 	/**
 	 * Acquire a lock to prevent a table optimization
 	 *
-	 * @return bool 
-	 * @throws LockPersistenceException 
+	 * @return bool
+	 * @throws LockPersistenceException
 	 */
 	public function acquireOptimizeLock(): bool
 	{
@@ -1781,8 +1803,8 @@ class Database
 	/**
 	 * Release the table optimization lock
 	 *
-	 * @return bool 
-	 * @throws LockPersistenceException 
+	 * @return bool
+	 * @throws LockPersistenceException
 	 */
 	public function releaseOptimizeLock(): bool
 	{

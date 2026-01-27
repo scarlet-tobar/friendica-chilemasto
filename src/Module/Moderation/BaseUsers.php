@@ -7,13 +7,15 @@
 
 namespace Friendica\Module\Moderation;
 
-use Friendica\App;
-use Friendica\Core\Hook;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\App\Page;
+use Friendica\AppHelper;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
-use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Register;
 use Friendica\Model\User;
 use Friendica\Module\BaseModeration;
@@ -22,6 +24,7 @@ use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException\ServiceUnavailableException;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 abstract class BaseUsers extends BaseModeration
@@ -29,11 +32,28 @@ abstract class BaseUsers extends BaseModeration
 	/** @var Database */
 	protected $database;
 
-	public function __construct(Database $database, App\Page $page, App $app, SystemMessages $systemMessages, IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
-		parent::__construct($page, $app, $systemMessages, $session, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+	private EventDispatcherInterface $eventDispatcher;
 
-		$this->database = $database;
+	public function __construct(
+		Database $database,
+		EventDispatcherInterface $eventDispatcher,
+		Page $page,
+		AppHelper $appHelper,
+		SystemMessages $systemMessages,
+		IHandleUserSessions $session,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
+		parent::__construct($page, $appHelper, $systemMessages, $session, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+
+		$this->database        = $database;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -93,11 +113,21 @@ abstract class BaseUsers extends BaseModeration
 				'accesskey' => 'd',
 			],
 		];
-		$tabs_arr = ['tabs' => $tabs, 'selectedTab' => $selectedTab];
-		Hook::callAll('moderation_users_tabs', $tabs_arr);
+
+		$hook_data = [
+			'tabs'        => $tabs,
+			'selectedTab' => $selectedTab,
+		];
+
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::MODERATION_USERS_TABS, $hook_data),
+		)->getArray();
+
+		$tabs = $hook_data['tabs'] ?? $tabs;
 
 		$tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
-		return Renderer::replaceMacros($tpl, ['$tabs' => $tabs_arr['tabs']]);
+
+		return Renderer::replaceMacros($tpl, ['$tabs' => $tabs, '$more' => $this->t('More')]);
 	}
 
 	protected function setupUserCallback(): \Closure

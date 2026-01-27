@@ -7,20 +7,23 @@
 
 namespace Friendica\Module\Profile;
 
-use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\App\Page;
+use Friendica\AppHelper;
 use Friendica\Content\Feature;
 use Friendica\Content\GroupManager;
 use Friendica\Content\Nav;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile as ProfileModel;
 use Friendica\Model\Tag;
@@ -37,33 +40,51 @@ use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
 use GuzzleHttp\Psr7\Uri;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Profile extends BaseProfile
 {
 	/** @var Database */
 	private $database;
-	/** @var App */
-	private $app;
+	/** @var AppHelper */
+	private $appHelper;
 	/** @var IHandleUserSessions */
 	private $session;
 	/** @var IManageConfigValues */
 	private $config;
-	/** @var App\Page */
+	/** @var Page */
 	private $page;
 	/** @var ProfileField */
 	private $profileField;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(ProfileField $profileField, App\Page $page, IManageConfigValues $config, IHandleUserSessions $session, App $app, Database $database, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		ProfileField $profileField,
+		Page $page,
+		IManageConfigValues $config,
+		IHandleUserSessions $session,
+		AppHelper $appHelper,
+		Database $database,
+		EventDispatcherInterface $eventDispatcher,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->database     = $database;
-		$this->app          = $app;
-		$this->session      = $session;
-		$this->config       = $config;
-		$this->page         = $page;
-		$this->profileField = $profileField;
+		$this->database        = $database;
+		$this->appHelper       = $appHelper;
+		$this->session         = $session;
+		$this->config          = $config;
+		$this->page            = $page;
+		$this->profileField    = $profileField;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	protected function rawContent(array $request = [])
@@ -95,32 +116,12 @@ class Profile extends BaseProfile
 
 	protected function content(array $request = []): string
 	{
-		$profile = ProfileModel::load($this->app, $this->parameters['nickname'] ?? '');
-		if (!$profile) {
+		$owner = User::getByNickname($this->parameters['nickname'] ?? '', ['uid']);
+		if (!$owner) {
 			throw new HTTPException\NotFoundException($this->t('Profile not found.'));
 		}
 
-		$remote_contact_id = $this->session->getRemoteContactID($profile['uid']);
-
-		if ($this->config->get('system', 'block_public') && !$this->session->isAuthenticated()) {
-			return Login::form();
-		}
-
-		if (!empty($profile['hidewall']) && !$this->session->isAuthenticated()) {
-			$this->baseUrl->redirect('profile/' . $profile['nickname'] . '/restricted');
-		}
-
-		if (!empty($profile['page-flags']) && in_array($profile['page-flags'], [User::PAGE_FLAGS_COMMUNITY, User::PAGE_FLAGS_COMM_MAN])) {
-			$this->page['htmlhead'] .= '<meta name="friendica.community" content="true" />' . "\n";
-		}
-
-		$this->page['htmlhead'] .= $this->buildHtmlHead($profile, $this->parameters['nickname']);
-
-		Nav::setSelected('home');
-
-		$is_owner = $this->session->getLocalUserId() == $profile['uid'];
-		$o        = self::getTabsHTML('profile', $is_owner, $profile['nickname'], $profile['hide-friends']);
-
+		$is_owner              = $this->session->getLocalUserId() == $owner['uid'];
 		$view_as_contacts      = [];
 		$view_as_contact_id    = 0;
 		$view_as_contact_alert = '';
@@ -150,9 +151,34 @@ class Profile extends BaseProfile
 			}
 		}
 
+		$profile = ProfileModel::load($this->appHelper, $this->parameters['nickname'], true, $view_as_contact_id);
+		if (!$profile) {
+			throw new HTTPException\NotFoundException($this->t('Profile not found.'));
+		}
+
+		$remote_contact_id = $this->session->getRemoteContactID($profile['uid']);
+
+		if ($this->config->get('system', 'block_public') && !$this->session->isAuthenticated()) {
+			return Login::form();
+		}
+
+		if (!empty($profile['hidewall']) && !$this->session->isAuthenticated()) {
+			$this->baseUrl->redirect('profile/' . $profile['nickname'] . '/restricted');
+		}
+
+		if (!empty($profile['page-flags']) && in_array($profile['page-flags'], [User::PAGE_FLAGS_COMMUNITY, User::PAGE_FLAGS_COMM_MAN])) {
+			$this->page['htmlhead'] .= '<meta name="friendica.community" content="true" />' . "\n";
+		}
+
+		$this->page['htmlhead'] .= $this->buildHtmlHead($profile, $this->parameters['nickname']);
+
+		Nav::setSelected('home');
+
+		$o = self::getTabsHTML('profile', $is_owner, $profile['nickname'], $profile['hide-friends']);
+
 		$basic_fields = [];
 
-		$basic_fields += self::buildField('fullname', $this->t('Full Name:'), $this->cleanInput($profile['uri-id'], $profile['name']));
+		$basic_fields += self::buildField('fullname', $this->t('Display name:'), $this->cleanInput($profile['uri-id'], $profile['name']));
 
 		if (Feature::isEnabled($profile['uid'], Feature::MEMBER_SINCE)) {
 			$basic_fields += self::buildField(
@@ -252,14 +278,14 @@ class Profile extends BaseProfile
 		}
 
 		$tpl = Renderer::getMarkupTemplate('profile/profile.tpl');
-		$o   .= Renderer::replaceMacros($tpl, [
+		$o .= Renderer::replaceMacros($tpl, [
 			'$title'                 => $this->t('Profile'),
 			'$yourself'              => $this->t('Yourself'),
 			'$view_as_contacts'      => $view_as_contacts,
 			'$view_as_contact_id'    => $view_as_contact_id,
 			'$view_as_contact_alert' => $view_as_contact_alert,
 			'$view_as'               => $this->t('View profile as:'),
-			'$submit'                => $this->t('Submit'),
+			'$submit'                => $this->t('View as selected profile'),
 			'$basic'                 => $this->t('Basic'),
 			'$advanced'              => $this->t('Advanced'),
 			'$is_owner'              => $profile['uid'] == $this->session->getLocalUserId(),
@@ -267,19 +293,20 @@ class Profile extends BaseProfile
 			'$basic_fields'          => $basic_fields,
 			'$custom_fields'         => $custom_fields,
 			'$profile'               => $profile,
+			'$homepage_verified'     => $this->l10n->t('This website has been verified to belong to the same person.'),
 			'$edit_link'             => [
 				'url'   => 'settings/profile', $this->t('Edit profile'),
-				'title' => '',
 				'label' => $this->t('Edit profile')
 			],
-			'$viewas_link'           => [
+			'$viewas_link' => [
 				'url'   => $this->args->getQueryString() . '#viewas',
-				'title' => '',
 				'label' => $this->t('View as')
 			],
 		]);
 
-		Hook::callAll('profile_advanced', $o);
+		$o = $this->eventDispatcher->dispatch(
+			new HTmlFilterEvent(HtmlFilterEvent::MOD_PROFILE_CONTENT, $o),
+		)->getHtml();
 
 		return $o;
 	}
@@ -339,7 +366,7 @@ class Profile extends BaseProfile
 		$htmlhead .= '<link rel="alternate" type="application/atom+xml" href="' . $this->baseUrl . '/feed/' . $nickname . '/" title="' . $this->t('%s\'s posts', htmlspecialchars($profile['name'], ENT_COMPAT, 'UTF-8', true)) . '"/>' . "\n";
 		$htmlhead .= '<link rel="alternate" type="application/atom+xml" href="' . $this->baseUrl . '/feed/' . $nickname . '/comments" title="' . $this->t('%s\'s comments', htmlspecialchars($profile['name'], ENT_COMPAT, 'UTF-8', true)) . '"/>' . "\n";
 		$htmlhead .= '<link rel="alternate" type="application/atom+xml" href="' . $this->baseUrl . '/feed/' . $nickname . '/activity" title="' . $this->t('%s\'s timeline', htmlspecialchars($profile['name'], ENT_COMPAT, 'UTF-8', true)) . '"/>' . "\n";
-		$uri      = urlencode('acct:' . $profile['nickname'] . '@' . $this->baseUrl->getHost() . ($this->baseUrl->getPath() ? '/' . $this->baseUrl->getPath() : ''));
+		$uri = urlencode('acct:' . $profile['nickname'] . '@' . $this->baseUrl->getHost() . ($this->baseUrl->getPath() ? '/' . $this->baseUrl->getPath() : ''));
 		$htmlhead .= '<link rel="lrdd" type="application/xrd+xml" href="' . $this->baseUrl . '/xrd/?uri=' . $uri . '" />' . "\n";
 		header('Link: <' . $this->baseUrl . '/xrd/?uri=' . $uri . '>; rel="lrdd"; type="application/xrd+xml"', false);
 
@@ -374,10 +401,10 @@ class Profile extends BaseProfile
 
 	/**
 	 * Clean the provided input to prevent XSS problems
-	 * @param int $uri_id 
-	 * @param string $input 
-	 * @return string 
-	 * @throws InternalServerErrorException 
+	 * @param int $uri_id
+	 * @param string $input
+	 * @return string
+	 * @throws InternalServerErrorException
 	 */
 	private function cleanInput(int $uri_id, string $input): string
 	{

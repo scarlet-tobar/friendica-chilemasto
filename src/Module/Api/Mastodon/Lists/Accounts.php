@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon\Lists;
 
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Circle;
@@ -32,7 +31,7 @@ class Accounts extends BaseApi
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
-		return Circle::removeMembers($this->parameters['id'], $request['account_ids']);
+		Circle::removeMembers($this->parameters['id'], $request['account_ids']);
 	}
 
 	protected function post(array $request = [])
@@ -40,7 +39,7 @@ class Accounts extends BaseApi
 		$this->checkAllowedScope(self::SCOPE_WRITE);
 
 		$request = $this->getRequest([
-			'account_ids' =>  [], // Array of account IDs to add to the list
+			'account_ids' => [], // Array of account IDs to add to the list
 		], $request);
 
 		if (empty($request['account_ids']) || empty($this->parameters['id'])) {
@@ -53,7 +52,7 @@ class Accounts extends BaseApi
 	/**
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	protected function rawContent(array $request = [])
+	protected function get(array $request = [])
 	{
 		$this->checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();

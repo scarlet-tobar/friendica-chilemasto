@@ -9,12 +9,11 @@ namespace Friendica\Security;
 
 use Exception;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException\UnauthorizedException;
-use Friendica\Util\DateTimeFormat;
 
 /**
  * Authentication via the basic auth method
@@ -75,9 +74,9 @@ class BasicAuth
 				$source = 'Twidere';
 			}
 
-			Logger::info('Unrecognized user-agent', ['http_user_agent' => $_SERVER['HTTP_USER_AGENT']]);
+			DI::logger()->info('Unrecognized user-agent', ['http_user_agent' => $_SERVER['HTTP_USER_AGENT']]);
 		} else {
-			Logger::info('Empty user-agent');
+			DI::logger()->info('Empty user-agent');
 		}
 
 		if (empty($source)) {
@@ -105,23 +104,22 @@ class BasicAuth
 	 *
 	 * @return integer User ID
 	 */
-	private static function getUserIdByAuth(bool $do_login = true):int
+	private static function getUserIdByAuth(bool $do_login = true): int
 	{
-		$a = DI::app();
 		self::$current_user_id = 0;
 
 		// workaround for HTTP-auth in CGI mode
 		if (!empty($_SERVER['REDIRECT_REMOTE_USER'])) {
 			$userpass = base64_decode(substr($_SERVER["REDIRECT_REMOTE_USER"], 6));
 			if (!empty($userpass) && strpos($userpass, ':')) {
-				list($name, $password) = explode(':', $userpass);
+				list($name, $password)    = explode(':', $userpass);
 				$_SERVER['PHP_AUTH_USER'] = $name;
-				$_SERVER['PHP_AUTH_PW'] = $password;
+				$_SERVER['PHP_AUTH_PW']   = $password;
 			}
 		}
 
 		$user     = $_SERVER['PHP_AUTH_USER'] ?? '';
-		$password = $_SERVER['PHP_AUTH_PW'] ?? '';
+		$password = $_SERVER['PHP_AUTH_PW']   ?? '';
 
 		// allow "user@server" login (but ignore 'server' part)
 		$at = strstr($user, "@", true);
@@ -133,25 +131,29 @@ class BasicAuth
 		$record = null;
 
 		$addon_auth = [
-			'username' => trim($user),
-			'password' => trim($password),
+			'username'      => trim($user),
+			'password'      => trim($password),
 			'authenticated' => 0,
-			'user_record' => null,
+			'user_record'   => null,
 		];
 
-		/*
-		* An addon indicates successful login by setting 'authenticated' to non-zero value and returning a user record
-		* Addons should never set 'authenticated' except to indicate success - as hooks may be chained
-		* and later addons should not interfere with an earlier one that succeeded.
-		*/
-		Hook::callAll('authenticate', $addon_auth);
+		$eventDispatcher = DI::eventDispatcher();
+
+		/**
+		 * An addon indicates successful login by setting 'authenticated' to non-zero value and returning a user record
+		 * Addons should never set 'authenticated' except to indicate success - as hooks may be chained
+		 * and later addons should not interfere with an earlier one that succeeded.
+		 */
+		$addon_auth = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_AUTHENTICATE, $addon_auth),
+		)->getArray();
 
 		if ($addon_auth['authenticated'] && !empty($addon_auth['user_record'])) {
 			$record = $addon_auth['user_record'];
 		} else {
 			try {
 				$user_id = User::getIdFromPasswordAuthentication(trim($user), trim($password), true);
-				$record = DBA::selectFirst('user', [], ['uid' => $user_id]);
+				$record  = DBA::selectFirst('user', [], ['uid' => $user_id]);
 			} catch (Exception $ex) {
 				$record = [];
 			}
@@ -161,7 +163,7 @@ class BasicAuth
 			if (!$do_login) {
 				return 0;
 			}
-			Logger::debug('Access denied', ['parameters' => $_SERVER]);
+			DI::logger()->debug('Access denied', ['parameters' => $_SERVER]);
 			// Checking for commandline for the tests, we have to avoid to send a header
 			if (DI::config()->get('system', 'basicauth') && (php_sapi_name() !== 'cli')) {
 				header('WWW-Authenticate: Basic realm="Friendica"');
@@ -169,7 +171,7 @@ class BasicAuth
 			throw new UnauthorizedException("This API requires login");
 		}
 
-		DI::auth()->setForUser($a, $record, false, false, false);
+		DI::auth()->setForUser($record, false, false, false);
 
 		Hook::callAll('logged_in', $record);
 

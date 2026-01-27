@@ -9,13 +9,14 @@ namespace Friendica\Model;
 
 use Friendica\Content\Feature;
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Network\HTTPException;
+use Friendica\Event\ArrayFilterEvent;
+use Friendica\Network\HTTPException\InternalServerErrorException;
+use Friendica\Network\HTTPException\NotFoundException;
+use Friendica\Network\HTTPException\UnauthorizedException;
 use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Map;
@@ -28,7 +29,6 @@ use Friendica\Util\XML;
  */
 class Event
 {
-
 	public static function getHTML(array $event, bool $simple = false, int $uriid = 0): string
 	{
 		if (empty($event)) {
@@ -217,7 +217,7 @@ class Event
 		}
 
 		DBA::delete('event', ['id' => $event_id]);
-		Logger::info("Deleted event", ['id' => $event_id]);
+		DI::logger()->info("Deleted event", ['id' => $event_id]);
 	}
 
 	/**
@@ -231,30 +231,31 @@ class Event
 	 */
 	public static function store(array $arr): int
 	{
-		$guid = $arr['guid'] ?? '' ?: System::createUUID();
-		$uri  = $arr['uri']  ?? '' ?: Item::newURI($guid);
+		$guid  = $arr['guid'] ?? '' ?: System::createUUID();
+		$uri   = $arr['uri']  ?? '' ?: Item::newURI($guid);
 		$event = [
-			'id'        => intval($arr['id']        ?? 0),
-			'uid'       => intval($arr['uid']       ?? 0),
-			'cid'       => intval($arr['cid']       ?? 0),
+			'id'        => intval($arr['id'] ?? 0),
+			'uid'       => intval($arr['uid'] ?? 0),
+			'cid'       => intval($arr['cid'] ?? 0),
 			'guid'      => $guid,
 			'uri'       => $uri,
 			'uri-id'    => ItemURI::insert(['uri' => $uri, 'guid' => $guid]),
-			'type'      => ($arr['type']      ?? '') ?: 'event',
-			'summary'   =>  $arr['summary']   ?? '',
-			'desc'      =>  $arr['desc']      ?? '',
-			'location'  =>  $arr['location']  ?? '',
-			'allow_cid' =>  $arr['allow_cid'] ?? '',
-			'allow_gid' =>  $arr['allow_gid'] ?? '',
-			'deny_cid'  =>  $arr['deny_cid']  ?? '',
-			'deny_gid'  =>  $arr['deny_gid']  ?? '',
+			'type'      => ($arr['type'] ?? '') ?: 'event',
+			'summary'   => $arr['summary']   ?? '',
+			'desc'      => $arr['desc']      ?? '',
+			'location'  => $arr['location']  ?? '',
+			'allow_cid' => $arr['allow_cid'] ?? '',
+			'allow_gid' => $arr['allow_gid'] ?? '',
+			'deny_cid'  => $arr['deny_cid']  ?? '',
+			'deny_gid'  => $arr['deny_gid']  ?? '',
 			'nofinish'  => intval($arr['nofinish'] ?? (!empty($arr['start']) && empty($arr['finish']))),
 			'created'   => DateTimeFormat::utc(($arr['created'] ?? '') ?: 'now'),
-			'edited'    => DateTimeFormat::utc(($arr['edited']  ?? '') ?: 'now'),
-			'start'     => DateTimeFormat::utc(($arr['start']   ?? '') ?: DBA::NULL_DATETIME),
-			'finish'    => DateTimeFormat::utc(($arr['finish']  ?? '') ?: DBA::NULL_DATETIME),
+			'edited'    => DateTimeFormat::utc(($arr['edited'] ?? '') ?: 'now'),
+			'start'     => DateTimeFormat::utc(($arr['start'] ?? '') ?: DBA::NULL_DATETIME),
+			'finish'    => DateTimeFormat::utc(($arr['finish'] ?? '') ?: DBA::NULL_DATETIME),
 		];
 
+		$eventDispatcher = DI::eventDispatcher();
 
 		if ($event['finish'] < DBA::NULL_DATETIME) {
 			$event['finish'] = DBA::NULL_DATETIME;
@@ -295,17 +296,21 @@ class Event
 				Item::update($fields, ['id' => $item['id']]);
 			}
 
-			Hook::callAll('event_updated', $event['id']);
+			$eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::EVENT_UPDATED, ['event' => $event]),
+			);
 		} else {
 			// New event. Store it.
 			DBA::insert('event', $event);
 
 			$event['id'] = DBA::lastInsertId();
 
-			Hook::callAll("event_created", $event['id']);
+			$eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::EVENT_CREATED, ['event' => $event]),
+			);
 		}
 
-		return $event['id'];
+		return (int) $event['id'];
 	}
 
 	public static function getItemArrayForId(int $event_id, array $item = []): array
@@ -333,7 +338,7 @@ class Event
 		$item['uri']           = $event['uri'];
 		$item['uri-id']        = ItemURI::getIdByURI($event['uri']);
 		$item['guid']          = $event['guid'];
-		$item['plink']         = $arr['plink'] ?? '';
+		$item['plink']         = '';
 		$item['post-type']     = Item::PT_EVENT;
 		$item['wall']          = $event['cid'] ? 0 : 1;
 		$item['contact-id']    = $contact['id'];
@@ -356,7 +361,7 @@ class Event
 		$item['body']          = self::getBBCode($event);
 		$item['event-id']      = $event['id'];
 
-		$item['object']  = '<object><type>' . XML::escape(Activity\ObjectType::EVENT) . '</type><title></title><id>' . XML::escape($event['uri']) . '</id>';
+		$item['object'] = '<object><type>' . XML::escape(Activity\ObjectType::EVENT) . '</type><title></title><id>' . XML::escape($event['uri']) . '</id>';
 		$item['object'] .= '<content>' . XML::escape(self::getBBCode($event)) . '</content>';
 		$item['object'] .= '</object>' . "\n";
 
@@ -374,13 +379,13 @@ class Event
 			return $item;
 		}
 
-		$item['post-type']     = Item::PT_EVENT;
-		$item['title']         = '';
-		$item['object-type']   = Activity\ObjectType::EVENT;
-		$item['body']          = self::getBBCode($event);
-		$item['event-id']      = $event_id;
+		$item['post-type']   = Item::PT_EVENT;
+		$item['title']       = '';
+		$item['object-type'] = Activity\ObjectType::EVENT;
+		$item['body']        = self::getBBCode($event);
+		$item['event-id']    = $event_id;
 
-		$item['object']  = '<object><type>' . XML::escape(Activity\ObjectType::EVENT) . '</type><title></title><id>' . XML::escape($event['uri']) . '</id>';
+		$item['object'] = '<object><type>' . XML::escape(Activity\ObjectType::EVENT) . '</type><title></title><id>' . XML::escape($event['uri']) . '</id>';
 		$item['object'] .= '<content>' . XML::escape(self::getBBCode($event)) . '</content>';
 		$item['object'] .= '</object>' . "\n";
 
@@ -397,7 +402,7 @@ class Event
 	{
 		// First day of the week (0 = Sunday).
 		$firstDay    = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'calendar', 'first_day_of_week') ?? 0;
-		$defaultView = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'calendar', 'defaultView') ?? 'month';
+		$defaultView = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'calendar', 'default_view')      ?? 'month';
 
 		return [
 			'firstDay'    => $firstDay,
@@ -487,23 +492,23 @@ class Event
 	 * @param string $nickname
 	 *
 	 * @return array the owner array
-	 * @throws HTTPException\InternalServerErrorException
-	 * @throws HTTPException\NotFoundException The given nickname does not exist
-	 * @throws HTTPException\UnauthorizedException The access for the given nickname is restricted
+	 * @throws InternalServerErrorException
+	 * @throws NotFoundException The given nickname does not exist
+	 * @throws UnauthorizedException The access for the given nickname is restricted
 	 */
 	public static function getOwnerForNickname(string $nickname): array
 	{
 		$owner = User::getOwnerDataByNick($nickname);
 		if (empty($owner) || $owner['account_removed'] || $owner['account_expired']) {
-			throw new HTTPException\NotFoundException(DI::l10n()->t('User not found.'));
+			throw new NotFoundException(DI::l10n()->t('User not found.'));
 		}
 
 		if (!DI::userSession()->isAuthenticated() && $owner['hidewall']) {
-			throw new HTTPException\UnauthorizedException(DI::l10n()->t('Access to this profile has been restricted.'));
+			throw new UnauthorizedException(DI::l10n()->t('Access to this profile has been restricted.'));
 		}
 
 		if (!DI::userSession()->isAuthenticated() && !Feature::isEnabled($owner['uid'], Feature::PUBLIC_CALENDAR)) {
-			throw new HTTPException\UnauthorizedException(DI::l10n()->t('Permission denied.'));
+			throw new UnauthorizedException(DI::l10n()->t('Permission denied.'));
 		}
 
 		return $owner;
@@ -514,7 +519,6 @@ class Event
 	 *
 	 * @param int         $owner_uid The User ID of the owner of the event
 	 * @param int         $event_id  The ID of the event in the event table
-	 * @param string|null $nickname  a possible nickname to search for instead of the owner uid
 	 * @return array Query result
 	 * @throws \Exception
 	 */
@@ -541,7 +545,7 @@ class Event
 			$owner_uid
 		));
 		if (empty($events)) {
-			throw new HTTPException\NotFoundException(DI::l10n()->t('Event not found.'));
+			throw new NotFoundException(DI::l10n()->t('Event not found.'));
 		}
 
 		return $events[0];
@@ -556,8 +560,8 @@ class Event
 	 * @param bool|null   $ignore    Filters ignored events (false: unignored events, true: ignored events, null: all events)
 	 *
 	 * @return array Query results.
-	 * @throws HTTPException\NotFoundException
-	 * @throws HTTPException\UnauthorizedException
+	 * @throws NotFoundException
+	 * @throws UnauthorizedException
 	 */
 	public static function getListByDate(int $owner_uid, string $start = null, string $finish = null, ?bool $ignore = false): array
 	{
@@ -649,12 +653,12 @@ class Event
 		if (DI::userSession()->getLocalUserId() && DI::userSession()->getLocalUserId() == $event['uid'] && $event['type'] == 'event') {
 			$edit = !$event['cid'] ? ['calendar/event/edit/' . $event['id'], DI::l10n()->t('Edit event'), '', ''] : null;
 			$copy = !$event['cid'] ? ['calendar/event/copy/' . $event['id'], DI::l10n()->t('Duplicate event'), '', ''] : null;
-			$drop =                  ['calendar/api/delete/' . $event['id'], DI::l10n()->t('Delete event'), '', ''];
+			$drop = ['calendar/api/delete/' . $event['id'], DI::l10n()->t('Delete event'), '', ''];
 		}
 
 		$title = strip_tags(BBCode::convertForUriId($event['uri-id'], $event['summary']));
 		if (!$title) {
-			[$title, $_trash] = explode("<br", BBCode::convertForUriId($event['uri-id'], Strings::escapeHtml($event['desc'])), BBCode::TWITTER_API);
+			list($title, $_trash) = explode("<br", BBCode::convertForUriId($event['uri-id'], Strings::escapeHtml($event['desc'])), BBCode::TWITTER_API);
 		}
 
 		$event['author-link'] = Contact::magicLink($event['author-link']);
@@ -694,7 +698,7 @@ class Event
 		}
 
 		switch ($format) {
-				// Format the exported data as a CSV file.
+			// Format the exported data as a CSV file.
 			case "csv":
 				$o .= '"Subject", "Start Date", "Start Time", "Description", "End Date", "End Time", "Location"' . PHP_EOL;
 
@@ -744,21 +748,21 @@ class Event
 						$tmp = $event['summary'];
 						$tmp = str_replace(PHP_EOL, PHP_EOL . ' ', $tmp);
 						$tmp = addcslashes($tmp, ',;');
-						$o   .= 'SUMMARY:' . $tmp . PHP_EOL;
+						$o .= 'SUMMARY:' . $tmp . PHP_EOL;
 					}
 
 					if ($event['desc']) {
 						$tmp = $event['desc'];
 						$tmp = str_replace(PHP_EOL, PHP_EOL . ' ', $tmp);
 						$tmp = addcslashes($tmp, ',;');
-						$o   .= 'DESCRIPTION:' . $tmp . PHP_EOL;
+						$o .= 'DESCRIPTION:' . $tmp . PHP_EOL;
 					}
 
 					if ($event['location']) {
 						$tmp = $event['location'];
 						$tmp = str_replace(PHP_EOL, PHP_EOL . ' ', $tmp);
 						$tmp = addcslashes($tmp, ',;');
-						$o   .= 'LOCATION:' . $tmp . PHP_EOL;
+						$o .= 'LOCATION:' . $tmp . PHP_EOL;
 					}
 
 					$o .= 'END:VEVENT' . PHP_EOL;
@@ -882,6 +886,7 @@ class Event
 		$dformat       = DI::l10n()->t('l F d, Y \@ g:i A'); // Friday January 18, 2011 @ 8:01 AM.
 		$dformat_short = DI::l10n()->t('D g:i A'); // Fri 8:01 AM.
 		$tformat       = DI::l10n()->t('g:i A'); // 8:01 AM.
+		$tzformat      = DI::l10n()->t('e'); // Atlantic/Azores.
 
 		// Convert the time to different formats.
 		$dtstart_dt    = DI::l10n()->getDay(DateTimeFormat::local($item['event-start'], $dformat));
@@ -892,6 +897,7 @@ class Event
 		$date_short  = DateTimeFormat::local($item['event-start'], 'j');
 		$start_time  = DateTimeFormat::local($item['event-start'], $tformat);
 		$start_short = DI::l10n()->getDayShort(DateTimeFormat::local($item['event-start'], $dformat_short));
+		$timezone    = DateTimeFormat::local($item['event-start'], $tzformat);
 
 		// If the option 'nofinisch' isn't set, we need to format the finish date/time.
 		if (!$item['event-nofinish']) {
@@ -912,7 +918,7 @@ class Event
 		}
 
 		// Construct the profile link (magic-auth).
-		$author       = [
+		$author = [
 			'uid'     => 0,
 			'id'      => $item['author-id'],
 			'network' => $item['author-network'],
@@ -939,6 +945,7 @@ class Event
 			'$start_short'    => $start_short,
 			'$end_time'       => $end_time,
 			'$end_short'      => $end_short,
+			'$timezone'       => $timezone,
 			'$author_name'    => $item['author-name'],
 			'$author_link'    => $profile_link,
 			'$author_avatar'  => $item['author-avatar'],

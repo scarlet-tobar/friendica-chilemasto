@@ -7,7 +7,9 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\AppHelper;
 use Friendica\Core\L10n;
 use Friendica\Factory\Api\Mastodon\Error;
 use Friendica\Factory\Api\Mastodon\Subscription as SubscriptionFactory;
@@ -26,9 +28,9 @@ class PushSubscription extends BaseApi
 	/** @var SubscriptionFactory */
 	protected $subscriptionFac;
 
-	public function __construct(\Friendica\Factory\Api\Mastodon\Error $errorFactory, App $app, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, SubscriptionFactory $subscriptionFac, array $server, array $parameters = [])
+	public function __construct(Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, SubscriptionFactory $subscriptionFac, array $server, array $parameters = [])
 	{
-		parent::__construct($errorFactory, $app, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->subscriptionFac = $subscriptionFac;
 	}
@@ -47,9 +49,9 @@ class PushSubscription extends BaseApi
 		$subscription = [
 			'application-id'                => $application['id'],
 			'uid'                           => $uid,
-			'endpoint'                      => $request['subscription']['endpoint'] ?? '',
+			'endpoint'                      => $request['subscription']['endpoint']       ?? '',
 			'pubkey'                        => $request['subscription']['keys']['p256dh'] ?? '',
-			'secret'                        => $request['subscription']['keys']['auth'] ?? '',
+			'secret'                        => $request['subscription']['keys']['auth']   ?? '',
 			Notification::TYPE_FOLLOW       => filter_var($request['data']['alerts'][Notification::TYPE_FOLLOW] ?? false, FILTER_VALIDATE_BOOLEAN),
 			Notification::TYPE_LIKE         => filter_var($request['data']['alerts'][Notification::TYPE_LIKE] ?? false, FILTER_VALIDATE_BOOLEAN),
 			Notification::TYPE_RESHARE      => filter_var($request['data']['alerts'][Notification::TYPE_RESHARE] ?? false, FILTER_VALIDATE_BOOLEAN),
@@ -64,7 +66,7 @@ class PushSubscription extends BaseApi
 		$this->logger->info('Subscription stored', ['ret' => $ret, 'subscription' => $subscription]);
 
 		$subscriptionObj = $this->subscriptionFac->createForApplicationIdAndUserId($application['id'], $uid);
-		$this->response->addJsonContent($subscriptionObj->toArray());
+		$this->jsonExit($subscriptionObj->toArray());
 	}
 
 	public function put(array $request = []): void
@@ -103,7 +105,7 @@ class PushSubscription extends BaseApi
 		]);
 
 		$subscriptionObj = $this->subscriptionFac->createForApplicationIdAndUserId($application['id'], $uid);
-		$this->response->addJsonContent($subscriptionObj->toArray());
+		$this->jsonExit($subscriptionObj->toArray());
 	}
 
 	private function setBoolean($input): bool
@@ -128,10 +130,10 @@ class PushSubscription extends BaseApi
 			'uid'            => $uid,
 		]);
 
-		$this->response->addJsonContent([]);
+		$this->jsonExit([]);
 	}
 
-	protected function rawContent(array $request = []): void
+	protected function get(array $request = []): void
 	{
 		$this->checkAllowedScope(self::SCOPE_PUSH);
 		$uid         = self::getCurrentUserID();

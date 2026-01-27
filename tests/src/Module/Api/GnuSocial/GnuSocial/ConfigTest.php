@@ -9,16 +9,16 @@ namespace Friendica\Test\src\Module\Api\GnuSocial\GnuSocial;
 
 use Friendica\DI;
 use Friendica\Module\Api\GNUSocial\GNUSocial\Config;
-use Friendica\Test\src\Module\Api\ApiTest;
+use Friendica\Test\ApiTestCase;
 
-class ConfigTest extends ApiTest
+class ConfigTest extends ApiTestCase
 {
 	/**
 	 * Test the api_statusnet_config() function.
 	 */
 	public function testApiStatusnetConfig()
 	{
-		$response = (new Config(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Config(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 		$json = $this->toJson($response);
 

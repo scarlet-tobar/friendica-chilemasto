@@ -10,9 +10,9 @@ namespace Friendica\Test\src\Module\Api\Twitter\Account;
 use Friendica\App\Router;
 use Friendica\DI;
 use Friendica\Module\Api\Twitter\Account\UpdateProfile;
-use Friendica\Test\src\Module\Api\ApiTest;
+use Friendica\Test\ApiTestCase;
 
-class UpdateProfileTest extends ApiTest
+class UpdateProfileTest extends ApiTestCase
 {
 	/**
 	 * Test the api_account_update_profile() function.
@@ -21,7 +21,7 @@ class UpdateProfileTest extends ApiTest
 	{
 		$this->useHttpMethod(Router::POST);
 
-		$response = (new UpdateProfile(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		$response = (new UpdateProfile(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
 			->run($this->httpExceptionMock, [
 				'name'        => 'new_name',
 				'description' => 'new_description'

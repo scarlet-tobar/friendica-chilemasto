@@ -8,19 +8,22 @@
 namespace Friendica\Module;
 
 use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
 use Friendica\BaseModule;
-use Friendica\Core\Addon;
+use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\KeyValueStorage\Capability\IManageKeyValuePairs;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\PostUpdate;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -29,6 +32,8 @@ use Psr\Log\LoggerInterface;
  */
 class Friendica extends BaseModule
 {
+	private AddonHelper $addonHelper;
+	private EventDispatcherInterface $eventDispatcher;
 	/** @var IManageConfigValues */
 	private $config;
 	/** @var IManageKeyValuePairs */
@@ -36,18 +41,33 @@ class Friendica extends BaseModule
 	/** @var IHandleUserSessions */
 	private $session;
 
-	public function __construct(IHandleUserSessions $session, IManageKeyValuePairs $keyValue, IManageConfigValues $config, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		AddonHelper $addonHelper,
+		EventDispatcherInterface $eventDispatcher,
+		IHandleUserSessions $session,
+		IManageKeyValuePairs $keyValue,
+		IManageConfigValues $config,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->config = $config;
-		$this->keyValue = $keyValue;
-		$this->session = $session;
+		$this->config          = $config;
+		$this->keyValue        = $keyValue;
+		$this->session         = $session;
+		$this->eventDispatcher = $eventDispatcher;
+		$this->addonHelper     = $addonHelper;
 	}
 
 	protected function content(array $request = []): string
 	{
-		$visibleAddonList = Addon::getVisibleList();
+		$visibleAddonList = $this->addonHelper->getVisibleEnabledAddons();
 		if (!empty($visibleAddonList)) {
 
 			$sorted = $visibleAddonList;
@@ -81,8 +101,8 @@ class Friendica extends BaseModule
 
 		if (!empty($blockList) && ($this->config->get('blocklist', 'public') || $this->session->isAuthenticated())) {
 			$blocked = [
-				'title'    => $this->t('On this server the following remote servers are blocked.'),
-				'header'   => [
+				'title'  => $this->t('On this server the following remote servers are blocked.'),
+				'header' => [
 					$this->t('Blocked domain'),
 					$this->t('Reason for the block'),
 				],
@@ -95,16 +115,20 @@ class Friendica extends BaseModule
 
 		$hooked = '';
 
-		Hook::callAll('about_hook', $hooked);
+		$hooked = $this->eventDispatcher->dispatch(
+			new HtmlFilterEvent(HtmlFilterEvent::MOD_ABOUT_CONTENT, $hooked),
+		)->getHtml();
 
 		$tpl = Renderer::getMarkupTemplate('friendica.tpl');
 
 		return Renderer::replaceMacros($tpl, [
-			'about'     => $this->t('This is Friendica, version %s that is running at the web location %s. The database version is %s, the post update version is %s.',
+			'about' => $this->t(
+				'This is Friendica, version %s that is running at the web location %s. The database version is %s, the post update version is %s.',
 				'<strong>' . App::VERSION . '</strong>',
 				$this->baseUrl,
 				'<strong>' . $this->config->get('system', 'build') . '/' . DB_UPDATE_VERSION . '</strong>',
-				'<strong>' . $this->keyValue->get('post_update_version') . '/' . PostUpdate::VERSION . '</strong>'),
+				'<strong>' . $this->keyValue->get('post_update_version') . '/' . PostUpdate::VERSION . '</strong>'
+			),
 			'friendica' => $this->t('Please visit <a href="https://friendi.ca">Friendi.ca</a> to learn more about the Friendica project.'),
 			'bugs'      => $this->t('Bug reports and issues: please visit') . ' ' . '<a href="https://github.com/friendica/friendica/issues?state=open">' . $this->t('the bugtracker at github') . '</a>',
 			'info'      => $this->t('Suggestions, praise, etc. - please email "info" at "friendi - dot - ca'),
@@ -146,7 +170,7 @@ class Friendica extends BaseModule
 			$register_policy = $register_policies[$register_policy_int];
 		}
 
-		$admin = [];
+		$admin         = [];
 		$administrator = User::getFirstAdmin(['username', 'nickname']);
 		if (!empty($administrator)) {
 			$admin = [
@@ -155,11 +179,11 @@ class Friendica extends BaseModule
 			];
 		}
 
-		$visible_addons = Addon::getVisibleList();
+		$visible_addons = $this->addonHelper->getVisibleEnabledAddons();
 
 		$this->config->reload();
 		$locked_features = [];
-		$featureLocks = $this->config->get('config', 'feature_lock');
+		$featureLocks    = $this->config->get('config', 'feature_lock');
 		if (isset($featureLocks)) {
 			foreach ($featureLocks as $feature => $lock) {
 				if ($feature === 'config_loaded') {

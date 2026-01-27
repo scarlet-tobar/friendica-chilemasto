@@ -7,10 +7,12 @@
 
 namespace Friendica\Worker;
 
+use Friendica\Core\Worker;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Network\HTTPException\NotFoundException;
+use Friendica\Util\Network;
 
 class AddContact
 {
@@ -38,5 +40,36 @@ class AddContact
 		} catch (\ImagickException $e) {
 			DI::logger()->notice('Imagick not found.', ['exception' => $e, 'uid' => $uid, 'url' => $url]);
 		}
+	}
+
+	/**
+	 * @param array|int $run_parameters Priority constant or array of options described in Worker::add
+	 * @param int    $uid User ID
+	 * @param string $url Contact link
+	 * @return int
+	 */
+	public static function add($run_parameters, int $uid, string $url): int
+	{
+		if (Network::isUrlBlocked($url)) {
+			return 0;
+		}
+
+		DI::logger()->debug('Add contact', ['uid' => $uid, 'url' => $url]);
+		return Worker::add($run_parameters, 'AddContact', 0, $url);
+	}
+
+	/**
+	 * Checks if the maximum number of allowed workers for this task is reached
+	 *
+	 * @return boolean
+	 */
+	public static function workerLimitReached(): bool
+	{
+		$add_limit = (int)DI::config()->get('system', 'contact_add_limit');
+		$adding    = Worker::countWorkersByCommand('AddContact');
+		if ($adding >= $add_limit) {
+			DI::logger()->info('The number of currently running jobs exceed the limit', ['adding' => $adding, 'limit' => $add_limit]);
+		}
+		return ($adding >= $add_limit);
 	}
 }

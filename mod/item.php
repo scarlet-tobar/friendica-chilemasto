@@ -16,16 +16,14 @@
  * information.
  */
 
-use Friendica\App;
 use Friendica\Content\Conversation;
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
@@ -45,7 +43,11 @@ function item_post()
 		item_drop($uid, $_REQUEST['dropitems']);
 	}
 
-	Hook::callAll('post_local_start', $_REQUEST);
+	$eventDispatcher = DI::eventDispatcher();
+
+	$_REQUEST = $eventDispatcher->dispatch(
+		new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_START, $_REQUEST)
+	)->getArray();
 
 	$return_path = $_REQUEST['return'] ?? '';
 	$preview     = intval($_REQUEST['preview'] ?? 0);
@@ -57,7 +59,7 @@ function item_post()
 	 */
 	if (!$preview && !empty($_REQUEST['post_id_random'])) {
 		if (DI::session()->get('post-random') == $_REQUEST['post_id_random']) {
-			Logger::warning('duplicate post');
+			DI::logger()->warning('duplicate post');
 			item_post_return(DI::baseUrl(), $return_path);
 		} else {
 			DI::session()->set('post-random', $_REQUEST['post_id_random']);
@@ -95,7 +97,7 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 	$post['edit'] = $post;
 	$post['file'] = Post\Category::getTextByURIId($post['uri-id'], $post['uid']);
 
-	Post\Media::deleteByURIId($post['uri-id'], [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE, Post\Media::HTML]);
+	Post\Media::deleteByURIId($post['uri-id'], [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE, Post\Media::HTML, Post\Media::HLS]);
 	$post = item_process($post, $request, $preview, $return_path);
 
 	$fields = [
@@ -133,10 +135,10 @@ function item_insert(int $uid, array $request, bool $preview, string $return_pat
 	$post = DI::contentItem()->initializePost($post);
 
 	$post['edit']      = null;
-	$post['post-type'] = $request['post_type'] ?? '';
-	$post['wall']      = $request['wall'] ?? true;
+	$post['post-type'] = $request['post_type']      ?? '';
+	$post['wall']      = $request['wall']           ?? true;
 	$post['pubmail']   = $request['pubmail_enable'] ?? false;
-	$post['created']   = $request['created_at'] ?? DateTimeFormat::utcNow();
+	$post['created']   = $request['created_at']     ?? DateTimeFormat::utcNow();
 	$post['edited']    = $post['changed'] = $post['commented'] = $post['created'];
 	$post['app']       = '';
 	$post['inform']    = '';
@@ -166,18 +168,18 @@ function item_insert(int $uid, array $request, bool $preview, string $return_pat
 		// This enables interaction like starring and saving into folders
 		if ($toplevel_item['uid'] == 0) {
 			$stored = Item::storeForUserByUriId($toplevel_item['uri-id'], $post['uid'], ['post-reason' => Item::PR_ACTIVITY]);
-			Logger::info('Public item stored for user', ['uri-id' => $toplevel_item['uri-id'], 'uid' => $post['uid'], 'stored' => $stored]);
+			DI::logger()->info('Public item stored for user', ['uri-id' => $toplevel_item['uri-id'], 'uid' => $post['uid'], 'stored' => $stored]);
 		}
 
-		$post['parent']      = $toplevel_item['id'];
-		$post['gravity']     = Item::GRAVITY_COMMENT;
-		$post['thr-parent']  = $parent_item['uri'];
-		$post['wall']        = $toplevel_item['wall'];
+		$post['parent']     = $toplevel_item['id'];
+		$post['gravity']    = Item::GRAVITY_COMMENT;
+		$post['thr-parent'] = $parent_item['uri'];
+		$post['wall']       = $toplevel_item['wall'];
 	} else {
-		$parent_item         = [];
-		$post['parent']      = 0;
-		$post['gravity']     = Item::GRAVITY_PARENT;
-		$post['thr-parent']  = $post['uri'];
+		$parent_item        = [];
+		$post['parent']     = 0;
+		$post['gravity']    = Item::GRAVITY_PARENT;
+		$post['thr-parent'] = $post['uri'];
 	}
 
 	$post = DI::contentItem()->getACL($post, $parent_item, $request);
@@ -198,7 +200,7 @@ function item_insert(int $uid, array $request, bool $preview, string $return_pat
 
 	$post = Post::selectFirst(Item::ITEM_FIELDLIST, ['id' => $post_id]);
 	if (!$post) {
-		Logger::error('Item couldn\'t be fetched.', ['post_id' => $post_id]);
+		DI::logger()->error('Item couldn\'t be fetched.', ['post_id' => $post_id]);
 		if ($return_path) {
 			DI::baseUrl()->redirect($return_path);
 		}
@@ -214,7 +216,7 @@ function item_insert(int $uid, array $request, bool $preview, string $return_pat
 		DI::contentItem()->copyPermissions($post['thr-parent-id'], $post['uri-id'], $post['parent-uri-id']);
 	}
 
-	Logger::debug('post_complete');
+	DI::logger()->debug('post_complete');
 
 	item_post_return(DI::baseUrl(), $return_path);
 	// NOTREACHED
@@ -257,34 +259,46 @@ function item_process(array $post, array $request, bool $preview, string $return
 	// preview mode - prepare the body for display and send it via json
 	if ($preview) {
 		// We have to preset some fields, so that the conversation can be displayed
-		$post['id']             = -1;
-		$post['uri-id']         = -1;
-		$post['author-network'] = Protocol::DFRN;
-		$post['author-updated'] = '';
-		$post['author-alias']   = '';
-		$post['author-gsid']    = 0;
-		$post['author-uri-id']  = ItemURI::getIdByURI($post['author-link']);
-		$post['owner-updated']  = '';
-		$post['has-media']      = false;
-		$post['quote-uri-id']   = Item::getQuoteUriId($post['body'], $post['uid']);
-		$post['body']           = BBCode::removeSharedData(Item::setHashtags($post['body']));
-		$post['writable']       = true;
-		$post['sensitive']      = false;
-		$post['post-reason']    = Item::PR_LOCAL;
+		$post['id']                 = -1;
+		$post['uri-id']             = -1;
+		$post['author-network']     = Protocol::DFRN;
+		$post['author-updated']     = '';
+		$post['author-alias']       = '';
+		$post['author-gsid']        = 0;
+		$post['author-uri-id']      = ItemURI::getIdByURI($post['author-link']);
+		$post['owner-updated']      = '';
+		$post['has-media']          = false;
+		$post['quote-uri-id']       = Item::getQuoteUriId($post['body'], $post['uid']);
+		$post['body']               = BBCode::removeSharedData(Item::setHashtags($post['body']));
+		$post['writable']           = true;
+		$post['sensitive']          = false;
+		$post['post-reason']        = Item::PR_LOCAL;
+		$post['owner-contact-type'] = Contact::TYPE_PERSON;
+		$post['owner-network']      = Protocol::DFRN;
 
 		$o = DI::conversation()->render([$post], Conversation::MODE_SEARCH, false, true);
 
 		System::jsonExit(['preview' => $o]);
 	}
 
-	Hook::callAll('post_local', $post);
+	$eventDispatcher = DI::eventDispatcher();
+
+	$hook_data = [
+		'item' => $post,
+	];
+
+	$hook_data = $eventDispatcher->dispatch(
+		new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, $hook_data)
+	)->getArray();
+
+	$post = $hook_data['item'] ?? $post;
 
 	unset($post['edit']);
 	unset($post['self']);
 	unset($post['api_source']);
 
 	if (!empty($request['scheduled_at'])) {
-		$scheduled_at = DateTimeFormat::convert($request['scheduled_at'], 'UTC', DI::app()->getTimeZone());
+		$scheduled_at = DateTimeFormat::convert($request['scheduled_at'], 'UTC', DI::appHelper()->getTimeZone());
 		if ($scheduled_at > DateTimeFormat::utcNow()) {
 			unset($post['created']);
 			unset($post['edited']);
@@ -298,7 +312,7 @@ function item_process(array $post, array $request, bool $preview, string $return
 	}
 
 	if (!empty($post['cancel'])) {
-		Logger::info('mod_item: post cancelled by addon.');
+		DI::logger()->info('mod_item: post cancelled by addon.');
 		if ($return_path) {
 			DI::baseUrl()->redirect($return_path);
 		}
@@ -325,12 +339,12 @@ function item_post_return($baseurl, $return_path)
 		$json['reload'] = $baseurl . '/' . $_REQUEST['jsreload'];
 	}
 
-	Logger::debug('post_json', ['json' => $json]);
+	DI::logger()->debug('post_json', ['json' => $json]);
 
 	System::jsonExit($json);
 }
 
-function item_content(App $a)
+function item_content()
 {
 	if (!DI::userSession()->isAuthenticated()) {
 		throw new HTTPException\UnauthorizedException();
@@ -445,7 +459,7 @@ function drop_item(int $id, string $return = ''): string
 		item_redirect_after_action($item, $return);
 		//NOTREACHED
 	} else {
-		Logger::warning('Permission denied.', ['local' => DI::userSession()->getLocalUserId(), 'uid' => $item['uid'], 'cid' => $contact_id]);
+		DI::logger()->warning('Permission denied.', ['local' => DI::userSession()->getLocalUserId(), 'uid' => $item['uid'], 'cid' => $contact_id]);
 		DI::sysmsg()->addNotice(DI::l10n()->t('Permission denied.'));
 		DI::baseUrl()->redirect('display/' . $item['guid']);
 		//NOTREACHED

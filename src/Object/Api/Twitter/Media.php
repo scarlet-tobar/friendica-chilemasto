@@ -31,7 +31,7 @@ class Media extends BaseDataTransferObject
 	protected $media_url;
 	/** @var string */
 	protected $media_url_https;
-	/** @var string */
+	/** @var array<string, array<string, mixed>> */
 	protected $sizes;
 	/** @var string */
 	protected $type;
@@ -41,7 +41,6 @@ class Media extends BaseDataTransferObject
 	/**
 	 * Creates a media entity array
 	 *
-	 * @param array $attachment
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function __construct(array $media, string $url, array $indices)

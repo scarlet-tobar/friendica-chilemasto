@@ -11,9 +11,9 @@ use Friendica\App\Router;
 use Friendica\DI;
 use Friendica\Module\Api\Twitter\Favorites\Destroy;
 use Friendica\Network\HTTPException\BadRequestException;
-use Friendica\Test\src\Module\Api\ApiTest;
+use Friendica\Test\ApiTestCase;
 
-class DestroyTest extends ApiTest
+class DestroyTest extends ApiTestCase
 {
 	protected function setUp(): void
 	{
@@ -31,7 +31,7 @@ class DestroyTest extends ApiTest
 	{
 		$this->expectException(BadRequestException::class);
 
-		(new Destroy(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 	}
 
@@ -42,7 +42,7 @@ class DestroyTest extends ApiTest
 	 */
 	public function testApiFavoritesCreateDestroyWithDestroyAction()
 	{
-		$response = (new Destroy(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'id' => 3
 			]);

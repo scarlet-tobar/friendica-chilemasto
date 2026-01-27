@@ -8,11 +8,12 @@
 namespace Friendica\Module;
 
 use DateTime;
-use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
 use Friendica\App\Router;
+use Friendica\AppHelper;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -51,8 +52,8 @@ class BaseApi extends BaseModule
 	 */
 	protected static $request = [];
 
-	/** @var App */
-	protected $app;
+	/** @var AppHelper */
+	protected $appHelper;
 
 	/** @var ApiResponse */
 	protected $response;
@@ -60,11 +61,11 @@ class BaseApi extends BaseModule
 	/** @var \Friendica\Factory\Api\Mastodon\Error */
 	protected $errorFactory;
 
-	public function __construct(\Friendica\Factory\Api\Mastodon\Error $errorFactory, App $app, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	public function __construct(\Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->app          = $app;
+		$this->appHelper    = $appHelper;
 		$this->errorFactory = $errorFactory;
 	}
 
@@ -225,7 +226,7 @@ class BaseApi extends BaseModule
 					self::setBoundaries($post_item['uri-id']);
 			}
 		} catch (\Exception $e) {
-			Logger::debug('Error processing page boundary calculation, skipping', ['error' => $e]);
+			$this->logger->debug('Error processing page boundary calculation, skipping', ['error' => $e]);
 		}
 	}
 
@@ -250,7 +251,7 @@ class BaseApi extends BaseModule
 
 	/**
 	 * Set boundaries for the "link" header
-	 * @param array $boundaries
+	 *
 	 * @param int|\DateTime $id
 	 */
 	protected static function setBoundaries($id)
@@ -286,8 +287,8 @@ class BaseApi extends BaseModule
 		$prev_request = $next_request = $request;
 
 		if ($asDate) {
-			$max_date = self::$boundaries['max'];
-			$min_date = self::$boundaries['min'];
+			$max_date               = self::$boundaries['max'];
+			$min_date               = self::$boundaries['min'];
 			$prev_request['min_id'] = $max_date->format(DateTimeFormat::JSON);
 			$next_request['max_id'] = $min_date->format(DateTimeFormat::JSON);
 		} else {
@@ -362,8 +363,8 @@ class BaseApi extends BaseModule
 	 */
 	public static function appSupportsQuotes(): bool
 	{
-		$token = OAuth::getCurrentApplicationToken();
-		return (!empty($token['name']) && in_array($token['name'], ['Fedilab']));
+		// @todo Clean up the whole functionality since it isn't of any use anymore.
+		return true;
 	}
 
 	/**
@@ -431,48 +432,48 @@ class BaseApi extends BaseModule
 		// Check for throttling (maximum posts per day, week and month)
 		$throttle_day = DI::config()->get('system', 'throttle_limit_day');
 		if ($throttle_day > 0) {
-			$datefrom = date(DateTimeFormat::MYSQL, time() - 24*60*60);
+			$datefrom = date(DateTimeFormat::MYSQL, time() - 24 * 60 * 60);
 
 			$condition = ["`gravity` = ? AND `uid` = ? AND `wall` AND `received` > ?", Item::GRAVITY_PARENT, $uid, $datefrom];
 			$posts_day = Post::countThread($condition);
 
 			if ($posts_day > $throttle_day) {
 				$this->logger->notice('Daily posting limit reached', ['uid' => $uid, 'posts' => $posts_day, 'limit' => $throttle_day]);
-				$error = $this->t('Too Many Requests');
+				$error             = $this->t('Too Many Requests');
 				$error_description = $this->tt("Daily posting limit of %d post reached. The post was rejected.", "Daily posting limit of %d posts reached. The post was rejected.", $throttle_day);
-				$errorobj = new \Friendica\Object\Api\Mastodon\Error($error, $error_description);
+				$errorobj          = new \Friendica\Object\Api\Mastodon\Error($error, $error_description);
 				$this->jsonError(429, $errorobj->toArray());
 			}
 		}
 
 		$throttle_week = DI::config()->get('system', 'throttle_limit_week');
 		if ($throttle_week > 0) {
-			$datefrom = date(DateTimeFormat::MYSQL, time() - 24*60*60*7);
+			$datefrom = date(DateTimeFormat::MYSQL, time() - 24 * 60 * 60 * 7);
 
-			$condition = ["`gravity` = ? AND `uid` = ? AND `wall` AND `received` > ?", Item::GRAVITY_PARENT, $uid, $datefrom];
+			$condition  = ["`gravity` = ? AND `uid` = ? AND `wall` AND `received` > ?", Item::GRAVITY_PARENT, $uid, $datefrom];
 			$posts_week = Post::countThread($condition);
 
 			if ($posts_week > $throttle_week) {
-				Logger::notice('Weekly posting limit reached', ['uid' => $uid, 'posts' => $posts_week, 'limit' => $throttle_week]);
-				$error = $this->t('Too Many Requests');
+				$this->logger->notice('Weekly posting limit reached', ['uid' => $uid, 'posts' => $posts_week, 'limit' => $throttle_week]);
+				$error             = $this->t('Too Many Requests');
 				$error_description = $this->tt("Weekly posting limit of %d post reached. The post was rejected.", "Weekly posting limit of %d posts reached. The post was rejected.", $throttle_week);
-				$errorobj = new \Friendica\Object\Api\Mastodon\Error($error, $error_description);
+				$errorobj          = new \Friendica\Object\Api\Mastodon\Error($error, $error_description);
 				$this->jsonError(429, $errorobj->toArray());
 			}
 		}
 
 		$throttle_month = DI::config()->get('system', 'throttle_limit_month');
 		if ($throttle_month > 0) {
-			$datefrom = date(DateTimeFormat::MYSQL, time() - 24*60*60*30);
+			$datefrom = date(DateTimeFormat::MYSQL, time() - 24 * 60 * 60 * 30);
 
-			$condition = ["`gravity` = ? AND `uid` = ? AND `wall` AND `received` > ?", Item::GRAVITY_PARENT, $uid, $datefrom];
+			$condition   = ["`gravity` = ? AND `uid` = ? AND `wall` AND `received` > ?", Item::GRAVITY_PARENT, $uid, $datefrom];
 			$posts_month = Post::countThread($condition);
 
 			if ($posts_month > $throttle_month) {
-				Logger::notice('Monthly posting limit reached', ['uid' => $uid, 'posts' => $posts_month, 'limit' => $throttle_month]);
-				$error = $this->t('Too Many Requests');
+				$this->logger->notice('Monthly posting limit reached', ['uid' => $uid, 'posts' => $posts_month, 'limit' => $throttle_month]);
+				$error             = $this->t('Too Many Requests');
 				$error_description = $this->tt('Monthly posting limit of %d post reached. The post was rejected.', 'Monthly posting limit of %d posts reached. The post was rejected.', $throttle_month);
-				$errorobj = new \Friendica\Object\Api\Mastodon\Error($error, $error_description);
+				$errorobj          = new \Friendica\Object\Api\Mastodon\Error($error, $error_description);
 				$this->jsonError(429, $errorobj->toArray());
 			}
 		}
@@ -509,7 +510,7 @@ class BaseApi extends BaseModule
 	/**
 	 * @param int   $errorno
 	 * @param Error $error
-	 * @return void
+	 * @return never
 	 * @throws HTTPException\InternalServerErrorException
 	 */
 	protected function logAndJsonError(int $errorno, Error $error)

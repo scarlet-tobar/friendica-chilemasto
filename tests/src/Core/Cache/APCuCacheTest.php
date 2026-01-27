@@ -8,11 +8,12 @@
 namespace Friendica\Test\src\Core\Cache;
 
 use Friendica\Core\Cache\Type\APCuCache;
+use Friendica\Test\MemoryCacheTestCase;
 
 /**
  * @group APCU
  */
-class APCuCacheTest extends MemoryCacheTest
+class APCuCacheTest extends MemoryCacheTestCase
 {
 	protected function setUp(): void
 	{
@@ -33,5 +34,19 @@ class APCuCacheTest extends MemoryCacheTest
 	{
 		$this->cache->clear(false);
 		parent::tearDown();
+	}
+
+	/**
+	 * @small
+	 */
+	public function testStats()
+	{
+		$stats = $this->instance->getStats();
+
+		self::assertNotNull($stats['entries']);
+		self::assertNotNull($stats['used_memory']);
+		self::assertNotNull($stats['hits']);
+		self::assertNotNull($stats['misses']);
+		self::assertNotNull($stats['avail_mem']);
 	}
 }

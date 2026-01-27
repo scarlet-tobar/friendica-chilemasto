@@ -14,14 +14,14 @@ use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Lock\Capability\ICanLock;
 use Friendica\Database\Database;
-use Friendica\Test\FixtureTest;
+use Friendica\Test\FixtureTestCase;
 use Friendica\Util\BasePath;
 use Friendica\Core\Config\Util\ConfigFileManager;
 use Psr\Log\LoggerInterface;
 
-class DependencyCheckTest extends FixtureTest
+class DependencyCheckTest extends FixtureTestCase
 {
-	protected function setUp() : void
+	protected function setUp(): void
 	{
 		parent::setUp();
 
@@ -114,18 +114,6 @@ class DependencyCheckTest extends FixtureTest
 	{
 		/** @var LoggerInterface $logger */
 		$logger = $this->dice->create(LoggerInterface::class, [['$channel' => 'test']]);
-
-		self::assertInstanceOf(LoggerInterface::class, $logger);
-	}
-
-	public function testDevLogger()
-	{
-		/** @var IManageConfigValues $config */
-		$config = $this->dice->create(IManageConfigValues::class);
-		$config->set('system', 'dlogfile', $this->root->url() . '/friendica.log');
-
-		/** @var LoggerInterface $logger */
-		$logger = $this->dice->create('$devLogger', ['dev']);
 
 		self::assertInstanceOf(LoggerInterface::class, $logger);
 	}

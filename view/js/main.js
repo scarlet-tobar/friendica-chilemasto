@@ -65,10 +65,12 @@ function openCloseWidget(inflated, deflated) {
 		elInf.style.display = "block";
 		elDef.style.display = "none";
 		localStorage.setItem(window.location.pathname.split("/")[1] + ":" + inflated, "block");
+		elInf.querySelector("button").focus();
 	} else {
 		elInf.style.display = "none";
 		elDef.style.display = "block";
 		localStorage.setItem(window.location.pathname.split("/")[1] + ":" + inflated, "none");
+		elDef.querySelector("button").focus();
 	}
 }
 
@@ -247,11 +249,25 @@ $(function() {
 	var notifications_mark = unescape($('<div>').append($("#nav-notifications-mark-all").clone()).html()); //outerHtml hack
 	var notifications_empty = unescape($("#nav-notifications-menu").html());
 
+	/* Ensure loading is visible when notifications menu is opened (if no notifications loaded yet)*/
+	$('#nav-notifications-linkmenu, #nav-notifications-menu-btn').on('click', function() {
+		if ($("#nav-notifications-loading").length && $("#nav-notifications-empty").length) {
+			// Only show loading if we haven't loaded notifications yet
+			var menu = $("#nav-notifications-menu");
+			var hasNotifications = menu.find('.notif-item, li').not('#nav-notifications-loading, #nav-notifications-empty').length > 0;
+			var hasContent = menu.html().indexOf('nav-notifications-see-all') > -1;
+			if (!hasNotifications && !hasContent) {
+				$("#nav-notifications-loading").show();
+				$("#nav-notifications-empty").hide();
+			}
+		}
+	});
+
 	/* enable perfect-scrollbars for different elements */
 	$('#nav-notifications-menu, aside').perfectScrollbar();
 
 	/* nav update event  */
-	$('nav').bind('nav-update', function(e, data) {
+	$('#topbar-first').bind('nav-update', function(e, data) {
 		var invalid = data.invalid || 0;
 		if (invalid == 1) {
 			window.location.href=window.location.href
@@ -301,11 +317,27 @@ $(function() {
 			$(".group-"+fid+" .notify").addClass("show").text(fcount);
 		});
 
+		// Hide loading state when we receive notification data
+		$("#nav-notifications-loading").hide();
+
 		if (data.notifications.length == 0) {
-			$("#nav-notifications-menu").html(notifications_empty);
+			$("#nav-notifications-empty").show();
 		} else {
+			$("#nav-notifications-empty").hide();
 			var nnm = $("#nav-notifications-menu");
+			// Preserve the loading and empty state elements when rebuilding the menu
+			var loadingElement = nnm.find("#nav-notifications-loading");
+			var emptyElement = nnm.find("#nav-notifications-empty");
+
 			nnm.html(notifications_all + notifications_mark);
+
+			// Re-add the loading and empty elements if they existed
+			if (loadingElement.length > 0) {
+				nnm.append(loadingElement);
+			}
+			if (emptyElement.length > 0) {
+				nnm.append(emptyElement);
+			}
 
 			var lastItemStorageKey = "notification-lastitem:" + localUser;
 			var notification_lastitem = parseInt(localStorage.getItem(lastItemStorageKey));
@@ -495,20 +527,22 @@ function NavUpdate() {
 		$.get(pingCmd, function(data) {
 			if (data.result) {
 				// send nav-update event
-				$('nav').trigger('nav-update', data.result);
+				$('#topbar-first').trigger('nav-update', data.result);
 
 				// start live update
 				['network', 'profile', 'channel', 'community', 'notes', 'display', 'contact'].forEach(function (src) {
-					if ($('#live-' + src).length) {
+					if ($('#live-' + src).length && (force_update || (updateContent && ['network', 'channel', 'community'].includes(src)))) {
 						liveUpdate(src);
 					}
 				});
 
-				if (!$('#live-network').length) {
+				if ($('#live-network').length) {
+					networkUpdate();
+				} else {
 					var update_url = 'ping_network?ping=1';
 					$.get(update_url, function(net) {
 						updateCounter('net', net);
-					});			
+					});
 				}
 
 				if ($('#live-photos').length) {
@@ -520,7 +554,7 @@ function NavUpdate() {
 			}
 		});
 	}
-	timer = setTimeout(NavUpdate, updateInterval);
+	timer = setTimeout(NavUpdate, 30000);
 }
 
 function updateConvItems(data) {
@@ -566,37 +600,13 @@ function updateConvItems(data) {
 	}
 }
 
-function liveUpdate(src) {
-	if ((src == null) || stopped || !profile_uid) {
-		$('.like-rotator').hide(); return;
-	}
-
-	if (($('.comment-edit-text-full').length) || in_progress) {
-		if (livetime) {
-			clearTimeout(livetime);
-		}
-		livetime = setTimeout(function() {liveUpdate(src)}, 5000);
-		return;
-	}
-
-	if (livetime != null) {
-		livetime = null;
-	}
-	prev = 'live-' + src;
-
-	in_progress = true;
-
+function getUpdateUrl(src)
+{
 	let force = force_update || $(document).scrollTop() === 0;
-
-	var orgHeight = $("section").height();
 
 	var udargs = ((netargs.length) ? '/' + netargs : '');
 
 	var update_url = src + udargs + '&p=' + profile_uid + '&force=' + (force ? 1 : 0) + '&item=' + update_item;
-
-	if (force_update) {
-		force_update = false;
-	}
 
 	if (getUrlParameter('page')) {
 		update_url += '&page=' + getUrlParameter('page');
@@ -627,6 +637,36 @@ function liveUpdate(src) {
 	if (match.length > 0) {
 		update_url += '&first_uriid=' + match[0].innerHTML;
 	}
+	return update_url;
+}
+
+function liveUpdate(src) {
+	if ((src == null) || stopped || !profile_uid) {
+		$('.like-rotator').hide(); return;
+	}
+
+	if (($('.comment-edit-text-full').length) || in_progress) {
+		if (livetime) {
+			clearTimeout(livetime);
+		}
+		livetime = setTimeout(function() {liveUpdate(src)}, 5000);
+		return;
+	}
+
+	if (livetime != null) {
+		livetime = null;
+	}
+	prev = 'live-' + src;
+
+	in_progress = true;
+
+	var orgHeight = $("section").height();
+
+	var update_url = getUpdateUrl(src);
+
+	if (force_update) {
+		force_update = false;
+	}
 
 	$.get('update_' + update_url, function(data) {
 		in_progress = false;
@@ -645,12 +685,12 @@ function liveUpdate(src) {
 			$(window).scrollTop($(window).scrollTop() + $("section").height() - orgHeight);
 		});
 	});
+}
 
-	if (src == 'network') {
-		$.get('ping_' + update_url, function(net) {
-			updateCounter('net', net);
-		});
-	}
+function networkUpdate() {
+	$.get('ping_' + getUpdateUrl('network'), function(net) {
+		updateCounter('net', net);
+	});
 }
 
 function updateCounter(type, counter) {
@@ -709,6 +749,15 @@ function doFollowThread(ident) {
 	unpause();
 	$('#like-rotator-' + ident.toString()).show();
 	$.post('item/' + ident.toString() + '/follow', NavUpdate);
+	liking = 1;
+	force_update = true;
+	update_item = ident.toString();
+}
+
+function doCompleteThread(ident) {
+	unpause();
+	$('#like-rotator-' + ident.toString()).show();
+	$.post('item/' + ident.toString() + '/complete', NavUpdate);
 	liking = 1;
 	force_update = true;
 	update_item = ident.toString();
@@ -1073,9 +1122,15 @@ Array.prototype.remove = function(item) {
 function previewTheme(elm) {
 	theme = $(elm).val();
 	$.getJSON('pretheme?theme=' + theme,function(data) {
-			$('#theme-preview').html('<div id="theme-desc">' + data.desc + '</div><div id="theme-version">' + data.version + '</div><div id="theme-credits">' + data.credits + '</div><a href="' + data.img + '"><img src="' + data.img + '" width="320" height="240" alt="' + theme + '" /></a>');
+			$('#theme-preview').html(`
+		<div id="theme-desc">${data.desc}</div>
+		<div id="theme-credits">${data.credits}</div>
+		<a href="${data.img}">
+			<img src="${data.img}" width="320" height="240" alt="${theme}" />
+		</a>
+		<div id="theme-version">${data.version}</div>
+	`);
 	});
-
 }
 
 // notification permission settings in localstorage

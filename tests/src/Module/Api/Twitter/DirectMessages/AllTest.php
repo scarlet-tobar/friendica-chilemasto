@@ -10,9 +10,9 @@ namespace Friendica\Test\src\Module\Api\Twitter\DirectMessages;
 use Friendica\DI;
 use Friendica\Module\Api\Twitter\DirectMessages\All;
 use Friendica\Factory\Api\Twitter\DirectMessage;
-use Friendica\Test\src\Module\Api\ApiTest;
+use Friendica\Test\ApiTestCase;
 
-class AllTest extends ApiTest
+class AllTest extends ApiTestCase
 {
 	/**
 	 * Test the api_direct_messages_box() function.
@@ -25,7 +25,7 @@ class AllTest extends ApiTest
 
 		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
 
-		$response = (new All($directMessage, DI::dba(), DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		$response = (new All($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
 			->run($this->httpExceptionMock);
 
 		$json = $this->toJson($response);

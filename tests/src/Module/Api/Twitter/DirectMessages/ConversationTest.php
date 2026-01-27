@@ -7,13 +7,12 @@
 
 namespace Friendica\Test\src\Module\Api\Twitter\DirectMessages;
 
-use Friendica\App\Router;
 use Friendica\DI;
 use Friendica\Factory\Api\Twitter\DirectMessage;
 use Friendica\Module\Api\Twitter\DirectMessages\Conversation;
-use Friendica\Test\src\Module\Api\ApiTest;
+use Friendica\Test\ApiTestCase;
 
-class ConversationTest extends ApiTest
+class ConversationTest extends ApiTestCase
 {
 	/**
 	 * Test the api_direct_messages_box() function.
@@ -24,7 +23,7 @@ class ConversationTest extends ApiTest
 	{
 		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
 
-		$response = (new Conversation($directMessage, DI::dba(), DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		$response = (new Conversation($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
 			->run($this->httpExceptionMock, [
 				'friendica_verbose' => true,
 			]);

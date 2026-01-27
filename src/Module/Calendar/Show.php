@@ -7,7 +7,10 @@
 
 namespace Friendica\Module\Calendar;
 
-use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\App\Page;
+use Friendica\AppHelper;
 use Friendica\BaseModule;
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
@@ -18,13 +21,13 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
 use Friendica\Model\Event;
 use Friendica\Model\Profile;
-use Friendica\Model\User;
 use Friendica\Module\BaseProfile;
 use Friendica\Module\Response;
 use Friendica\Module\Security\Login;
 use Friendica\Network\HTTPException;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Util\Profiler;
+use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
 
 class Show extends BaseModule
@@ -33,19 +36,19 @@ class Show extends BaseModule
 	protected $session;
 	/** @var SystemMessages */
 	protected $sysMessages;
-	/** @var App\Page */
+	/** @var Page */
 	protected $page;
-	/** @var App */
-	protected $app;
+	/** @var AppHelper */
+	protected $appHelper;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, SystemMessages $sysMessages, App\Page $page, App $app, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, SystemMessages $sysMessages, Page $page, AppHelper $appHelper, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->session     = $session;
 		$this->sysMessages = $sysMessages;
 		$this->page        = $page;
-		$this->app         = $app;
+		$this->appHelper   = $appHelper;
 	}
 
 	protected function content(array $request = []): string
@@ -55,7 +58,7 @@ class Show extends BaseModule
 			throw new HTTPException\UnauthorizedException();
 		}
 
-		$owner = Profile::load($this->app, $nickname, false);
+		$owner = Profile::load($this->appHelper, $nickname, false);
 		if (!$owner || $owner['account_expired'] || $owner['account_removed']) {
 			throw new HTTPException\NotFoundException($this->t('User not found.'));
 		}
@@ -109,13 +112,15 @@ class Show extends BaseModule
 			'$tabs'      => $tabs,
 			'$title'     => $this->t('Events'),
 			'$view'      => $this->t('View'),
-			'$new_event' => ['calendar/event/new', $this->t('Create New Event'), '', ''],
+			'$new_event' => ['calendar/event/new', $this->t('New Event'), '', ''],
 
-			'$today' => $this->t('today'),
-			'$month' => $this->t('month'),
-			'$week'  => $this->t('week'),
-			'$day'   => $this->t('day'),
-			'$list'  => $this->t('list'),
+			'$today' => Strings::ucFirst($this->t('today')),
+			'$month' => Strings::ucFirst($this->t('month')),
+			'$week'  => Strings::ucFirst($this->t('week')),
+			'$day'   => Strings::ucFirst($this->t('day')),
+			'$list'  => Strings::ucFirst($this->t('list')),
+			'$prev'  => Strings::ucFirst($this->t('prev')),
+			'$next'  => Strings::ucFirst($this->t('next')),
 		]);
 
 		return $o;

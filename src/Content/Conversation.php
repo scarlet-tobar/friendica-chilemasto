@@ -7,13 +7,13 @@
 
 namespace Friendica\Content;
 
-use Friendica\App;
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
+use Friendica\App\Mode;
+use Friendica\App\Page;
 use Friendica\BaseModule;
 use Friendica\Core\ACL;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
@@ -21,6 +21,8 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
 use Friendica\Database\DBA;
+use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item as ItemModel;
 use Friendica\Model\Post;
@@ -32,13 +34,15 @@ use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Object\Post as PostObject;
 use Friendica\Object\Thread;
 use Friendica\Protocol\Activity;
-use Friendica\User\Settings\Entity\UserGServer;
-use Friendica\User\Settings\Repository;
+use Friendica\User\Settings\Entity\UserGServer as UserGServerEntity;
+use Friendica\User\Settings\Repository\UserGServer as UserGServerRepository;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
 use Friendica\Util\Temporal;
+use ImagickException;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Conversation
@@ -64,7 +68,7 @@ class Conversation
 	private $logger;
 	/** @var Item */
 	private $item;
-	/** @var App\Arguments */
+	/** @var Arguments */
 	private $args;
 	/** @var IManagePersonalConfigValues */
 	private $pConfig;
@@ -72,33 +76,32 @@ class Conversation
 	private $baseURL;
 	/** @var IManageConfigValues */
 	private $config;
-	/** @var App */
-	private $app;
-	/** @var App\Page */
+	/** @var Page */
 	private $page;
-	/** @var App\Mode */
+	/** @var Mode */
 	private $mode;
 	/** @var IHandleUserSessions */
 	private $session;
-	/** @var Repository\UserGServer */
+	/** @var UserGServerRepository */
 	private $userGServer;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(Repository\UserGServer $userGServer, LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, Item $item, Arguments $args, BaseURL $baseURL, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, App\Page $page, App\Mode $mode, App $app, IHandleUserSessions $session)
+	public function __construct(UserGServerRepository $userGServer, LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, Item $item, Arguments $args, BaseURL $baseURL, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Page $page, Mode $mode, EventDispatcherInterface $eventDispatcher, IHandleUserSessions $session)
 	{
-		$this->activity    = $activity;
-		$this->item        = $item;
-		$this->config      = $config;
-		$this->mode        = $mode;
-		$this->baseURL     = $baseURL;
-		$this->profiler    = $profiler;
-		$this->logger      = $logger;
-		$this->l10n        = $l10n;
-		$this->args        = $args;
-		$this->pConfig     = $pConfig;
-		$this->page        = $page;
-		$this->app         = $app;
-		$this->session     = $session;
-		$this->userGServer = $userGServer;
+		$this->activity        = $activity;
+		$this->item            = $item;
+		$this->config          = $config;
+		$this->mode            = $mode;
+		$this->baseURL         = $baseURL;
+		$this->profiler        = $profiler;
+		$this->logger          = $logger;
+		$this->l10n            = $l10n;
+		$this->args            = $args;
+		$this->pConfig         = $pConfig;
+		$this->page            = $page;
+		$this->eventDispatcher = $eventDispatcher;
+		$this->session         = $session;
+		$this->userGServer     = $userGServer;
 	}
 
 	/**
@@ -110,7 +113,7 @@ class Conversation
 	 * @param array &$conv_responses (already created with builtin activity structure)
 	 * @return void
 	 * @throws ImagickException
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws InternalServerErrorException
 	 */
 	public function builtinActivityPuller(array $activity, array &$conv_responses)
 	{
@@ -204,7 +207,7 @@ class Conversation
 
 		if ($total === 0) {
 			throw new InternalServerErrorException(sprintf('There has to be at least one Liker for verb "%s"', $verb));
-		} else if ($total === 1) {
+		} elseif ($total === 1) {
 			$likerString = $likers[0];
 		} else {
 			if ($total < $this->config->get('system', 'max_likers')) {
@@ -262,7 +265,10 @@ class Conversation
 					$phrase = $this->l10n->tt('<button type="button" %2$s>%1$d person</button> likes this', '<button type="button" %2$s>%1$d people</button> like this', $total, $spanatts);
 					break;
 				case 'dislike':
-					$phrase = $this->l10n->tt('<button type="button" %2$s>%1$d person</button> doesn\'t like this', '<button type="button" %2$s>%1$d peiple</button> don\'t like this', $total, $spanatts);
+					$dislike_translation_plural = '<button type="button" %2$s>%1$d people</button> don\'t like this';
+					// @deprecated 2025.07 this translation is scheduled for removal as a new translation has been added without the typo
+					$dislike_translation_plural = '<button type="button" %2$s>%1$d peiple</button> don\'t like this';
+					$phrase                     = $this->l10n->tt('<button type="button" %2$s>%1$d person</button> doesn\'t like this', $dislike_translation_plural, $total, $spanatts);
 					break;
 				case 'attendyes':
 					$phrase = $this->l10n->tt('<button type="button" %2$s>%1$d person</button> attends', '<button type="button" %2$s>%1$d people</button> attend', $total, $spanatts);
@@ -317,20 +323,23 @@ class Conversation
 
 		$tpl = Renderer::getMarkupTemplate('jot-header.tpl');
 		$this->page['htmlhead'] .= Renderer::replaceMacros($tpl, [
-			'$newpost'   => 'true',
-			'$geotag'    => $geotag,
-			'$nickname'  => $x['nickname'],
-			'$ispublic'  => $this->l10n->t('Visible to <strong>everybody</strong>'),
-			'$linkurl'   => $this->l10n->t('Please enter a image/video/audio/webpage URL:'),
-			'$term'      => $this->l10n->t('Tag term:'),
-			'$fileas'    => $this->l10n->t('Save to Folder:'),
-			'$whereareu' => $this->l10n->t('Where are you right now?'),
-			'$delitems'  => $this->l10n->t("Delete item\x28s\x29?"),
-			'$is_mobile' => $this->mode->isMobile(),
+			'$newpost'       => 'true',
+			'$geotag'        => $geotag,
+			'$nickname'      => $x['nickname'],
+			'$ispublic'      => $this->l10n->t('Visible to <strong>everybody</strong>'),
+			'$linkurl'       => $this->l10n->t('Please enter a image/video/audio/webpage URL:'),
+			'$term'          => $this->l10n->t('Tag term:'),
+			'$fileas'        => $this->l10n->t('Save to Folder'),
+			'$whereareu'     => $this->l10n->t('Where are you right now?'),
+			'$delitems'      => $this->l10n->t("Delete item\x28s\x29?"),
+			'$postPublished' => $this->l10n->t('Post published.'),
+			'$goToPost'      => $this->l10n->t('Go to post'),
+			'$is_mobile'     => $this->mode->isMobile(),
 		]);
 
-		$jotplugins = '';
-		Hook::callAll('jot_tool', $jotplugins);
+		$jotplugins = $this->eventDispatcher->dispatch(
+			new HtmlFilterEvent(HtmlFilterEvent::JOT_TOOL, ''),
+		)->getHtml();
 
 		if ($this->config->get('system', 'set_creation_date')) {
 			$created_at = Temporal::getDateTimeField(
@@ -408,7 +417,7 @@ class Conversation
 
 			//jot nav tab (used in some themes)
 			'$message' => $this->l10n->t('Message'),
-			'$browser' => $this->l10n->t('Browser'),
+			'$browser' => $this->l10n->t('Add file'),
 
 			'$compose_link_title'  => $this->l10n->t('Open Compose page'),
 			'$always_open_compose' => $this->pConfig->get($this->session->getLocalUserId(), 'frio', 'always_open_compose', false),
@@ -454,7 +463,7 @@ class Conversation
 
 		$userGservers = $this->userGServer->listIgnoredByUser($this->session->getLocalUserId());
 
-		$ignoredGsids = array_map(function (UserGServer $userGServer) {
+		$ignoredGsids = array_map(function (UserGServerEntity $userGServer) {
 			return $userGServer->gsid;
 		}, $userGservers->getArrayCopy());
 
@@ -560,7 +569,10 @@ class Conversation
 		}
 
 		$cb = ['items' => $items, 'mode' => $mode, 'update' => $update, 'preview' => $preview];
-		Hook::callAll('conversation_start', $cb);
+
+		$cb = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::CONVERSATION_START, $cb),
+		)->getArray();
 
 		$items = $cb['items'];
 
@@ -596,7 +608,7 @@ class Conversation
 	 * @param string $formSecurityToken A 'contact_action' form security token
 	 * @return array
 	 * @throws InternalServerErrorException
-	 * @throws \ImagickException
+	 * @throws ImagickException
 	 */
 	public function getThreadList(array $items, string $mode, bool $preview, bool $pagedrop, string $formSecurityToken): array
 	{
@@ -650,10 +662,6 @@ class Conversation
 				if (!$this->item->isVisibleActivity($item)) {
 					continue;
 				}
-
-				/// @todo Check if this call is needed or not
-				$arr = ['item' => $item];
-				Hook::callAll('display_item', $arr);
 
 				$item['pagedrop'] = $pagedrop;
 
@@ -973,8 +981,8 @@ class Conversation
 		}
 
 		foreach ($items as $key => $row) {
-			$items[$key]['emojis']      = $emojis[$key] ?? [];
-			$items[$key]['counts']      = $counts[$key] ?? 0;
+			$items[$key]['emojis']      = $emojis[$key]      ?? [];
+			$items[$key]['counts']      = $counts[$key]      ?? 0;
 			$items[$key]['quoteshares'] = $quoteshares[$key] ?? [];
 
 			$always_display = in_array($mode, [self::MODE_CONTACTS, self::MODE_CONTACT_POSTS]);
@@ -1017,7 +1025,7 @@ class Conversation
 			$emojis[$count['uri-id']][$count['reaction']]['title'] = [];
 		}
 
-		// @todo The following code should be removed, once that we display activity authors on demand 
+		// @todo The following code should be removed, once that we display activity authors on demand
 		$activity_verbs = [
 			Activity::LIKE,
 			Activity::DISLIKE,
@@ -1428,7 +1436,7 @@ class Conversation
 	public function getContextLessThreadList(array $items, string $mode, bool $preview, bool $pagedrop, string $formSecurityToken): array
 	{
 		$threads = [];
-		$uriids = [];
+		$uriids  = [];
 
 		foreach ($items as $item) {
 			if (in_array($item['uri-id'], $uriids)) {
@@ -1453,7 +1461,7 @@ class Conversation
 
 			$tags = Tag::populateFromItem($item);
 
-			$author       = [
+			$author = [
 				'uid'     => 0,
 				'id'      => $item['author-id'],
 				'network' => $item['author-network'],
@@ -1468,7 +1476,11 @@ class Conversation
 			}
 
 			$locate = ['location' => $item['location'], 'coord' => $item['coord'], 'html' => ''];
-			Hook::callAll('render_location', $locate);
+
+			$locate = $this->eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::RENDER_LOCATION, $locate),
+			)->getArray();
+
 			$location_html = $locate['html'] ?: Strings::escapeHtml($locate['location'] ?: $locate['coord'] ?: '');
 
 			$this->item->localize($item);
@@ -1498,7 +1510,7 @@ class Conversation
 
 			$body_html = ItemModel::prepareBody($item, true, $preview);
 
-			[$categories, $folders] = $this->item->determineCategoriesTerms($item, $this->session->getLocalUserId());
+			list($categories, $folders) = $this->item->determineCategoriesTerms($item, $this->session->getLocalUserId());
 
 			if (!empty($item['featured'])) {
 				$pinned = $this->l10n->t('Pinned item');
@@ -1564,7 +1576,10 @@ class Conversation
 			];
 
 			$arr = ['item' => $item, 'output' => $tmp_item];
-			Hook::callAll('display_item', $arr);
+
+			$arr = $this->eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::DISPLAY_ITEM, $arr),
+			)->getArray();
 
 			$threads[] = [
 				'id'      => $item['id'],

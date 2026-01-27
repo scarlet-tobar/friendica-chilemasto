@@ -7,10 +7,10 @@
 
 namespace Friendica\Util;
 
-use Friendica\Core\Logger;
 use DateTime;
 use DateTimeZone;
 use Exception;
+use Friendica\DI;
 
 /**
  * Temporal class
@@ -23,7 +23,7 @@ class DateTimeFormat
 	const JSON  = 'Y-m-d\TH:i:s.v\Z';
 	const API   = 'D M d H:i:s +0000 Y';
 
-	static $localTimezone = 'UTC';
+	public static $localTimezone = 'UTC';
 
 	public static function setLocalTimeZone(string $timezone)
 	{
@@ -117,8 +117,12 @@ class DateTimeFormat
 			$tz_to = 'UTC';
 		}
 
-		if (($s === '') || (!is_string($s))) {
+		if ($s === '') {
 			$s = 'now';
+		}
+
+		if (is_numeric($s) && ($s > time() * 100)) {
+			$s = number_format($s / 1000, 0, '.', '');
 		}
 
 		// Lowest possible datetime value
@@ -135,12 +139,13 @@ class DateTimeFormat
 		}
 
 		try {
-			$d = new DateTime($s, $from_obj);
+			$d = DateTime::createFromFormat('U', $s, $from_obj)
+				?: new DateTime($s, $from_obj);
 		} catch (Exception $e) {
 			try {
 				$d = new DateTime(self::fix($s), $from_obj);
 			} catch (\Throwable $e) {
-				Logger::warning('DateTimeFormat::convert: exception: ' . $e->getMessage());
+				DI::logger()->warning('DateTimeFormat::convert: exception: ' . $e->getMessage());
 				$d = new DateTime('now', $from_obj);
 			}
 		}
@@ -176,6 +181,7 @@ class DateTimeFormat
 		$pregPatterns = [
 			['#(\w+), (\d+ \w+ \d+) (\d+:\d+:\d+) (.+)#', '$2 $3 $4'],
 			['#(\d+:\d+) (\w+), (\w+) (\d+), (\d+)#', '$1 $2 $3 $4 $5'],
+			['#\[[^\]]*\]#', ''], // 2025-03-07T08:54:14.341+01:00[Europe/Berlin]
 		];
 
 		foreach ($pregPatterns as $pattern) {

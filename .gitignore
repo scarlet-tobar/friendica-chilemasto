@@ -72,7 +72,6 @@ venv/
 /.idea
 
 #ignore addons directory
-/addons
 /addon
 
 #ignore base .htaccess
@@ -90,6 +89,7 @@ venv/
 #Ignore cache files
 .php_cs.cache
 .php-cs-fixer.cache
+.phpmd.result-cache.php
 
 #ignore avatar picture cache path
 /avatar
@@ -102,3 +102,6 @@ tests/.phpunit.result.cache
 
 #ignore .php_cs (local copy)
 .php_cs
+
+#ignore daemon.pid file
+daemon.pid

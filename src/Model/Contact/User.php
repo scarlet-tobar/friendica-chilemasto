@@ -8,13 +8,13 @@
 namespace Friendica\Model\Contact;
 
 use Exception;
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\ItemURI;
+use Friendica\Network\HTTPException\InternalServerErrorException;
 use PDOException;
 
 /**
@@ -30,9 +30,8 @@ class User
 	 * Insert a user-contact for a given contact array
 	 *
 	 * @param array $contact
-	 * @return void
 	 */
-	public static function insertForContactArray(array $contact)
+	public static function insertForContactArray(array $contact): bool
 	{
 		if (empty($contact['uid'])) {
 			// We don't create entries for the public user - by now
@@ -40,7 +39,7 @@ class User
 		}
 
 		if (empty($contact['uri-id']) && empty($contact['url'])) {
-			Logger::info('Missing contact details', ['contact' => $contact]);
+			DI::logger()->info('Missing contact details', ['contact' => $contact]);
 			return false;
 		}
 
@@ -52,18 +51,18 @@ class User
 		if (!empty($contact['uri-id']) && DBA::isResult($pcontact)) {
 			$pcid = $pcontact['id'];
 		} elseif (empty($contact['url']) || !($pcid = Contact::getIdForURL($contact['url'], 0, false))) {
-			Logger::info('Public contact for user not found', ['uri-id' => $contact['uri-id'], 'uid' => $contact['uid']]);
+			DI::logger()->info('Public contact for user not found', ['uri-id' => $contact['uri-id'], 'uid' => $contact['uid']]);
 			return false;
 		}
 
-		$fields = self::preparedFields($contact);
-		$fields['cid'] = $pcid;
-		$fields['uid'] = $contact['uid'];
+		$fields           = self::preparedFields($contact);
+		$fields['cid']    = $pcid;
+		$fields['uid']    = $contact['uid'];
 		$fields['uri-id'] = $contact['uri-id'];
 
 		$ret = DBA::insert('user-contact', $fields, Database::INSERT_UPDATE);
 
-		Logger::info('Inserted user contact', ['uid' => $contact['uid'], 'cid' => $pcid, 'uri-id' => $contact['uri-id'], 'ret' => $ret]);
+		DI::logger()->info('Inserted user contact', ['uid' => $contact['uid'], 'cid' => $pcid, 'uri-id' => $contact['uri-id'], 'ret' => $ret]);
 
 		return $ret;
 	}
@@ -89,8 +88,8 @@ class User
 					continue;
 				}
 				$update_fields['cid'] = $contact['pid'];
-				$ret = DBA::update('user-contact', $update_fields, ['uri-id' => $contact['uri-id'], 'uid' => $contact['uid']], true);
-				Logger::info('Updated user contact', ['uid' => $contact['uid'], 'id' => $contact['pid'], 'uri-id' => $contact['uri-id'], 'ret' => $ret]);
+				$ret                  = DBA::update('user-contact', $update_fields, ['uri-id' => $contact['uri-id'], 'uid' => $contact['uid']], true);
+				DI::logger()->info('Updated user contact', ['uid' => $contact['uid'], 'id' => $contact['pid'], 'uri-id' => $contact['uri-id'], 'ret' => $ret]);
 			}
 
 			DBA::close($contacts);
@@ -130,7 +129,7 @@ class User
 	 * @param boolean $blocked  Is the contact blocked or unblocked?
 	 * @param boolean $only_set Only set the block flag, don't execute any block transmission
 	 * @return void
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public static function setBlocked(int $cid, int $uid, bool $blocked, bool $only_set = false)
 	{
@@ -171,7 +170,7 @@ class User
 	 * @param int $uid User ID
 	 *
 	 * @return boolean is the contact id blocked for the given user?
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public static function isBlocked(int $cid, int $uid): bool
 	{
@@ -212,7 +211,7 @@ class User
 	 * @param int     $uid     User ID
 	 * @param boolean $ignored Is the contact ignored or unignored?
 	 * @return void
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public static function setIgnored(int $cid, int $uid, bool $ignored)
 	{
@@ -234,7 +233,7 @@ class User
 	 * @param int $cid Either public contact id or user's contact id
 	 * @param int $uid User ID
 	 * @return boolean is the contact id ignored for the given user?
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public static function isIgnored(int $cid, int $uid): bool
 	{
@@ -275,7 +274,7 @@ class User
 	 * @param int     $uid       User ID
 	 * @param boolean $collapsed are the contact's posts collapsed or uncollapsed?
 	 * @return void
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public static function setCollapsed(int $cid, int $uid, bool $collapsed)
 	{
@@ -293,7 +292,7 @@ class User
 	 * @param int $cid Either public contact id or user's contact id
 	 * @param int $uid User ID
 	 * @return boolean is the contact id blocked for the given user?
-	 * @throws HTTPException\InternalServerErrorException
+	 * @throws InternalServerErrorException
 	 * @throws \ImagickException
 	 */
 	public static function isCollapsed(int $cid, int $uid): bool
@@ -314,7 +313,7 @@ class User
 	 * @param int $uid       User ID
 	 * @param int $frequency Type of post frequency in channels
 	 * @return void
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public static function setChannelFrequency(int $cid, int $uid, int $frequency)
 	{
@@ -332,14 +331,14 @@ class User
 	 * @param int $cid Either public contact id or user's contact id
 	 * @param int $uid User ID
 	 * @return int Type of post frequency in channels
-	 * @throws HTTPException\InternalServerErrorException
+	 * @throws InternalServerErrorException
 	 * @throws \ImagickException
 	 */
 	public static function getChannelFrequency(int $cid, int $uid): int
 	{
 		$pcid = Contact::getPublicContactId($cid, $uid);
 		if (!$pcid) {
-			return false;
+			return self::FREQUENCY_DEFAULT;
 		}
 
 		$public_contact = DBA::selectFirst('user-contact', ['channel-frequency'], ['cid' => $pcid, 'uid' => $uid]);
@@ -349,11 +348,11 @@ class User
 	/**
 	 * Set the channel only value for contact id and user id
 	 *
-	 * @param int $cid           Either public contact id or user's contact id
-	 * @param int $uid           User ID
-	 * @param int $isChannelOnly Is channel only
+	 * @param int  $cid           Either public contact id or user's contact id
+	 * @param int  $uid           User ID
+	 * @param bool $isChannelOnly Is channel only
 	 * @return void
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public static function setChannelOnly(int $cid, int $uid, bool $isChannelOnly)
 	{
@@ -371,7 +370,7 @@ class User
 	 * @param int $cid Either public contact id or user's contact id
 	 * @param int $uid User ID
 	 * @return bool Contact is channel only
-	 * @throws HTTPException\InternalServerErrorException
+	 * @throws InternalServerErrorException
 	 * @throws \ImagickException
 	 */
 	public static function getChannelOnly(int $cid, int $uid): bool
@@ -392,7 +391,7 @@ class User
 	 * @param int     $uid     User ID
 	 * @param boolean $blocked Is the user blocked or unblocked by the contact?
 	 * @return void
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public static function setIsBlocked(int $cid, int $uid, bool $blocked)
 	{
@@ -410,7 +409,7 @@ class User
 	 * @param int $cid Either public contact id or user's contact id
 	 * @param int $uid User ID
 	 * @return boolean Is the user blocked or unblocked by the contact?
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public static function isIsBlocked(int $cid, int $uid): bool
 	{

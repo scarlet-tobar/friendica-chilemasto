@@ -1,6 +1,6 @@
 -- ------------------------------------------
--- Friendica 2024.12 (Interrupted Fern)
--- DB_UPDATE_VERSION 1576
+-- Friendica 2025.07-rc (Interrupted Fern)
+-- DB_UPDATE_VERSION 1586
 -- ------------------------------------------
 
 
@@ -41,10 +41,13 @@ CREATE TABLE IF NOT EXISTS `gserver` (
 	`blocked` boolean COMMENT 'Server is blocked',
 	`failed` boolean COMMENT 'Connection failed',
 	`next_contact` datetime DEFAULT '0001-01-01 00:00:00' COMMENT 'Next connection request',
+	`redirect-gsid` int unsigned COMMENT 'Target Gserver id in case of a redirect',
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `nurl` (`nurl`(190)),
 	 INDEX `next_contact` (`next_contact`),
-	 INDEX `network` (`network`)
+	 INDEX `network` (`network`),
+	 INDEX `redirect-gsid` (`redirect-gsid`),
+	FOREIGN KEY (`redirect-gsid`) REFERENCES `gserver` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Global servers';
 
 --
@@ -1076,18 +1079,6 @@ CREATE TABLE IF NOT EXISTS `notify-threads` (
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='';
 
 --
--- TABLE oembed
---
-CREATE TABLE IF NOT EXISTS `oembed` (
-	`url` varbinary(383) NOT NULL COMMENT 'page url',
-	`maxwidth` mediumint unsigned NOT NULL COMMENT 'Maximum width passed to Oembed',
-	`content` mediumtext COMMENT 'OEmbed data of the page',
-	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'datetime of creation',
-	 PRIMARY KEY(`url`,`maxwidth`),
-	 INDEX `created` (`created`)
-) DEFAULT COLLATE utf8mb4_general_ci COMMENT='cache for OEmbed queries';
-
---
 -- TABLE openwebauth-token
 --
 CREATE TABLE IF NOT EXISTS `openwebauth-token` (
@@ -1108,7 +1099,7 @@ CREATE TABLE IF NOT EXISTS `openwebauth-token` (
 CREATE TABLE IF NOT EXISTS `parsed_url` (
 	`url_hash` binary(64) NOT NULL COMMENT 'page url hash',
 	`guessing` boolean NOT NULL DEFAULT '0' COMMENT 'is the \'guessing\' mode active?',
-	`oembed` boolean NOT NULL DEFAULT '0' COMMENT 'is the data the result of oembed?',
+	`oembed` boolean NOT NULL DEFAULT '0' COMMENT 'is the data the result of oembed? - Obsolete field.',
 	`url` text NOT NULL COMMENT 'page url',
 	`content` mediumtext COMMENT 'page data',
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'datetime of creation',
@@ -1284,7 +1275,7 @@ CREATE TABLE IF NOT EXISTS `post-collection` (
 CREATE TABLE IF NOT EXISTS `post-content` (
 	`uri-id` int unsigned NOT NULL COMMENT 'Id of the item-uri table entry that contains the item uri',
 	`title` varchar(255) NOT NULL DEFAULT '' COMMENT 'item title',
-	`content-warning` varchar(255) NOT NULL DEFAULT '' COMMENT '',
+	`content-warning` varchar(500) NOT NULL DEFAULT '' COMMENT '',
 	`body` mediumtext COMMENT 'item body content',
 	`raw-body` mediumtext COMMENT 'Body without embedded media links',
 	`quote-uri-id` int unsigned COMMENT 'Id of the item-uri table that contains the quoted uri',
@@ -1371,18 +1362,59 @@ CREATE TABLE IF NOT EXISTS `post-engagement` (
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Engagement data per post';
 
 --
+-- TABLE channel-post
+--
+CREATE TABLE IF NOT EXISTS `channel-post` (
+	`channel` int unsigned NOT NULL COMMENT 'Channel id',
+	`uri-id` int unsigned NOT NULL COMMENT 'Post engagement entry',
+	`uid` mediumint unsigned NOT NULL COMMENT 'User id',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
+	`received` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
+	`commented` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
+	 PRIMARY KEY(`channel`,`uri-id`),
+	 INDEX `uri-id` (`uri-id`),
+	 INDEX `uid` (`uid`),
+	 INDEX `channel_created` (`channel`,`created`),
+	 INDEX `channel_received` (`channel`,`received`),
+	 INDEX `channel_commented` (`channel`,`commented`),
+	FOREIGN KEY (`channel`) REFERENCES `channel` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
+	FOREIGN KEY (`uri-id`) REFERENCES `post-engagement` (`uri-id`) ON UPDATE RESTRICT ON DELETE CASCADE,
+	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Posts in a user defined channel';
+
+--
+-- TABLE system-channel-post
+--
+CREATE TABLE IF NOT EXISTS `system-channel-post` (
+	`channel` varchar(20) NOT NULL COMMENT 'System channel id',
+	`uid` mediumint unsigned NOT NULL COMMENT 'User id',
+	`uri-id` int unsigned NOT NULL COMMENT 'Post engagement entry',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
+	`received` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
+	`commented` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
+	 PRIMARY KEY(`channel`,`uid`,`uri-id`),
+	 INDEX `uri-id` (`uri-id`),
+	 INDEX `uid` (`uid`),
+	 INDEX `channel_created` (`channel`,`uid`,`created`),
+	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE,
+	FOREIGN KEY (`uri-id`) REFERENCES `post-engagement` (`uri-id`) ON UPDATE RESTRICT ON DELETE CASCADE
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Posts in a system channel';
+
+--
 -- TABLE post-history
 --
 CREATE TABLE IF NOT EXISTS `post-history` (
 	`uri-id` int unsigned NOT NULL COMMENT 'Id of the item-uri table entry that contains the item uri',
 	`edited` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Date of edit',
 	`title` varchar(255) NOT NULL DEFAULT '' COMMENT 'item title',
-	`content-warning` varchar(255) NOT NULL DEFAULT '' COMMENT '',
+	`content-warning` varchar(500) NOT NULL DEFAULT '' COMMENT '',
 	`body` mediumtext COMMENT 'item body content',
 	`raw-body` mediumtext COMMENT 'Body without embedded media links',
+	`quote-uri-id` int unsigned COMMENT 'Id of the item-uri table that contains the quoted uri',
 	`location` varchar(255) NOT NULL DEFAULT '' COMMENT 'text location where this item originated',
 	`coord` varchar(255) NOT NULL DEFAULT '' COMMENT 'longitude/latitude pair representing location where this item originated',
 	`language` text COMMENT 'Language information about this post',
+	`sensitive` boolean COMMENT 'If true, this post contains sensitive content',
 	`app` varchar(255) NOT NULL DEFAULT '' COMMENT 'application which generated this item',
 	`rendered-hash` varchar(32) NOT NULL DEFAULT '' COMMENT '',
 	`rendered-html` mediumtext COMMENT 'item.body converted to html',
@@ -1393,7 +1425,9 @@ CREATE TABLE IF NOT EXISTS `post-history` (
 	`resource-id` varchar(32) NOT NULL DEFAULT '' COMMENT 'Used to link other tables to items, it identifies the linked resource (e.g. photo) and if set must also set resource_type',
 	`plink` varbinary(383) NOT NULL DEFAULT '' COMMENT 'permalink or URL to a displayable copy of the message at its source',
 	 PRIMARY KEY(`uri-id`,`edited`),
-	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
+	 INDEX `quote-uri-id` (`quote-uri-id`),
+	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
+	FOREIGN KEY (`quote-uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Post history';
 
 --
@@ -1438,6 +1472,18 @@ CREATE TABLE IF NOT EXISTS `post-media` (
 	`publisher-url` varbinary(383) COMMENT 'URL of the publisher of the media',
 	`publisher-name` varchar(255) COMMENT 'Name of the publisher of the media',
 	`publisher-image` varbinary(383) COMMENT 'Image of the publisher of the media',
+	`player-url` varbinary(383) COMMENT 'URL of the embedded player for this media',
+	`player-height` smallint unsigned COMMENT 'Height of the embedded player',
+	`player-width` smallint unsigned COMMENT 'Width of the embedded player',
+	`embed-type` varchar(10) COMMENT 'Type of the embed (e.g. rich or video)',
+	`embed-html` text COMMENT 'HTML embed code for this media',
+	`embed-height` smallint unsigned COMMENT 'Height of the embed',
+	`embed-width` smallint unsigned COMMENT 'Width of the embed',
+	`page-type` varchar(30) COMMENT 'Type of the page (e.g. article, website)',
+	`schematypes` varchar(255) COMMENT 'Schema types of the page as JSON string',
+	`language` char(3) COMMENT 'Language information about this media in the ISO 639 format',
+	`published` datetime COMMENT 'Publification date of this media',
+	`modified` datetime COMMENT 'Modification date of this media',
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `uri-id-url` (`uri-id`,`url`(512)),
 	 INDEX `uri-id-id` (`uri-id`,`id`),
@@ -1609,7 +1655,7 @@ CREATE TABLE IF NOT EXISTS `post-user` (
 	`psid` int unsigned COMMENT 'ID of the permission set of this post',
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `uid_uri-id` (`uid`,`uri-id`),
-	 INDEX `uri-id` (`uri-id`),
+	 INDEX `uri-id_origin_deleted` (`uri-id`,`origin`,`deleted`),
 	 INDEX `parent-uri-id` (`parent-uri-id`),
 	 INDEX `thr-parent-id` (`thr-parent-id`),
 	 INDEX `external-id` (`external-id`),
@@ -2050,6 +2096,62 @@ CREATE VIEW `application-view` AS SELECT
 			INNER JOIN `user` ON `user`.`uid` = `application-token`.`uid` AND `user`.`verified` AND NOT `user`.`blocked` AND NOT `user`.`account_removed` AND NOT `user`.`account_expired`;
 
 --
+-- VIEW channel-post-view
+--
+DROP VIEW IF EXISTS `channel-post-view`;
+CREATE VIEW `channel-post-view` AS SELECT 
+	`channel-post`.`channel` AS `channel`,
+	`channel-post`.`uid` AS `uid`,
+	`channel-post`.`uri-id` AS `uri-id`,
+	`post-engagement`.`owner-id` AS `owner-id`,
+	`post-engagement`.`media-type` AS `media-type`,
+	`post-engagement`.`language` AS `language`,
+	`post-engagement`.`searchtext` AS `searchtext`,
+	`post-engagement`.`size` AS `size`,
+	`channel-post`.`commented` AS `commented`,
+	`channel-post`.`received` AS `received`,
+	`channel-post`.`created` AS `created`,
+	`post-engagement`.`network` AS `network`,
+	`ownercontact`.`contact-type` AS `contact-type`,
+	`post-engagement`.`restricted` AS `restricted`,
+	0 AS `comments`,
+	0 AS `activities`
+	FROM `channel-post`
+			INNER JOIN `post-engagement` ON `post-engagement`.`uri-id` = `channel-post`.`uri-id`
+			INNER JOIN `post-thread` ON `post-thread`.`uri-id` = `channel-post`.`uri-id`
+			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread`.`author-id`
+			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread`.`owner-id`
+			WHERE NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`;
+
+--
+-- VIEW system-channel-post-view
+--
+DROP VIEW IF EXISTS `system-channel-post-view`;
+CREATE VIEW `system-channel-post-view` AS SELECT 
+	`system-channel-post`.`channel` AS `channel`,
+	`system-channel-post`.`uid` AS `uid`,
+	`system-channel-post`.`uri-id` AS `uri-id`,
+	`post-engagement`.`owner-id` AS `owner-id`,
+	`post-engagement`.`media-type` AS `media-type`,
+	`post-engagement`.`language` AS `language`,
+	`post-engagement`.`searchtext` AS `searchtext`,
+	`post-engagement`.`size` AS `size`,
+	`system-channel-post`.`commented` AS `commented`,
+	`system-channel-post`.`received` AS `received`,
+	`system-channel-post`.`created` AS `created`,
+	`post-engagement`.`network` AS `network`,
+	`ownercontact`.`contact-type` AS `contact-type`,
+	`post-engagement`.`restricted` AS `restricted`,
+	0 AS `comments`,
+	0 AS `activities`
+	FROM `system-channel-post`
+			INNER JOIN `post-engagement` ON `post-engagement`.`uri-id` = `system-channel-post`.`uri-id`
+			INNER JOIN `post-thread` ON `post-thread`.`uri-id` = `system-channel-post`.`uri-id`
+			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread`.`author-id`
+			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread`.`owner-id`
+			WHERE NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`;
+
+--
 -- VIEW circle-member-view
 --
 DROP VIEW IF EXISTS `circle-member-view`;
@@ -2111,7 +2213,7 @@ CREATE VIEW `post-engagement-user-view` AS SELECT
 	`post-thread-user`.`created` AS `created`,
 	`post-thread-user`.`network` AS `network`,
 	`post-user`.`protocol` AS `protocol`,
-	`post-engagement`.`language` AS `restricted`,
+	`post-engagement`.`restricted` AS `restricted`,
 	0 AS `comments`,
 	0 AS `activities`
 	FROM `post-thread-user`
@@ -2238,7 +2340,7 @@ CREATE VIEW `post-searchindex-user-view` AS SELECT
 	`post-thread-user`.`created` AS `created`,
 	`post-thread-user`.`network` AS `network`,
 	`post-user`.`protocol` AS `protocol`,
-	`post-searchindex`.`language` AS `restricted`,
+	`post-searchindex`.`restricted` AS `restricted`,
 	0 AS `comments`,
 	0 AS `activities`
 	FROM `post-thread-user`
@@ -3809,7 +3911,8 @@ CREATE VIEW `pending-view` AS SELECT
 	`contact`.`nick` AS `nick`
 	FROM `register`
 			INNER JOIN `contact` ON `register`.`uid` = `contact`.`uid`
-			INNER JOIN `user` ON `register`.`uid` = `user`.`uid`;
+			INNER JOIN `user` ON `register`.`uid` = `user`.`uid`
+			WHERE `register`.`uid` != 0;
 
 --
 -- VIEW tag-search-view

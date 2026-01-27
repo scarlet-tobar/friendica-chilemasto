@@ -8,10 +8,9 @@
 namespace Friendica\Console;
 
 use Console_Table;
-use Friendica\App;
-use Friendica\Content\Pager;
+use Friendica\App\Mode;
 use Friendica\Core\L10n;
-use Friendica\Core\Addon as AddonCore;
+use Friendica\Core\Addon\AddonHelper;
 use Friendica\Database\Database;
 use Friendica\Util\Strings;
 use RuntimeException;
@@ -24,7 +23,7 @@ class Addon extends \Asika\SimpleConsole\Console
 	protected $helpOptions = ['h', 'help', '?'];
 
 	/**
-	 * @var App\Mode
+	 * @var Mode
 	 */
 	private $appMode;
 	/**
@@ -35,6 +34,7 @@ class Addon extends \Asika\SimpleConsole\Console
 	 * @var Database
 	 */
 	private $dba;
+	private AddonHelper $addonHelper;
 
 	protected function getHelp()
 	{
@@ -57,15 +57,16 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(App\Mode $appMode, L10n $l10n, Database $dba, array $argv = null)
+	public function __construct(Mode $appMode, L10n $l10n, Database $dba, AddonHelper $addonHelper, array $argv = null)
 	{
 		parent::__construct($argv);
 
 		$this->appMode     = $appMode;
 		$this->l10n        = $l10n;
 		$this->dba         = $dba;
+		$this->addonHelper = $addonHelper;
 
-		AddonCore::loadAddons();
+		$this->addonHelper->loadAddons();
 	}
 
 	protected function doExecute(): int
@@ -122,28 +123,30 @@ HELP;
 				$this->out($this->getHelp());
 				return false;
 		}
-		foreach (AddonCore::getAvailableList() as $addon) {
-			$addon_name = $addon[0];
-			$enabled = AddonCore::isEnabled($addon_name) ? "enabled" : "disabled";
-			switch ($subCmd) {
-				case 'all':
-					$table->addRow([$addon_name, $enabled]);
-					break;
-				case 'enabled':
-					if (!$enabled) {
-						continue 2;
-					}
-					$table->addRow([$addon_name]);
-				case 'disabled':
-					if ($enabled) {
-						continue 2;
-					}
-					$table->addRow([$addon_name]);
-					break;
+
+		foreach ($this->addonHelper->getAvailableAddons() as $addonId) {
+			$enabled = $this->addonHelper->isAddonEnabled($addonId);
+
+			if ($subCmd === 'all') {
+				$table->addRow([$addonId, $enabled ? 'enabled' : 'disabled']);
+
+				continue;
 			}
 
+			if ($subCmd === 'enabled' && $enabled === true) {
+				$table->addRow([$addonId]);
+				continue;
+			}
+
+			if ($subCmd === 'disabled' && $enabled === false) {
+				$table->addRow([$addonId]);
+				continue;
+			}
 		}
+
 		$this->out($table->getTable());
+
+		return 0;
 	}
 
 	/**
@@ -161,11 +164,11 @@ HELP;
 			throw new RuntimeException($this->l10n->t('Addon not found'));
 		}
 
-		if (AddonCore::isEnabled($addon)) {
+		if ($this->addonHelper->isAddonEnabled($addon)) {
 			throw new RuntimeException($this->l10n->t('Addon already enabled'));
 		}
 
-		AddonCore::install($addon);
+		$this->addonHelper->installAddon($addon);
 
 		return 0;
 	}
@@ -185,11 +188,11 @@ HELP;
 			throw new RuntimeException($this->l10n->t('Addon not found'));
 		}
 
-		if (!AddonCore::isEnabled($addon)) {
+		if (!$this->addonHelper->isAddonEnabled($addon)) {
 			throw new RuntimeException($this->l10n->t('Addon already disabled'));
 		}
 
-		AddonCore::uninstall($addon);
+		$this->addonHelper->uninstallAddon($addon);
 
 		return 0;
 	}

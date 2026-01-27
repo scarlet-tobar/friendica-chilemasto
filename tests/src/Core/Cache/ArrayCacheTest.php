@@ -8,8 +8,9 @@
 namespace Friendica\Test\src\Core\Cache;
 
 use Friendica\Core\Cache\Type\ArrayCache;
+use Friendica\Test\MemoryCacheTestCase;
 
-class ArrayCacheTest extends MemoryCacheTest
+class ArrayCacheTest extends MemoryCacheTestCase
 {
 	protected function getInstance()
 	{
@@ -31,5 +32,13 @@ class ArrayCacheTest extends MemoryCacheTest
 		// Array Cache doesn't support TTL
 		self::markTestSkipped("Array Cache doesn't support TTL");
 		return true;
+	}
+
+	/**
+	 * @small
+	 */
+	public function testGetStats()
+	{
+		self::assertEmpty($this->cache->getStats());
 	}
 }

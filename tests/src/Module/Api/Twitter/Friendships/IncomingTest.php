@@ -7,12 +7,11 @@
 
 namespace Friendica\Test\src\Module\Api\Twitter\Friendships;
 
-use Friendica\App\Router;
 use Friendica\DI;
 use Friendica\Module\Api\Twitter\Friendships\Incoming;
-use Friendica\Test\src\Module\Api\ApiTest;
+use Friendica\Test\ApiTestCase;
 
-class IncomingTest extends ApiTest
+class IncomingTest extends ApiTestCase
 {
 	/**
 	 * Test the api_friendships_incoming() function.
@@ -21,7 +20,7 @@ class IncomingTest extends ApiTest
 	 */
 	public function testApiFriendshipsIncoming()
 	{
-		$response = (new Incoming(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Incoming(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 
 		$json = $this->toJson($response);

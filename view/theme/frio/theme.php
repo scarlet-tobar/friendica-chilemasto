@@ -12,16 +12,16 @@
  * Maintainer: Hypolite Petovan <https://friendica.mrpetovan.com/profile/hypolite>
  */
 
-use Friendica\App;
+use Friendica\App\Mode;
+use Friendica\AppHelper;
 use Friendica\Content\Text\Plaintext;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
+use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
-use Friendica\Model\Profile;
 
 const FRIO_SCHEME_ACCENT_BLUE   = '#1e87c2';
 const FRIO_SCHEME_ACCENT_RED    = '#b50404';
@@ -30,18 +30,16 @@ const FRIO_SCHEME_ACCENT_GREEN  = '#218f39';
 const FRIO_SCHEME_ACCENT_PINK   = '#d900a9';
 
 const FRIO_DEFAULT_SCHEME = 'light';
-const FRIO_CUSTOM_SCHEME = '---';
+const FRIO_CUSTOM_SCHEME  = '---';
 
 /*
  * This script can be included even when the app is in maintenance mode which requires us to avoid any config call
  */
 
-function frio_init(App $a)
+function frio_init(AppHelper $appHelper)
 {
 	global $frio;
 	$frio = 'view/theme/frio';
-
-	$a->setThemeInfoValue('videowidth', 622);
 
 	Renderer::setActiveTemplateEngine('smarty3');
 
@@ -64,7 +62,7 @@ function frio_install()
 	Hook::register('nav_info', 'view/theme/frio/theme.php', 'frio_remote_nav');
 	Hook::register('display_item', 'view/theme/frio/theme.php', 'frio_display_item');
 
-	Logger::info('installed theme frio');
+	DI::logger()->info('installed theme frio');
 }
 
 /**
@@ -81,9 +79,9 @@ function frio_install()
 function frio_item_photo_links(&$body_info)
 {
 	$occurence = 0;
-	$p = Plaintext::getBoundariesPosition($body_info['html'], '<a', '>');
+	$p         = Plaintext::getBoundariesPosition($body_info['html'], '<a', '>');
 	while ($p !== false && ($occurence++ < 500)) {
-		$link = substr($body_info['html'], $p['start'], $p['end'] - $p['start']);
+		$link    = substr($body_info['html'], $p['start'], $p['end'] - $p['start']);
 		$matches = [];
 
 		preg_match('/\/photos\/[\w]+\/image\/([\w]+)/', $link, $matches);
@@ -117,7 +115,7 @@ function frio_item_photo_menu(&$arr)
 {
 	foreach ($arr['menu'] as $k => $v) {
 		if (strpos($v, 'message/new/') === 0) {
-			$v = 'javascript:addToModal(\'' . $v . '\'); return false;';
+			$v               = 'javascript:addToModal(\'' . $v . '\'); return false;';
 			$arr['menu'][$k] = $v;
 		}
 	}
@@ -155,7 +153,7 @@ function frio_contact_photo_menu(&$args)
 	// and if it's a friendica contact we set it to false
 	foreach ($args['menu'] as $k => $v) {
 		if ($k === 'status' || $k === 'profile' || $k === 'photos') {
-			$v[2] = (($args['contact']['network'] === 'dfrn') ? false : true);
+			$v[2]                = (($args['contact']['network'] === 'dfrn') ? false : true);
 			$args['menu'][$k][2] = $v[2];
 		}
 	}
@@ -179,13 +177,12 @@ function frio_contact_photo_menu(&$args)
  *  Some links will point to the local pages because the user would expect
  *  local page (these pages are: search, community, help, apps, directory).
  *
- * @param App   $a        The App class
  * @param array $nav_info The original nav info array: nav, banner, userinfo, sitelocation
  * @throws Exception
  */
 function frio_remote_nav(array &$nav_info)
 {
-	if (DI::mode()->has(App\Mode::MAINTENANCEDISABLED)) {
+	if (DI::mode()->has(Mode::MAINTENANCEDISABLED)) {
 		// get the homelink from $_SESSION
 		$homelink = DI::userSession()->getMyUrl();
 		if (!$homelink) {
@@ -212,7 +209,7 @@ function frio_remote_nav(array &$nav_info)
 				'icon' => Contact::getMicro($remoteUser),
 				'name' => $remoteUser['name'],
 			];
-			$server_url           = $remoteUser['baseurl'];
+			$server_url = $remoteUser['baseurl'];
 		}
 
 		if (!DI::userSession()->getLocalUserId() && !empty($server_url) && !is_null($remoteUser)) {
@@ -256,4 +253,21 @@ function frio_display_item(&$arr)
 		];
 	}
 	$arr['output']['follow_thread'] = $followThread;
+
+	$completeThread = [];
+	if (
+		DI::userSession()->getLocalUserId()
+		&& in_array($arr['item']['uid'], [0, DI::userSession()->getLocalUserId()])
+		&& $arr['item']['network'] == Protocol::ACTIVITYPUB
+		&& $arr['item']['gravity'] == Item::GRAVITY_PARENT
+		&& !$arr['item']['self']
+	) {
+		$completeThread = [
+			'menu'   => 'complete_thread',
+			'title'  => DI::l10n()->t('Complete Thread'),
+			'action' => 'doCompleteThread(' . $arr['item']['uri-id'] . ');',
+			'href'   => '#'
+		];
+	}
+	$arr['output']['complete_thread'] = $completeThread;
 }

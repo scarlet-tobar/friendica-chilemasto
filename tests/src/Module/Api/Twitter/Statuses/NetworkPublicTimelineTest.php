@@ -7,13 +7,13 @@
 
 namespace Friendica\Test\src\Module\Api\Twitter\Statuses;
 
-use Friendica\App\Router;
 use Friendica\Capabilities\ICanCreateResponses;
+use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Module\Api\Twitter\Statuses\NetworkPublicTimeline;
-use Friendica\Test\src\Module\Api\ApiTest;
+use Friendica\Test\ApiTestCase;
 
-class NetworkPublicTimelineTest extends ApiTest
+class NetworkPublicTimelineTest extends ApiTestCase
 {
 	/**
 	 * Test the api_statuses_networkpublic_timeline() function.
@@ -22,7 +22,10 @@ class NetworkPublicTimelineTest extends ApiTest
 	 */
 	public function testApiStatusesNetworkpublicTimeline()
 	{
-		$response = (new NetworkPublicTimeline(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		// @todo: This call is needed for this test
+		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+
+		$response = (new NetworkPublicTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'max_id' => 10
 			]);
@@ -44,7 +47,10 @@ class NetworkPublicTimelineTest extends ApiTest
 	 */
 	public function testApiStatusesNetworkpublicTimelineWithNegativePage()
 	{
-		$response = (new NetworkPublicTimeline(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		// @todo: This call is needed for this test
+		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+
+		$response = (new NetworkPublicTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'page' => -2
 			]);
@@ -80,7 +86,10 @@ class NetworkPublicTimelineTest extends ApiTest
 	 */
 	public function testApiStatusesNetworkpublicTimelineWithRss()
 	{
-		$response = (new NetworkPublicTimeline(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [
+		// @todo: This call is needed for this test
+		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+
+		$response = (new NetworkPublicTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [
 			'extension' => ICanCreateResponses::TYPE_RSS
 		]))->run($this->httpExceptionMock, [
 			'page' => -2

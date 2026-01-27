@@ -9,9 +9,9 @@ namespace Friendica\Test\src\Core\Session;
 
 use Friendica\Core\Session\Model\UserSession;
 use Friendica\Core\Session\Type\ArraySession;
-use Friendica\Test\MockedTest;
+use Friendica\Test\MockedTestCase;
 
-class UserSessionTest extends MockedTest
+class UserSessionTest extends MockedTestCase
 {
 	public function dataLocalUserId()
 	{
@@ -152,13 +152,13 @@ class UserSessionTest extends MockedTest
 				'data' => [
 					'remote' => ['3' => '21'],
 				],
-				'expected' => false,
+				'expected' => 0,
 			],
 			'empty' => [
 				'cid'  => 21,
 				'data' => [
 				],
-				'expected' => false,
+				'expected' => 0,
 			],
 		];
 	}
@@ -167,7 +167,7 @@ class UserSessionTest extends MockedTest
 	public function testGetUserIdForVisitorContactID(int $cid, array $data, $expected)
 	{
 		$userSession = new UserSession(new ArraySession($data));
-		$this->assertEquals($expected, $userSession->getUserIDForVisitorContactID($cid));
+		$this->assertSame($expected, $userSession->getUserIDForVisitorContactID($cid));
 	}
 
 	public function dataAuthenticated()

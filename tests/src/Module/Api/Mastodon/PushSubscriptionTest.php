@@ -7,9 +7,9 @@
 
 namespace Friendica\Test\src\Module\Api\Mastodon;
 
-use Friendica\Test\src\Module\Api\ApiTest;
+use Friendica\Test\ApiTestCase;
 
-class PushSubscriptionTest extends ApiTest
+class PushSubscriptionTest extends ApiTestCase
 {
 	/**
 	 * Test the api_account_verify_credentials() function.
@@ -22,7 +22,7 @@ class PushSubscriptionTest extends ApiTest
 
 		// $this->useHttpMethod(Router::POST);
 		//
-		// $response = (new PushSubscription(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::mstdnSubscription(), DI::mstdnError(), []))
+		// $response = (new PushSubscription(DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::mstdnSubscription(), DI::mstdnError(), []))
 		// 	->run();
 		//
 		// $json = $this->toJson($response);

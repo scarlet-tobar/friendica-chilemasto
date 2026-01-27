@@ -7,8 +7,11 @@
 
 namespace Friendica\Module\Conversation;
 
-use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
 use Friendica\App\Mode;
+use Friendica\App\Page;
+use Friendica\AppHelper;
 use Friendica\Content\BoundariesPager;
 use Friendica\Content\Conversation;
 use Friendica\Content\Conversation\Entity\Channel;
@@ -28,17 +31,15 @@ use Friendica\Content\Widget\TrendingTags;
 use Friendica\Core\ACL;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Database\Database;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Circle;
-use Friendica\Model\Post;
 use Friendica\Model\Profile;
 use Friendica\Module\Response;
 use Friendica\Module\Security\Login;
@@ -46,6 +47,7 @@ use Friendica\Network\HTTPException;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Network extends Timeline
@@ -56,20 +58,20 @@ class Network extends Timeline
 	protected $dateFrom;
 	/** @var string */
 	protected $dateTo;
-	/** @var int */
+	/** @var bool */
 	protected $star;
-	/** @var int */
+	/** @var bool */
 	protected $mention;
 
-	/** @var App */
-	protected $app;
+	/** @var AppHelper */
+	protected $appHelper;
 	/** @var ICanCache */
 	protected $cache;
 	/** @var IManageConfigValues The config */
 	protected $config;
 	/** @var SystemMessages */
 	protected $systemMessages;
-	/** @var App\Page */
+	/** @var Page */
 	protected $page;
 	/** @var Conversation */
 	protected $conversation;
@@ -87,12 +89,55 @@ class Network extends Timeline
 	protected $community;
 	/** @var NetworkFactory */
 	protected $networkFactory;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(UserDefinedChannelFactory $userDefinedChannel, NetworkFactory $network, CommunityFactory $community, ChannelFactory $channelFactory, UserDefinedChannel $channel, App $app, TimelineFactory $timeline, SystemMessages $systemMessages, Mode $mode, Conversation $conversation, App\Page $page, IHandleUserSessions $session, Database $database, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, ICanCache $cache, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
-		parent::__construct($channel, $mode, $session, $database, $pConfig, $config, $cache, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+	public function __construct(
+		UserDefinedChannelFactory $userDefinedChannel,
+		NetworkFactory $network,
+		CommunityFactory $community,
+		ChannelFactory $channelFactory,
+		UserDefinedChannel $channel,
+		AppHelper $appHelper,
+		EventDispatcherInterface $eventDispatcher,
+		TimelineFactory $timeline,
+		SystemMessages $systemMessages,
+		Mode $mode,
+		Conversation $conversation,
+		Page $page,
+		IHandleUserSessions $session,
+		Database $database,
+		IManagePersonalConfigValues $pConfig,
+		IManageConfigValues $config,
+		ICanCache $cache,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
+		parent::__construct(
+			$channel,
+			$mode,
+			$session,
+			$database,
+			$pConfig,
+			$config,
+			$cache,
+			$l10n,
+			$baseUrl,
+			$args,
+			$logger,
+			$profiler,
+			$response,
+			$server,
+			$parameters,
+		);
 
-		$this->app                = $app;
+		$this->appHelper          = $appHelper;
+		$this->eventDispatcher    = $eventDispatcher;
 		$this->timeline           = $timeline;
 		$this->systemMessages     = $systemMessages;
 		$this->conversation       = $conversation;
@@ -113,44 +158,73 @@ class Network extends Timeline
 
 		$module = 'network';
 
-		$arr = ['query' => $this->args->getQueryString()];
-		Hook::callAll('network_content_init', $arr);
+		$hook_data = [
+			'query' => $this->args->getQueryString(),
+		];
 
-		$o = '';
+		$this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_CONTENT_START, $hook_data)
+		);
 
-		if (Feature::isEnabled($this->session->getLocalUserId(), Feature::CIRCLES)) {
-			$this->page['aside'] .= Circle::sidebarWidget($module, $module . '/circle', 'standard', $this->circleId);
-		}
-		if (Feature::isEnabled($this->session->getLocalUserId(), Feature::GROUPS)) {
-			$this->page['aside'] .= GroupManager::widget($this->session->getLocalUserId());
-		}
-		if (Feature::isEnabled($this->session->getLocalUserId(), Feature::ARCHIVE)) {
-			$this->page['aside'] .= Widget::postedByYear($module . '/archive', $this->session->getLocalUserId(), false);
-		}
-		if (Feature::isEnabled($this->session->getLocalUserId(), Feature::NETWORKS)) {
-			$this->page['aside'] .= Widget::networks($module, $this->network);
-		}
-		if (Feature::isEnabled($this->session->getLocalUserId(), Feature::ACCOUNTS)) {
-			$this->page['aside'] .= Widget::accountTypes($module, $this->accountTypeString);
-		}
-		if (Feature::isEnabled($this->session->getLocalUserId(), Feature::CHANNELS)) {
-			$this->page['aside'] .= Widget::channels($module, $this->selectedTab, $this->session->getLocalUserId());
-		}
-		if (Feature::isEnabled($this->session->getLocalUserId(), Feature::SEARCHES)) {
-			$this->page['aside'] .= Widget\SavedSearches::getHTML($this->args->getQueryString());
-		}
-		if (Feature::isEnabled($this->session->getLocalUserId(), Feature::FOLDERS)) {
-			$this->page['aside'] .= Widget::fileAs('filed', '');
-		}
-		if (($this->channel->isTimeline($this->selectedTab) || $this->userDefinedChannel->isTimeline($this->selectedTab, $this->session->getLocalUserId())) &&
-			!in_array($this->selectedTab, [Channel::FOLLOWERS, Channel::FORYOU, Channel::DISCOVER]) && Feature::isEnabled($this->session->getLocalUserId(), Feature::NOSHARER)) {
-			$this->page['aside'] .= $this->getNoSharerWidget('network');
-		}
-		if (Feature::isEnabled($this->session->getLocalUserId(), Feature::TRENDING_TAGS)) {
-			$this->page['aside'] .= TrendingTags::getHTML($this->selectedTab);
+		$o           = '';
+		$widgetorder = json_decode($this->pConfig->get($this->session->getLocalUserId(), 'feature', 'widgetorder'));
+
+		if (empty($widgetorder)) {
+			$widgetorder = [
+				Feature::CIRCLES,
+				Feature::GROUPS,
+				Feature::ARCHIVE,
+				Feature::NETWORKS,
+				Feature::ACCOUNTS,
+				Feature::CHANNELS,
+				Feature::SEARCHES,
+				Feature::FOLDERS,
+				Feature::NOSHARER,
+				Feature::TRENDING_TAGS
+			];
 		}
 
-		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll') && ($_GET['mode'] ?? '') != 'minimal') {
+		foreach ($widgetorder as $widget) {
+			if (Feature::isEnabled($this->session->getLocalUserId(), $widget)) {
+				switch ($widget) {
+					case Feature::CIRCLES:
+						$this->page['aside'] .= Circle::sidebarWidget($module, $module . '/circle', 'standard', $this->circleId);
+						break;
+					case Feature::GROUPS:
+						$this->page['aside'] .= GroupManager::widget($this->session->getLocalUserId());
+						break;
+					case Feature::ARCHIVE:
+						$this->page['aside'] .= Widget::postedByYear($module . '/archive', $this->session->getLocalUserId(), false);
+						break;
+					case Feature::NETWORKS:
+						$this->page['aside'] .= Widget::networks($module, $this->network);
+						break;
+					case Feature::ACCOUNTS:
+						$this->page['aside'] .= Widget::accountTypes($module, $this->accountTypeString);
+						break;
+					case Feature::CHANNELS:
+						$this->page['aside'] .= Widget::channels($module, $this->selectedTab, $this->session->getLocalUserId());
+						break;
+					case Feature::SEARCHES:
+						$this->page['aside'] .= Widget\SavedSearches::getHTML($this->args->getQueryString());
+						break;
+					case Feature::FOLDERS:
+						$this->page['aside'] .= Widget::fileAs('filed', '');
+						break;
+					case Feature::TRENDING_TAGS:
+						$this->page['aside'] .= TrendingTags::getHTML($this->selectedTab);
+						break;
+					case Feature::NOSHARER:
+						if (($this->channel->isTimeline($this->selectedTab) || $this->userDefinedChannel->isTimeline($this->selectedTab, $this->session->getLocalUserId())) &&
+							!in_array($this->selectedTab, [Channel::FOLLOWERS, Channel::FORYOU, Channel::DISCOVER])) {
+							$this->page['aside'] .= $this->getNoSharerWidget('network');
+						}
+						break;
+				}
+			}
+		}
+
+		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true) && ($_GET['mode'] ?? '') != 'minimal') {
 			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
 			$o .= Renderer::replaceMacros($tpl, ['$reload_uri' => $this->args->getQueryString()]);
 		}
@@ -189,9 +263,9 @@ class Network extends Timeline
 
 			$x = [
 				'lockstate' => $this->circleId || $this->network || ACL::getLockstateForUserId($this->session->getLocalUserId()) ? 'lock' : 'unlock',
-				'acl' => ACL::getFullSelectorHTML($this->page, $this->session->getLocalUserId(), true, $default_permissions),
-				'bang' => (($this->circleId || $this->network) ? '!' : ''),
-				'content' => '',
+				'acl'       => ACL::getFullSelectorHTML($this->page, $this->session->getLocalUserId(), true, $default_permissions),
+				'bang'      => (($this->circleId || $this->network) ? '!' : ''),
+				'content'   => '',
 			];
 
 			$o .= $this->conversation->statusEditor($x);
@@ -227,13 +301,13 @@ class Network extends Timeline
 			$items = [];
 		}
 
-		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll')) {
+		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
 			$o .= HTML::scrollLoader();
 		} else {
 			$pager = new BoundariesPager(
 				$this->l10n,
 				$this->args->getQueryString(),
-				$items[0][$this->order] ?? null,
+				$items[0][$this->order]                 ?? null,
 				$items[count($items) - 1][$this->order] ?? null,
 				$this->itemsPerPage
 			);
@@ -272,24 +346,42 @@ class Network extends Timeline
 			$tabs = array_merge($tabs, $this->getTabArray($this->community->getTimelines(true), 'network', 'channel'));
 		}
 
-		$arr = ['tabs' => $tabs];
-		Hook::callAll('network_tabs', $arr);
+		$menu_tab_order = json_decode($this->pConfig->get($this->session->getLocalUserId(), 'system', 'menu_timeline_order'));
+		if (!empty($menu_tab_order)) {
+			$tmp = [];
+			foreach ($menu_tab_order as $order) {
+				foreach ($tabs as $key => $val) {
+					if ($key == $order || $order == $val['code']) {
+						$tmp[$key] = $val;
+					}
+				}
+			}
+			$tabs = $tmp;
+		}
+
+		$hook_data = [
+			'tabs' => $tabs,
+		];
+
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_CONTENT_TABS, $hook_data)
+		)->getArray();
 
 		if (!empty($network_timelines)) {
 			$tabs = [];
 
-			foreach ($arr['tabs'] as $tab) {
+			foreach ($hook_data['tabs'] as $tab) {
 				if (in_array($tab['code'], $network_timelines)) {
 					$tabs[] = $tab;
 				}
 			}
 		} else {
-			$tabs = $arr['tabs'];
+			$tabs = $hook_data['tabs'];
 		}
 
 		$tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
 
-		return Renderer::replaceMacros($tpl, ['$tabs' => $tabs]);
+		return Renderer::replaceMacros($tpl, ['$tabs' => $tabs, '$more' => $this->l10n->t('More')]);
 	}
 
 	protected function parseRequest(array $request)
@@ -310,23 +402,23 @@ class Network extends Timeline
 
 		if (!empty($request['star'])) {
 			$this->selectedTab = NetworkEntity::STAR;
-			$this->star = true;
+			$this->star        = true;
 		} else {
 			$this->star = $this->selectedTab == NetworkEntity::STAR;
 		}
 
 		if (!empty($request['mention'])) {
 			$this->selectedTab = NetworkEntity::MENTION;
-			$this->mention = true;
+			$this->mention     = true;
 		} else {
 			$this->mention = $this->selectedTab == NetworkEntity::MENTION;
 		}
 
 		if (!empty($request['order'])) {
 			$this->selectedTab = $request['order'];
-			$this->order = $request['order'];
-			$this->star = false;
-			$this->mention = false;
+			$this->order       = $request['order'];
+			$this->star        = false;
+			$this->mention     = false;
 		} elseif (in_array($this->selectedTab, [NetworkEntity::RECEIVED, NetworkEntity::STAR]) || $this->community->isTimeline($this->selectedTab)) {
 			$this->order = 'received';
 		} elseif (($this->selectedTab == NetworkEntity::CREATED) || $this->channel->isTimeline($this->selectedTab) || $this->userDefinedChannel->isTimeline($this->selectedTab, $this->session->getLocalUserId())) {
@@ -341,7 +433,8 @@ class Network extends Timeline
 		// since otherwise the feed will optically jump, when some already visible thread has been updated.
 		if ($this->update && ($this->selectedTab == NetworkEntity::COMMENTED)) {
 			$this->order = 'received';
-			$request['last_received']  = $request['last_commented'] ?? null;
+
+			$request['last_received']  = $request['last_commented']  ?? null;
 			$request['first_received'] = $request['first_commented'] ?? null;
 		}
 
@@ -358,7 +451,7 @@ class Network extends Timeline
 		$this->network = $request['nets'] ?? '';
 
 		$this->dateFrom = $this->parameters['from'] ?? '';
-		$this->dateTo = $this->parameters['to'] ?? '';
+		$this->dateTo   = $this->parameters['to']   ?? '';
 
 		$this->setMaxMinByOrder($request);
 
@@ -393,10 +486,10 @@ class Network extends Timeline
 		}
 
 		if ($this->dateFrom) {
-			$conditionStrings = DBA::mergeConditions($conditionStrings, ["`received` <= ? ", DateTimeFormat::convert($this->dateFrom, 'UTC', $this->app->getTimeZone())]);
+			$conditionStrings = DBA::mergeConditions($conditionStrings, ["`received` <= ? ", DateTimeFormat::convert($this->dateFrom, 'UTC', $this->appHelper->getTimeZone())]);
 		}
 		if ($this->dateTo) {
-			$conditionStrings = DBA::mergeConditions($conditionStrings, ["`received` >= ? ", DateTimeFormat::convert($this->dateTo, 'UTC', $this->app->getTimeZone())]);
+			$conditionStrings = DBA::mergeConditions($conditionStrings, ["`received` >= ? ", DateTimeFormat::convert($this->dateTo, 'UTC', $this->appHelper->getTimeZone())]);
 		}
 
 		if ($this->circleId) {
@@ -464,16 +557,8 @@ class Network extends Timeline
 			return $items;
 		}
 
-		$this->setItemsSeenByCondition(['unseen' => true, 'uid' => $this->session->getLocalUserId(), 'parent-uri-id' => array_column($items, 'uri-id')]);
+		$this->setItemsSeenForUser($this->session->getLocalUserId());
 
-		$posts = Post::selectToArray(['uri-id'], ['unseen' => true, 'uid' => $this->session->getLocalUserId()], ['limit' => 100]);
-		if (!empty($posts)) {
-			$this->setItemsSeenByCondition(['unseen' => true, 'uid' => $this->session->getLocalUserId(), 'uri-id' => array_column($posts, 'uri-id')]);
-		}
-
-		if (count($posts) == 100) {
-			Worker::add(Worker::PRIORITY_MEDIUM, 'SetSeen', $this->session->getLocalUserId());
-		}
 		return $items;
 	}
 

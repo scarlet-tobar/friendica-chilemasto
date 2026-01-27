@@ -7,7 +7,6 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
@@ -27,36 +26,43 @@ class ExpirePosts
 	 */
 	public static function execute()
 	{
-		Logger::notice('Expire posts - start');
+		DI::logger()->notice('Expire posts - start');
 
 		if (!DBA::acquireOptimizeLock()) {
-			Logger::warning('Lock could not be acquired');
+			DI::logger()->warning('Lock could not be acquired');
 			Worker::defer();
 			return;
 		}
 
-		Logger::notice('Expire posts - Delete expired origin posts');
+		$processlist = DBA::processlist();
+		if ($processlist['max_time'] > 60) {
+			DI::logger()->warning('Processlist shows a long running query, task will be deferred.', ['time' => $processlist['max_time'], 'query' => $processlist['max_query']]);
+			Worker::defer();
+			return;
+		}
+
+		DI::logger()->notice('Expire posts - Delete expired origin posts');
 		self::deleteExpiredOriginPosts();
 
-		Logger::notice('Expire posts - Delete orphaned entries');
+		DI::logger()->notice('Expire posts - Delete orphaned entries');
 		self::deleteOrphanedEntries();
 
-		Logger::notice('Expire posts - delete external posts');
+		DI::logger()->notice('Expire posts - delete external posts');
 		self::deleteExpiredExternalPosts();
 
 		if (DI::config()->get('system', 'add_missing_posts')) {
-			Logger::notice('Expire posts - add missing posts');
+			DI::logger()->notice('Expire posts - add missing posts');
 			self::addMissingEntries();
 		}
 
-		Logger::notice('Expire posts - delete unused attachments');
+		DI::logger()->notice('Expire posts - delete unused attachments');
 		self::deleteUnusedAttachments();
 
-		Logger::notice('Expire posts - delete unused item-uri entries');
+		DI::logger()->notice('Expire posts - delete unused item-uri entries');
 		self::deleteUnusedItemUri();
 
 		DBA::releaseOptimizeLock();
-		Logger::notice('Expire posts - done');
+		DI::logger()->notice('Expire posts - done');
 	}
 
 	/**
@@ -71,16 +77,16 @@ class ExpirePosts
 			return;
 		}
 
-		Logger::notice('Delete expired posts');
+		DI::logger()->notice('Delete expired posts');
 		// physically remove anything that has been deleted for more than two months
 		$condition = ["`gravity` = ? AND `deleted` AND `edited` < ?", Item::GRAVITY_PARENT, DateTimeFormat::utc('now - 60 days')];
-		$pass = 0;
+		$pass      = 0;
 		do {
 			++$pass;
-			$rows = DBA::select('post-user', ['uri-id', 'uid'], $condition, ['limit' => $limit]);
+			$rows           = DBA::select('post-user', ['uri-id', 'uid'], $condition, ['limit' => $limit]);
 			$affected_count = 0;
 			while ($row = Post::fetch($rows)) {
-				Logger::info('Delete expired item', ['pass' => $pass, 'uri-id' => $row['uri-id']]);
+				DI::logger()->info('Delete expired item', ['pass' => $pass, 'uri-id' => $row['uri-id']]);
 				Post\User::delete(['parent-uri-id' => $row['uri-id'], 'uid' => $row['uid']]);
 				$affected_count += DBA::affectedRows();
 				Post\Origin::delete(['parent-uri-id' => $row['uri-id'], 'uid' => $row['uid']]);
@@ -88,7 +94,7 @@ class ExpirePosts
 			}
 			DBA::close($rows);
 			DBA::commit();
-			Logger::notice('Delete expired posts - done', ['pass' => $pass, 'rows' => $affected_count]);
+			DI::logger()->notice('Delete expired posts - done', ['pass' => $pass, 'rows' => $affected_count]);
 		} while ($affected_count);
 	}
 
@@ -99,7 +105,7 @@ class ExpirePosts
 	 */
 	private static function deleteOrphanedEntries()
 	{
-		Logger::notice('Delete orphaned entries');
+		DI::logger()->notice('Delete orphaned entries');
 
 		// "post-user" is the leading table. So we delete every entry that isn't found there
 		$tables = ['item', 'post', 'post-content', 'post-thread', 'post-thread-user'];
@@ -108,10 +114,10 @@ class ExpirePosts
 				continue;
 			}
 
-			Logger::notice('Start collecting orphaned entries', ['table' => $table]);
-			$uris = DBA::select($table, ['uri-id'], ["NOT `uri-id` IN (SELECT `uri-id` FROM `post-user`)"]);
+			DI::logger()->notice('Start collecting orphaned entries', ['table' => $table]);
+			$uris           = DBA::select($table, ['uri-id'], ["NOT `uri-id` IN (SELECT `uri-id` FROM `post-user`)"]);
 			$affected_count = 0;
-			Logger::notice('Deleting orphaned entries - start', ['table' => $table]);
+			DI::logger()->notice('Deleting orphaned entries - start', ['table' => $table]);
 			while ($rows = DBA::toArray($uris, false, 100)) {
 				$ids = array_column($rows, 'uri-id');
 				DBA::delete($table, ['uri-id' => $ids]);
@@ -119,9 +125,9 @@ class ExpirePosts
 			}
 			DBA::close($uris);
 			DBA::commit();
-			Logger::notice('Orphaned entries deleted', ['table' => $table, 'rows' => $affected_count]);
+			DI::logger()->notice('Orphaned entries deleted', ['table' => $table, 'rows' => $affected_count]);
 		}
-		Logger::notice('Delete orphaned entries - done');
+		DI::logger()->notice('Delete orphaned entries - done');
 	}
 
 	/**
@@ -131,10 +137,10 @@ class ExpirePosts
 	 */
 	private static function addMissingEntries()
 	{
-		Logger::notice('Adding missing entries');
+		DI::logger()->notice('Adding missing entries');
 
-		$rows = 0;
-		$userposts = DBA::select('post-user', [], ["`uri-id` not in (select `uri-id` from `post`)"]);
+		$rows      = 0;
+		$userposts = DBA::p("SELECT `post-user`.* FROM `post-user` LEFT JOIN `post` ON `post`.`uri-id` = `post-user`.`uri-id` WHERE `post`.`uri-id` IS NULL");
 		while ($fields = DBA::fetch($userposts)) {
 			$post_fields = DI::dbaDefinition()->truncateFieldsForTable('post', $fields);
 			DBA::insert('post', $post_fields, Database::INSERT_IGNORE);
@@ -142,39 +148,39 @@ class ExpirePosts
 		}
 		DBA::close($userposts);
 		if ($rows > 0) {
-			Logger::notice('Added post entries', ['rows' => $rows]);
+			DI::logger()->notice('Added post entries', ['rows' => $rows]);
 		} else {
-			Logger::notice('No post entries added');
+			DI::logger()->notice('No post entries added');
 		}
 
-		$rows = 0;
+		$rows      = 0;
 		$userposts = DBA::select('post-user', [], ["`gravity` = ? AND `uri-id` not in (select `uri-id` from `post-thread`)", Item::GRAVITY_PARENT]);
 		while ($fields = DBA::fetch($userposts)) {
-			$post_fields = DI::dbaDefinition()->truncateFieldsForTable('post-thread', $fields);
+			$post_fields              = DI::dbaDefinition()->truncateFieldsForTable('post-thread', $fields);
 			$post_fields['commented'] = $post_fields['changed'] = $post_fields['created'];
 			DBA::insert('post-thread', $post_fields, Database::INSERT_IGNORE);
 			$rows++;
 		}
 		DBA::close($userposts);
 		if ($rows > 0) {
-			Logger::notice('Added post-thread entries', ['rows' => $rows]);
+			DI::logger()->notice('Added post-thread entries', ['rows' => $rows]);
 		} else {
-			Logger::notice('No post-thread entries added');
+			DI::logger()->notice('No post-thread entries added');
 		}
 
-		$rows = 0;
+		$rows      = 0;
 		$userposts = DBA::select('post-user', [], ["`gravity` = ? AND `id` not in (select `post-user-id` from `post-thread-user`)", Item::GRAVITY_PARENT]);
 		while ($fields = DBA::fetch($userposts)) {
-			$post_fields = DI::dbaDefinition()->truncateFieldsForTable('post-thread-user', $fields);
+			$post_fields              = DI::dbaDefinition()->truncateFieldsForTable('post-thread-user', $fields);
 			$post_fields['commented'] = $post_fields['changed'] = $post_fields['created'];
 			DBA::insert('post-thread-user', $post_fields, Database::INSERT_IGNORE);
 			$rows++;
 		}
 		DBA::close($userposts);
 		if ($rows > 0) {
-			Logger::notice('Added post-thread-user entries', ['rows' => $rows]);
+			DI::logger()->notice('Added post-thread-user entries', ['rows' => $rows]);
 		} else {
-			Logger::notice('No post-thread-user entries added');
+			DI::logger()->notice('No post-thread-user entries added');
 		}
 	}
 
@@ -196,47 +202,72 @@ class ExpirePosts
 			['order' => ['received' => true]]
 		);
 		if (empty($item['uri-id'])) {
-			Logger::warning('No item with uri-id found - we better quit here');
+			DI::logger()->warning('No item with uri-id found - we better quit here');
 			return;
 		}
-		Logger::notice('Start collecting orphaned URI-ID', ['last-id' => $item['uri-id']]);
-		$condition = [
-			"`id` < ?
-			AND NOT EXISTS(SELECT `uri-id` FROM `post-user` WHERE `uri-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `parent-uri-id` FROM `post-user` WHERE `parent-uri-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `thr-parent-id` FROM `post-user` WHERE `thr-parent-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `external-id` FROM `post-user` WHERE `external-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `replies-id` FROM `post-user` WHERE `replies-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `context-id` FROM `post-thread` WHERE `context-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `conversation-id` FROM `post-thread` WHERE `conversation-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `uri-id` FROM `mail` WHERE `uri-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `uri-id` FROM `event` WHERE `uri-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `uri-id` FROM `user-contact` WHERE `uri-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `uri-id` FROM `contact` WHERE `uri-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `uri-id` FROM `apcontact` WHERE `uri-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `uri-id` FROM `diaspora-contact` WHERE `uri-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `uri-id` FROM `inbox-status` WHERE `uri-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `uri-id` FROM `post-delivery` WHERE `uri-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `uri-id` FROM `post-delivery` WHERE `inbox-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `parent-uri-id` FROM `mail` WHERE `parent-uri-id` = `item-uri`.`id`)
-			AND NOT EXISTS(SELECT `thr-parent-id` FROM `mail` WHERE `thr-parent-id` = `item-uri`.`id`)", $item['uri-id']
+		DI::logger()->notice('Start collecting orphaned URI-ID', ['last-id' => $item['uri-id']]);
+
+		$sql = [
+			'SELECT i.id
+			FROM `item-uri` i
+			LEFT JOIN `post-user` pu1 ON i.id = pu1.`uri-id`
+			LEFT JOIN `post-user` pu2 ON i.id = pu2.`parent-uri-id`
+			LEFT JOIN `post-user` pu3 ON i.id = pu3.`thr-parent-id`
+			LEFT JOIN `post-user` pu4 ON i.id = pu4.`external-id`
+			LEFT JOIN `post-user` pu5 ON i.id = pu5.`replies-id`
+			LEFT JOIN `post-thread` pt1 ON i.id = pt1.`context-id`
+			LEFT JOIN `post-thread` pt2 ON i.id = pt2.`conversation-id`
+			LEFT JOIN `mail` m1 ON i.id = m1.`uri-id`
+			LEFT JOIN `event` e ON i.id = e.`uri-id`
+			LEFT JOIN `user-contact` uc ON i.id = uc.`uri-id`
+			LEFT JOIN `contact` c ON i.id = c.`uri-id`
+			LEFT JOIN `apcontact` ac ON i.id = ac.`uri-id`
+			LEFT JOIN `diaspora-contact` dc ON i.id = dc.`uri-id`
+			LEFT JOIN `inbox-status` ins ON i.id = ins.`uri-id`
+			LEFT JOIN `post-delivery` pd1 ON i.id = pd1.`uri-id`
+			LEFT JOIN `post-delivery` pd2 ON i.id = pd2.`inbox-id`
+			LEFT JOIN `mail` m2 ON i.id = m2.`parent-uri-id`
+			LEFT JOIN `mail` m3 ON i.id = m3.`thr-parent-id`
+			WHERE
+			  i.id < ? AND
+			  pu1.`uri-id` IS NULL AND
+			  pu2.`parent-uri-id` IS NULL AND
+			  pu3.`thr-parent-id` IS NULL AND
+			  pu4.`external-id` IS NULL AND
+			  pu5.`replies-id` IS NULL AND
+			  pt1.`context-id` IS NULL AND
+			  pt2.`conversation-id` IS NULL AND
+			  m1.`uri-id` IS NULL AND
+			  e.`uri-id` IS NULL AND
+			  uc.`uri-id` IS NULL AND
+			  c.`uri-id` IS NULL AND
+			  ac.`uri-id` IS NULL AND
+			  dc.`uri-id` IS NULL AND
+			  ins.`uri-id` IS NULL AND
+			  pd1.`uri-id` IS NULL AND
+			  pd2.`inbox-id` IS NULL AND
+			  m2.`parent-uri-id` IS NULL AND
+			  m3.`thr-parent-id` IS NULL
+			LIMIT ?',
+			$item['uri-id'],
+			$limit
 		];
 		$pass = 0;
 		do {
 			++$pass;
-			$uris = DBA::select('item-uri', ['id'], $condition, ['limit' => $limit]);
+			$uris  = DBA::p(...$sql);
 			$total = DBA::numRows($uris);
-			Logger::notice('Start deleting orphaned URI-ID', ['pass' => $pass, 'last-id' => $item['uri-id']]);
+			DI::logger()->notice('Start deleting orphaned URI-ID', ['pass' => $pass, 'last-id' => $item['uri-id']]);
 			$affected_count = 0;
 			while ($rows = DBA::toArray($uris, false, 100)) {
 				$ids = array_column($rows, 'id');
 				DBA::delete('item-uri', ['id' => $ids]);
 				$affected_count += DBA::affectedRows();
-				Logger::debug('Deleted', ['pass' => $pass, 'affected_count' => $affected_count, 'total' => $total]);
+				DI::logger()->debug('Deleted', ['pass' => $pass, 'affected_count' => $affected_count, 'total' => $total]);
 			}
 			DBA::close($uris);
 			DBA::commit();
-			Logger::notice('Orphaned URI-ID entries removed', ['pass' => $pass, 'rows' => $affected_count]);
+			DI::logger()->notice('Orphaned URI-ID entries removed', ['pass' => $pass, 'rows' => $affected_count]);
 		} while ($affected_count);
 	}
 
@@ -250,14 +281,14 @@ class ExpirePosts
 			return;
 		}
 
-		$expire_days = DI::config()->get('system', 'dbclean-expire-days');
+		$expire_days           = DI::config()->get('system', 'dbclean-expire-days');
 		$expire_days_unclaimed = DI::config()->get('system', 'dbclean-expire-unclaimed');
 		if (empty($expire_days_unclaimed)) {
 			$expire_days_unclaimed = $expire_days;
 		}
 
 		if (!empty($expire_days)) {
-			Logger::notice('Start collecting expired threads', ['expiry_days' => $expire_days]);
+			DI::logger()->notice('Start collecting expired threads', ['expiry_days' => $expire_days]);
 			$condition = [
 				"`received` < ?
 				AND NOT `uri-id` IN (SELECT `uri-id` FROM `post-thread-user`
@@ -281,7 +312,7 @@ class ExpirePosts
 				++$pass;
 				$uris = DBA::select('post-thread', ['uri-id'], $condition, ['limit' => $limit]);
 
-				Logger::notice('Start deleting expired threads', ['pass' => $pass]);
+				DI::logger()->notice('Start deleting expired threads', ['pass' => $pass]);
 				$affected_count = 0;
 				while ($rows = DBA::toArray($uris, false, 100)) {
 					$ids = array_column($rows, 'uri-id');
@@ -290,12 +321,12 @@ class ExpirePosts
 				}
 				DBA::close($uris);
 				DBA::commit();
-				Logger::notice('Deleted expired threads', ['pass' => $pass, 'rows' => $affected_count]);
+				DI::logger()->notice('Deleted expired threads', ['pass' => $pass, 'rows' => $affected_count]);
 			} while ($affected_count);
 		}
 
 		if (!empty($expire_days_unclaimed)) {
-			Logger::notice('Start collecting unclaimed public items', ['expiry_days' => $expire_days_unclaimed]);
+			DI::logger()->notice('Start collecting unclaimed public items', ['expiry_days' => $expire_days_unclaimed]);
 			$condition = [
 				"`gravity` = ? AND `uid` = ? AND `received` < ?
 				AND NOT `uri-id` IN (SELECT `parent-uri-id` FROM `post-user` AS `i` WHERE `i`.`uid` != ?
@@ -307,19 +338,19 @@ class ExpirePosts
 			$pass = 0;
 			do {
 				++$pass;
-				$uris = DBA::select('post-user', ['uri-id'], $condition, ['limit' => $limit]);
+				$uris  = DBA::select('post-user', ['uri-id'], $condition, ['limit' => $limit]);
 				$total = DBA::numRows($uris);
-				Logger::notice('Start deleting unclaimed public items', ['pass' => $pass]);
+				DI::logger()->notice('Start deleting unclaimed public items', ['pass' => $pass]);
 				$affected_count = 0;
 				while ($rows = DBA::toArray($uris, false, 100)) {
 					$ids = array_column($rows, 'uri-id');
 					DBA::delete('item-uri', ['id' => $ids]);
 					$affected_count += DBA::affectedRows();
-					Logger::debug('Deleted', ['pass' => $pass, 'affected_count' => $affected_count, 'total' => $total]);
+					DI::logger()->debug('Deleted', ['pass' => $pass, 'affected_count' => $affected_count, 'total' => $total]);
 				}
 				DBA::close($uris);
 				DBA::commit();
-				Logger::notice('Deleted unclaimed public items', ['pass' => $pass, 'rows' => $affected_count]);
+				DI::logger()->notice('Deleted unclaimed public items', ['pass' => $pass, 'rows' => $affected_count]);
 			} while ($affected_count);
 		}
 	}

@@ -10,6 +10,7 @@ namespace Friendica\Test\src\Core\Cache;
 use Exception;
 use Friendica\Core\Cache\Type\MemcachedCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Test\MemoryCacheTestCase;
 use Mockery;
 use Psr\Log\NullLogger;
 
@@ -17,7 +18,7 @@ use Psr\Log\NullLogger;
  * @requires extension memcached
  * @group MEMCACHED
  */
-class MemcachedCacheTest extends MemoryCacheTest
+class MemcachedCacheTest extends MemoryCacheTestCase
 {
 	protected function getInstance()
 	{
@@ -56,5 +57,22 @@ class MemcachedCacheTest extends MemoryCacheTest
 	public function testGetAllKeys($value1, $value2, $value3)
 	{
 		static::markTestIncomplete('Race condition because of too fast getAllKeys() which uses a workaround');
+	}
+
+	/**
+	 * @small
+	 */
+	public function testStats()
+	{
+		$stats = $this->instance->getStats();
+
+		self::assertNotNull($stats['version']);
+		self::assertIsNumeric($stats['hits']);
+		self::assertIsNumeric($stats['misses']);
+		self::assertIsNumeric($stats['evictions']);
+		self::assertIsNumeric($stats['entries']);
+		self::assertIsNumeric($stats['used_memory']);
+		self::assertGreaterThan(0, $stats['connected_clients']);
+		self::assertGreaterThan(0, $stats['uptime']);
 	}
 }

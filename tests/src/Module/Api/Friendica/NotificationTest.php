@@ -10,11 +10,11 @@ namespace Friendica\Test\src\Module\Api\Friendica;
 use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\DI;
 use Friendica\Module\Api\Friendica\Notification;
-use Friendica\Test\src\Module\Api\ApiTest;
+use Friendica\Test\ApiTestCase;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
 
-class NotificationTest extends ApiTest
+class NotificationTest extends ApiTestCase
 {
 	public function testEmpty()
 	{
@@ -43,7 +43,7 @@ class NotificationTest extends ApiTest
 	public function testWithXmlResult()
 	{
 		$date    = DateTimeFormat::local('2020-01-01 12:12:02');
-		$dateRel = Temporal::getRelativeDate('2020-01-01 07:12:02');
+		$dateRel = Temporal::getRelativeDate('2020-01-01 12:12:02');
 
 		$assertXml = <<<XML
 <?xml version="1.0"?>
@@ -52,7 +52,7 @@ class NotificationTest extends ApiTest
 </notes>
 XML;
 
-		$response = (new Notification(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'xml']))
+		$response = (new Notification(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'xml']))
 			->run($this->httpExceptionMock);
 
 		self::assertXmlStringEqualsXmlString($assertXml, (string)$response->getBody());
@@ -64,7 +64,7 @@ XML;
 
 	public function testWithJsonResult()
 	{
-		$response = (new Notification(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		$response = (new Notification(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
 			->run($this->httpExceptionMock);
 
 		$json = $this->toJson($response);

@@ -7,8 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon\Accounts;
 
-use Friendica\Core\Logger;
-use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Module\BaseApi;
 
@@ -30,7 +28,7 @@ class Relationships extends BaseApi
 		], $request);
 
 		if (empty($request['id'])) {
-			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
+			$this->jsonExit([]);
 		}
 
 		if (!is_array($request['id'])) {

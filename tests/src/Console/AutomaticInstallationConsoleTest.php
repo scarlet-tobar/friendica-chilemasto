@@ -13,18 +13,17 @@ use Friendica\Console\AutomaticInstallation;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Installer;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Database\Database;
 use Friendica\DI;
+use Friendica\Test\ConsoleTestCase;
 use Friendica\Test\Util\RendererMockTrait;
 use Friendica\Test\Util\VFSTrait;
 use Mockery;
 use Mockery\MockInterface;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
-use Psr\Log\NullLogger;
 
-class AutomaticInstallationConsoleTest extends ConsoleTest
+class AutomaticInstallationConsoleTest extends ConsoleTestCase
 {
 	use VFSTrait;
 	use RendererMockTrait;
@@ -58,13 +57,14 @@ class AutomaticInstallationConsoleTest extends ConsoleTest
 	 */
 	private $dice;
 
-	public function setUp() : void
+	public function setUp(): void
 	{
 		static::markTestSkipped('Needs class \'Installer\' as constructing argument for console tests');
 
 		parent::setUp();
 
-		$this->setUpVfsDir();;
+		$this->setUpVfsDir();
+		;
 
 		if ($this->root->hasChild('config' . DIRECTORY_SEPARATOR . 'local.config.php')) {
 			$this->root->getChild('config')
@@ -76,8 +76,8 @@ class AutomaticInstallationConsoleTest extends ConsoleTest
 		$l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
 
 		$this->dice->shouldReceive('create')
-		           ->with(L10n::class)
-		           ->andReturn($l10nMock);
+				   ->with(L10n::class)
+				   ->andReturn($l10nMock);
 
 		DI::init($this->dice);
 
@@ -103,7 +103,6 @@ class AutomaticInstallationConsoleTest extends ConsoleTest
 		});
 
 		$this->mode->shouldReceive('isInstall')->andReturn(true);
-		Logger::init(new NullLogger());
 	}
 
 	/**
@@ -117,11 +116,11 @@ class AutomaticInstallationConsoleTest extends ConsoleTest
 			'empty' => [
 				'data' => [
 					'database' => [
-						'hostname'    => '',
-						'username'    => '',
-						'password'    => '',
-						'database'    => '',
-						'port'        => '',
+						'hostname' => '',
+						'username' => '',
+						'password' => '',
+						'database' => '',
+						'port'     => '',
 					],
 					'config' => [
 						'php_path'    => '',
@@ -129,23 +128,22 @@ class AutomaticInstallationConsoleTest extends ConsoleTest
 						'admin_email' => '',
 					],
 					'system' => [
-						'basepath'    => '',
-						'urlpath'     => '',
-						'url'         => 'http://friendica.local',
-						'ssl_policy'  => 0,
+						'basepath'         => '',
+						'url'              => 'http://friendica.local',
+						'ssl_policy'       => 0,
 						'default_timezone' => '',
-						'language'    => '',
+						'language'         => '',
 					],
 				],
 			],
 			'normal' => [
 				'data' => [
 					'database' => [
-						'hostname'    => 'testhost',
-						'port'        => 3306,
-						'username'    => 'friendica',
-						'password'    => 'a password',
-						'database'    => 'database',
+						'hostname' => 'testhost',
+						'port'     => 3306,
+						'username' => 'friendica',
+						'password' => 'a password',
+						'database' => 'database',
 					],
 					'config' => [
 						'php_path'    => '',
@@ -153,23 +151,22 @@ class AutomaticInstallationConsoleTest extends ConsoleTest
 						'admin_email' => 'admin@philipp.info',
 					],
 					'system' => [
-						'urlpath'     => 'test/it',
-						'url'         => 'http://friendica.local/test/it',
-						'basepath'    => '',
-						'ssl_policy'  => '2',
+						'url'              => 'http://friendica.local/test/it',
+						'basepath'         => '',
+						'ssl_policy'       => '2',
 						'default_timezone' => 'en',
-						'language'    => 'Europe/Berlin',
+						'language'         => 'Europe/Berlin',
 					],
 				],
 			],
 			'special' => [
 				'data' => [
 					'database' => [
-						'hostname'    => 'testhost.new.domain',
-						'port'        => 3341,
-						'username'    => 'fr"§%ica',
-						'password'    => '$%\"gse',
-						'database'    => 'db',
+						'hostname' => 'testhost.new.domain',
+						'port'     => 3341,
+						'username' => 'fr"§%ica',
+						'password' => '$%\"gse',
+						'database' => 'db',
 					],
 					'config' => [
 						'php_path'    => '',
@@ -177,12 +174,11 @@ class AutomaticInstallationConsoleTest extends ConsoleTest
 						'admin_email' => 'admin@philipp.info',
 					],
 					'system' => [
-						'urlpath'     => 'test/it',
-						'url'         => 'https://friendica.local/test/it',
-						'basepath'    => '',
-						'ssl_policy'  => '1',
+						'url'              => 'https://friendica.local/test/it',
+						'basepath'         => '',
+						'ssl_policy'       => '1',
 						'default_timezone' => 'en',
-						'language'    => 'Europe/Berlin',
+						'language'         => 'Europe/Berlin',
 					],
 				],
 			],
@@ -273,7 +269,7 @@ Creating config file...
 Checking database...
 
 [Error] --------
-Could not connect to database.: 
+Could not connect to database.:
 
 
 FIN;
@@ -353,7 +349,6 @@ FIN;
 		self::assertConfigEntry('system', 'default_timezone', $assertion, ($default) ? Installer::DEFAULT_TZ : null);
 		self::assertConfigEntry('system', 'language', $assertion, ($default) ? Installer::DEFAULT_LANG : null);
 		self::assertConfigEntry('system', 'url', $assertion);
-		self::assertConfigEntry('system', 'urlpath', $assertion);
 		self::assertConfigEntry('system', 'ssl_policy', $assertion, ($default) ? App\BaseURL::DEFAULT_SSL_SCHEME : null);
 		self::assertConfigEntry('system', 'basepath', ($realBasepath) ? $this->root->url() : $assertion);
 	}
@@ -447,7 +442,6 @@ return [
 	],
 	'system' => [
 		'basepath' => '{$conf('system', 'basepath')}',
-		'urlpath' => '{$conf('system', 'urlpath')}',
 		'url' => '{$conf('system', 'url')}',
 		'ssl_policy' => '{$conf('system', 'ssl_policy')}',
 		'default_timezone' => '{$conf('system', 'default_timezone')}',
@@ -564,22 +558,22 @@ CONF;
 
 		$console = new AutomaticInstallation($this->consoleArgv);
 
-		$option = function($var, $cat, $key) use ($data, $console) {
+		$option = function ($var, $cat, $key) use ($data, $console) {
 			if (!empty($data[$cat][$key])) {
 				$console->setOption($var, $data[$cat][$key]);
 			}
 		};
-		$option('dbhost'    , 'database', 'hostname');
-		$option('dbport'    , 'database', 'port');
-		$option('dbuser'    , 'database', 'username');
-		$option('dbpass'    , 'database', 'password');
-		$option('dbdata'    , 'database', 'database');
-		$option('url'       , 'system'  , 'url');
-		$option('phppath'   , 'config'  , 'php_path');
-		$option('admin'     , 'config'  , 'admin_email');
-		$option('tz'        , 'system'  , 'default_timezone');
-		$option('lang'      , 'system'  , 'language');
-		$option('basepath'  , 'system'  , 'basepath');
+		$option('dbhost', 'database', 'hostname');
+		$option('dbport', 'database', 'port');
+		$option('dbuser', 'database', 'username');
+		$option('dbpass', 'database', 'password');
+		$option('dbdata', 'database', 'database');
+		$option('url', 'system', 'url');
+		$option('phppath', 'config', 'php_path');
+		$option('admin', 'config', 'admin_email');
+		$option('tz', 'system', 'default_timezone');
+		$option('lang', 'system', 'language');
+		$option('basepath', 'system', 'basepath');
 
 		$txt = $this->dumpExecute($console);
 
@@ -605,7 +599,7 @@ CONF;
 		self::assertStuckDB($txt);
 		self::assertTrue($this->root->hasChild('config' . DIRECTORY_SEPARATOR . 'local.config.php'));
 
-		self::assertConfig(['config' => ['hostname' => 'friendica.local'], 'system' => ['url' => 'http://friendica.local', 'ssl_policy' => 0, 'urlpath' => '']], false, true, false, true);
+		self::assertConfig(['config' => ['hostname' => 'friendica.local'], 'system' => ['url' => 'http://friendica.local', 'ssl_policy' => 0]], false, true, false, true);
 	}
 
 	public function testGetHelp()
@@ -633,12 +627,12 @@ Options
     -d|--dbdata <database>    The name of the mysql/mariadb database (env MYSQL_DATABASE)
     -U|--dbuser <username>    The username of the mysql/mariadb database login (env MYSQL_USER or MYSQL_USERNAME)
     -P|--dbpass <password>    The password of the mysql/mariadb database login (env MYSQL_PASSWORD)
-    -U|--url <url>            The full base URL of Friendica - f.e. 'https://friendica.local/sub' (env FRIENDICA_URL) 
+    -U|--url <url>            The full base URL of Friendica - f.e. 'https://friendica.local/sub' (env FRIENDICA_URL)
     -B|--phppath <php_path>   The path of the PHP binary (env FRIENDICA_PHP_PATH)
     -b|--basepath <base_path> The basepath of Friendica (env FRIENDICA_BASE_PATH)
     -t|--tz <timezone>        The timezone of Friendica (env FRIENDICA_TZ)
     -L|--lang <language>      The language of Friendica (env FRIENDICA_LANG)
- 
+
 Environment variables
    MYSQL_HOST                  The host of the mysql/mariadb database (mandatory if mysql and environment is used)
    MYSQL_PORT                  The port of the mysql/mariadb database
@@ -651,7 +645,7 @@ Environment variables
    FRIENDICA_ADMIN_MAIL        The admin email address of Friendica (this email will be used for admin access)
    FRIENDICA_TZ                The timezone of Friendica
    FRIENDICA_LANG              The langauge of Friendica
-   
+
 Examples
 	bin/console autoinstall -f 'input.config.php
 		Installs Friendica with the prepared 'input.config.php' file

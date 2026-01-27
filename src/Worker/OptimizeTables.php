@@ -7,7 +7,6 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\DI;
 
@@ -20,18 +19,19 @@ class OptimizeTables
 	{
 
 		if (!DI::lock()->acquire('optimize_tables', 0)) {
-			Logger::warning('Lock could not be acquired');
+			DI::logger()->warning('Lock could not be acquired');
 			return;
 		}
 
-		Logger::info('Optimize start');
+		DI::logger()->info('Optimize start');
 
 		DBA::optimizeTable('cache');
 		DBA::optimizeTable('locks');
-		DBA::optimizeTable('oembed');
 		DBA::optimizeTable('parsed_url');
 		DBA::optimizeTable('session');
 		DBA::optimizeTable('post-engagement');
+		DBA::optimizeTable('channel-post');
+		DBA::optimizeTable('system-channel-post');
 		DBA::optimizeTable('check-full-text-search');
 
 		if (DI::config()->get('system', 'optimize_all_tables')) {
@@ -60,7 +60,7 @@ class OptimizeTables
 			DBA::optimizeTable('tag');
 		}
 
-		Logger::info('Optimize end');
+		DI::logger()->info('Optimize end');
 
 		DI::lock()->release('optimize_tables');
 	}

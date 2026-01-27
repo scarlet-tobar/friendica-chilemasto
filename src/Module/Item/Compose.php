@@ -8,18 +8,21 @@
 namespace Friendica\Module\Item;
 
 use DateTime;
-use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\App\Page;
+use Friendica\AppHelper;
 use Friendica\BaseModule;
 use Friendica\Content\Feature;
 use Friendica\Core\ACL;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Model\UserSession;
 use Friendica\Core\Theme;
 use Friendica\Database\DBA;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\User;
@@ -31,6 +34,7 @@ use Friendica\Util\ACLFormatter;
 use Friendica\Util\Crypto;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Compose extends BaseModule
@@ -41,7 +45,7 @@ class Compose extends BaseModule
 	/** @var ACLFormatter */
 	private $ACLFormatter;
 
-	/** @var App\Page */
+	/** @var Page */
 	private $page;
 
 	/** @var IManagePersonalConfigValues */
@@ -53,21 +57,23 @@ class Compose extends BaseModule
 	/** @var UserSession */
 	private $session;
 
-	/** @var App */
-	private $app;
+	/** @var AppHelper */
+	private $appHelper;
 
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(App $app, UserSession $session, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, App\Page $page, ACLFormatter $ACLFormatter, SystemMessages $systemMessages, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(EventDispatcherInterface $eventDispatcher, AppHelper $appHelper, UserSession $session, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Page $page, ACLFormatter $ACLFormatter, SystemMessages $systemMessages, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->systemMessages = $systemMessages;
-		$this->ACLFormatter   = $ACLFormatter;
-		$this->page           = $page;
-		$this->pConfig        = $pConfig;
-		$this->config         = $config;
-		$this->session        = $session;
-		$this->app            = $app;
+		$this->systemMessages  = $systemMessages;
+		$this->ACLFormatter    = $ACLFormatter;
+		$this->page            = $page;
+		$this->pConfig         = $pConfig;
+		$this->config          = $config;
+		$this->session         = $session;
+		$this->appHelper       = $appHelper;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	protected function post(array $request = [])
@@ -87,7 +93,7 @@ class Compose extends BaseModule
 			return Login::form('compose');
 		}
 
-		if ($this->app->getCurrentTheme() !== 'frio') {
+		if ($this->appHelper->getCurrentTheme() !== 'frio') {
 			throw new NotImplementedException($this->l10n->t('This feature is only available with the frio theme.'));
 		}
 
@@ -112,29 +118,28 @@ class Compose extends BaseModule
 
 		switch ($posttype) {
 			case Item::PT_PERSONAL_NOTE:
-				$compose_title = $this->l10n->t('Compose new personal note');
-				$type = 'note';
-				$doesFederate = false;
-				$contact_allow_list = [$this->app->getContactId()];
-				$circle_allow_list = [];
-				$contact_deny_list = [];
-				$circle_deny_list = [];
+				$compose_title      = $this->l10n->t('Compose new personal note');
+				$type               = 'note';
+				$doesFederate       = false;
+				$contact_allow_list = [$this->appHelper->getContactId()];
+				$circle_allow_list  = [];
+				$contact_deny_list  = [];
+				$circle_deny_list   = [];
 				break;
 			default:
 				$compose_title = $this->l10n->t('Compose new post');
-				$type = 'post';
-				$doesFederate = true;
+				$type          = 'post';
+				$doesFederate  = true;
 
 				$contact_allow = $_REQUEST['contact_allow'] ?? '';
-				$circle_allow = $_REQUEST['circle_allow'] ?? '';
-				$contact_deny = $_REQUEST['contact_deny'] ?? '';
-				$circle_deny = $_REQUEST['circle_deny'] ?? '';
+				$circle_allow  = $_REQUEST['circle_allow']  ?? '';
+				$contact_deny  = $_REQUEST['contact_deny']  ?? '';
+				$circle_deny   = $_REQUEST['circle_deny']   ?? '';
 
 				if ($contact_allow
 					. $circle_allow
 					. $contact_deny
-				    . $circle_deny)
-				{
+					. $circle_deny) {
 					$contact_allow_list = $contact_allow ? explode(',', $contact_allow) : [];
 					$circle_allow_list  = $circle_allow  ? explode(',', $circle_allow)  : [];
 					$contact_deny_list  = $contact_deny  ? explode(',', $contact_deny)  : [];
@@ -144,26 +149,27 @@ class Compose extends BaseModule
 				break;
 		}
 
-		$title         = $_REQUEST['title']         ?? '';
-		$category      = $_REQUEST['category']      ?? '';
-		$body          = $_REQUEST['body']          ?? '';
-		$location      = $_REQUEST['location']      ?? $user['default-location'];
-		$wall          = $_REQUEST['wall']          ?? $type == 'post';
+		$title    = $_REQUEST['title']    ?? '';
+		$category = $_REQUEST['category'] ?? '';
+		$body     = $_REQUEST['body']     ?? '';
+		$location = $_REQUEST['location'] ?? $user['default-location'];
+		$wall     = $_REQUEST['wall']     ?? $type == 'post';
 
-		$jotplugins = '';
-		Hook::callAll('jot_tool', $jotplugins);
+		$jotplugins = $this->eventDispatcher->dispatch(
+			new HtmlFilterEvent(HtmlFilterEvent::JOT_TOOL, ''),
+		)->getHtml();
 
 		// Output
 		$this->page->registerFooterScript(Theme::getPathForFile('js/ajaxupload.js'));
 		$this->page->registerFooterScript(Theme::getPathForFile('js/linkPreview.js'));
 		$this->page->registerFooterScript(Theme::getPathForFile('js/compose.js'));
 
-		$contact = Contact::getById($this->app->getContactId());
+		$contact = Contact::getById($this->appHelper->getContactId());
 
 		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'set_creation_date')) {
 			$created_at = Temporal::getDateTimeField(
-				new \DateTime(DBA::NULL_DATETIME),
-				new \DateTime('now'),
+				new DateTime(DBA::NULL_DATETIME),
+				new DateTime('now'),
 				null,
 				$this->l10n->t('Created at'),
 				'created_at'
@@ -199,8 +205,12 @@ class Compose extends BaseModule
 				'wait'                 => $this->l10n->t('Please wait'),
 				'placeholdertitle'     => $this->l10n->t('Set title'),
 				'placeholdercategory'  => Feature::isEnabled($this->session->getLocalUserId(), Feature::CATEGORIES) ? $this->l10n->t('Categories (comma-separated list)') : '',
-				'always_open_compose'  => $this->pConfig->get($this->session->getLocalUserId(), 'frio', 'always_open_compose',
-					$this->config->get('frio', 'always_open_compose', false)) ? '' :
+				'always_open_compose'  => $this->pConfig->get(
+					$this->session->getLocalUserId(),
+					'frio',
+					'always_open_compose',
+					$this->config->get('frio', 'always_open_compose', false)
+				) ? '' :
 						$this->l10n->t('You can make this page always open when you use the New Post button in the <a href="/settings/display">Theme Customization settings</a>.'),
 			],
 
@@ -217,11 +227,11 @@ class Compose extends BaseModule
 				$this->l10n->t('Scheduled at'),
 				'scheduled_at'
 			),
-			'$created_at'   => $created_at,
-			'$title'        => $title,
-			'$category'     => $category,
-			'$body'         => $body,
-			'$location'     => $location,
+			'$created_at' => $created_at,
+			'$title'      => $title,
+			'$category'   => $category,
+			'$body'       => $body,
+			'$location'   => $location,
 
 			'$contact_allow' => implode(',', $contact_allow_list),
 			'$circle_allow'  => implode(',', $circle_allow_list),
@@ -230,7 +240,7 @@ class Compose extends BaseModule
 
 			'$jotplugins'   => $jotplugins,
 			'$rand_num'     => Crypto::randomDigits(12),
-			'$acl_selector'  => ACL::getFullSelectorHTML($this->page, $this->session->getLocalUserId(), $doesFederate, [
+			'$acl_selector' => ACL::getFullSelectorHTML($this->page, $this->session->getLocalUserId(), $doesFederate, [
 				'allow_cid' => $contact_allow_list,
 				'allow_gid' => $circle_allow_list,
 				'deny_cid'  => $contact_deny_list,

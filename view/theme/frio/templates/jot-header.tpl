@@ -65,7 +65,19 @@
 <script type="text/javascript">
 	var ispublic = '{{$ispublic nofilter}}';
 	aStr.linkurl = '{{$linkurl}}';
+	aStr.postPublished = '{{$postPublished}}';
+	aStr.goToPost = '{{$goToPost}}';
 
+	function goToElement(elementId) {
+		let $element = $('#' + elementId);
+		if ($element.length) {
+			window.scrollTo(0, $element.offset().top - 100);
+			$element.addClass('highlight-post');
+			setTimeout(function() {
+				$element.removeClass('highlight-post');
+			}, 2000);
+		}
+	}
 
 	$(document).ready(function() {
 
@@ -107,6 +119,16 @@
 			// This cancels the automatic redirection after item submission
 			formData.delete('return');
 
+			let isNewPost = !formData.get('post_id');
+
+			// remember existing post IDs to find our new one later
+			let existingPostIds = new Set();
+			if (isNewPost) {
+				$('.toplevel_item').each(function() {
+					existingPostIds.add($(this).attr('id'));
+				});
+			}
+
 			$.ajax({
 				url: 'item',
 				data: formData,
@@ -129,10 +151,44 @@
 				$share.button('reset');
 				$sharePreview.button('reset');
 
-				// Force the display update of the edited post/comment
+				force_update = true;
 				if (formData.get('post_id')) {
-					force_update = true;
 					update_item = formData.get('post_id');
+				}
+
+				if (isNewPost) {
+					let alertHandler = function() {
+						// find our new post (has edit button)
+						let newPostElement = null;
+						$('.toplevel_item').each(function() {
+							if (!existingPostIds.has($(this).attr('id')) && $(this).find('.pencil').length > 0) {
+								newPostElement = $(this);
+								return false;
+							}
+						});
+
+						if (newPostElement) {
+							let postId = newPostElement.attr('id');
+							let alertHtml = '<div id="post-published-alert" class="alert alert-info alert-dismissible" role="alert">' +
+								'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+								aStr.postPublished + ' ' +
+								'<a href="#' + postId + '" class="alert-link" onclick="goToElement(\'' + postId + '\'); return false;">' + aStr.goToPost + '</a>' +
+								'</div>';
+
+							$('#post-published-alert').remove();
+							$('body').append(alertHtml);
+
+							// auto-dismiss after 5 seconds
+							setTimeout(function() {
+								$('#post-published-alert').fadeOut(400, function() {
+									$(this).remove();
+								});
+							}, 5000);
+						}
+
+						document.removeEventListener('postprocess_liveupdate', alertHandler);
+					};
+					document.addEventListener('postprocess_liveupdate', alertHandler);
 				}
 
 				NavUpdate();
@@ -296,33 +352,45 @@
 	}
 
 	function itemFiler(id) {
-		var bordercolor = $("input").css("border-color");
+		var modal = $('#modal').modal();
 
-		$.get('filer/', function(data){
-			$.colorbox({html:data});
-			$("#id_term").keypress(function(){
-				$(this).css("border-color",bordercolor);
-			})
-			$("#select_term").change(function(){
-				$("#id_term").css("border-color",bordercolor);
-			})
+		$.get('filer/', function (data) {
+			modal
+				.find('#modal-body')
+				.append(data);
 
-			$("#filer_save").click(function(e){
+			modal
+				.find('#modal-header h4')
+				.append("{{$fileas}}");
+
+			// Ensure focus after the modal is fully visible
+			modal.on('shown.bs.modal', function () {
+				$('#id_term').trigger('focus');
+			});
+
+			$("#filer_save").click(function (e) {
 				e.preventDefault();
-				reply = $("#id_term").val();
-				if(reply && reply.length) {
+				const term = $("#id_term").val();
+				if (term && term.length) {
 					commentBusy = true;
+					formModified = true;
 					$('body').css('cursor', 'wait');
-					$.get('filer/' + id + '?term=' + reply, NavUpdate);
-//					if(timer) clearTimeout(timer);
-//					timer = setTimeout(NavUpdate,3000);
-					liking = 1;
-					force_update = true;
-					$.colorbox.close();
-					formModified = true; // Mark the form as modified
+					$.get('filer/' + id + '?term=' + term)
+						.done(function () {
+							$('#modal-body').empty();
+							$('#modal').modal('hide');
+							resetFormModifiedFlag();
+						})
+						.always(function () {
+							liking = 1;
+							force_update = true;
+							update_item = id;
+							NavUpdate();
+						});
 				} else {
-					$("#id_term").css("border-color","#FF0000");
+					$("#id_term").css("border-color", "#FF0000");
 				}
+
 				return false;
 			});
 		});

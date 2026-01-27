@@ -7,7 +7,10 @@
 
 namespace Friendica\Module\Moderation\Blocklist;
 
-use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\App\Page;
+use Friendica\AppHelper;
 use Friendica\Content\Pager;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
@@ -18,7 +21,6 @@ use Friendica\Model;
 use Friendica\Module\BaseModeration;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
-use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
@@ -27,9 +29,9 @@ class Contact extends BaseModeration
 	/** @var Database */
 	private $database;
 
-	public function __construct(Database $database, App\Page $page, App $app, SystemMessages $systemMessages, IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(Database $database, Page $page, AppHelper $appHelper, SystemMessages $systemMessages, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
-		parent::__construct($page, $app, $systemMessages, $session, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+		parent::__construct($page, $appHelper, $systemMessages, $session, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->database = $database;
 	}
@@ -93,15 +95,18 @@ class Contact extends BaseModeration
 		$t = Renderer::getMarkupTemplate('moderation/blocklist/contact.tpl');
 		return Renderer::replaceMacros($t, [
 			// strings //
-			'$title'       => $this->t('Moderation'),
-			'$page'        => $this->t('Remote Contact Blocklist'),
-			'$description' => $this->t('This page allows you to prevent any message from a remote contact to reach your node.'),
-			'$submit'      => $this->t('Block Remote Contact'),
-			'$select_all'  => $this->t('select all'),
-			'$select_none' => $this->t('select none'),
-			'$block'       => $this->t('Block'),
-			'$unblock'     => $this->t('Unblock'),
-			'$no_data'     => $this->t('No remote contact is blocked from this node.'),
+			'$title'        => $this->t('Moderation'),
+			'$page'         => $this->t('Remote Contact Blocklist'),
+			'$description'  => $this->t('This page allows you to prevent any message from a remote contact to reach your node.'),
+			'$submit'       => $this->t('Block Remote Contact'),
+			'$importexport' => $this->t('Import/Export'),
+			'$import_csv'   => $this->t('Import from CSV file'),
+			'$export_csv'   => $this->t('Export to CSV file'),
+			'$select_all'   => $this->t('select all'),
+			'$select_none'  => $this->t('select none'),
+			'$block'        => $this->t('Block'),
+			'$unblock'      => $this->t('Unblock'),
+			'$no_data'      => $this->t('No remote contact is blocked from this node.'),
 
 			'$h_contacts'  => $this->t('Blocked Remote Contacts'),
 			'$h_newblock'  => $this->t('Block New Remote Contact'),

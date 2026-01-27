@@ -51,7 +51,7 @@ final class ATProtocol
 	/** @var \Friendica\Core\Config\Capability\IManageConfigValues */
 	private $config;
 
-	/** @var IManagePersonalConfigValue */
+	/** @var IManagePersonalConfigValues */
 	private $pConfig;
 
 	/** @var ICanSendHttpRequests */
@@ -129,17 +129,26 @@ final class ATProtocol
 		}
 
 		$data = $this->get($pds . '/xrpc/' . $url, [HttpClientOptions::HEADERS => $headers]);
-		if (empty($data) || (!empty($data->code) && ($data->code < 200 || $data->code >= 400))) {
+
+		if ($data === null) {
 			$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_API_FAIL);
+			$this->pConfig->set($uid, 'bluesky', 'status-message', 'Unknown error occured while fetching data from Bluesky');
+			return null;
+		}
+
+		if (!empty($data->code) && ($data->code < 200 || $data->code >= 400)) {
 			if (!empty($data->message)) {
 				$this->pConfig->set($uid, 'bluesky', 'status-message', $data->message);
 			} elseif (!empty($data->code)) {
 				$this->pConfig->set($uid, 'bluesky', 'status-message', 'Error Code: ' . $data->code);
 			}
-		} elseif (!empty($data)) {
-			$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_SUCCESS);
-			$this->pConfig->set($uid, 'bluesky', 'status-message', '');
+
+			return $data;
 		}
+
+		$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_SUCCESS);
+		$this->pConfig->set($uid, 'bluesky', 'status-message', '');
+
 		return $data;
 	}
 
@@ -179,10 +188,9 @@ final class ATProtocol
 	 * Perform an XRPC post for a given user
 	 * @see https://atproto.com/specs/xrpc#lexicon-http-endpoints
 	 *
-	 * @param integer $uid       User ID
-	 * @param string $url        Endpoints like "com.atproto.repo.createRecord"
-	 * @param [type] $parameters array or StdClass with parameters
-	 * @return stdClass|null
+	 * @param int            $uid        User ID
+	 * @param string         $url        Endpoints like "com.atproto.repo.createRecord"
+	 * @param array|stdClass $parameters array or StdClass with parameters
 	 */
 	public function XRPCPost(int $uid, string $url, $parameters): ?stdClass
 	{
@@ -215,16 +223,20 @@ final class ATProtocol
 			return null;
 		}
 
-		$data = json_decode($curlResult->getBodyString());
+		$data = json_decode($curlResult->getBodyString(), false);
+
 		if (!$curlResult->isSuccess()) {
 			$this->logger->notice('API Error', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data ?: $curlResult->getBodyString()]);
 			if (!$data) {
 				$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_API_FAIL);
-				if (!empty($data->message)) {
-					$this->pConfig->set($uid, 'bluesky', 'status-message', $data->message);
-				} elseif (!empty($data->code)) {
-					$this->pConfig->set($uid, 'bluesky', 'status-message', 'Error Code: ' . $data->code);
+				if (!empty($curlResult->getBodyString())) {
+					$this->pConfig->set($uid, 'bluesky', 'status-message', $curlResult->getBodyString());
+				} elseif (!empty($curlResult->getReturnCode())) {
+					$this->pConfig->set($uid, 'bluesky', 'status-message', 'Error Code: ' . $curlResult->getReturnCode());
+				} else {
+					$this->pConfig->set($uid, 'bluesky', 'status-message', 'Unknown error occured while posting to Bluesky');
 				}
+
 				return null;
 			}
 			$data->code = $curlResult->getReturnCode();
@@ -239,6 +251,8 @@ final class ATProtocol
 				$this->pConfig->set($uid, 'bluesky', 'status-message', $data->message);
 			} elseif (!empty($data->code)) {
 				$this->pConfig->set($uid, 'bluesky', 'status-message', 'Error Code: ' . $data->code);
+			} else {
+				$this->pConfig->set($uid, 'bluesky', 'status-message', 'Unknown error occured while posting to Bluesky');
 			}
 		}
 		return $data;

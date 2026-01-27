@@ -10,13 +10,14 @@ namespace Friendica\Test\src\Core\Cache;
 use Exception;
 use Friendica\Core\Cache\Type\RedisCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Test\MemoryCacheTestCase;
 use Mockery;
 
 /**
  * @requires extension redis
  * @group REDIS
  */
-class RedisCacheTest extends MemoryCacheTest
+class RedisCacheTest extends MemoryCacheTestCase
 {
 	protected function getInstance()
 	{
@@ -44,7 +45,7 @@ class RedisCacheTest extends MemoryCacheTest
 			->andReturn(null);
 
 		try {
-			$this->cache = new \Friendica\Core\Cache\Type\RedisCache($host, $configMock);
+			$this->cache = new RedisCache($host, $configMock);
 		} catch (Exception $e) {
 			static::markTestSkipped('Redis is not available. Failure: ' . $e->getMessage());
 		}
@@ -55,5 +56,22 @@ class RedisCacheTest extends MemoryCacheTest
 	{
 		$this->cache->clear(false);
 		parent::tearDown();
+	}
+
+	/**
+	 * @small
+	 */
+	public function testStats()
+	{
+		$stats = $this->instance->getStats();
+
+		self::assertNotNull($stats['version']);
+		self::assertIsNumeric($stats['hits']);
+		self::assertIsNumeric($stats['misses']);
+		self::assertIsNumeric($stats['evictions']);
+		self::assertIsNumeric($stats['entries']);
+		self::assertIsNumeric($stats['used_memory']);
+		self::assertGreaterThan(0, $stats['connected_clients']);
+		self::assertGreaterThan(0, $stats['uptime']);
 	}
 }

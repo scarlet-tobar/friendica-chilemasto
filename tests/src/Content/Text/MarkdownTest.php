@@ -9,9 +9,9 @@ namespace Friendica\Test\src\Content\Text;
 
 use Exception;
 use Friendica\Content\Text\Markdown;
-use Friendica\Test\FixtureTest;
+use Friendica\Test\FixtureTestCase;
 
-class MarkdownTest extends FixtureTest
+class MarkdownTest extends FixtureTestCase
 {
 	public function dataMarkdown()
 	{
@@ -51,7 +51,7 @@ class MarkdownTest extends FixtureTest
 		return [
 			'bug-8358-double-decode' => [
 				'expectedBBCode' => 'with the <sup> and </sup> tag',
-				'markdown' => 'with the &lt;sup&gt; and &lt;/sup&gt; tag',
+				'markdown'       => 'with the &lt;sup&gt; and &lt;/sup&gt; tag',
 			],
 		];
 	}
