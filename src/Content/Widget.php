@@ -48,6 +48,12 @@ class Widget
 	 */
 	public static function findPeople(): string
 	{
+		// Langs in friendica are all lowercase and dash separated (e.g. da-dk) - in the directory
+		// they're underscore separated, with the latter part being uppercase (e.g. da_DK)
+		$directory_user_lang_string = "";
+		if (DI::userSession()->get('language')) {
+			$directory_user_lang_string = "&lang=" . DI::l10n()->langToLocaleCode(DI::userSession()->get('language'));
+		}
 		$global_dir = Search::getGlobalDirectory();
 
 		if (DI::config()->get('system', 'invitation_only')) {
@@ -70,7 +76,7 @@ class Widget
 		$nv['random']          = DI::l10n()->t('Random Profile');
 		$nv['inv']             = DI::l10n()->t('Invite Friends');
 		$nv['directory']       = DI::l10n()->t('Global Directory');
-		$nv['global_dir']      = OpenWebAuth::getZrlUrl($global_dir, true);
+		$nv['global_dir']      = OpenWebAuth::getZrlUrl($global_dir, true) . $directory_user_lang_string;
 		$nv['local_directory'] = DI::l10n()->t('Local Directory');
 
 		$aside        = [];
@@ -611,9 +617,9 @@ class Widget
 		$widget_timelineorder = json_decode(DI::pConfig()->get($uid, 'system', 'widget_timeline_order'));
 		if (!empty($widget_timelineorder)) {
 			$tmp = [];
-			foreach($widget_timelineorder as $order) {
-				foreach($channels as $channel) {
-					if($channel['ref'] == $order) {
+			foreach ($widget_timelineorder as $order) {
+				foreach ($channels as $channel) {
+					if ($channel['ref'] == $order) {
 						$tmp[] = $channel;
 					}
 				}
