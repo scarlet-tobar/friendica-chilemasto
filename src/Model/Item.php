@@ -1196,13 +1196,13 @@ class Item
 		DI::logger()->debug('Post accepted for channels', ['uri-id' => $uri_id, 'uid' => $uid, 'network' => $item['network']]);
 
 		if (($item['gravity'] === self::GRAVITY_ACTIVITY) && ($item['verb'] === Activity::ANNOUNCE) && ($item['parent-uri-id'] === $item['thr-parent-id'])) {
-			DI::ChannelPost()->add($engagement, $uid, $item['author-id']);
+			DI::ChannelPost()->add($engagement, self::GRAVITY_PARENT, $uid, $item['author-id']);
 			DI::SystemChannelPost()->add($engagement, self::GRAVITY_PARENT, $uid, $item['network'], $item['author-id']);
 		} else {
 			if ($item['origin']) {
-				DI::ChannelPost()->add($engagement, $uid, $item['author-id']);
-			} elseif ($item['gravity'] === self::GRAVITY_PARENT) {
-				DI::ChannelPost()->add($engagement, $uid);
+				DI::ChannelPost()->add($engagement, $item['gravity'], $uid, $item['author-id']);
+			} else {
+				DI::ChannelPost()->add($engagement, $item['gravity'], $uid);
 			}
 			DI::SystemChannelPost()->add($engagement, $item['gravity'], $uid, $item['network']);
 		}

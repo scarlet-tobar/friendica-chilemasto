@@ -316,9 +316,10 @@ class UserDefinedChannel extends BaseRepository
 	 * @param int    $owner_id Owner contact id.
 	 * @param int    $reshare_id Reshare contact id.
 	 * @param array  $uids User IDs to filter channels.
+	 * @param array  $circles circle IDs to filter channels.
 	 * @return UserDefinedChannels|null Collection of matching channels or null.
 	 */
-	public function getMatchingChannels(string $searchtext, string $language, array $tags, int $media_type, int $owner_id, int $reshare_id, array $uids): ?UserDefinedChannels
+	public function getMatchingChannels(string $searchtext, string $language, array $tags, int $media_type, int $owner_id, int $reshare_id, array $uids, array $circles): ?UserDefinedChannels
 	{
 		if (!in_array($language, User::getLanguages())) {
 			$this->logger->debug('Unwanted language found. No matched channel found.', ['language' => $language, 'searchtext' => $searchtext]);
@@ -327,7 +328,12 @@ class UserDefinedChannel extends BaseRepository
 
 		$disposableFullTextSearch = new DisposableFullTextSearch($this->db, $searchtext);
 
-		$filteredChannels = $this->select(['uid' => $uids, 'valid' => true])->filter(
+		$condition = ['uid' => $uids, 'valid' => true];
+		if ($circles) {
+			$condition = DBA::mergeConditions($condition, ['circle' => $circles]);
+		}
+
+		$filteredChannels = $this->select($condition)->filter(
 			function (UserDefinedChannelEntity $channel) use ($owner_id, $reshare_id, $language, $tags, $media_type, $disposableFullTextSearch, $searchtext) {
 				if (
 					($channel->circle > 0)

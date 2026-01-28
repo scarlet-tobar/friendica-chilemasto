@@ -9,11 +9,13 @@ declare(strict_types=1);
 
 namespace Friendica\Content\Conversation\Factory;
 
+use Friendica\Content\Conversation\Entity\UserDefinedChannel as UserDefinedChannelEntity;
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Database\Database;
 use Friendica\Model\Contact;
+use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Tag;
 use Psr\Log\LoggerInterface;
@@ -56,11 +58,12 @@ final class ChannelPost
 	 * system's channel caching is enabled and matching channels are found.
 	 *
 	 * @param array $engagement post-engagement record
+	 * @param int $gravity Gravity of the post
 	 * @param int $uid User id context.
 	 * @param int $reshare_id Optional reshare id.
 	 * @return void
 	 */
-	public function add(array $engagement, int $uid, int $reshare_id = 0): void
+	public function add(array $engagement, int $gravity, int $uid, int $reshare_id = 0): void
 	{
 		if (!$this->config->get('system', 'channel_cache')) {
 			return;
@@ -80,8 +83,9 @@ final class ChannelPost
 
 		$language = $engagement['language'] !== L10n::UNDETERMINED_LANGUAGE ? $engagement['language'] : '';
 		$tags     = array_column(Tag::getByURIId($engagement['uri-id'], [Tag::HASHTAG]), 'name');
+		$circles  = ($gravity != Item::GRAVITY_PARENT) ? [UserDefinedChannelEntity::CIRCLE_CREATION, UserDefinedChannelEntity::CIRCLE_POSTS, UserDefinedChannelEntity::CIRCLE_ACTIVITY] : [];
 
-		$channels = $this->channelRepository->getMatchingChannels($engagement['searchtext'], $language, $tags, $engagement['media-type'], $engagement['owner-id'], $reshare_id, $uids);
+		$channels = $this->channelRepository->getMatchingChannels($engagement['searchtext'], $language, $tags, $engagement['media-type'], $engagement['owner-id'], $reshare_id, $uids, $circles);
 		if (!($channels instanceof \Friendica\Content\Conversation\Collection\UserDefinedChannels) || $channels->count() === 0) {
 			$this->logger->debug('No channels found', ['uri-id' => $engagement['uri-id'], 'uids' => $uids, 'reshare_id' => $reshare_id]);
 			return;
