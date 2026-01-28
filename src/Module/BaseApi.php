@@ -357,17 +357,6 @@ class BaseApi extends BaseModule
 	}
 
 	/**
-	 * Check if the app is known to support quoted posts
-	 *
-	 * @return bool
-	 */
-	public static function appSupportsQuotes(): bool
-	{
-		// @todo Clean up the whole functionality since it isn't of any use anymore.
-		return true;
-	}
-
-	/**
 	 * Get current application token
 	 *
 	 * @return array token
