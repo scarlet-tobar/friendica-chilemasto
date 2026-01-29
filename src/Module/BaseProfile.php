@@ -90,7 +90,7 @@ class BaseProfile extends BaseModule
 
 		if ($is_owner) {
 			$tabs[] = [
-				'label'     => DI::l10n()->t('Personal Notes'),
+				'label'     => DI::l10n()->t('Personal notes'),
 				'url'       => DI::baseUrl() . '/notes',
 				'sel'       => $current == 'notes' ? 'active' : '',
 				'title'     => DI::l10n()->t('Only You Can See This'),

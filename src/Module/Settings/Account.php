@@ -504,7 +504,7 @@ class Account extends BaseSettings
 			'$ptitle' => DI::l10n()->t('Account Settings'),
 			'$desc'   => DI::l10n()->t("Your Identity Address is <strong>'%s'</strong> or '%s'.", $nickname . '@' . DI::baseUrl()->getHost() . DI::baseUrl()->getPath(), DI::baseUrl() . '/profile/' . $nickname),
 
-			'$submit'              => DI::l10n()->t('Save Settings'),
+			'$submit'              => DI::l10n()->t('Save settings'),
 			'$uid'                 => DI::userSession()->getLocalUserId(),
 			'$form_security_token' => self::getFormSecurityToken('settings'),
 			'$open'                => $this->parameters['open'] ?? 'password',
@@ -543,7 +543,7 @@ class Account extends BaseSettings
 			'$aclselect'           => ACL::getFullSelectorHTML(DI::page(), $this->session->getLocalUserId()),
 
 			'$expire' => [
-				'label'        => DI::l10n()->t('Expiration settings'),
+				'label'        => DI::l10n()->t('Post expiration'),
 				'days'         => ['expire', DI::l10n()->t("Automatically expire posts after this many days:"), $expire, DI::l10n()->t('If empty, posts will not expire. Expired posts will be deleted')],
 				'items'        => ['expire_items', DI::l10n()->t('Expire posts'), $expire_items, DI::l10n()->t('When activated, posts and comments will be expired.')],
 				'notes'        => ['expire_notes', DI::l10n()->t('Expire personal notes'), $expire_notes, DI::l10n()->t('When activated, the personal notes on your profile page will be expired.')],
@@ -551,17 +551,17 @@ class Account extends BaseSettings
 				'network_only' => ['expire_network_only', DI::l10n()->t('Only expire posts by others'), $expire_network_only, DI::l10n()->t('When activated, your own posts never expire. Then the settings above are only valid for posts you received.')],
 			],
 
-			'$h_not'   => DI::l10n()->t('Notification Settings'),
-			'$lbl_not' => DI::l10n()->t('Send a notification email when:'),
+			'$h_not'   => DI::l10n()->t('Notifications'),
+			'$lbl_not' => DI::l10n()->t('Send an email when:'),
 			'$notify1' => ['notify1', DI::l10n()->t('You receive an introduction'), ($notify & Notification\Type::INTRO), Notification\Type::INTRO, ''],
 			'$notify2' => ['notify2', DI::l10n()->t('Your introductions are confirmed'), ($notify & Notification\Type::CONFIRM), Notification\Type::CONFIRM, ''],
-			'$notify3' => ['notify3', DI::l10n()->t('Someone writes on your profile wall'), ($notify & Notification\Type::WALL), Notification\Type::WALL, ''],
+			'$notify3' => ['notify3', DI::l10n()->t('Someone writes on your wall'), ($notify & Notification\Type::WALL), Notification\Type::WALL, ''],
 			'$notify4' => ['notify4', DI::l10n()->t('Someone writes a followup comment'), ($notify & Notification\Type::COMMENT), Notification\Type::COMMENT, ''],
 			'$notify5' => ['notify5', DI::l10n()->t('You receive a private message'), ($notify & Notification\Type::MAIL), Notification\Type::MAIL, ''],
 			'$notify6' => ['notify6', DI::l10n()->t('You receive a friend suggestion'), ($notify & Notification\Type::SUGGEST), Notification\Type::SUGGEST, ''],
 			'$notify7' => ['notify7', DI::l10n()->t('You are tagged in a post'), ($notify & Notification\Type::TAG_SELF), Notification\Type::TAG_SELF, ''],
 
-			'$lbl_notify'                    => DI::l10n()->t('Create a desktop notification when:'),
+			'$lbl_notify'                    => DI::l10n()->t('Notify when:'),
 			'$notify_tagged'                 => ['notify_tagged', DI::l10n()->t('Someone tagged you'), is_null($notify_type) || $notify_type & UserNotification::TYPE_EXPLICIT_TAGGED, ''],
 			'$notify_direct_comment'         => ['notify_direct_comment', DI::l10n()->t('Someone directly commented on your post'), is_null($notify_type) || $notify_type & (UserNotification::TYPE_IMPLICIT_TAGGED + UserNotification::TYPE_DIRECT_COMMENT + UserNotification::TYPE_DIRECT_THREAD_COMMENT), ''],
 			'$notify_like'                   => ['notify_like', DI::l10n()->t('Someone liked your content'), DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'notify_like'), DI::l10n()->t('Can only be enabled, when the direct comment notification is enabled.')],

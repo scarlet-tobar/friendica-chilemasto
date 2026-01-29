@@ -439,10 +439,10 @@ class Photos extends \Friendica\Module\BaseProfile
 		$o .= Renderer::replaceMacros($tpl, [
 			'$title'      => $this->t('Recent Photos'),
 			'$can_post'   => $is_owner,
-			'$upload'     => [$this->t('Upload Photos'), 'photos/' . $this->owner['nickname'] . '/upload'],
+			'$upload'     => [$this->t('Upload photo'), 'photos/' . $this->owner['nickname'] . '/upload'],
 			'$photos'     => $photos,
 			'$paginate'   => $pager->renderFull($total),
-			'upload_text' => $this->t('Upload Photos'),
+			'upload_text' => $this->t('Upload photo'),
 		]);
 
 		return $o;

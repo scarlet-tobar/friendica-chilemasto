@@ -38,7 +38,7 @@ function notes_content(bool $update = false)
 	$o = BaseProfile::getTabsHTML('notes', true, DI::userSession()->getLocalUserNickname(), false);
 
 	if (!$update) {
-		$o .= '<h3>' . DI::l10n()->t('Personal Notes') . '</h3>';
+		$o .= '<h3>' . DI::l10n()->t('Personal notes') . '</h3>';
 
 		$x = [
 			'lockstate' => 'lock',
