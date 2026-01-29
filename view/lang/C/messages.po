@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-04 20:49+0100\n"
+"POT-Creation-Date: 2026-01-06 15:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3594,7 +3594,7 @@ msgstr ""
 msgid "Title/Description:"
 msgstr ""
 
-#: src/Model/Profile.php:803 src/Module/Admin/Summary.php:184
+#: src/Model/Profile.php:803 src/Module/Admin/Summary.php:208
 #: src/Module/Moderation/Report/Create.php:282
 #: src/Module/Moderation/Summary.php:65
 msgid "Summary"
@@ -3909,7 +3909,7 @@ msgstr ""
 #: src/Module/Admin/Federation.php:218 src/Module/Admin/Logs/Settings.php:74
 #: src/Module/Admin/Logs/View.php:71 src/Module/Admin/Queue.php:59
 #: src/Module/Admin/Site.php:457 src/Module/Admin/Storage.php:124
-#: src/Module/Admin/Summary.php:183 src/Module/Admin/Themes/Details.php:82
+#: src/Module/Admin/Summary.php:207 src/Module/Admin/Themes/Details.php:82
 #: src/Module/Admin/Themes/Index.php:103 src/Module/Admin/Tos.php:63
 #: src/Module/Moderation/Users/Pending.php:82
 msgid "Administration"
@@ -5397,96 +5397,100 @@ msgstr ""
 msgid "Database (legacy)"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:39
+#: src/Module/Admin/Summary.php:40
 #, php-format
 msgid "Template engine (%s) error: %s"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:43
+#: src/Module/Admin/Summary.php:44
 #, php-format
 msgid "Your DB still runs with MyISAM tables. You should change the engine type to InnoDB. As Friendica will use InnoDB only features in the future, you should change this! See <a href=\"%s\">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php bin/console.php dbstructure toinnodb</tt> of your Friendica installation for an automatic conversion.<br />"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:48
+#: src/Module/Admin/Summary.php:49
 #, php-format
 msgid "Your DB still runs with InnoDB tables in the Antelope file format. You should change the file format to Barracuda. Friendica is using features that are not provided by the Antelope format. See <a href=\"%s\">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php bin/console.php dbstructure toinnodb</tt> of your Friendica installation for an automatic conversion.<br />"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:58
+#: src/Module/Admin/Summary.php:59
 #, php-format
 msgid "Your table_definition_cache is too low (%d). This can lead to the database error \"Prepared statement needs to be re-prepared\". Please set it at least to %d. See <a href=\"%s\">here</a> for more information.<br />"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:66
+#: src/Module/Admin/Summary.php:67
 #, php-format
 msgid "There is a new version of Friendica available for download. Your current version is %1$s, upstream version is %2$s"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:74
+#: src/Module/Admin/Summary.php:75
 msgid "The database update failed. Please run \"php bin/console.php dbstructure update\" from the command line and have a look at the errors that might appear."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:78
+#: src/Module/Admin/Summary.php:79
 msgid "The last update failed. Please run \"php bin/console.php dbstructure update\" from the command line and have a look at the errors that might appear. (Some of the errors are possibly inside the logfile.)"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:82
+#: src/Module/Admin/Summary.php:83
 msgid "The system.url entry is missing. This is a low level setting and can lead to unexpected behavior. Please add a valid entry as soon as possible in the config file or per console command!"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:87
+#: src/Module/Admin/Summary.php:88
 msgid "The worker was never executed. Please check your database structure!"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:89
+#: src/Module/Admin/Summary.php:90
 #, php-format
 msgid "The last worker execution was on %s UTC. This is older than one hour. Please check your crontab settings."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:94
+#: src/Module/Admin/Summary.php:95
 #, php-format
 msgid "Friendica's configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>.htconfig.php</code>. See <a href=\"%s\">the Config help page</a> for help with the transition."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:98
+#: src/Module/Admin/Summary.php:99
 #, php-format
 msgid "Friendica's configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>config/local.ini.php</code>. See <a href=\"%s\">the Config help page</a> for help with the transition."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:105
+#: src/Module/Admin/Summary.php:106
 #, php-format
 msgid "<a href=\"%s\">%s</a> is not reachable on your system. This is a severe configuration issue that prevents server to server communication. See <a href=\"%s\">the installation page</a> for help."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:133
+#: src/Module/Admin/Summary.php:134
 #, php-format
 msgid "Friendica's system.basepath was updated from '%s' to '%s'. Please remove the system.basepath from your db to avoid differences."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:143
+#: src/Module/Admin/Summary.php:144
 #, php-format
 msgid "Friendica's current system.basepath '%s' is wrong and the config file '%s' isn't used."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:153
+#: src/Module/Admin/Summary.php:154
 #, php-format
 msgid "Friendica's current system.basepath '%s' is not equal to the config file '%s'. Please fix your configuration."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:165
+#: src/Module/Admin/Summary.php:166
 msgid "Message queues"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:168
+#: src/Module/Admin/Summary.php:169
 msgid "Server Settings"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:186
+#: src/Module/Admin/Summary.php:210
 msgid "Version"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:190
+#: src/Module/Admin/Summary.php:214
 msgid "Active addons"
+msgstr ""
+
+#: src/Module/Admin/Summary.php:217
+msgid "Enable new addons"
 msgstr ""
 
 #: src/Module/Admin/Themes/Details.php:49 src/Module/Admin/Themes/Index.php:57
@@ -8084,6 +8088,10 @@ msgstr ""
 
 #: src/Module/Moderation/Summary.php:68
 msgid "Pending registrations"
+msgstr ""
+
+#: src/Module/Moderation/Summary.php:70
+msgid "Registered accounts by type"
 msgstr ""
 
 #: src/Module/Moderation/Users/Active.php:29

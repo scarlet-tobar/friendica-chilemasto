@@ -3516,6 +3516,14 @@ section.help-content-wrapper li {
 #admin-summary-wrapper {
 	padding-top: 10px;
 }
+#admin-summary-wrapper h2 {
+	font-size: 21px;
+	padding-top: 13px;
+	padding-bottom: 8px;
+}
+#admin-summary-addons tr td:first-child {
+	width: clamp(30px, 20vw, 200px);
+}
 #adminpage ul#addonslist,
 li.addon {
 	list-style: none;
