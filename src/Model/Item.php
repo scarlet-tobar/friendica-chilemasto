@@ -76,6 +76,7 @@ class Item
 	const PR_PUSHED       = 80;
 	const PR_LOCAL        = 81;
 	const PR_AUDIENCE     = 82;
+	const PR_CHANNEL      = 83;
 
 	// system.accept_only_sharer setting values
 	const COMPLETION_NONE    = 1;

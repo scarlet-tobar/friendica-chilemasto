@@ -13,6 +13,8 @@ use Friendica\App\Page;
 use Friendica\AppHelper;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Conversation\Collection\Timelines;
+use Friendica\Content\Conversation\Entity\Channel;
+use Friendica\Content\Conversation\Entity\UserDefinedChannel;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Conversation\Factory\Channel as ChannelFactory;
 use Friendica\Content\Conversation\Factory\Community as CommunityFactory;
@@ -26,11 +28,13 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
+use Friendica\Model\Post\Engagement;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException;
+use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
@@ -91,6 +95,8 @@ class Display extends BaseSettings
 		$enable                  = (array)$request['enable'];
 		$bookmark                = (array)$request['bookmark'];
 		$channel_languages       = (array)$request['channel_languages'];
+		$timeline_channels       = (array)$request['timeline_channels'];
+		$filter_channels         = (array)$request['filter_channels'];
 		$first_day_of_week       = (int)$request['first_day_of_week'];
 		$calendar_default_view   = trim($request['calendar_default_view']);
 		$infinite_scroll         = (bool)$request['infinite_scroll'];
@@ -170,6 +176,8 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'network_timelines', $network_timelines);
 		$this->pConfig->set($uid, 'system', 'enabled_timelines', $enabled_timelines);
 		$this->pConfig->set($uid, 'channel', 'languages', $channel_languages);
+		$this->pConfig->set($uid, 'channel', 'timeline_channels', $timeline_channels);
+		$this->pConfig->set($uid, 'channel', 'filter_channels', $filter_channels);
 
 		$this->pConfig->set($uid, 'accessibility', 'hide_empty_descriptions', $hide_empty_descriptions);
 		$this->pConfig->set($uid, 'accessibility', 'hide_custom_emojis', $hide_custom_emojis);
@@ -286,6 +294,27 @@ class Display extends BaseSettings
 		$enabled_timelines    = $this->pConfig->get($uid, 'system', 'enabled_timelines', $this->getAvailableTimelines($uid, false)->column('code'));
 		$channel_languages    = User::getWantedLanguages($uid);
 		$languages            = $this->l10n->getLanguageCodes(true, true);
+		$timeline_channels    = $this->pConfig->get($uid, 'channel', 'timeline_channels') ?? [];
+		$filter_channels      = $this->pConfig->get($uid, 'channel', 'filter_channels')   ?? [];
+
+		$channels = [];
+		if ($this->config->get('system', 'system_channel_cache')) {
+			foreach ($this->channel->getTimelines($uid) as $channel) {
+				if (!in_array($channel->code, [Channel::FORYOU, Channel::QUIETSHARERS])) {
+					$channels[$channel->code] = $channel->label;
+				}
+			}
+		}
+
+		$filter = [];
+		if ($this->config->get('system', 'channel_cache')) {
+			foreach ($this->userDefinedChannel->selectByUid($uid) as $channel) {
+				$filter[$channel->code] = $channel->label;
+				if (in_array($channel->circle, [UserDefinedChannel::CIRCLE_GLOBAL, UserDefinedChannel::CIRCLE_FOLLOWERS])) {
+					$channels[$channel->code] = $channel->label;
+				}
+			}
+		}
 
 		$timelines = [];
 		foreach ($this->getAvailableTimelines($uid) as $timeline) {
@@ -441,7 +470,11 @@ class Display extends BaseSettings
 			'$timelines'            => $timelines,
 			'$timeline_explanation' => $this->t('Enable timelines that you want to see in the channels widget. Bookmark timelines that you want to see in the top menu.'),
 
-			'$channel_languages' => ['channel_languages[]', $this->t('Channel languages:'), $channel_languages, $this->t('Select all the languages you want to see in your channels. "Unspecified" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language). If you want to see all languages, you will need to select all items in the list.'), $languages, 'multiple'],
+			'$channel_languages'     => ['channel_languages[]', $this->t('Channel languages:'), $channel_languages, $this->t('Select all the languages you want to see in your channels. "Unspecified" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language). If you want to see all languages, you will need to select all items in the list.'), $languages, 'multiple'],
+			'$timeline_channels'     => ['timeline_channels[]', $this->t('Timeline channels:'), $timeline_channels, $this->t('Select all the channels that you want to see in your network timeline.'), $channels, 'multiple'],
+			'$has_timeline_channels' => !empty($channels),
+			'$filter_channels'       => ['filter_channels[]', $this->t('Filter channels:'), $filter_channels, $this->t('Select all the channels that you want to use as a filter for your network timeline. All posts from these channels will be hidden. For technical reasons postings that are older than %s will not be filtered.', DateTimeFormat::local(Engagement::getCreationDateLimit(false)), 'r'), $filter, 'multiple'],
+			'$has_filter_channels'   => !empty($filter),
 
 			'$first_day_of_week'     => ['first_day_of_week', $this->t('Beginning of week:'), $first_day_of_week, '', $weekdays, false],
 			'$calendar_default_view' => ['calendar_default_view', $this->t('Default calendar view:'), $calendar_default_view, '', $calendarViews, false],

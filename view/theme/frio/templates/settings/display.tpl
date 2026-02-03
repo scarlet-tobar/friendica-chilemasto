@@ -123,6 +123,16 @@
 					<div class="panel-body">
 						{{include file="field_select.tpl" field=$channel_languages}}
 					</div>
+					{{if $has_timeline_channels}}
+						<div class="panel-body">
+							{{include file="field_select.tpl" field=$timeline_channels}}
+						</div>
+					{{/if}}
+					{{if $has_filter_channels}}
+						<div class="panel-body">
+							{{include file="field_select.tpl" field=$filter_channels}}
+						</div>
+					{{/if}}
 					<div class="panel-footer">
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>

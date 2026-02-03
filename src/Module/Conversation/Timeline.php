@@ -14,6 +14,7 @@ use Friendica\BaseModule;
 use Friendica\Content\Conversation\Collection\Timelines;
 use Friendica\Content\Conversation\Entity\Channel as ChannelEntity;
 use Friendica\Content\Conversation\Entity\Community;
+use Friendica\Content\Conversation\Entity\UserDefinedChannel as EntityUserDefinedChannel;
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -395,7 +396,7 @@ class Timeline extends BaseModule
 		} elseif (is_numeric($this->selectedTab) && !empty($channel = $this->channelRepository->selectById($this->selectedTab, $uid))) {
 			if (!$this->config->get('system', 'channel_cache')) {
 				$condition = $this->channelRepository->getCondition($channel, $uid);
-				if (in_array($channel->circle, [-3, -4, -5])) {
+				if (in_array($channel->circle, [EntityUserDefinedChannel::CIRCLE_CREATION, EntityUserDefinedChannel::CIRCLE_POSTS, EntityUserDefinedChannel::CIRCLE_ACTIVITY])) {
 					$table     = SearchIndex::getSearchView();
 					$condition = DBA::mergeConditions($condition, ['uid' => $uid]);
 				}
@@ -403,9 +404,13 @@ class Timeline extends BaseModule
 				$condition = ['channel' => $this->selectedTab];
 				$table     = 'channel-post-view';
 			}
-			if (in_array($channel->circle, [-3, -4, -5])) {
-				$orders      = ['-3' => 'created', '-4' => 'received', '-5' => 'commented'];
-				$this->order = $orders[$channel->circle];
+			if (in_array($channel->circle, [EntityUserDefinedChannel::CIRCLE_CREATION, EntityUserDefinedChannel::CIRCLE_POSTS, EntityUserDefinedChannel::CIRCLE_ACTIVITY])) {
+				$orders = [
+					EntityUserDefinedChannel::CIRCLE_CREATION => 'created',
+					EntityUserDefinedChannel::CIRCLE_POSTS    => 'received',
+					EntityUserDefinedChannel::CIRCLE_ACTIVITY => 'commented'
+				];
+				$this->order = $orders[(int)$channel->circle];
 			}
 		}
 

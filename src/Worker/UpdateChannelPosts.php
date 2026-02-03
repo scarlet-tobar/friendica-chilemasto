@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Friendica\Worker;
 
+use Friendica\Content\Conversation\Entity\UserDefinedChannel;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -53,9 +54,13 @@ final class UpdateChannelPosts
 		$order  = 'created';
 		$table  = 'post-engagement';
 		$fields = ['uri-id', 'created'];
-		if (in_array($channel->circle, [-3, -4, -5])) {
-			$orders    = ['-3' => 'created', '-4' => 'received', '-5' => 'commented'];
-			$order     = $orders[$channel->circle];
+		if (in_array($channel->circle, [UserDefinedChannel::CIRCLE_CREATION, UserDefinedChannel::CIRCLE_POSTS, UserDefinedChannel::CIRCLE_ACTIVITY])) {
+			$orders = [
+				UserDefinedChannel::CIRCLE_CREATION => 'created',
+				UserDefinedChannel::CIRCLE_POSTS    => 'received',
+				UserDefinedChannel::CIRCLE_ACTIVITY => 'commented'
+			];
+			$order     = $orders[(int)$channel->circle];
 			$table     = 'post-engagement-user-view';
 			$fields    = ['uri-id', 'created', 'received', 'commented'];
 			$condition = DBA::mergeConditions($condition, ['uid' => $uid]);

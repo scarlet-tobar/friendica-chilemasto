@@ -4,14 +4,15 @@ Posts in a user defined channel
 
 ## Fields
 
-| Field     | Description           | Type               | Null | Key | Default             | Extra |
-| --------- | --------------------- | ------------------ | ---- | --- | ------------------- | ----- |
-| channel   | Channel id            | int unsigned       | NO   | PRI | NULL                |       |
-| uri-id    | Post engagement entry | int unsigned       | NO   | PRI | NULL                |       |
-| uid       | User id               | mediumint unsigned | NO   |     | NULL                |       |
-| created   |                       | datetime           | NO   |     | 0001-01-01 00:00:00 |       |
-| received  |                       | datetime           | NO   |     | 0001-01-01 00:00:00 |       |
-| commented |                       | datetime           | NO   |     | 0001-01-01 00:00:00 |       |
+| Field       | Description                                       | Type               | Null | Key | Default             | Extra |
+| ----------- | ------------------------------------------------- | ------------------ | ---- | --- | ------------------- | ----- |
+| channel     | Channel id                                        | int unsigned       | NO   | PRI | NULL                |       |
+| uri-id      | Post engagement entry                             | int unsigned       | NO   | PRI | NULL                |       |
+| uid         | User id                                           | mediumint unsigned | NO   |     | NULL                |       |
+| in-timeline | If true, this post is in the user's main timeline | boolean            | NO   |     | 0                   |       |
+| created     |                                                   | datetime           | NO   |     | 0001-01-01 00:00:00 |       |
+| received    |                                                   | datetime           | NO   |     | 0001-01-01 00:00:00 |       |
+| commented   |                                                   | datetime           | NO   |     | 0001-01-01 00:00:00 |       |
 
 ## Indexes
 

@@ -52,6 +52,7 @@ return [
 			"channel" => ["channel-post", "channel"],
 			"uid" => ["channel-post", "uid"],
 			"uri-id" => ["channel-post", "uri-id"],
+			"in-timeline" => ["channel-post", "in-timeline"],
 			"owner-id" => ["post-engagement", "owner-id"],
 			"media-type" => ["post-engagement", "media-type"],
 			"language" => ["post-engagement", "language"],
@@ -78,6 +79,7 @@ return [
 			"channel" => ["system-channel-post", "channel"],
 			"uid" => ["system-channel-post", "uid"],
 			"uri-id" => ["system-channel-post", "uri-id"],
+			"in-timeline" => ["system-channel-post", "in-timeline"],
 			"owner-id" => ["post-engagement", "owner-id"],
 			"media-type" => ["post-engagement", "media-type"],
 			"language" => ["post-engagement", "language"],
@@ -1430,6 +1432,7 @@ return [
 	],
 	"network-thread-view" => [
 		"fields" => [
+			"channel" => "''",
 			"uri-id" => ["post-thread-user", "uri-id"],
 			"parent" => ["post-thread-user", "post-user-id"],
 			"received" => ["post-thread-user", "received"],
@@ -1457,6 +1460,7 @@ return [
 	],
 	"network-thread-circle-view" => [
 		"fields" => [
+			"channel" => "''",
 			"uri-id" => ["post-thread-user", "uri-id"],
 			"parent" => ["post-thread-user", "post-user-id"],
 			"received" => ["post-thread-user", "received"],

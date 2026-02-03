@@ -468,51 +468,51 @@ class Network extends Timeline
 
 	protected function getItems()
 	{
-		$conditionFields  = ['uid' => $this->session->getLocalUserId()];
-		$conditionStrings = [];
+		$timelineCondition = [];
+		$commonCondition   = ['uid' => $this->session->getLocalUserId()];
 
 		if (!is_null($this->accountType)) {
-			$conditionFields['contact-type'] = $this->accountType;
+			$commonCondition['contact-type'] = $this->accountType;
 		}
 
 		if ($this->star) {
-			$conditionFields['starred'] = true;
+			$timelineCondition['starred'] = true;
 		}
 		if ($this->mention) {
-			$conditionFields['mention'] = true;
+			$timelineCondition['mention'] = true;
 		}
 		if ($this->network) {
-			$conditionFields['network'] = $this->network;
+			$commonCondition['network'] = $this->network;
 		}
 
 		if ($this->dateFrom) {
-			$conditionStrings = DBA::mergeConditions($conditionStrings, ["`received` <= ? ", DateTimeFormat::convert($this->dateFrom, 'UTC', $this->appHelper->getTimeZone())]);
+			$commonCondition = DBA::mergeConditions($commonCondition, ["`received` <= ? ", DateTimeFormat::convert($this->dateFrom, 'UTC', $this->appHelper->getTimeZone())]);
 		}
 		if ($this->dateTo) {
-			$conditionStrings = DBA::mergeConditions($conditionStrings, ["`received` >= ? ", DateTimeFormat::convert($this->dateTo, 'UTC', $this->appHelper->getTimeZone())]);
+			$commonCondition = DBA::mergeConditions($commonCondition, ["`received` >= ? ", DateTimeFormat::convert($this->dateTo, 'UTC', $this->appHelper->getTimeZone())]);
 		}
 
 		if ($this->circleId) {
-			$conditionStrings = DBA::mergeConditions($conditionStrings, ["`contact-id` IN (SELECT `contact-id` FROM `group_member` WHERE `gid` = ?)", $this->circleId]);
+			$commonCondition = DBA::mergeConditions($commonCondition, ["`contact-id` IN (SELECT `contact-id` FROM `group_member` WHERE `gid` = ?)", $this->circleId]);
 		}
 
 		// Currently only the order modes "received" and "commented" are in use
 		if (!empty($this->itemUriId)) {
-			$conditionStrings = DBA::mergeConditions($conditionStrings, ['uri-id' => $this->itemUriId]);
+			$commonCondition = DBA::mergeConditions($commonCondition, ['uri-id' => $this->itemUriId]);
 		} else {
 			if (isset($this->maxId)) {
 				switch ($this->order) {
 					case 'received':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`received` < ?", $this->maxId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`received` < ?", $this->maxId]);
 						break;
 					case 'commented':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`commented` < ?", $this->maxId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`commented` < ?", $this->maxId]);
 						break;
 					case 'created':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`created` < ?", $this->maxId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`created` < ?", $this->maxId]);
 						break;
 					case 'uriid':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`uri-id` < ?", $this->maxId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`uri-id` < ?", $this->maxId]);
 						break;
 				}
 			}
@@ -520,16 +520,16 @@ class Network extends Timeline
 			if (isset($this->minId)) {
 				switch ($this->order) {
 					case 'received':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`received` > ?", $this->minId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`received` > ?", $this->minId]);
 						break;
 					case 'commented':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`commented` > ?", $this->minId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`commented` > ?", $this->minId]);
 						break;
 					case 'created':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`created` > ?", $this->minId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`created` > ?", $this->minId]);
 						break;
 					case 'uriid':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`uri-id` > ?", $this->minId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`uri-id` > ?", $this->minId]);
 						break;
 				}
 			}
@@ -546,12 +546,61 @@ class Network extends Timeline
 			$params['order'] = [$this->order => true];
 		}
 
-		$items = $this->database->selectToArray($this->circleId ? 'network-thread-circle-view' : 'network-thread-view', [], DBA::mergeConditions($conditionFields, $conditionStrings), $params);
+		$filterchannels = $this->pConfig->get($this->session->getLocalUserId(), 'channel', 'filter_channels') ?? [];
+		if ($filterchannels) {
+			$query           = "`uri-id` NOT IN (SELECT `uri-id` FROM `channel-post-view` WHERE `uid` = ? AND `channel` IN (" . substr(str_repeat('?, ', count($filterchannels)), 0, -2) . "))";
+			$commonCondition = DBA::mergeConditions($commonCondition, array_merge([$query], [$this->session->getLocalUserId()], $filterchannels));
+		}
+
+		$fields    = ['uri-id', 'created', 'received', 'commented', 'channel'];
+		$condition = DBA::mergeConditions($timelineCondition, $commonCondition);
+
+		$timeline = $this->database->getSQL($this->circleId ? 'network-thread-circle-view' : 'network-thread-view', $fields, $condition, $params);
+		array_shift($condition);
+		$sql = '(' . $timeline . ')';
+
+		$systemchannels = [];
+		$userchannels   = [];
+		foreach ($this->pConfig->get($this->session->getLocalUserId(), 'channel', 'timeline_channels') ?? [] as $channel) {
+			if (is_numeric($channel)) {
+				$userchannels[] = (int)$channel;
+			} else {
+				$systemchannels[] = $channel;
+			}
+		}
+
+		if ($systemchannels) {
+			$channel_condition = DBA::mergeConditions(['channel' => $systemchannels, 'in-timeline' => false], $commonCondition);
+			$sql .= ' UNION ALL (' . $this->database->getSQL('system-channel-post-view', $fields, $channel_condition, $params) . ')';
+			array_shift($channel_condition);
+			$condition = array_merge($condition, $channel_condition);
+		}
+
+		if ($userchannels) {
+			$channel_condition = DBA::mergeConditions(['channel' => $userchannels, 'in-timeline' => false], $commonCondition);
+			$sql .= ' UNION ALL (' . $this->database->getSQL('channel-post-view', $fields, $channel_condition, $params) . ')';
+			array_shift($channel_condition);
+			$condition = array_merge($condition, $channel_condition);
+		}
+
+		if ($systemchannels || $userchannels) {
+			$sql .= DBA::buildParameter($params);
+		}
+
+		$result = $this->database->p($sql, $condition);
+		$items  = $this->database->toArray($result);
 
 		// min_id quirk, continued
 		if (isset($this->minId) && !isset($this->maxId)) {
 			$items = array_reverse($items);
 		}
+
+		// Avoid duplicates
+		$posts = [];
+		foreach ($items as $item) {
+			$posts[$item['uri-id']] = $item;
+		}
+		$items = $posts;
 
 		if ($this->ping || !$this->database->isResult($items)) {
 			return $items;

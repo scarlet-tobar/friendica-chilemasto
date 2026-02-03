@@ -379,7 +379,7 @@ class Engagement
 		DI::logger()->notice('Cleared expired engagements', ['limit' => $limit, 'rows' => DBA::affectedRows()]);
 	}
 
-	private static function getCreationDateLimit(bool $forDeletion): string
+	public static function getCreationDateLimit(bool $forDeletion): string
 	{
 		$posts = DI::config()->get('channel', 'engagement_post_limit');
 		if (!empty($posts)) {

@@ -91,10 +91,20 @@ final class SystemChannelPost
 		$uids = $this->channelRepository->getUsersForPost($engagement['uri-id'], $post_uid, $post['network'], $post['private']);
 
 		foreach ($uids as $uid) {
+			if ($engagement['restricted'] && !Post::exists(['parent-uri-id' => $engagement['uri-id'], 'uid' => $uid])) {
+				continue;
+			}
+
 			foreach ($channels as $channel) {
 				if ($this->dba->exists('system-channel-post', ['channel' => $channel, 'uid' => $uid, 'uri-id' => $engagement['uri-id']])) {
 					continue;
 				}
+
+				$wanted = User::getWantedLanguages($uid);
+				if ($channel !== Channel::LANGUAGE && $wanted && !in_array($engagement['language'], $wanted)) {
+					continue;
+				}
+
 				$store = false;
 				switch ($channel) {
 					case Channel::WHATSHOT:
@@ -195,14 +205,15 @@ final class SystemChannelPost
 				}
 
 				$cache = [
-					'channel'   => $channel,
-					'uid'       => $uid,
-					'uri-id'    => $engagement['uri-id'],
-					'created'   => $post['created'],
-					'received'  => $post['received'],
-					'commented' => $post['commented'],
+					'channel'     => $channel,
+					'uid'         => $uid,
+					'uri-id'      => $engagement['uri-id'],
+					'in-timeline' => Post::exists(['parent-uri-id' => $engagement['uri-id'], 'uid' => $uid]),
+					'created'     => $post['created'],
+					'received'    => $post['received'],
+					'commented'   => $post['commented'],
 				];
-				$ret = $this->dba->insert('system-channel-post', $cache, Database::INSERT_IGNORE);
+				$ret = $this->dba->insert('system-channel-post', $cache, Database::INSERT_UPDATE);
 				$this->logger->debug('Added system channel post', ['uri-id' => $engagement['uri-id'], 'cache' => $cache, 'ret' => $ret]);
 			}
 		}
