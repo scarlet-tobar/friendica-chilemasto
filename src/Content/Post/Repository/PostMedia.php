@@ -461,6 +461,9 @@ class PostMedia extends BaseRepository
 			} else {
 				$player = $this->getLinkAttachment($media);
 			}
+			if ($player === '') {
+				continue;
+			}
 			@$tmp->loadHTML(mb_convert_encoding($player, 'HTML-ENTITIES', "UTF-8"), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 			$div      = $tmp->documentElement;
 			$imported = $doc->importNode($div, true);

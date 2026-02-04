@@ -155,6 +155,9 @@ class Jetstream
 						$this->logger->error('Error while trying to receive a message', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 						break;
 					}
+				} catch (\Exception $e) {
+					$this->logger->error('General error while trying to receive a message', ['capped' => $this->capped, 'code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
+					break;
 				}
 				$last_timeout = time();
 			}

@@ -1751,6 +1751,10 @@ class ParseUrl
 			return $siteinfo;
 		}
 
+		if ($data['html'] == '') {
+			return $siteinfo;
+		}
+
 		$dom = new DOMDocument();
 		if (!@$dom->loadHTML($data['html'])) {
 			return $siteinfo;
