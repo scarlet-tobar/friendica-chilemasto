@@ -11,7 +11,6 @@
     {{/if}}
     <div id="profile-jot-wrapper">
         <form class="comment-edit-form" data-item-id="{{$id}}" id="comment-edit-form-{{$id}}" action="compose/{{$type}}" method="post">
-            {{**}}
             <input type="hidden" name="post_id_random" value="{{$rand_num}}" />
             <input type="hidden" name="post_type" value="{{$posttype}}" />
             <input type="hidden" name="wall" value="{{$wall}}" />
