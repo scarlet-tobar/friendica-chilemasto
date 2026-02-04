@@ -3012,9 +3012,9 @@ $a->strings['You\'ve received an introduction from \'%1$s\' at %2$s'] = 'Du hast
 $a->strings['You\'ve received [url=%1$s]an introduction[/url] from %2$s.'] = 'Du hast eine [url=%1$s]Kontaktanfrage[/url] von %2$s erhalten.';
 $a->strings['You may visit their profile at %s'] = 'Hier kannst du das Profil betrachten: %s';
 $a->strings['Please visit %s to approve or reject the introduction.'] = 'Bitte besuche %s, um die Kontaktanfrage anzunehmen oder abzulehnen.';
-$a->strings['%s You have a new friend'] = '%sDu hast einen neuen Kontakt';
+$a->strings['%s You have a new friend'] = '%s Du hast einen neuen Kontakt';
 $a->strings['%1$s is your friend at %2$s'] = '%1$s ist dein Freund bei %2$s';
-$a->strings['%s You have a new follower'] = '%sDu hast einen neuen Kontakt';
+$a->strings['%s You have a new follower'] = '%s Du hast einen neuen Kontakt';
 $a->strings['You have a new follower at %2$s : %1$s'] = 'Du hast einen neuen Kontakt auf %2$s: %1$s';
 $a->strings['%s Friend suggestion received'] = '%sKontaktvorschlag erhalten';
 $a->strings['You\'ve received a friend suggestion from \'%1$s\' at %2$s'] = 'Du hast einen Kontakt-Vorschlag von \'%1$s\' auf %2$s erhalten';
