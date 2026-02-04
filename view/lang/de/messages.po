@@ -1553,12 +1553,12 @@ msgstr "Zu uns gepusht"
 #: src/Content/Conversation.php:816
 #, php-format
 msgid "Channel \"%s\": %s"
-msgstr ""
+msgstr "Kanal \"%s\": %s"
 
 #: src/Content/Conversation.php:818
 #, php-format
 msgid "Channel \"%s\""
-msgstr ""
+msgstr "Kanal \"%s\""
 
 #: src/Content/Conversation.php:1553 src/Object/Post.php:250
 msgid "Pinned item"
@@ -3566,7 +3566,7 @@ msgstr "H:i"
 
 #: src/Model/Event.php:889
 msgid "e"
-msgstr ""
+msgstr "e"
 
 #: src/Model/Event.php:954 src/Model/Event.php:956
 msgid "Show map"
@@ -5949,7 +5949,7 @@ msgstr "Aktivierte Addons"
 
 #: src/Module/Admin/Summary.php:217
 msgid "Enable new addons"
-msgstr ""
+msgstr "Neue Addons aktivieren"
 
 #: src/Module/Admin/Themes/Details.php:49 src/Module/Admin/Themes/Index.php:57
 #, php-format
@@ -8719,7 +8719,7 @@ msgstr "Anstehende Anmeldungen"
 
 #: src/Module/Moderation/Summary.php:70
 msgid "Registered accounts by type"
-msgstr ""
+msgstr "Registrierte Accounts nach Kontoart"
 
 #: src/Module/Moderation/Users/Active.php:29
 #: src/Module/Moderation/Users/Index.php:29
@@ -11018,15 +11018,15 @@ msgstr "Wählen Sie alle Sprachen aus, die Sie in Ihren Kanälen sehen möchten.
 
 #: src/Module/Settings/Display.php:474
 msgid "Timeline channels:"
-msgstr ""
+msgstr "Timeline Kanäle:"
 
 #: src/Module/Settings/Display.php:474
 msgid "Select all the channels that you want to see in your network timeline."
-msgstr ""
+msgstr "Wähle alle Kanäle aus, die du in deinem Netzwerk Reiter sehen willst."
 
 #: src/Module/Settings/Display.php:476
 msgid "Filter channels:"
-msgstr ""
+msgstr "Filter Kanäle"
 
 #: src/Module/Settings/Display.php:476
 #, php-format
@@ -11034,7 +11034,7 @@ msgid ""
 "Select all the channels that you want to use as a filter for your network "
 "timeline. All posts from these channels will be hidden. For technical "
 "reasons postings that are older than %s will not be filtered."
-msgstr ""
+msgstr "Wähle die Kanäle, die du als Filter für die Netzwerk Timeline verwenden willst. Die Beiträge in diesen Kanälen werden nicht angezeigt. Aus technischen Gründen werden Beiträge älter als %s nicht gefiltert."
 
 #: src/Module/Settings/Display.php:479
 msgid "Beginning of week:"
@@ -12369,7 +12369,7 @@ msgstr "Du hast einen neuen Kontakt auf %2$s: %1$s"
 #: src/Navigation/Notifications/Repository/Notify.php:414
 #, php-format
 msgid "%s Friend suggestion received"
-msgstr "%sKontaktvorschlag erhalten"
+msgstr "%s Kontaktvorschlag erhalten"
 
 #: src/Navigation/Notifications/Repository/Notify.php:416
 #, php-format
