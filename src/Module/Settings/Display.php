@@ -95,8 +95,8 @@ class Display extends BaseSettings
 		$enable                  = (array)$request['enable'];
 		$bookmark                = (array)$request['bookmark'];
 		$channel_languages       = (array)$request['channel_languages'];
-		$timeline_channels       = (array)$request['timeline_channels'];
-		$filter_channels         = (array)$request['filter_channels'];
+		$timeline_channels       = isset($request['timeline_channels']) ? (array)$request['timeline_channels'] : null;
+		$filter_channels         = isset($request['filter_channels']) ? (array)$request['filter_channels'] : null;
 		$first_day_of_week       = (int)$request['first_day_of_week'];
 		$calendar_default_view   = trim($request['calendar_default_view']);
 		$infinite_scroll         = (bool)$request['infinite_scroll'];
@@ -176,8 +176,13 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'network_timelines', $network_timelines);
 		$this->pConfig->set($uid, 'system', 'enabled_timelines', $enabled_timelines);
 		$this->pConfig->set($uid, 'channel', 'languages', $channel_languages);
-		$this->pConfig->set($uid, 'channel', 'timeline_channels', $timeline_channels);
-		$this->pConfig->set($uid, 'channel', 'filter_channels', $filter_channels);
+
+		if (!is_null($timeline_channels)) {
+			$this->pConfig->set($uid, 'channel', 'timeline_channels', $timeline_channels);
+		}
+		if (!is_null($filter_channels)) {
+			$this->pConfig->set($uid, 'channel', 'filter_channels', $filter_channels);
+		}
 
 		$this->pConfig->set($uid, 'accessibility', 'hide_empty_descriptions', $hide_empty_descriptions);
 		$this->pConfig->set($uid, 'accessibility', 'hide_custom_emojis', $hide_custom_emojis);
