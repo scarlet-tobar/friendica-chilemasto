@@ -1697,6 +1697,9 @@ textarea.comment-edit-text:focus + .comment-edit-form .preview {
 .fbrowser.photo .photo-album-image-wrapper .jg-caption {
 	pointer-events: none;
 }
+.fbswitcher {
+	margin-top: -3px;
+}
 
 /* Photo album hover effect using jg-caption */
 .photo-top-image-wrapper {
