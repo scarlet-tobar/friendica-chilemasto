@@ -112,7 +112,7 @@ abstract class BaseAdmin extends BaseModule
 			'$admin'      => ['addons_admin' => $addons_admin],
 			'$subpages'   => $aside_sub,
 			'$admtxt'     => DI::l10n()->t('Admin'),
-			'$plugadmtxt' => DI::l10n()->t('Addon Features'),
+			'$plugadmtxt' => DI::l10n()->t('Addon settings'),
 			'$h_pending'  => DI::l10n()->t('User registrations waiting for confirmation'),
 			'$admurl'     => 'admin/'
 		]);

@@ -12,14 +12,14 @@
 
 	<form action="profile/{{$nickname}}/photos" enctype="multipart/form-data" method="post" name="photos-upload-form" id="photos-upload-form">
 		<div id="photos-upload-div" class="form-group">
-			<label id="photos-upload-text" for="photos-upload-newalbum">{{$newalbum}}</label>
-
-			<input id="photos-upload-album-select" class="form-control" placeholder="{{$existalbumtext}}" list="dl-photo-upload" type="text" name="album">
+			<label for="photos-upload-newalbum">{{$albumtext_label}}</label>
+			<input id="photos-upload-album-select" class="form-control" list="dl-photo-upload" type="text" name="album">
 			<datalist id="dl-photo-upload">
 				{{foreach $albumselect as $value => $name}}
 					<option value="{{$value}}"{{if $selname == $value}} selected{{/if}}>{{$name}}</option>
 				{{/foreach}}
 			</datalist>
+			<p><small>{{$albumtext_description}}</small></p>
 		</div>
 		<div id="photos-upload-end" class="clearfix"></div>
 

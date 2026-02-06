@@ -2991,6 +2991,10 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 	margin-top: 15px;
 }
 
+#photos-usage-message {
+	padding-bottom: 15px;
+}
+
 /* Events page */
 
 .fc .fc-month-view .fc-content .fc-title .item-desc:hover {

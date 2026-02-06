@@ -71,8 +71,7 @@ class View extends BaseAdmin
 			'$title' => DI::l10n()->t('Administration'),
 			'$page'  => DI::l10n()->t('View Logs'),
 			'$l10n'  => [
-				'Search'                => DI::l10n()->t('Search'),
-				'Search_in_logs'        => DI::l10n()->t('Search in logs'),
+				'Search'                => DI::l10n()->t('Search in logs'),
 				'Show_all'              => DI::l10n()->t('Show all'),
 				'Date'                  => DI::l10n()->t('Date'),
 				'Level'                 => DI::l10n()->t('Level'),
