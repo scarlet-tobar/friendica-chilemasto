@@ -1282,22 +1282,22 @@ class ParseUrl
 		}
 
 		$content = JsonLD::fetchElement($jsonld, 'height');
-		if (!empty($content) && is_string($content)) {
+		if (!empty($content) && is_string($content) && is_numeric($content)) {
 			$media['height'] = trim($content);
 		}
 
 		$content = JsonLD::fetchElement($jsonld, 'width');
-		if (!empty($content) && is_string($content)) {
+		if (!empty($content) && is_string($content) && is_numeric($content)) {
 			$media['width'] = trim($content);
 		}
 
 		$content = JsonLD::fetchElement($jsonld, 'duration');
-		if (!empty($content) && is_string($content)) {
+		if (!empty($content) && is_string($content) && is_numeric($content)) {
 			$media['duration'] = trim($content);
 		}
 
 		$content = JsonLD::fetchElement($jsonld, 'contentSize');
-		if (!empty($content) && is_string($content)) {
+		if (!empty($content) && is_string($content) && is_numeric($content)) {
 			$media['size'] = trim($content);
 		}
 
