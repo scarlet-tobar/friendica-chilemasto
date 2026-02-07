@@ -18,6 +18,7 @@ use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Tag;
+use Friendica\Protocol\Activity;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -92,7 +93,7 @@ final class ChannelPost
 		}
 
 		foreach ($channels as $channel) {
-			$in_timeline = Post::exists(['parent-uri-id' => $engagement['uri-id'], 'uid' => $channel->uid]);
+			$in_timeline = Post::exists(["`parent-uri-id` = ? AND `uid` = ? AND NOT `verb` IN (?, ?, ?)", $engagement['uri-id'], $channel->uid, Activity::FOLLOW, Activity::VIEW, Activity::READ]);
 
 			if ($engagement['restricted'] && !$in_timeline) {
 				continue;

@@ -394,6 +394,7 @@ class Statuses extends BaseApi
 			if (Post::exists(['uri-id' => $this->parameters['id'], 'uid' => $uid, 'unseen' => true])) {
 				Post::update(['unseen' => false], ['uri-id' => $this->parameters['id'], 'uid' => $uid, 'unseen' => true]);
 			}
+			$this->item->setViewed($this->parameters['id'], $uid);
 		}
 
 		$this->jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, false));

@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2026.04-dev (Blutwurz)
--- DB_UPDATE_VERSION 1587
+-- DB_UPDATE_VERSION 1588
 -- ------------------------------------------
 
 
@@ -1353,6 +1353,7 @@ CREATE TABLE IF NOT EXISTS `post-engagement` (
 	`restricted` boolean NOT NULL DEFAULT '0' COMMENT 'If true, this post is either unlisted or not from a federated network',
 	`comments` mediumint unsigned COMMENT 'Number of comments',
 	`activities` mediumint unsigned COMMENT 'Number of activities (like, dislike, ...)',
+	`views` mediumint unsigned COMMENT 'Number of views',
 	 PRIMARY KEY(`uri-id`),
 	 INDEX `owner-id` (`owner-id`),
 	 INDEX `created` (`created`),
@@ -2118,8 +2119,9 @@ CREATE VIEW `channel-post-view` AS SELECT
 	`post-engagement`.`network` AS `network`,
 	`ownercontact`.`contact-type` AS `contact-type`,
 	`post-engagement`.`restricted` AS `restricted`,
-	0 AS `comments`,
-	0 AS `activities`
+	`post-engagement`.`comments` AS `comments`,
+	`post-engagement`.`activities` AS `activities`,
+	`post-engagement`.`views` AS `views`
 	FROM `channel-post`
 			INNER JOIN `post-engagement` ON `post-engagement`.`uri-id` = `channel-post`.`uri-id`
 			INNER JOIN `post-thread` ON `post-thread`.`uri-id` = `channel-post`.`uri-id`
@@ -2148,8 +2150,9 @@ CREATE VIEW `system-channel-post-view` AS SELECT
 	`post-engagement`.`network` AS `network`,
 	`ownercontact`.`contact-type` AS `contact-type`,
 	`post-engagement`.`restricted` AS `restricted`,
-	0 AS `comments`,
-	0 AS `activities`
+	`post-engagement`.`comments` AS `comments`,
+	`post-engagement`.`activities` AS `activities`,
+	`post-engagement`.`views` AS `views`
 	FROM `system-channel-post`
 			INNER JOIN `post-engagement` ON `post-engagement`.`uri-id` = `system-channel-post`.`uri-id`
 			INNER JOIN `post-thread` ON `post-thread`.`uri-id` = `system-channel-post`.`uri-id`
@@ -2220,8 +2223,9 @@ CREATE VIEW `post-engagement-user-view` AS SELECT
 	`post-thread-user`.`network` AS `network`,
 	`post-user`.`protocol` AS `protocol`,
 	`post-engagement`.`restricted` AS `restricted`,
-	0 AS `comments`,
-	0 AS `activities`
+	`post-engagement`.`comments` AS `comments`,
+	`post-engagement`.`activities` AS `activities`,
+	`post-engagement`.`views` AS `views`
 	FROM `post-thread-user`
 			INNER JOIN `post-engagement` ON `post-engagement`.`uri-id` = `post-thread-user`.`uri-id`
 			INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id`
@@ -2245,9 +2249,9 @@ CREATE VIEW `post-timeline-view` AS SELECT
 	`post-user`.`gravity` AS `gravity`,
 	`post-user`.`created` AS `created`,
 	`post-user`.`edited` AS `edited`,
-	`post-thread-user`.`commented` AS `commented`,
+	`post-thread`.`commented` AS `commented`,
 	`post-user`.`received` AS `received`,
-	`post-thread-user`.`changed` AS `changed`,
+	`post-thread`.`changed` AS `changed`,
 	`post-user`.`private` AS `private`,
 	`post-user`.`visible` AS `visible`,
 	`post-user`.`deleted` AS `deleted`,
@@ -2273,11 +2277,11 @@ CREATE VIEW `post-timeline-view` AS SELECT
 	`post-user`.`causer-id` AS `causer-id`,
 	`causer`.`blocked` AS `causer-blocked`,
 	`causer`.`gsid` AS `causer-gsid`,
-	`post-thread-user`.`network` AS `parent-network`,
-	`post-thread-user`.`owner-id` AS `parent-owner-id`,
-	`post-thread-user`.`author-id` AS `parent-author-id`
+	`post-thread`.`network` AS `parent-network`,
+	`post-thread`.`owner-id` AS `parent-owner-id`,
+	`post-thread`.`author-id` AS `parent-author-id`
 	FROM `post-user`
-			LEFT JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
+			LEFT JOIN `post-thread` ON `post-thread`.`uri-id` = `post-user`.`parent-uri-id`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-user`.`contact-id`
 			STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = `post-user`.`author-id`
 			STRAIGHT_JOIN `contact` AS `owner` ON `owner`.`id` = `post-user`.`owner-id`
@@ -2293,9 +2297,9 @@ CREATE VIEW `post-timeline-origin-view` AS SELECT
 	`post-origin`.`gravity` AS `gravity`,
 	`post-origin`.`created` AS `created`,
 	`post-user`.`edited` AS `edited`,
-	`post-thread-user`.`commented` AS `commented`,
+	`post-thread`.`commented` AS `commented`,
 	`post-origin`.`received` AS `received`,
-	`post-thread-user`.`changed` AS `changed`,
+	`post-thread`.`changed` AS `changed`,
 	`post-origin`.`private` AS `private`,
 	`post-user`.`visible` AS `visible`,
 	`post-user`.`deleted` AS `deleted`,
@@ -2323,7 +2327,7 @@ CREATE VIEW `post-timeline-origin-view` AS SELECT
 	`causer`.`gsid` AS `causer-gsid`
 	FROM `post-origin`
 			INNER JOIN `post-user` ON `post-user`.`id` = `post-origin`.`id`
-			LEFT JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-origin`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-origin`.`uid`
+			LEFT JOIN `post-thread` ON `post-thread`.`uri-id` = `post-origin`.`parent-uri-id`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-user`.`contact-id`
 			STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = `post-user`.`author-id`
 			STRAIGHT_JOIN `contact` AS `owner` ON `owner`.`id` = `post-user`.`owner-id`
@@ -2348,7 +2352,8 @@ CREATE VIEW `post-searchindex-user-view` AS SELECT
 	`post-user`.`protocol` AS `protocol`,
 	`post-searchindex`.`restricted` AS `restricted`,
 	0 AS `comments`,
-	0 AS `activities`
+	0 AS `activities`,
+	0 AS `views`
 	FROM `post-thread-user`
 			INNER JOIN `post-searchindex` ON `post-searchindex`.`uri-id` = `post-thread-user`.`uri-id`
 			INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id`
@@ -2767,9 +2772,9 @@ CREATE VIEW `post-user-view` AS SELECT
 	`thr-parent-item-uri`.`uri` AS `thr-parent`,
 	`post-user`.`thr-parent-id` AS `thr-parent-id`,
 	`conversation-item-uri`.`uri` AS `conversation`,
-	`post-thread-user`.`conversation-id` AS `conversation-id`,
+	`post-thread`.`conversation-id` AS `conversation-id`,
 	`context-item-uri`.`uri` AS `context`,
-	`post-thread-user`.`context-id` AS `context-id`,
+	`post-thread`.`context-id` AS `context-id`,
 	`quote-item-uri`.`uri` AS `quote-uri`,
 	`post-content`.`quote-uri-id` AS `quote-uri-id`,
 	`item-uri`.`guid` AS `guid`,
@@ -2781,9 +2786,9 @@ CREATE VIEW `post-user-view` AS SELECT
 	`post-user`.`replies-id` AS `replies-id`,
 	`post-user`.`created` AS `created`,
 	`post-user`.`edited` AS `edited`,
-	`post-thread-user`.`commented` AS `commented`,
+	`post-thread`.`commented` AS `commented`,
 	`post-user`.`received` AS `received`,
-	`post-thread-user`.`changed` AS `changed`,
+	`post-thread`.`changed` AS `changed`,
 	`post-user`.`post-type` AS `post-type`,
 	`post-user`.`post-reason` AS `post-reason`,
 	`post-user`.`private` AS `private`,
@@ -2915,15 +2920,16 @@ CREATE VIEW `post-user-view` AS SELECT
 	EXISTS(SELECT `id` FROM `post-media` WHERE `post-media`.`uri-id` = `post-user`.`uri-id`) AS `has-media`,
 	`diaspora-interaction`.`interaction` AS `signed_text`,
 	`parent-item-uri`.`guid` AS `parent-guid`,
-	`post-thread-user`.`network` AS `parent-network`,
-	`post-thread-user`.`owner-id` AS `parent-owner-id`,
-	`post-thread-user`.`author-id` AS `parent-author-id`,
+	`post-thread`.`network` AS `parent-network`,
+	`post-thread`.`owner-id` AS `parent-owner-id`,
+	`post-thread`.`author-id` AS `parent-author-id`,
 	`parent-post-author`.`url` AS `parent-author-link`,
 	`parent-post-author`.`name` AS `parent-author-name`,
 	`parent-post-author`.`nick` AS `parent-author-nick`,
 	`parent-post-author`.`network` AS `parent-author-network`
 	FROM `post-user`
-			INNER JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
+			LEFT JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
+			INNER JOIN `post-thread` ON `post-thread`.`uri-id` = `post-user`.`parent-uri-id`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-user`.`contact-id`
 			STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = `post-user`.`author-id`
 			STRAIGHT_JOIN `contact` AS `owner` ON `owner`.`id` = `post-user`.`owner-id`
@@ -2931,8 +2937,8 @@ CREATE VIEW `post-user-view` AS SELECT
 			LEFT JOIN `item-uri` ON `item-uri`.`id` = `post-user`.`uri-id`
 			LEFT JOIN `item-uri` AS `thr-parent-item-uri` ON `thr-parent-item-uri`.`id` = `post-user`.`thr-parent-id`
 			LEFT JOIN `item-uri` AS `parent-item-uri` ON `parent-item-uri`.`id` = `post-user`.`parent-uri-id`
-			LEFT JOIN `item-uri` AS `conversation-item-uri` ON `conversation-item-uri`.`id` = `post-thread-user`.`conversation-id`
-			LEFT JOIN `item-uri` AS `context-item-uri` ON `context-item-uri`.`id` = `post-thread-user`.`context-id`
+			LEFT JOIN `item-uri` AS `conversation-item-uri` ON `conversation-item-uri`.`id` = `post-thread`.`conversation-id`
+			LEFT JOIN `item-uri` AS `context-item-uri` ON `context-item-uri`.`id` = `post-thread`.`context-id`
 			LEFT JOIN `item-uri` AS `external-item-uri` ON `external-item-uri`.`id` = `post-user`.`external-id`
 			LEFT JOIN `item-uri` AS `replies-item-uri` ON `replies-item-uri`.`id` = `post-user`.`replies-id`
 			LEFT JOIN `verb` ON `verb`.`id` = `post-user`.`vid`
@@ -2943,7 +2949,7 @@ CREATE VIEW `post-user-view` AS SELECT
 			LEFT JOIN `post-delivery-data` ON `post-delivery-data`.`uri-id` = `post-user`.`uri-id` AND `post-user`.`origin`
 			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post-user`.`uri-id`
 			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-user`.`psid`
-			LEFT JOIN `contact` AS `parent-post-author` ON `parent-post-author`.`id` = `post-thread-user`.`author-id`;
+			LEFT JOIN `contact` AS `parent-post-author` ON `parent-post-author`.`id` = `post-thread`.`author-id`;
 
 --
 -- VIEW post-thread-user-view

@@ -65,8 +65,9 @@ return [
 			"network" => ["post-engagement", "network"],
 			"contact-type" => ["ownercontact", "contact-type"],
 			"restricted" => ["post-engagement", "restricted"],
-			"comments" => "0",
-			"activities" => "0",
+			"comments" => ["post-engagement", "comments"],
+			"activities" => ["post-engagement", "activities"],
+			"views" => ["post-engagement", "views"],
 		],
 		"query" => "FROM `channel-post`
 			INNER JOIN `post-engagement` ON `post-engagement`.`uri-id` = `channel-post`.`uri-id`
@@ -93,8 +94,9 @@ return [
 			"network" => ["post-engagement", "network"],
 			"contact-type" => ["ownercontact", "contact-type"],
 			"restricted" => ["post-engagement", "restricted"],
-			"comments" => "0",
-			"activities" => "0",
+			"comments" => ["post-engagement", "comments"],
+			"activities" => ["post-engagement", "activities"],
+			"views" => ["post-engagement", "views"],
 		],
 		"query" => "FROM `system-channel-post`
 			INNER JOIN `post-engagement` ON `post-engagement`.`uri-id` = `system-channel-post`.`uri-id`
@@ -159,8 +161,9 @@ return [
 			"network" => ["post-thread-user", "network"],
 			"protocol" => ["post-user", "protocol"],
 			"restricted" => ["post-engagement", "restricted"],
-			"comments" => "0",
-			"activities" => "0",
+			"comments" => ["post-engagement", "comments"],
+			"activities" => ["post-engagement", "activities"],
+			"views" => ["post-engagement", "views"],
 		],
 		"query" => "FROM `post-thread-user`
 			INNER JOIN `post-engagement` ON `post-engagement`.`uri-id` = `post-thread-user`.`uri-id`
@@ -182,9 +185,9 @@ return [
 			"gravity" => ["post-user", "gravity"],
 			"created" => ["post-user", "created"],
 			"edited" => ["post-user", "edited"],
-			"commented" => ["post-thread-user", "commented"],
+			"commented" => ["post-thread", "commented"],
 			"received" => ["post-user", "received"],
-			"changed" => ["post-thread-user", "changed"],
+			"changed" => ["post-thread", "changed"],
 			"private" => ["post-user", "private"],
 			"visible" => ["post-user", "visible"],
 			"deleted" => ["post-user", "deleted"],
@@ -210,12 +213,12 @@ return [
 			"causer-id" => ["post-user", "causer-id"],
 			"causer-blocked" => ["causer", "blocked"],
 			"causer-gsid" => ["causer", "gsid"],
-			"parent-network" => ["post-thread-user", "network"],
-			"parent-owner-id" => ["post-thread-user", "owner-id"],
-			"parent-author-id" => ["post-thread-user", "author-id"],
+			"parent-network" => ["post-thread", "network"],
+			"parent-owner-id" => ["post-thread", "owner-id"],
+			"parent-author-id" => ["post-thread", "author-id"],
 		],
 		"query" => "FROM `post-user`
-			LEFT JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
+			LEFT JOIN `post-thread` ON `post-thread`.`uri-id` = `post-user`.`parent-uri-id`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-user`.`contact-id`
 			STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = `post-user`.`author-id`
 			STRAIGHT_JOIN `contact` AS `owner` ON `owner`.`id` = `post-user`.`owner-id`
@@ -228,9 +231,9 @@ return [
 			"gravity" => ["post-origin", "gravity"],
 			"created" => ["post-origin", "created"],
 			"edited" => ["post-user", "edited"],
-			"commented" => ["post-thread-user", "commented"],
+			"commented" => ["post-thread", "commented"],
 			"received" => ["post-origin", "received"],
-			"changed" => ["post-thread-user", "changed"],
+			"changed" => ["post-thread", "changed"],
 			"private" => ["post-origin", "private"],
 			"visible" => ["post-user", "visible"],
 			"deleted" => ["post-user", "deleted"],
@@ -259,7 +262,7 @@ return [
 		],
 		"query" => "FROM `post-origin`
 			INNER JOIN `post-user` ON `post-user`.`id` = `post-origin`.`id`
-			LEFT JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-origin`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-origin`.`uid`
+			LEFT JOIN `post-thread` ON `post-thread`.`uri-id` = `post-origin`.`parent-uri-id`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-user`.`contact-id`
 			STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = `post-user`.`author-id`
 			STRAIGHT_JOIN `contact` AS `owner` ON `owner`.`id` = `post-user`.`owner-id`
@@ -282,6 +285,7 @@ return [
 			"restricted" => ["post-searchindex", "restricted"],
 			"comments" => "0",
 			"activities" => "0",
+			"views" => "0",
 		],
 		"query" => "FROM `post-thread-user`
 			INNER JOIN `post-searchindex` ON `post-searchindex`.`uri-id` = `post-thread-user`.`uri-id`
@@ -694,9 +698,9 @@ return [
 			"thr-parent" => ["thr-parent-item-uri", "uri"],
 			"thr-parent-id" => ["post-user", "thr-parent-id"],
 			"conversation" => ["conversation-item-uri", "uri"],
-			"conversation-id" => ["post-thread-user", "conversation-id"],
+			"conversation-id" => ["post-thread", "conversation-id"],
 			"context" => ["context-item-uri", "uri"],
-			"context-id" => ["post-thread-user", "context-id"],
+			"context-id" => ["post-thread", "context-id"],
 			"quote-uri" => ["quote-item-uri", "uri"],
 			"quote-uri-id" => ["post-content", "quote-uri-id"],
 			"guid" => ["item-uri", "guid"],
@@ -708,9 +712,9 @@ return [
 			"replies-id" => ["post-user", "replies-id"],
 			"created" => ["post-user", "created"],
 			"edited" => ["post-user", "edited"],
-			"commented" => ["post-thread-user", "commented"],
+			"commented" => ["post-thread", "commented"],
 			"received" => ["post-user", "received"],
-			"changed" => ["post-thread-user", "changed"],
+			"changed" => ["post-thread", "changed"],
 			"post-type" => ["post-user", "post-type"],
 			"post-reason" => ["post-user", "post-reason"],
 			"private" => ["post-user", "private"],
@@ -842,16 +846,17 @@ return [
 			"has-media" => "EXISTS(SELECT `id` FROM `post-media` WHERE `post-media`.`uri-id` = `post-user`.`uri-id`)",
 			"signed_text" => ["diaspora-interaction", "interaction"],
 			"parent-guid" => ["parent-item-uri", "guid"],
-			"parent-network" => ["post-thread-user", "network"],
-			"parent-owner-id" => ["post-thread-user", "owner-id"],
-			"parent-author-id" => ["post-thread-user", "author-id"],
+			"parent-network" => ["post-thread", "network"],
+			"parent-owner-id" => ["post-thread", "owner-id"],
+			"parent-author-id" => ["post-thread", "author-id"],
 			"parent-author-link" => ["parent-post-author", "url"],
 			"parent-author-name" => ["parent-post-author", "name"],
 			"parent-author-nick" => ["parent-post-author", "nick"],
 			"parent-author-network" => ["parent-post-author", "network"],
 		],
 		"query" => "FROM `post-user`
-			INNER JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
+			LEFT JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
+			INNER JOIN `post-thread` ON `post-thread`.`uri-id` = `post-user`.`parent-uri-id`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-user`.`contact-id`
 			STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = `post-user`.`author-id`
 			STRAIGHT_JOIN `contact` AS `owner` ON `owner`.`id` = `post-user`.`owner-id`
@@ -859,8 +864,8 @@ return [
 			LEFT JOIN `item-uri` ON `item-uri`.`id` = `post-user`.`uri-id`
 			LEFT JOIN `item-uri` AS `thr-parent-item-uri` ON `thr-parent-item-uri`.`id` = `post-user`.`thr-parent-id`
 			LEFT JOIN `item-uri` AS `parent-item-uri` ON `parent-item-uri`.`id` = `post-user`.`parent-uri-id`
-			LEFT JOIN `item-uri` AS `conversation-item-uri` ON `conversation-item-uri`.`id` = `post-thread-user`.`conversation-id`
-			LEFT JOIN `item-uri` AS `context-item-uri` ON `context-item-uri`.`id` = `post-thread-user`.`context-id`
+			LEFT JOIN `item-uri` AS `conversation-item-uri` ON `conversation-item-uri`.`id` = `post-thread`.`conversation-id`
+			LEFT JOIN `item-uri` AS `context-item-uri` ON `context-item-uri`.`id` = `post-thread`.`context-id`
 			LEFT JOIN `item-uri` AS `external-item-uri` ON `external-item-uri`.`id` = `post-user`.`external-id`
 			LEFT JOIN `item-uri` AS `replies-item-uri` ON `replies-item-uri`.`id` = `post-user`.`replies-id`
 			LEFT JOIN `verb` ON `verb`.`id` = `post-user`.`vid`
@@ -871,7 +876,7 @@ return [
 			LEFT JOIN `post-delivery-data` ON `post-delivery-data`.`uri-id` = `post-user`.`uri-id` AND `post-user`.`origin`
 			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post-user`.`uri-id`
 			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-user`.`psid`
-			LEFT JOIN `contact` AS `parent-post-author` ON `parent-post-author`.`id` = `post-thread-user`.`author-id`"
+			LEFT JOIN `contact` AS `parent-post-author` ON `parent-post-author`.`id` = `post-thread`.`author-id`"
 	],
 	"post-thread-user-view" => [
 		"fields" => [

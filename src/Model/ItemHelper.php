@@ -266,7 +266,10 @@ final class ItemHelper
 			'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid',
 			'wall', 'private', 'origin', 'author-id'
 		];
-		$condition = ['uri-id' => [$item['thr-parent-id'], $item['parent-uri-id']], 'uid' => $item['uid']];
+
+		$uids = $item['verb'] === Activity::VIEW ? [0, $item['uid']] : $item['uid'];
+
+		$condition = ['uri-id' => [$item['thr-parent-id'], $item['parent-uri-id']], 'uid' => $uids];
 		$params    = ['order' => ['id' => false]];
 		$parent    = Post::selectFirst($fields, $condition, $params);
 

@@ -18,6 +18,7 @@ Engagement data per post
 | restricted   | If true, this post is either unlisted or not from a federated network | boolean            | NO   |     | 0       |       |
 | comments     | Number of comments                                                    | mediumint unsigned | YES  |     | NULL    |       |
 | activities   | Number of activities (like, dislike, ...)                             | mediumint unsigned | YES  |     | NULL    |       |
+| views        | Number of views                                                       | mediumint unsigned | YES  |     | NULL    |       |
 
 ## Indexes
 

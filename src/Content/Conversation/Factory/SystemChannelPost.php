@@ -17,6 +17,7 @@ use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\User;
+use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
 use Psr\Log\LoggerInterface;
 
@@ -108,7 +109,7 @@ final class SystemChannelPost
 				$store = false;
 				switch ($channel) {
 					case Channel::WHATSHOT:
-						$store = ($engagement['comments'] > $this->channelRepository->getMedianComments($uid, 4, $network) || $engagement['activities'] > $this->channelRepository->getMedianActivities($uid, 4, $network)) && $engagement['contact-type'] != Contact::TYPE_COMMUNITY;
+						$store = ($engagement['comments'] > $this->channelRepository->getMedianComments($uid, 4, $network) || $engagement['activities'] > $this->channelRepository->getMedianActivities($uid, 4, $network) || $engagement['views'] > $this->channelRepository->getMedianViews($uid, 4, $network)) && $engagement['contact-type'] != Contact::TYPE_COMMUNITY;
 						break;
 
 					case Channel::FORYOU:
@@ -117,7 +118,7 @@ final class SystemChannelPost
 						if ($relation = $this->dba->selectFirst('contact-relation', ['relation-thread-score', 'follows'], ['relation-cid' => $cid, 'cid' => $owner])) {
 							$store = $relation['relation-thread-score'] > $this->channelRepository->getMedianRelationThreadScore($cid, 4);
 							if (!$store && $relation['follows']) {
-								$store = ($engagement['comments'] >= $this->channelRepository->getMedianComments($uid, 4, $network) || $engagement['activities'] >= $this->channelRepository->getMedianActivities($uid, 4, $network));
+								$store = ($engagement['comments'] >= $this->channelRepository->getMedianComments($uid, 4, $network) || $engagement['activities'] >= $this->channelRepository->getMedianActivities($uid, 4, $network) || $engagement['views'] >= $this->channelRepository->getMedianViews($uid, 4, $network));
 							}
 						}
 
@@ -139,7 +140,7 @@ final class SystemChannelPost
 								$store = $this->dba->exists('contact-relation', ["`relation-cid` = ? AND `cid` = ? AND `follows` AND `relation-thread-score` > ?",
 									$owner, $cid, 0]);
 							}
-							if (!$store && ($engagement['comments'] >= $this->channelRepository->getMedianComments($uid, 4, $network) || $engagement['activities'] >= $this->channelRepository->getMedianActivities($uid, 4, $network))) {
+							if (!$store && ($engagement['comments'] >= $this->channelRepository->getMedianComments($uid, 4, $network) || $engagement['activities'] >= $this->channelRepository->getMedianActivities($uid, 4, $network)) || $engagement['views'] >= $this->channelRepository->getMedianViews($uid, 4, $network)) {
 								$store = $this->dba->exists('contact-relation', ["`relation-cid` = ? AND `cid` = ? AND `relation-thread-score` > ?", $owner, $cid, 0]);
 								if (!$store) {
 									$store = $this->dba->exists('contact-relation', ["`cid` = ? AND `relation-cid` = ? AND `relation-thread-score` > ?", $owner, $cid, 0]);
@@ -208,7 +209,7 @@ final class SystemChannelPost
 					'channel'     => $channel,
 					'uid'         => $uid,
 					'uri-id'      => $engagement['uri-id'],
-					'in-timeline' => Post::exists(['parent-uri-id' => $engagement['uri-id'], 'uid' => $uid]),
+					'in-timeline' => Post::exists(["`parent-uri-id` = ? AND `uid` = ? AND NOT `verb` IN (?, ?, ?)", $engagement['uri-id'], $uid, Activity::FOLLOW, Activity::VIEW, Activity::READ]),
 					'created'     => $post['created'],
 					'received'    => $post['received'],
 					'commented'   => $post['commented'],
