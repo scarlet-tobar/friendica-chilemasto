@@ -36,10 +36,10 @@
 				</a>
 			</li>
 		{{/if}}
-		{{if $nav.events}}
-			<li role="menuitem" id="nav-calendar-link" class="nav-menu {{$sel.events}}">
-				<a accesskey="e" class="{{$nav.events.2}} desktop-view" href="{{$nav.events.0}}" title="{{$nav.events.3}}">{{$nav.events.1}}</a>
-				<a class="{{$nav.events.2}} mobile-view" href="{{$nav.events.0}}" title="{{$nav.events.3}}"><i class="icon s22 icon-calendar"></i></a>
+		{{if $nav.calendar}}
+			<li role="menuitem" id="nav-calendar-link" class="nav-menu {{$sel.calendar}}">
+				<a accesskey="e" class="{{$nav.calendar.2}} desktop-view" href="{{$nav.calendar.0}}" title="{{$nav.calendar.3}}">{{$nav.calendar.1}}</a>
+				<a class="{{$nav.calendar.2}} mobile-view" href="{{$nav.calendar.0}}" title="{{$nav.calendar.3}}"><i class="icon s22 icon-calendar"></i></a>
 			</li>
 		{{/if}}
 		{{if $nav.channel}}

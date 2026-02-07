@@ -90,11 +90,11 @@ class Show extends BaseModule
 			'$i18n'         => $i18n,
 		]);
 
-		Nav::setSelected($is_owner ? 'home' : 'calendar');
-
 		if ($is_owner) {
 			// Removing the vCard added by Profile::load for owners
 			$this->page['aside'] = '';
+			// Only highlight the calendar link if you're on your own calendar
+			Nav::setSelected('calendar');
 		}
 
 		$this->page['aside'] .= Widget\CalendarExport::getHTML($owner['uid']);
@@ -110,7 +110,7 @@ class Show extends BaseModule
 		$tpl = Renderer::getMarkupTemplate("calendar/calendar.tpl");
 		$o   = Renderer::replaceMacros($tpl, [
 			'$tabs'      => $tabs,
-			'$title'     => $this->t('Events'),
+			'$title'     => $this->t('Calendar'),
 			'$view'      => $this->t('View'),
 			'$new_event' => ['calendar/event/new', $this->t('New Event'), '', ''],
 

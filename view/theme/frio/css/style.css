@@ -645,6 +645,16 @@ nav.navbar .nav > li > button:hover,
 nav.navbar .nav > li > button:focus {
 	background-color: $nav_icon_hover_color;
 }
+/* Current section highlighting */
+#topbar-first .nav > li > a.selected i,
+#nav-notification.dropdown.open {
+  border-bottom: 3px solid $nav_icon_color;
+	padding-bottom: 7px;
+}
+/* Offset the overflow caused by the current section highlighting padding above by a lowered height */
+#topbar-first .nav > li > a.selected:hover {
+	height: 50px;
+}
 #topbar-first .nav > .account {
 	height: 50px;
 	margin-left: 20px;

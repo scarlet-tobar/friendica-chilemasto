@@ -96,7 +96,7 @@ class Conversations extends BaseModule
 
 		$this->page['aside'] .= VCard::getHTML($contact, true);
 
-		Nav::setSelected('contact');
+		Nav::setSelected('contacts');
 
 		$output = '';
 

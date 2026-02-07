@@ -280,7 +280,7 @@ class Profile extends BaseModule
 		$this->page['aside'] .= $vcard_widget . $circles_widget;
 
 		$o = '';
-		Nav::setSelected('contact');
+		Nav::setSelected('contacts');
 
 		$_SESSION['return_path'] = $this->args->getQueryString();
 

@@ -81,7 +81,7 @@ class Posts extends BaseModule
 
 		$this->page['aside'] .= Widget\VCard::getHTML($contact);
 
-		Nav::setSelected('contact');
+		Nav::setSelected('contacts');
 
 		Contact::setPageTitle($contact);
 
