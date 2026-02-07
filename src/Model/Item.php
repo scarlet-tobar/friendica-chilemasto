@@ -1162,6 +1162,9 @@ class Item
 				self::reshareChannelPost($engagement_uri_id);
 			}
 
+			if ($posted_item['origin'] && in_array($posted_item['verb'], [Activity::LIKE, Activity::DISLIKE, Activity::ATTEND, Activity::ATTENDNO, Activity::ATTENDMAYBE, Activity::ANNOUNCE, Activity::POST])) {
+				DI::contentItem()->setViewed($posted_item['thr-parent-id'], $posted_item['uid']);
+			}
 		}
 
 		if ($posted_item['uid'] !== 0 && ($posted_item['origin'] || !in_array($posted_item['network'], Protocol::FEDERATED))) {
@@ -2572,7 +2575,7 @@ class Item
 			return false;
 		}
 
-		if (!Post::exists(['uri-id' => $item['parent-uri-id'], 'uid' => $uid])) {
+		if (!in_array($verb, ['view', 'unview']) && !Post::exists(['uri-id' => $item['parent-uri-id'], 'uid' => $uid])) {
 			$stored = self::storeForUserByUriId($item['parent-uri-id'], $uid, ['post-reason' => Item::PR_ACTIVITY]);
 			if (($item['parent-uri-id'] == $item['uri-id']) && !empty($stored)) {
 				$item = Post::selectFirst(self::ITEM_FIELDLIST, ['id' => $stored]);
@@ -2626,6 +2629,10 @@ class Item
 			case 'announce':
 			case 'unannounce':
 				$activity = Activity::ANNOUNCE;
+				break;
+			case 'view':
+			case 'unview':
+				$activity = Activity::VIEW;
 				break;
 			default:
 				DI::logger()->warning('unknown verb', ['verb' => $verb, 'item' => $item_id]);

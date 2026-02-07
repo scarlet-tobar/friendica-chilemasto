@@ -89,7 +89,7 @@ class Display extends BaseModule
 		$item    = null;
 		$itemUid = $this->session->getLocalUserId();
 
-		$fields = ['uri-id', 'parent-uri-id', 'author-id', 'author-link', 'contact-id', 'contact-contact-type', 'body', 'uid', 'guid', 'gravity',
+		$fields = ['id', 'uri-id', 'parent-uri-id', 'author-id', 'author-link', 'contact-id', 'contact-contact-type', 'body', 'uid', 'guid', 'gravity',
 			'plink', 'origin', 'uri', 'post-reason', 'owner-contact-type', 'owner-network', 'owner-id', 'guid',
 			'author-network', 'author-alias', 'private'];
 
@@ -146,6 +146,10 @@ class Display extends BaseModule
 		if (!$this->pConfig->get($this->session->getLocalUserId(), 'system', 'detailed_notif')) {
 			$this->notification->setAllSeenForUser($this->session->getLocalUserId(), ['parent-uri-id' => $item['parent-uri-id']]);
 			$this->notify->setAllSeenForUser($this->session->getLocalUserId(), ['parent-uri-id' => $item['parent-uri-id']]);
+		}
+
+		if ($this->session->getLocalUserId() != 0) {
+			$this->contentItem->setViewed($item['uri-id'], $this->session->getLocalUserId());
 		}
 
 		$this->displaySidebar($item);

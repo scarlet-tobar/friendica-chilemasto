@@ -750,6 +750,42 @@ class UserDefinedChannel extends BaseRepository
 	}
 
 	/**
+	 * Compute median views for a user's wanted languages.
+	 *
+	 * @param int $uid User id.
+	 * @param int $divider Divider used to determine median index.
+	 * @param string $network Optional network filter.
+	 * @return int Median views value.
+	 */
+	public function getMedianViews(int $uid, int $divider, string $network = ''): int
+	{
+		$languages = User::getWantedLanguages($uid);
+		$cache_key = 'Channel:getMedianViews:' . $divider . ':' . implode(':', $languages) . $network;
+		$views     = $this->cache->get($cache_key);
+		if (!empty($views)) {
+			return $views;
+		}
+
+		$condition = ["`contact-type` != ? AND `views` > ? AND NOT `restricted`", Contact::TYPE_COMMUNITY, 0];
+		$condition = $this->addLanguageCondition($uid, $condition);
+
+		if ($network) {
+			$condition = DBA::mergeConditions($condition, ["`network` = ?", $network]);
+		}
+
+		$limit = $this->db->count('post-engagement', $condition) / $divider;
+		$post  = $this->db->selectToArray('post-engagement', ['views'], $condition, ['order' => ['views' => true], 'limit' => [$limit, 1]]);
+		$views = $post[0]['views'] ?? 0;
+		if (empty($views)) {
+			return 0;
+		}
+
+		$this->cache->set($cache_key, $views, Duration::HALF_HOUR);
+		$this->logger->debug('Calculated median views', ['divider' => $divider, 'languages' => $languages, 'network' => $network, 'median' => $views]);
+		return $views;
+	}
+
+	/**
 	 * Compute median relation thread score for a contact id.
 	 *
 	 * @param int $cid Contact id.

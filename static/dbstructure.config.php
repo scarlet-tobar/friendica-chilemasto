@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1587);
+	define('DB_UPDATE_VERSION', 1588);
 }
 
 return [
@@ -1359,6 +1359,7 @@ return [
 			"restricted" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "If true, this post is either unlisted or not from a federated network"],
 			"comments" => ["type" => "mediumint unsigned", "comment" => "Number of comments"],
 			"activities" => ["type" => "mediumint unsigned", "comment" => "Number of activities (like, dislike, ...)"],
+			"views" => ["type" => "mediumint unsigned", "comment" => "Number of views"],
 		],
 		"indexes" => [
 			"PRIMARY" => ["uri-id"],

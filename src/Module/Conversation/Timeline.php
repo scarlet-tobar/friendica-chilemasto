@@ -320,9 +320,9 @@ class Timeline extends BaseModule
 		if ($this->selectedTab == ChannelEntity::WHATSHOT) {
 			if (!$cache) {
 				if (!is_null($this->accountType)) {
-					$condition = ["(`comments` > ? OR `activities` > ?) AND `contact-type` = ?", $this->channelRepository->getMedianComments($uid, 4), $this->channelRepository->getMedianActivities($uid, 4), $this->accountType];
+					$condition = ["(`comments` > ? OR `activities` > ? OR `views` > ?) AND `contact-type` = ?", $this->channelRepository->getMedianComments($uid, 4), $this->channelRepository->getMedianActivities($uid, 4), $this->channelRepository->getMedianViews($uid, 4), $this->accountType];
 				} else {
-					$condition = ["(`comments` > ? OR `activities` > ?) AND `contact-type` != ?", $this->channelRepository->getMedianComments($uid, 4), $this->channelRepository->getMedianActivities($uid, 4), Contact::TYPE_COMMUNITY];
+					$condition = ["(`comments` > ? OR `activities` > ? OR `views` > ?) AND `contact-type` != ?", $this->channelRepository->getMedianComments($uid, 4), $this->channelRepository->getMedianActivities($uid, 4), $this->channelRepository->getMedianViews($uid, 4), Contact::TYPE_COMMUNITY];
 				}
 			}
 		} elseif ($this->selectedTab == ChannelEntity::FORYOU) {
@@ -331,9 +331,9 @@ class Timeline extends BaseModule
 
 				$condition = [
 					"(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `relation-thread-score` > ?) OR
-					((`comments` >= ? OR `activities` >= ?) AND `owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?)) OR
+					((`comments` >= ? OR `activities` >= ? OR `views` >= ?) AND `owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?)) OR
 					(`owner-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`notify_new_posts` OR `channel-frequency` = ?))))",
-					$cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4), $this->channelRepository->getMedianComments($uid, 4), $this->channelRepository->getMedianActivities($uid, 4), $cid,
+					$cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4), $this->channelRepository->getMedianComments($uid, 4), $this->channelRepository->getMedianActivities($uid, 4), $this->channelRepository->getMedianViews($uid, 4), $cid,
 					$uid, Contact\User::FREQUENCY_ALWAYS
 				];
 			}
@@ -345,11 +345,11 @@ class Timeline extends BaseModule
 					"`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND NOT `follows`) AND
 					(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND NOT `follows` AND `relation-thread-score` > ?) OR
 					`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `cid` = ? AND `relation-thread-score` > ?) OR
-					((`comments` >= ? OR `activities` >= ?) AND
+					((`comments` >= ? OR `activities` >= ? OR `views` >= ?) AND
 					(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `cid` = ? AND `relation-thread-score` > ?)) OR
 					(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `relation-thread-score` > ?))))",
 					$cid, $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4), $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4),
-					$this->channelRepository->getMedianComments($uid, 4), $this->channelRepository->getMedianActivities($uid, 4), $cid, 0, $cid, 0
+					$this->channelRepository->getMedianComments($uid, 4), $this->channelRepository->getMedianActivities($uid, 4), $this->channelRepository->getMedianViews($uid, 4), $cid, 0, $cid, 0
 				];
 			}
 		} elseif ($this->selectedTab == ChannelEntity::FOLLOWERS) {

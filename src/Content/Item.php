@@ -1363,4 +1363,24 @@ class Item
 		$used_languages = $this->l10n->t("Detected languages in this post:\n%s", $used_languages);
 		return $used_languages;
 	}
+
+	public function setViewed(int $uri_id, int $uid)
+	{
+		if (Post::exists(['thr-parent-id' => $uri_id, 'verb' => Activity::VIEW, 'uid' => $uid])) {
+			return;
+		}
+
+		$item = Post::selectFirst(['id'], ['uri-id' => $uri_id, 'gravity' => ItemModel::GRAVITY_PARENT, 'uid' => [0, $uid]], ['order' => ['uid' => true]]);
+		if (!DBA::isResult($item)) {
+			return;
+		}
+
+		$self = DBA::selectFirst('contact', ['id'], ['uid' => $uid, 'self' => true]);
+		if (!DBA::isResult($self)) {
+			return;
+		}
+
+		$this->logger->debug('Marking item as viewed.', ['uri-id' => $uri_id, 'uid' => $uid]);
+		ItemModel::performActivity($item['id'], 'view', $uid, '<' . $self['id'] . '>', '', '', '');
+	}
 }
