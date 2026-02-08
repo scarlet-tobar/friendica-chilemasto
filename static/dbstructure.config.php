@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1588);
+	define('DB_UPDATE_VERSION', 1589);
 }
 
 return [
@@ -459,7 +459,7 @@ return [
 			"name" => ["type" => "varchar(255)", "not null" => "1", "comment" => ""],
 			"redirect_uri" => ["type" => "varbinary(383)", "not null" => "1", "comment" => ""],
 			"website" => ["type" => "varbinary(383)", "comment" => ""],
-			"scopes" => ["type" => "varchar(255)", "comment" => ""],
+			"scopes" => ["type" => "varchar(511)", "comment" => ""],
 			"read" => ["type" => "boolean", "comment" => "Read scope"],
 			"write" => ["type" => "boolean", "comment" => "Write scope"],
 			"follow" => ["type" => "boolean", "comment" => "Follow scope"],
