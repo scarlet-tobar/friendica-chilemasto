@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2026.04-dev (Blutwurz)
--- DB_UPDATE_VERSION 1588
+-- DB_UPDATE_VERSION 1589
 -- ------------------------------------------
 
 
@@ -414,7 +414,7 @@ CREATE TABLE IF NOT EXISTS `application` (
 	`name` varchar(255) NOT NULL COMMENT '',
 	`redirect_uri` varbinary(383) NOT NULL COMMENT '',
 	`website` varbinary(383) COMMENT '',
-	`scopes` varchar(255) COMMENT '',
+	`scopes` varchar(511) COMMENT '',
 	`read` boolean COMMENT 'Read scope',
 	`write` boolean COMMENT 'Write scope',
 	`follow` boolean COMMENT 'Follow scope',

@@ -12,7 +12,7 @@ OAuth application
 | name          |                 | varchar(255)   | NO   |     | NULL    |                |
 | redirect_uri  |                 | varbinary(383) | NO   |     | NULL    |                |
 | website       |                 | varbinary(383) | YES  |     | NULL    |                |
-| scopes        |                 | varchar(255)   | YES  |     | NULL    |                |
+| scopes        |                 | varchar(511)   | YES  |     | NULL    |                |
 | read          | Read scope      | boolean        | YES  |     | NULL    |                |
 | write         | Write scope     | boolean        | YES  |     | NULL    |                |
 | follow        | Follow scope    | boolean        | YES  |     | NULL    |                |
