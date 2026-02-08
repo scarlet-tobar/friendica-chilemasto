@@ -984,7 +984,8 @@ class Processor
 				$item['quote-uri-id'] = ItemURI::getIdByURI($activity['quote-url']);
 				DI::logger()->info('Quote is queued but not processed yet', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $item['quote-uri-id']]);
 			} else {
-				DI::logger()->notice('Quote was not fetched', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url']]);
+				DI::logger()->notice('Quote was not fetched, link will be added instead as attachment.', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url']]);
+				self::storeAttachmentAsMedia($item['uri-id'], ['url' => $activity['quote-url']]);
 			}
 		}
 
