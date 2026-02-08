@@ -223,6 +223,10 @@ class Post
 		$edpost = false;
 
 		if (DI::userSession()->getLocalUserId()) {
+			if ($commentable && Contact\User::isIsBlocked($item['author-id'], DI::userSession()->getLocalUserId())) {
+				$commentable = false;
+			}
+
 			if (Strings::compareLink(DI::session()->get('my_url'), $item['author-link'])) {
 				if ($item['event-id'] != 0) {
 					$edpost = ['calendar/event/edit/' . $item['event-id'], DI::l10n()->t('Edit')];
