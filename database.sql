@@ -236,6 +236,7 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	 INDEX `next-update` (`next-update`),
 	 INDEX `local-data-next-update` (`local-data`,`next-update`),
 	 INDEX `uid_lastitem` (`uid`,`last-item`),
+	 INDEX `uid_created` (`uid`,`created`),
 	 INDEX `baseurl` (`baseurl`(64)),
 	 INDEX `uid_contact-type` (`uid`,`contact-type`),
 	 INDEX `uid_self_contact-type` (`uid`,`self`,`contact-type`),
