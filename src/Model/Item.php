@@ -403,7 +403,7 @@ class Item
 		Post\DeliveryData::delete($item['uri-id']);
 
 		// If it's the parent of a comment thread, kill all the kids
-		if ($item['gravity'] == self::GRAVITY_PARENT) {
+		if ($item['gravity'] == self::GRAVITY_PARENT && !is_null($item['parent'])) {
 			self::markForDeletion(['parent' => $item['parent'], 'deleted' => false], $priority);
 		}
 
