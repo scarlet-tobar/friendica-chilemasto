@@ -368,7 +368,7 @@ final class ItemHelper
 		return $item;
 	}
 
-	private function hasRestrictions(array $item, int $author_id, int $restrictions = null): bool
+	private function hasRestrictions(array $item, int $author_id, ?int $restrictions = null): bool
 	{
 		if (empty($restrictions) || ($author_id == $item['author-id'])) {
 			return false;
@@ -393,6 +393,16 @@ final class ItemHelper
 		}
 
 		if (($restrictions & Item::CANT_QUOTE) && (!empty($item['quote-uri']) || !empty($item['quote-uri-id']))) {
+			return true;
+		}
+
+		if ($item['uid'] != 0 && Contact\User::isBlocked($item['author-id'], $item['uid'])) {
+			$this->logger->debug('Author is blocked by the user, post is ignored.', ['author' => $item['author-id'], 'uid' => $item['uid']]);
+			return true;
+		}
+
+		if ($item['uid'] != 0 && Contact\User::isIsBlocked($author_id, $item['uid'])) {
+			$this->logger->debug('User is blocked by the author, post is ignored.', ['author' => $author_id, 'uid' => $item['uid']]);
 			return true;
 		}
 
