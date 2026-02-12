@@ -4106,7 +4106,7 @@ div.login-form, .login-content-wrapper,
 
 	.mod-home.is-not-singleuser .login-form,
 	.mod-login #content .login-form {
-		background-color: #fff;
+		background-color: $background_color;
 		padding: 1.5em;
 		position: relative;
 	}
