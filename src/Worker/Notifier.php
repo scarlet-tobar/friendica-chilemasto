@@ -332,6 +332,11 @@ class Notifier
 		$ap_contacts = $apdelivery['contacts'];
 		$delivery_queue_count += $apdelivery['count'];
 
+		if ($target_item['verb'] === Activity::VIEW) {
+			DI::logger()->info('Not delivering view activities', ['guid' => $target_item['guid'], 'uri-id' => $target_item['uri-id']]);
+			return;
+		}
+
 		if (!$only_ap_delivery) {
 			if (empty($delivery_contacts_stmt)) {
 				$condition = ['id' => $recipients, 'self' => false, 'uid' => [0, $uid],
@@ -384,7 +389,7 @@ class Notifier
 			$delivery_queue_count += self::delivery($cmd, $post_uriid, $sender_uid, $target_item, $parent, $thr_parent, $owner, $batch_delivery, false, $contacts, $ap_contacts, $conversants);
 		}
 
-		if (!empty($target_item)) {
+		if ($target_item) {
 			DI::logger()->info('Calling hooks for ' . $cmd . ' ' . $target_id);
 
 			Hook::fork($appHelper->getQueueValue('priority'), 'notifier_normal', $target_item);
