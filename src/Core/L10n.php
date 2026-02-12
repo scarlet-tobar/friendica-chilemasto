@@ -470,6 +470,17 @@ class L10n
 	}
 
 	/**
+	 * Converts e.g. en-gb to en_GB and da-dk to da_DK, which is the format some other systems expect
+	 *
+	 * @param string $lang
+	 * @return string
+	 * */
+	public function langToLocaleCode($lang)
+	{
+		return preg_replace_callback("/([a-z]+)-([a-z]+)/", fn ($m) => $m[1] . "_" . strtoupper($m[2]), $lang);
+	}
+
+	/**
 	 * Convert the language code to ISO639-1
 	 * It also converts old codes to their new counterparts.
 	 *
