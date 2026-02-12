@@ -766,7 +766,12 @@ class Transmitter
 							if (($profile['type'] == 'Group') && ($profile['url'] != ($actor_profile['url'] ?? ''))) {
 								$data['to'][] = $profile['url'];
 							} else {
-								$data['cc'][] = $profile['url'];
+								// Event participation (Accept/Reject/TentativeAccept) must be directly addressed to the event organizer
+								if (in_array($item['verb'] ?? '', [Activity::ATTEND, Activity::ATTENDNO, Activity::ATTENDMAYBE])) {
+									$data['to'][] = $profile['url'];
+								} else {
+									$data['cc'][] = $profile['url'];
+								}
 								if (($item['private'] != Item::PRIVATE) && !empty($actor_profile['followers']) && (!$exclusive || !$is_group_thread)) {
 									$data['cc'][] = $actor_profile['followers'];
 								}
