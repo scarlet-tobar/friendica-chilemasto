@@ -48,7 +48,7 @@
 			{{/if}}
 
 			{{* The main content (images or files) *}}
-			<div class="list {{$type}} media-body" role="main" aria-label="${{aria_browser_content}}">
+			<div class="list {{$type}} media-body" role="main" aria-label="{{$aria_browser_content}}">
 				<div class="fbrowser-content-container">
 					{{foreach $files as $f}}
 					<div class="photo-album-image-wrapper">
