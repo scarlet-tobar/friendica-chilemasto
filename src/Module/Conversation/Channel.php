@@ -131,8 +131,8 @@ class Channel extends Timeline
 		$pager = new BoundariesPager(
 			$this->l10n,
 			$this->args->getQueryString(),
-			$items[0][$order],
-			$items[count($items) - 1][$order],
+			$items[array_key_first($items)][$order],
+			$items[array_key_last($items)][$order],
 			$this->itemsPerPage
 		);
 
