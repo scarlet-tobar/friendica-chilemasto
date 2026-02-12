@@ -307,8 +307,8 @@ class Network extends Timeline
 			$pager = new BoundariesPager(
 				$this->l10n,
 				$this->args->getQueryString(),
-				$items[0][$this->order]                 ?? null,
-				$items[count($items) - 1][$this->order] ?? null,
+				$items[array_key_first($items)][$this->order] ?? null,
+				$items[array_key_last($items)][$this->order]  ?? null,
 				$this->itemsPerPage
 			);
 
