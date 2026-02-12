@@ -766,6 +766,7 @@ class Transmitter
 							if (($profile['type'] == 'Group') && ($profile['url'] != ($actor_profile['url'] ?? ''))) {
 								$data['to'][] = $profile['url'];
 							} else {
+								// Event participation (Accept/Reject/TentativeAccept) must be directly addressed to the event organizer
 								if (in_array($item['verb'] ?? '', [Activity::ATTEND, Activity::ATTENDNO, Activity::ATTENDMAYBE])) {
 									$data['to'][] = $profile['url'];
 								} else {
