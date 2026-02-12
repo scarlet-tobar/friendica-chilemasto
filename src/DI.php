@@ -413,6 +413,11 @@ abstract class DI
 		return self::$dice->create(Network\HTTPClient\Capability\ICanSendHttpRequests::class);
 	}
 
+	public static function robotsTxt(): Network\RobotsTxt
+	{
+		return self::$dice->create(Network\RobotsTxt::class);
+	}
+
 	//
 	// "Repository" namespace
 	//
