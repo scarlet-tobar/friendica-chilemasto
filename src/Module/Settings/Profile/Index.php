@@ -313,8 +313,8 @@ class Index extends BaseSettings
 			'$xmpp'          => ['xmpp', $this->t('XMPP (Jabber) address:'), $owner['xmpp'], $this->t('The XMPP address will be published so that people can follow you there.')],
 			'$matrix'        => ['matrix', $this->t('Matrix (Element) address:'), $owner['matrix'], $this->t('The Matrix address will be published so that people can follow you there.')],
 			'$homepage'      => ['homepage', $this->t('Homepage URL:'), $owner['homepage'], $homepage_help_text],
-			'$pub_keywords'  => ['pub_keywords', $this->t('Public Keywords:'), $owner['pub_keywords'], $this->t('(Used for suggesting potential friends, can be seen by others)')],
-			'$prv_keywords'  => ['prv_keywords', $this->t('Private Keywords:'), $owner['prv_keywords'], $this->t('(Used for searching profiles, never shown to others)')],
+			'$pub_keywords'  => ['pub_keywords', $this->t('Public Keywords:'), $owner['pub_keywords'], $this->t('Used for suggesting potential friends, can be seen by others.')],
+			'$prv_keywords'  => ['prv_keywords', $this->t('Private Keywords:'), $owner['prv_keywords'], $this->t('Used for searching profiles, never shown to others.')],
 			'$custom_fields' => $custom_fields,
 		]);
 

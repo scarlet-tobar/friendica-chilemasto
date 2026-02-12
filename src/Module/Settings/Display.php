@@ -446,14 +446,14 @@ class Display extends BaseSettings
 			'$form_security_token' => self::getFormSecurityToken('settings_display'),
 			'$uid'                 => $uid,
 
-			'$theme'        => ['theme', $this->t('Display theme'), $theme_selected, '', $themes, true],
+			'$theme'        => ['theme', $this->t('Theme'), $theme_selected, '', $themes, true],
 			'$mobile_theme' => ['mobile_theme', $this->t('Mobile theme'), $mobile_theme_selected, '', $mobile_themes, false],
 			'$theme_config' => $theme_config,
 
 			'$itemspage_network'        => ['itemspage_network', $this->t('Number of items to display per page:'), $itemspage_network, $this->t('Maximum of 100 items')],
 			'$itemspage_mobile_network' => ['itemspage_mobile_network', $this->t('Number of items to display per page when viewed from mobile device:'), $itemspage_mobile_network, $this->t('Maximum of 100 items')],
 			'$update_content'           => ['update_content', $this->t('Regularly update the page content'), $update_content, $this->t('When enabled, new content on network, community and channels are added on top.')],
-			'$enable_smile'             => ['enable_smile', $this->t('Display emoticons'), $enable_smile, $this->t('When enabled, emoticons are replaced with matching symbols.')],
+			'$enable_smile'             => ['enable_smile', $this->t('Display emojis'), $enable_smile, $this->t('When enabled, emoticons are replaced with matching emojis.')],
 			'$infinite_scroll'          => ['infinite_scroll', $this->t('Infinite scroll'), $infinite_scroll, $this->t('Automatic fetch new items when reaching the page end.')],
 			'$enable_smart_threading'   => ['enable_smart_threading', $this->t('Enable Smart Threading'), $enable_smart_threading, $this->t('Enable the automatic suppression of extraneous thread indentation.')],
 			'$enable_dislike'           => ['enable_dislike', $this->t('Display the Dislike feature'), $enable_dislike, $this->t('Display the Dislike button and dislike reactions on posts and comments.')],

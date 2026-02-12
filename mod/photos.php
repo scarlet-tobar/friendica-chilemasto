@@ -88,7 +88,7 @@ function photos_init()
 				'$title'    => DI::l10n()->t('Photo Albums'),
 				'$recent'   => DI::l10n()->t('Recent Photos'),
 				'$albums'   => $ret['albums'],
-				'$upload'   => [DI::l10n()->t('Upload Photos'), 'photos/' . $owner['nickname'] . '/upload'],
+				'$upload'   => [DI::l10n()->t('Upload photo'), 'photos/' . $owner['nickname'] . '/upload'],
 				'$can_post' => $can_post
 			]);
 		}
@@ -656,7 +656,7 @@ function photos_content()
 
 		$default_upload_box    = Renderer::replaceMacros(Renderer::getMarkupTemplate('photos_default_uploader_box.tpl'), []);
 		$default_upload_submit = Renderer::replaceMacros(Renderer::getMarkupTemplate('photos_default_uploader_submit.tpl'), [
-			'$submit' => DI::l10n()->t('Upload selected picture'),
+			'$submit' => DI::l10n()->t('Upload selected photo'),
 		]);
 
 		// Get the relevant size limits for uploads. Abbreviated var names: MaxImageSize -> mis; upload_max_filesize -> umf
@@ -679,7 +679,7 @@ function photos_content()
 		$aclselect_e = ($visitor ? '' : ACL::getFullSelectorHTML(DI::page(), DI::userSession()->getLocalUserId()));
 
 		$o .= Renderer::replaceMacros($tpl, [
-			'$pagename'              => DI::l10n()->t('Upload Photos'),
+			'$pagename'              => DI::l10n()->t('Upload photo'),
 			'$sessid'                => session_id(),
 			'$usage'                 => $usage_message,
 			'$nickname'              => $user['nickname'],
@@ -823,7 +823,7 @@ function photos_content()
 			'$photos'   => $photos,
 			'$album'    => $album,
 			'$can_post' => $can_post,
-			'$upload'   => [DI::l10n()->t('Upload Photos'), 'photos/' . $user['nickname'] . '/upload/' . bin2hex($album)],
+			'$upload'   => [DI::l10n()->t('Upload photo'), 'photos/' . $user['nickname'] . '/upload/' . bin2hex($album)],
 			'$order'    => $order,
 			'$edit'     => $edit,
 			'$drop'     => $drop,

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-12 18:06+0100\n"
+"POT-Creation-Date: 2026-02-12 23:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -272,8 +272,10 @@ msgstr ""
 msgid "Your message:"
 msgstr ""
 
-#: mod/message.php:188 mod/message.php:345 src/Content/Conversation.php:371
-#: src/Module/Post/Edit.php:129
+#: mod/message.php:188 mod/message.php:345 mod/photos.php:91 mod/photos.php:682
+#: mod/photos.php:826 src/Content/Conversation.php:371
+#: src/Module/Post/Edit.php:129 src/Module/Profile/Photos.php:442
+#: src/Module/Profile/Photos.php:445
 msgid "Upload photo"
 msgstr ""
 
@@ -342,8 +344,8 @@ msgid_plural "%d messages"
 msgstr[0] ""
 msgstr[1] ""
 
-#: mod/notes.php:41 src/Module/BaseProfile.php:93
-msgid "Personal Notes"
+#: mod/notes.php:41 src/Content/Nav.php:231 src/Module/BaseProfile.php:93
+msgid "Personal notes"
 msgstr ""
 
 #: mod/notes.php:45
@@ -376,12 +378,6 @@ msgstr ""
 #: mod/photos.php:89 src/Module/Profile/Photos.php:420
 #: src/Module/Profile/Photos.php:440
 msgid "Recent Photos"
-msgstr ""
-
-#: mod/photos.php:91 mod/photos.php:682 mod/photos.php:826
-#: src/Module/Profile/Photos.php:422 src/Module/Profile/Photos.php:442
-#: src/Module/Profile/Photos.php:445
-msgid "Upload Photos"
 msgstr ""
 
 #: mod/photos.php:103 src/Module/BaseSettings.php:60
@@ -428,8 +424,8 @@ msgstr ""
 msgid "No photos selected"
 msgstr ""
 
-#: mod/photos.php:659 src/Module/Settings/Profile/Index.php:276
-msgid "Upload selected picture"
+#: mod/photos.php:659
+msgid "Upload selected photo"
 msgstr ""
 
 #: mod/photos.php:675
@@ -2043,10 +2039,6 @@ msgid "Your calendar"
 msgstr ""
 
 #: src/Content/Nav.php:231
-msgid "Personal notes"
-msgstr ""
-
-#: src/Content/Nav.php:231
 msgid "Your personal notes"
 msgstr ""
 
@@ -2162,6 +2154,7 @@ msgstr ""
 
 #: src/Content/Nav.php:310 src/Module/BaseNotifications.php:134
 #: src/Module/Notifications/Introductions.php:63
+#: src/Module/Settings/Account.php:554
 msgid "Notifications"
 msgstr ""
 
@@ -3951,8 +3944,7 @@ msgstr ""
 #: src/Module/Admin/Addons/Index.php:85 src/Module/Admin/Features.php:69
 #: src/Module/Admin/Logs/Settings.php:76 src/Module/Admin/Site.php:460
 #: src/Module/Admin/Themes/Index.php:105 src/Module/Admin/Tos.php:72
-#: src/Module/Settings/Account.php:507 src/Module/Settings/Addons.php:64
-#: src/Module/Settings/Connectors.php:143
+#: src/Module/Settings/Addons.php:64 src/Module/Settings/Connectors.php:143
 #: src/Module/Settings/Connectors.php:228
 #: src/Module/Settings/ContactImport.php:111
 #: src/Module/Settings/Delegation.php:179 src/Module/Settings/Display.php:427
@@ -5937,12 +5929,12 @@ msgstr ""
 
 #: src/Module/Calendar/Event/Form.php:209
 #: src/Module/Calendar/Event/Form.php:233
-msgid "Finish date/time is not known or not relevant"
+msgid "End date/time is unknown or irrelevant"
 msgstr ""
 
 #: src/Module/Calendar/Event/Form.php:211
 #: src/Module/Calendar/Event/Form.php:216
-msgid "Event Finishes:"
+msgid "Event ends:"
 msgstr ""
 
 #: src/Module/Calendar/Event/Form.php:223
@@ -8647,6 +8639,10 @@ msgstr ""
 msgid "View Album"
 msgstr ""
 
+#: src/Module/Profile/Photos.php:422
+msgid "Upload Photos"
+msgstr ""
+
 #: src/Module/Profile/Profile.php:121 src/Module/Profile/Profile.php:156
 #: src/Module/Profile/Restricted.php:38
 msgid "Profile not found."
@@ -9272,6 +9268,10 @@ msgstr ""
 msgid "Your Identity Address is <strong>'%s'</strong> or '%s'."
 msgstr ""
 
+#: src/Module/Settings/Account.php:507 view/theme/frio/config.php:158
+msgid "Save settings"
+msgstr ""
+
 #: src/Module/Settings/Account.php:512
 msgid "Password Settings"
 msgstr ""
@@ -9401,7 +9401,7 @@ msgid "Default Post Permissions"
 msgstr ""
 
 #: src/Module/Settings/Account.php:546
-msgid "Expiration settings"
+msgid "Post expiration"
 msgstr ""
 
 #: src/Module/Settings/Account.php:547
@@ -9444,12 +9444,8 @@ msgstr ""
 msgid "When activated, your own posts never expire. Then the settings above are only valid for posts you received."
 msgstr ""
 
-#: src/Module/Settings/Account.php:554
-msgid "Notification Settings"
-msgstr ""
-
 #: src/Module/Settings/Account.php:555
-msgid "Send a notification email when:"
+msgid "Send an email when:"
 msgstr ""
 
 #: src/Module/Settings/Account.php:556
@@ -9461,7 +9457,7 @@ msgid "Your introductions are confirmed"
 msgstr ""
 
 #: src/Module/Settings/Account.php:558
-msgid "Someone writes on your profile wall"
+msgid "Someone writes on your wall"
 msgstr ""
 
 #: src/Module/Settings/Account.php:559
@@ -9481,7 +9477,7 @@ msgid "You are tagged in a post"
 msgstr ""
 
 #: src/Module/Settings/Account.php:564
-msgid "Create a desktop notification when:"
+msgid "Notify when:"
 msgstr ""
 
 #: src/Module/Settings/Account.php:565
@@ -10067,7 +10063,7 @@ msgid "Reset order"
 msgstr ""
 
 #: src/Module/Settings/Display.php:449
-msgid "Display theme"
+msgid "Theme"
 msgstr ""
 
 #: src/Module/Settings/Display.php:450
@@ -10095,11 +10091,11 @@ msgid "When enabled, new content on network, community and channels are added on
 msgstr ""
 
 #: src/Module/Settings/Display.php:456
-msgid "Display emoticons"
+msgid "Display emojis"
 msgstr ""
 
 #: src/Module/Settings/Display.php:456
-msgid "When enabled, emoticons are replaced with matching symbols."
+msgid "When enabled, emoticons are replaced with matching emojis."
 msgstr ""
 
 #: src/Module/Settings/Display.php:457
@@ -10324,6 +10320,10 @@ msgstr ""
 msgid "Upload new picture"
 msgstr ""
 
+#: src/Module/Settings/Profile/Index.php:276
+msgid "Upload selected picture"
+msgstr ""
+
 #: src/Module/Settings/Profile/Index.php:277
 msgid "Pick existing picture from photos"
 msgstr ""
@@ -10404,7 +10404,7 @@ msgid "Public Keywords:"
 msgstr ""
 
 #: src/Module/Settings/Profile/Index.php:316
-msgid "(Used for suggesting potential friends, can be seen by others)"
+msgid "Used for suggesting potential friends, can be seen by others."
 msgstr ""
 
 #: src/Module/Settings/Profile/Index.php:317
@@ -10412,7 +10412,7 @@ msgid "Private Keywords:"
 msgstr ""
 
 #: src/Module/Settings/Profile/Index.php:317
-msgid "(Used for searching profiles, never shown to others)"
+msgid "Used for searching profiles, never shown to others."
 msgstr ""
 
 #: src/Module/Settings/Profile/Photo/Crop.php:90
@@ -12013,10 +12013,6 @@ msgstr ""
 
 #: view/theme/frio/config.php:153
 msgid "Ensure that the image has the correct permissions, allowing all users to view it."
-msgstr ""
-
-#: view/theme/frio/config.php:158
-msgid "Save settings"
 msgstr ""
 
 #: view/theme/frio/config.php:160
