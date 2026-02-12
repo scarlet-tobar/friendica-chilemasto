@@ -1532,7 +1532,7 @@ section #jotOpen {
 }
 #jot-title-wrap,
 #jot-category-wrap {
-	margin-bottom: 5px;
+	margin-bottom: 10px;
 }
 #jot-text-wrap {
 	margin-top: 20px;
@@ -1561,6 +1561,14 @@ textarea.comment-edit-text:focus + .comment-edit-form .preview {
 	border: 2px solid #6fdbe8;
 	border-top: none;
 }
+#compose-additional-settings-location {
+	align-items: center;
+	display: flex;
+	flex-grow: 1;
+	gap: 5px;
+	padding-bottom: 15px;
+}
+
 .preview hr.previewseparator {
 	margin-top: 0px;
 	border-color: #d2d2d2;
@@ -2317,7 +2325,9 @@ wall-item-comment-wrapper.well hr {
 }
 
 .comment-edit-submit-wrapper {
-	text-align: right;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
 	margin-bottom: 0;
 }
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-11 10:14+0100\n"
+"POT-Creation-Date: 2026-02-12 18:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -776,19 +776,19 @@ msgid "All contacts"
 msgstr ""
 
 #: src/BaseModule.php:440 src/Content/Conversation/Factory/Channel.php:33
-#: src/Content/Widget.php:257 src/Core/ACL.php:185 src/Module/Contact.php:399
+#: src/Content/Widget.php:263 src/Core/ACL.php:185 src/Module/Contact.php:399
 #: src/Module/Privacy/PermissionTooltip.php:181
 #: src/Module/Privacy/PermissionTooltip.php:203
 #: src/Module/Settings/Channels.php:154
 msgid "Followers"
 msgstr ""
 
-#: src/BaseModule.php:445 src/Content/Widget.php:258 src/Module/Contact.php:402
+#: src/BaseModule.php:445 src/Content/Widget.php:264 src/Module/Contact.php:402
 #: src/Module/Settings/Channels.php:153
 msgid "Following"
 msgstr ""
 
-#: src/BaseModule.php:450 src/Content/Widget.php:259 src/Model/User.php:1386
+#: src/BaseModule.php:450 src/Content/Widget.php:265 src/Model/User.php:1386
 #: src/Module/Contact.php:405
 msgid "Friends"
 msgstr ""
@@ -1710,7 +1710,7 @@ msgstr ""
 msgid "Network Widgets"
 msgstr ""
 
-#: src/Content/Feature.php:127 src/Content/Widget.php:233
+#: src/Content/Feature.php:127 src/Content/Widget.php:239
 #: src/Model/Circle.php:587 src/Module/Circle.php:132
 #: src/Module/Contact.php:385 src/Module/Welcome.php:63
 msgid "Circles"
@@ -1722,7 +1722,7 @@ msgstr ""
 
 #: src/Content/Feature.php:128 src/Content/GroupManager.php:131
 #: src/Content/Nav.php:275 src/Content/Text/HTML.php:877
-#: src/Content/Widget.php:558 src/Model/User.php:1400
+#: src/Content/Widget.php:564 src/Model/User.php:1400
 msgid "Groups"
 msgstr ""
 
@@ -1730,7 +1730,7 @@ msgstr ""
 msgid "Display posts that have been distributed by the selected group."
 msgstr ""
 
-#: src/Content/Feature.php:129 src/Content/Widget.php:527
+#: src/Content/Feature.php:129 src/Content/Widget.php:533
 msgid "Archives"
 msgstr ""
 
@@ -1738,7 +1738,7 @@ msgstr ""
 msgid "Display an archive where posts can be selected by month and year."
 msgstr ""
 
-#: src/Content/Feature.php:130 src/Content/Widget.php:306
+#: src/Content/Feature.php:130 src/Content/Widget.php:312
 msgid "Protocols"
 msgstr ""
 
@@ -1746,7 +1746,7 @@ msgstr ""
 msgid "Display posts with the selected protocols."
 msgstr ""
 
-#: src/Content/Feature.php:131 src/Content/Widget.php:564
+#: src/Content/Feature.php:131 src/Content/Widget.php:570
 #: src/Module/Settings/Account.php:391
 msgid "Account Types"
 msgstr ""
@@ -1755,7 +1755,7 @@ msgstr ""
 msgid "Display posts done by accounts with the selected account type."
 msgstr ""
 
-#: src/Content/Feature.php:132 src/Content/Widget.php:626
+#: src/Content/Feature.php:132 src/Content/Widget.php:632
 #: src/Module/Admin/Site.php:474 src/Module/BaseSettings.php:113
 #: src/Module/Settings/Channels.php:224 src/Module/Settings/Display.php:434
 msgid "Channels"
@@ -1773,7 +1773,7 @@ msgstr ""
 msgid "Display posts that contain subscribed hashtags."
 msgstr ""
 
-#: src/Content/Feature.php:134 src/Content/Widget.php:336
+#: src/Content/Feature.php:134 src/Content/Widget.php:342
 msgid "Saved Folders"
 msgstr ""
 
@@ -1833,12 +1833,12 @@ msgstr ""
 msgid "External link to group"
 msgstr ""
 
-#: src/Content/GroupManager.php:137 src/Content/Widget.php:533
+#: src/Content/GroupManager.php:137 src/Content/Widget.php:539
 msgid "show less"
 msgstr ""
 
-#: src/Content/GroupManager.php:138 src/Content/Widget.php:428
-#: src/Content/Widget.php:534
+#: src/Content/GroupManager.php:138 src/Content/Widget.php:434
+#: src/Content/Widget.php:540
 msgid "show more"
 msgstr ""
 
@@ -1933,7 +1933,7 @@ msgstr ""
 msgid "Raw content"
 msgstr ""
 
-#: src/Content/Item.php:458 src/Content/Widget.php:65
+#: src/Content/Item.php:458 src/Content/Widget.php:71
 #: src/Model/Contact.php:1296 src/Model/Contact.php:1308
 #: src/Module/Contact/Follow.php:152 view/theme/vier/theme.php:182
 msgid "Connect/Follow"
@@ -2326,113 +2326,113 @@ msgstr ""
 msgid "Connect"
 msgstr ""
 
-#: src/Content/Widget.php:57
+#: src/Content/Widget.php:63
 #, php-format
 msgid "%d invitation available"
 msgid_plural "%d invitations available"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Content/Widget.php:63 view/theme/vier/theme.php:180
+#: src/Content/Widget.php:69 view/theme/vier/theme.php:180
 msgid "Find People"
 msgstr ""
 
-#: src/Content/Widget.php:64 view/theme/vier/theme.php:181
+#: src/Content/Widget.php:70 view/theme/vier/theme.php:181
 msgid "Enter name or interest"
 msgstr ""
 
-#: src/Content/Widget.php:66 view/theme/vier/theme.php:183
+#: src/Content/Widget.php:72 view/theme/vier/theme.php:183
 msgid "Examples: Robert Morgenstein, Fishing"
 msgstr ""
 
-#: src/Content/Widget.php:67 src/Module/Contact.php:445
+#: src/Content/Widget.php:73 src/Module/Contact.php:445
 #: src/Module/Directory.php:82 view/theme/vier/theme.php:184
 msgid "Find"
 msgstr ""
 
-#: src/Content/Widget.php:68 src/Module/Contact/Suggestions.php:59
+#: src/Content/Widget.php:74 src/Module/Contact/Suggestions.php:59
 #: view/theme/vier/theme.php:185
 msgid "Friend Suggestions"
 msgstr ""
 
-#: src/Content/Widget.php:69 view/theme/vier/theme.php:186
+#: src/Content/Widget.php:75 view/theme/vier/theme.php:186
 msgid "Similar Interests"
 msgstr ""
 
-#: src/Content/Widget.php:70 view/theme/vier/theme.php:187
+#: src/Content/Widget.php:76 view/theme/vier/theme.php:187
 msgid "Random Profile"
 msgstr ""
 
-#: src/Content/Widget.php:71 view/theme/vier/theme.php:188
+#: src/Content/Widget.php:77 view/theme/vier/theme.php:188
 msgid "Invite Friends"
 msgstr ""
 
-#: src/Content/Widget.php:72 src/Module/Directory.php:74
+#: src/Content/Widget.php:78 src/Module/Directory.php:74
 #: view/theme/vier/theme.php:189
 msgid "Global Directory"
 msgstr ""
 
-#: src/Content/Widget.php:74 view/theme/vier/theme.php:191
+#: src/Content/Widget.php:80 view/theme/vier/theme.php:191
 msgid "Local Directory"
 msgstr ""
 
-#: src/Content/Widget.php:235
+#: src/Content/Widget.php:241
 msgid "Everyone"
 msgstr ""
 
-#: src/Content/Widget.php:260 src/Module/Contact.php:408
+#: src/Content/Widget.php:266 src/Module/Contact.php:408
 msgid "No relationship"
 msgstr ""
 
-#: src/Content/Widget.php:265
+#: src/Content/Widget.php:271
 msgid "Relationships"
 msgstr ""
 
-#: src/Content/Widget.php:267 src/Module/Circle.php:282
+#: src/Content/Widget.php:273 src/Module/Circle.php:282
 #: src/Module/Contact.php:329
 msgid "All Contacts"
 msgstr ""
 
-#: src/Content/Widget.php:308
+#: src/Content/Widget.php:314
 msgid "All Protocols"
 msgstr ""
 
-#: src/Content/Widget.php:338 src/Content/Widget.php:369
+#: src/Content/Widget.php:344 src/Content/Widget.php:375
 msgid "Everything"
 msgstr ""
 
-#: src/Content/Widget.php:367
+#: src/Content/Widget.php:373
 msgid "Categories"
 msgstr ""
 
-#: src/Content/Widget.php:424
+#: src/Content/Widget.php:430
 #, php-format
 msgid "%d contact in common"
 msgid_plural "%d contacts in common"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Content/Widget.php:535
+#: src/Content/Widget.php:541
 msgid "On this date"
 msgstr ""
 
-#: src/Content/Widget.php:555
+#: src/Content/Widget.php:561
 msgid "Persons"
 msgstr ""
 
-#: src/Content/Widget.php:556
+#: src/Content/Widget.php:562
 msgid "Organisations"
 msgstr ""
 
-#: src/Content/Widget.php:557 src/Model/Contact.php:1814
+#: src/Content/Widget.php:563 src/Model/Contact.php:1814
 msgid "News"
 msgstr ""
 
-#: src/Content/Widget.php:559
+#: src/Content/Widget.php:565
 msgid "Relays"
 msgstr ""
 
-#: src/Content/Widget.php:566 src/Module/Moderation/BaseUsers.php:76
+#: src/Content/Widget.php:572 src/Module/Moderation/BaseUsers.php:76
 msgid "All"
 msgstr ""
 
@@ -2879,158 +2879,158 @@ msgstr ""
 msgid "%s (%s)"
 msgstr ""
 
-#: src/Core/L10n.php:512 src/Model/Event.php:421
+#: src/Core/L10n.php:523 src/Model/Event.php:421
 #: src/Module/Settings/Display.php:402
 msgid "Monday"
 msgstr ""
 
-#: src/Core/L10n.php:512 src/Model/Event.php:422
+#: src/Core/L10n.php:523 src/Model/Event.php:422
 #: src/Module/Settings/Display.php:403
 msgid "Tuesday"
 msgstr ""
 
-#: src/Core/L10n.php:512 src/Model/Event.php:423
+#: src/Core/L10n.php:523 src/Model/Event.php:423
 #: src/Module/Settings/Display.php:404
 msgid "Wednesday"
 msgstr ""
 
-#: src/Core/L10n.php:512 src/Model/Event.php:424
+#: src/Core/L10n.php:523 src/Model/Event.php:424
 #: src/Module/Settings/Display.php:405
 msgid "Thursday"
 msgstr ""
 
-#: src/Core/L10n.php:512 src/Model/Event.php:425
+#: src/Core/L10n.php:523 src/Model/Event.php:425
 #: src/Module/Settings/Display.php:406
 msgid "Friday"
 msgstr ""
 
-#: src/Core/L10n.php:512 src/Model/Event.php:426
+#: src/Core/L10n.php:523 src/Model/Event.php:426
 #: src/Module/Settings/Display.php:407
 msgid "Saturday"
 msgstr ""
 
-#: src/Core/L10n.php:512 src/Model/Event.php:420
+#: src/Core/L10n.php:523 src/Model/Event.php:420
 #: src/Module/Settings/Display.php:401
 msgid "Sunday"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:441
+#: src/Core/L10n.php:529 src/Model/Event.php:441
 msgid "January"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:442
+#: src/Core/L10n.php:529 src/Model/Event.php:442
 msgid "February"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:443
+#: src/Core/L10n.php:529 src/Model/Event.php:443
 msgid "March"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:444
+#: src/Core/L10n.php:529 src/Model/Event.php:444
 msgid "April"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Core/L10n.php:541 src/Model/Event.php:432
+#: src/Core/L10n.php:529 src/Core/L10n.php:552 src/Model/Event.php:432
 msgid "May"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:445
+#: src/Core/L10n.php:529 src/Model/Event.php:445
 msgid "June"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:446
+#: src/Core/L10n.php:529 src/Model/Event.php:446
 msgid "July"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:447
+#: src/Core/L10n.php:529 src/Model/Event.php:447
 msgid "August"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:448
+#: src/Core/L10n.php:529 src/Model/Event.php:448
 msgid "September"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:449
+#: src/Core/L10n.php:529 src/Model/Event.php:449
 msgid "October"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:450
+#: src/Core/L10n.php:529 src/Model/Event.php:450
 msgid "November"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:451
+#: src/Core/L10n.php:529 src/Model/Event.php:451
 msgid "December"
 msgstr ""
 
-#: src/Core/L10n.php:535 src/Model/Event.php:413
+#: src/Core/L10n.php:546 src/Model/Event.php:413
 msgid "Mon"
 msgstr ""
 
-#: src/Core/L10n.php:535 src/Model/Event.php:414
+#: src/Core/L10n.php:546 src/Model/Event.php:414
 msgid "Tue"
 msgstr ""
 
-#: src/Core/L10n.php:535 src/Model/Event.php:415
+#: src/Core/L10n.php:546 src/Model/Event.php:415
 msgid "Wed"
 msgstr ""
 
-#: src/Core/L10n.php:535 src/Model/Event.php:416
+#: src/Core/L10n.php:546 src/Model/Event.php:416
 msgid "Thu"
 msgstr ""
 
-#: src/Core/L10n.php:535 src/Model/Event.php:417
+#: src/Core/L10n.php:546 src/Model/Event.php:417
 msgid "Fri"
 msgstr ""
 
-#: src/Core/L10n.php:535 src/Model/Event.php:418
+#: src/Core/L10n.php:546 src/Model/Event.php:418
 msgid "Sat"
 msgstr ""
 
-#: src/Core/L10n.php:535 src/Model/Event.php:412
+#: src/Core/L10n.php:546 src/Model/Event.php:412
 msgid "Sun"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:428
+#: src/Core/L10n.php:552 src/Model/Event.php:428
 msgid "Jan"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:429
+#: src/Core/L10n.php:552 src/Model/Event.php:429
 msgid "Feb"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:430
+#: src/Core/L10n.php:552 src/Model/Event.php:430
 msgid "Mar"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:431
+#: src/Core/L10n.php:552 src/Model/Event.php:431
 msgid "Apr"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:433
+#: src/Core/L10n.php:552 src/Model/Event.php:433
 msgid "Jun"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:434
+#: src/Core/L10n.php:552 src/Model/Event.php:434
 msgid "Jul"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:435
+#: src/Core/L10n.php:552 src/Model/Event.php:435
 msgid "Aug"
 msgstr ""
 
-#: src/Core/L10n.php:541
+#: src/Core/L10n.php:552
 msgid "Sep"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:437
+#: src/Core/L10n.php:552 src/Model/Event.php:437
 msgid "Oct"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:438
+#: src/Core/L10n.php:552 src/Model/Event.php:438
 msgid "Nov"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:439
+#: src/Core/L10n.php:552 src/Model/Event.php:439
 msgid "Dec"
 msgstr ""
 
@@ -7278,7 +7278,7 @@ msgid "Location services are disabled. Please check the website's permissions on
 msgstr ""
 
 #: src/Module/Item/Compose.php:214
-msgid "You can make this page always open when you use the New Post button in the <a href=\"/settings/display\">Theme Customization settings</a>."
+msgid "If you want to always use this editor for posting, you can configure the New Post button to always open it in your <a href=\"/settings/display\">Theme settings</a>."
 msgstr ""
 
 #: src/Module/Item/Display.php:168

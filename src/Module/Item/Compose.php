@@ -211,7 +211,7 @@ class Compose extends BaseModule
 					'always_open_compose',
 					$this->config->get('frio', 'always_open_compose', false)
 				) ? '' :
-						$this->l10n->t('You can make this page always open when you use the New Post button in the <a href="/settings/display">Theme Customization settings</a>.'),
+						$this->l10n->t('If you want to always use this editor for posting, you can configure the New Post button to always open it in your <a href="/settings/display">Theme settings</a>.'),
 			],
 
 			'$id'           => 0,
