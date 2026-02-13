@@ -690,6 +690,12 @@ class Notifier
 			return ['count' => 0, 'contacts' => []];
 		}
 
+		// "View" is not delivered
+		if ($target_item['verb'] === Activity::VIEW) {
+			DI::logger()->info('Not delivering view activities', ['guid' => $target_item['guid'], 'uri-id' => $target_item['uri-id']]);
+			return ['count' => 0, 'contacts' => []];
+		}
+
 		$inboxes       = [];
 		$relay_inboxes = [];
 
