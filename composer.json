@@ -183,9 +183,10 @@
 		],
 		"cs:fix-develop": "TARGET_BRANCH=develop COMMAND=fix bin/dev/fix-codestyle.sh",
 		"rector:install": "@composer install -d bin/dev/rector",
-		"rector:check": "bin/dev/rector/vendor/bin/rector --config=\".rector.php\" --dry-run",
-		"refactor": [
-			"bin/dev/rector/vendor/bin/rector --config=\".rector.php\"",
+		"rector:check": "@rector:fix --dry-run",
+		"rector:run": "bin/dev/rector/vendor/bin/rector --config=\".rector.php\"",
+		"rectify": [
+			"@rector:run",
 			"@cs:fix-develop"
 		],
 		"db:update-structure": "bin/console.php dbstructure dumpsql > database.sql",
