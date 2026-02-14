@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-12 23:20+0100\n"
+"POT-Creation-Date: 2026-02-13 20:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,7 +44,7 @@ msgstr ""
 msgid "Item not found."
 msgstr ""
 
-#: mod/item.php:463 mod/message.php:56 mod/message.php:102 mod/notes.php:34
+#: mod/item.php:463 mod/message.php:56 mod/message.php:102 mod/notes.php:35
 #: mod/photos.php:132 mod/photos.php:624 src/Model/Event.php:511
 #: src/Module/Attach.php:40 src/Module/BaseApi.php:90
 #: src/Module/BaseNotifications.php:83 src/Module/BaseSettings.php:38
@@ -344,15 +344,15 @@ msgid_plural "%d messages"
 msgstr[0] ""
 msgstr[1] ""
 
-#: mod/notes.php:41 src/Content/Nav.php:231 src/Module/BaseProfile.php:93
+#: mod/notes.php:42 src/Content/Nav.php:231 src/Module/BaseProfile.php:93
 msgid "Personal notes"
 msgstr ""
 
-#: mod/notes.php:45
+#: mod/notes.php:46
 msgid "Personal notes are visible only by yourself."
 msgstr ""
 
-#: mod/notes.php:46 src/Module/Admin/Storage.php:128
+#: mod/notes.php:47 src/Module/Admin/Storage.php:128
 #: src/Module/Filer/SaveTag.php:60 src/Module/Post/Edit.php:127
 #: src/Module/Settings/Channels.php:228
 msgid "Save"
@@ -446,7 +446,7 @@ msgid "Do not show a status post for this upload"
 msgstr ""
 
 #: mod/photos.php:691 mod/photos.php:1051 src/Content/Conversation.php:404
-#: src/Module/Calendar/Event/Form.php:239 src/Module/Post/Edit.php:181
+#: src/Module/Calendar/Event/Form.php:241 src/Module/Post/Edit.php:181
 msgid "Permissions"
 msgstr ""
 
@@ -584,7 +584,7 @@ msgid "Comment"
 msgstr ""
 
 #: mod/photos.php:1098 mod/photos.php:1154 mod/photos.php:1234
-#: src/Content/Conversation.php:416 src/Module/Calendar/Event/Form.php:234
+#: src/Content/Conversation.php:416 src/Module/Calendar/Event/Form.php:236
 #: src/Module/Item/Compose.php:200 src/Module/Post/Edit.php:163
 #: src/Object/Post.php:1180
 msgid "Preview"
@@ -2191,8 +2191,9 @@ msgid "Manage other accounts, including groups and pages"
 msgstr ""
 
 #: src/Content/Nav.php:324 src/Module/Admin/Addons/Details.php:140
-#: src/Module/Admin/Themes/Details.php:85 src/Module/BaseSettings.php:177
-#: src/Module/Welcome.php:39 view/theme/frio/theme.php:230
+#: src/Module/Admin/Themes/Details.php:85 src/Module/BaseAdmin.php:88
+#: src/Module/BaseSettings.php:177 src/Module/Welcome.php:39
+#: view/theme/frio/theme.php:230
 msgid "Settings"
 msgstr ""
 
@@ -4129,9 +4130,8 @@ msgstr ""
 msgid "PHP log currently disabled."
 msgstr ""
 
-#: src/Module/Admin/Logs/Settings.php:75 src/Module/BaseAdmin.php:87
-#: src/Module/BaseAdmin.php:88
-msgid "Logs"
+#: src/Module/Admin/Logs/Settings.php:75
+msgid "Log settings"
 msgstr ""
 
 #: src/Module/Admin/Logs/Settings.php:77
@@ -4178,7 +4178,7 @@ msgstr ""
 msgid "Couldn't open <strong>%1$s</strong> log file.<br/>Check to see if file %1$s is readable."
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:72 src/Module/BaseAdmin.php:89
+#: src/Module/Admin/Logs/View.php:72
 msgid "View Logs"
 msgstr ""
 
@@ -4215,7 +4215,7 @@ msgstr ""
 msgid "Click to view details"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:84 src/Module/Calendar/Event/Form.php:193
+#: src/Module/Admin/Logs/View.php:84 src/Module/Calendar/Event/Form.php:195
 msgid "Event details"
 msgstr ""
 
@@ -4246,6 +4246,11 @@ msgstr ""
 
 #: src/Module/Admin/Logs/View.php:91
 msgid "Process ID"
+msgstr ""
+
+#: src/Module/Admin/Logs/View.php:99
+#, php-format
+msgid "Current log path: %s"
 msgstr ""
 
 #: src/Module/Admin/Queue.php:36
@@ -4408,7 +4413,7 @@ msgstr ""
 msgid "Policies"
 msgstr ""
 
-#: src/Module/Admin/Site.php:465 src/Module/Calendar/Event/Form.php:238
+#: src/Module/Admin/Site.php:465 src/Module/Calendar/Event/Form.php:240
 #: src/Module/Contact.php:532 src/Module/Profile/Profile.php:290
 msgid "Advanced"
 msgstr ""
@@ -5667,6 +5672,14 @@ msgstr ""
 msgid "Inspect worker Queue"
 msgstr ""
 
+#: src/Module/BaseAdmin.php:87
+msgid "Logs"
+msgstr ""
+
+#: src/Module/BaseAdmin.php:89 src/Module/Calendar/Show.php:114
+msgid "View"
+msgstr ""
+
 #: src/Module/BaseAdmin.php:91 src/Module/BaseModeration.php:109
 msgid "Diagnostics"
 msgstr ""
@@ -5894,17 +5907,17 @@ msgstr ""
 msgid "Event title and start time are required."
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:194
+#: src/Module/Calendar/Event/Form.php:196
 msgid "Starting date and Title are required."
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:195
-#: src/Module/Calendar/Event/Form.php:200
+#: src/Module/Calendar/Event/Form.php:197
+#: src/Module/Calendar/Event/Form.php:202
 msgid "Event Starts:"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:195
-#: src/Module/Calendar/Event/Form.php:223 src/Module/Debug/Probe.php:45
+#: src/Module/Calendar/Event/Form.php:197
+#: src/Module/Calendar/Event/Form.php:225 src/Module/Debug/Probe.php:45
 #: src/Module/Install.php:186 src/Module/Install.php:212
 #: src/Module/Install.php:217 src/Module/Install.php:231
 #: src/Module/Install.php:240 src/Module/Install.php:245
@@ -5927,35 +5940,35 @@ msgstr ""
 msgid "Required"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:209
-#: src/Module/Calendar/Event/Form.php:233
+#: src/Module/Calendar/Event/Form.php:211
+#: src/Module/Calendar/Event/Form.php:235
 msgid "End date/time is unknown or irrelevant"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:211
-#: src/Module/Calendar/Event/Form.php:216
+#: src/Module/Calendar/Event/Form.php:213
+#: src/Module/Calendar/Event/Form.php:218
 msgid "Event ends:"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:223
-#: src/Module/Calendar/Event/Form.php:229
+#: src/Module/Calendar/Event/Form.php:225
+#: src/Module/Calendar/Event/Form.php:231
 msgid "Title (BBCode not allowed)"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:225
+#: src/Module/Calendar/Event/Form.php:227
 msgid "Description (BBCode allowed)"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:227
+#: src/Module/Calendar/Event/Form.php:229
 msgid "Location (BBCode not allowed)"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:230
-#: src/Module/Calendar/Event/Form.php:231
+#: src/Module/Calendar/Event/Form.php:232
+#: src/Module/Calendar/Event/Form.php:233
 msgid "Share this event"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:236 src/Module/Contact/Advanced.php:118
+#: src/Module/Calendar/Event/Form.php:238 src/Module/Contact/Advanced.php:118
 #: src/Module/Contact/Profile.php:415
 #: src/Module/Debug/ActivityPubConversion.php:128
 #: src/Module/Debug/Babel.php:280 src/Module/Debug/Localtime.php:50
@@ -5974,7 +5987,7 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:237 src/Module/Profile/Profile.php:289
+#: src/Module/Calendar/Event/Form.php:239 src/Module/Profile/Profile.php:289
 msgid "Basic"
 msgstr ""
 
@@ -5988,10 +6001,6 @@ msgstr ""
 
 #: src/Module/Calendar/Export.php:99
 msgid "calendar"
-msgstr ""
-
-#: src/Module/Calendar/Show.php:114
-msgid "View"
 msgstr ""
 
 #: src/Module/Calendar/Show.php:115
