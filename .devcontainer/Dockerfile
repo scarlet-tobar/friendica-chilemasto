@@ -2,10 +2,10 @@ FROM php:8.4-apache
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update -y;
-
 # Install MariaDB client
-RUN apt-get install -y mariadb-client
+RUN apt-get update \
+        && apt-get install -y --no-install-recommends mariadb-client \
+;
 
 # Base packages
 RUN apt-get install -y \
