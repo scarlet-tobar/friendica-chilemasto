@@ -631,7 +631,8 @@ class Item
 
 		$priority = Worker::PRIORITY_HIGH;
 
-		$copy_permissions = false;
+		$copy_permissions    = false;
+		$defined_permissions = isset($item['allow_cid']) && isset($item['allow_gid']) && isset($item['deny_cid']) && isset($item['deny_gid']) && isset($item['private']);
 
 		// If it is a posting where users should get notifications, then define it as wall posting
 		if ($notify) {
@@ -643,8 +644,12 @@ class Item
 			}
 
 			// Mastodon style API visibility
-			$copy_permissions = ($item['visibility'] ?? 'private') == 'private';
-			unset($item['visibility']);
+			if (isset($item['visibility'])) {
+				$copy_permissions = $item['visibility'] === 'private';
+				unset($item['visibility']);
+			} else {
+				$copy_permissions = !$defined_permissions;
+			}
 		} else {
 			$item['network'] = trim(($item['network'] ?? '') ?: Protocol::PHANTOM);
 		}
@@ -677,8 +682,6 @@ class Item
 		if (!isset($item['post-type'])) {
 			$item['post-type'] = empty($item['title']) ? self::PT_NOTE : self::PT_ARTICLE;
 		}
-
-		$defined_permissions = isset($item['allow_cid']) && isset($item['allow_gid']) && isset($item['deny_cid']) && isset($item['deny_gid']) && isset($item['private']);
 
 		$uid = intval($item['uid']);
 
