@@ -561,11 +561,14 @@ class Network extends Timeline
 
 		$systemchannels = [];
 		$userchannels   = [];
-		foreach ($this->pConfig->get($this->session->getLocalUserId(), 'channel', 'timeline_channels') ?? [] as $channel) {
-			if (is_numeric($channel)) {
-				$userchannels[] = (int)$channel;
-			} else {
-				$systemchannels[] = $channel;
+
+		if (!$this->mention && !$this->star) {
+			foreach ($this->pConfig->get($this->session->getLocalUserId(), 'channel', 'timeline_channels') ?? [] as $channel) {
+				if (is_numeric($channel)) {
+					$userchannels[] = (int)$channel;
+				} else {
+					$systemchannels[] = $channel;
+				}
 			}
 		}
 
