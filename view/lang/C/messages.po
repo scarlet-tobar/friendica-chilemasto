@@ -2191,8 +2191,9 @@ msgid "Manage other accounts, including groups and pages"
 msgstr ""
 
 #: src/Content/Nav.php:324 src/Module/Admin/Addons/Details.php:140
-#: src/Module/Admin/Themes/Details.php:85 src/Module/BaseSettings.php:177
-#: src/Module/Welcome.php:39 view/theme/frio/theme.php:230
+#: src/Module/Admin/Themes/Details.php:85 src/Module/BaseAdmin.php:88
+#: src/Module/BaseSettings.php:177 src/Module/Welcome.php:39
+#: view/theme/frio/theme.php:230
 msgid "Settings"
 msgstr ""
 
@@ -4129,9 +4130,8 @@ msgstr ""
 msgid "PHP log currently disabled."
 msgstr ""
 
-#: src/Module/Admin/Logs/Settings.php:75 src/Module/BaseAdmin.php:87
-#: src/Module/BaseAdmin.php:88
-msgid "Logs"
+#: src/Module/Admin/Logs/Settings.php:75
+msgid "Log settings"
 msgstr ""
 
 #: src/Module/Admin/Logs/Settings.php:77
@@ -4178,7 +4178,7 @@ msgstr ""
 msgid "Couldn't open <strong>%1$s</strong> log file.<br/>Check to see if file %1$s is readable."
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:72 src/Module/BaseAdmin.php:89
+#: src/Module/Admin/Logs/View.php:72
 msgid "View Logs"
 msgstr ""
 
@@ -4246,6 +4246,11 @@ msgstr ""
 
 #: src/Module/Admin/Logs/View.php:91
 msgid "Process ID"
+msgstr ""
+
+#: src/Module/Admin/Logs/View.php:99
+#, php-format
+msgid "Current log path: %s"
 msgstr ""
 
 #: src/Module/Admin/Queue.php:36
@@ -5667,6 +5672,14 @@ msgstr ""
 msgid "Inspect worker Queue"
 msgstr ""
 
+#: src/Module/BaseAdmin.php:87
+msgid "Logs"
+msgstr ""
+
+#: src/Module/BaseAdmin.php:89 src/Module/Calendar/Show.php:114
+msgid "View"
+msgstr ""
+
 #: src/Module/BaseAdmin.php:91 src/Module/BaseModeration.php:109
 msgid "Diagnostics"
 msgstr ""
@@ -5988,10 +6001,6 @@ msgstr ""
 
 #: src/Module/Calendar/Export.php:99
 msgid "calendar"
-msgstr ""
-
-#: src/Module/Calendar/Show.php:114
-msgid "View"
 msgstr ""
 
 #: src/Module/Calendar/Show.php:115

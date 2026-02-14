@@ -357,7 +357,7 @@ final class ItemHelper
 		}
 
 		// If its a post that originated here then tag the thread as "mention"
-		if ($item['origin'] && $item['uid']) {
+		if ($item['origin'] && $item['uid'] && $item['verb'] !== Activity::VIEW) {
 			$this->database->update('post-thread-user', ['mention' => true], ['uri-id' => $item['parent-uri-id'], 'uid' => $item['uid']]);
 			$this->logger->info('tagged thread as mention', ['parent' => $parent_id, 'parent-uri-id' => $item['parent-uri-id'], 'uid' => $item['uid']]);
 		}
