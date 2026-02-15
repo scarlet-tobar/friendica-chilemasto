@@ -903,37 +903,7 @@ class Item
 			}
 		}
 
-		if (empty($item['event-id'])) {
-			if (array_key_exists('event-id', $item)) {
-				unset($item['event-id']);
-			}
-
-			$ev = Event::fromBBCode($item['body']);
-			if ((!empty($ev['desc']) || !empty($ev['summary'])) && !empty($ev['start'])) {
-				DI::logger()->info('Event found.');
-				$ev['cid']       = $item['contact-id'];
-				$ev['uid']       = $item['uid'];
-				$ev['uri']       = $item['uri'];
-				$ev['edited']    = $item['edited'];
-				$ev['private']   = $item['private'];
-				$ev['guid']      = $item['guid'];
-				$ev['plink']     = $item['plink'];
-				$ev['network']   = $item['network'];
-				$ev['protocol']  = $item['protocol']  ?? Conversation::PARCEL_UNKNOWN;
-				$ev['direction'] = $item['direction'] ?? Conversation::UNKNOWN;
-				$ev['source']    = $item['source']    ?? '';
-
-				$event = DBA::selectFirst('event', ['id'], ['uri' => $item['uri'], 'uid' => $item['uid']]);
-				if (DBA::isResult($event)) {
-					$ev['id'] = $event['id'];
-				}
-
-				$event_id = Event::store($ev);
-				$item     = Event::getItemArrayForImportedId($event_id, $item);
-
-				DI::logger()->info('Event was stored', ['id' => $event_id]);
-			}
-		}
+		$item = self::storeEvent($item);
 
 		if (empty($item['causer-id'])) {
 			unset($item['causer-id']);
@@ -960,12 +930,16 @@ class Item
 		$inserted = Post::insert($item['uri-id'], $item);
 
 		if ($item['gravity'] == self::GRAVITY_PARENT) {
-			Post\Thread::insert($item['uri-id'], $item);
+			if (!Post\Thread::insert($item['uri-id'], $item) && !Post\Thread::exists($item['uri-id'])) {
+				DI::logger()->error('Post-Thread entry was not inserted', ['uri-id' => $item['uri-id']]);
+			}
 		}
 
 		// The content of activities normally doesn't matter - except for likes from Misskey
 		if (!in_array($item['verb'], self::ACTIVITIES) || in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE]) && !empty($item['body']) && (mb_strlen($item['body']) == 1)) {
-			Post\Content::insert($item['uri-id'], $item);
+			if (!Post\Content::insert($item['uri-id'], $item) && !Post\Content::exists($item['uri-id'])) {
+				DI::logger()->error('Post-Content entry was not inserted', ['uri-id' => $item['uri-id']]);
+			}
 		}
 
 		$item['parent'] = $parent_id;
@@ -1012,12 +986,52 @@ class Item
 
 		if ($item['gravity'] == self::GRAVITY_PARENT) {
 			$item['post-user-id'] = $post_user_id;
-			Post\ThreadUser::insert($item['uri-id'], $item['uid'], $item);
+			if (!Post\ThreadUser::insert($item['uri-id'], $item['uid'], $item)) {
+				DI::logger()->error('Post-Thread-User entry was not inserted', ['uri-id' => $item['uri-id']]);
+			}
 		}
 
 		DI::logger()->notice('created item', ['post-id' => $post_user_id, 'uid' => $item['uid'], 'network' => $item['network'], 'uri-id' => $item['uri-id'], 'guid' => $item['guid']]);
 
 		return self::handleCreatedItem($orig_item, $post_user_id, $uid, $notify, $copy_permissions, $parent_origin, $priority, $notify_type, $inserted, $source);
+	}
+
+	private static function storeEvent(array $item): array
+	{
+		if (!empty($item['event-id'])) {
+			return $item;
+		}
+
+		if (array_key_exists('event-id', $item)) {
+			unset($item['event-id']);
+		}
+
+		$ev = Event::fromBBCode($item['body']);
+		if ((!empty($ev['desc']) || !empty($ev['summary'])) && !empty($ev['start'])) {
+			DI::logger()->info('Event found.');
+			$ev['cid']       = $item['contact-id'];
+			$ev['uid']       = $item['uid'];
+			$ev['uri']       = $item['uri'];
+			$ev['edited']    = $item['edited'];
+			$ev['private']   = $item['private'];
+			$ev['guid']      = $item['guid'];
+			$ev['plink']     = $item['plink'];
+			$ev['network']   = $item['network'];
+			$ev['protocol']  = $item['protocol']  ?? Conversation::PARCEL_UNKNOWN;
+			$ev['direction'] = $item['direction'] ?? Conversation::UNKNOWN;
+			$ev['source']    = $item['source']    ?? '';
+
+			$event = DBA::selectFirst('event', ['id'], ['uri' => $item['uri'], 'uid' => $item['uid']]);
+			if (DBA::isResult($event)) {
+				$ev['id'] = $event['id'];
+			}
+
+			$event_id = Event::store($ev);
+			$item     = Event::getItemArrayForImportedId($event_id, $item);
+
+			DI::logger()->info('Event was stored', ['id' => $event_id]);
+		}
+		return $item;
 	}
 
 	private static function handleCreatedItem(array $orig_item, int $post_user_id, int $uid, int $notify, bool $copy_permissions, $parent_origin, int $priority, string $notify_type, bool $inserted, $source): int
