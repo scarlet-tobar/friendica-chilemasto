@@ -81,6 +81,7 @@ class Directory extends BaseModule
 			'$search_mod' => 'directory',
 			'$submit'     => DI::l10n()->t('Find'),
 			'$paginate'   => $pager->renderFull($profiles['total']),
+			'$num_results_text' => DI::l10n()->t("Accounts listed: %s", $profiles['total']),
 		]);
 
 		return $output;

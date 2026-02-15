@@ -2808,6 +2808,11 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 	padding-top: 10px;
 }
 
+#num-results {
+	padding-top: 20px;
+	margin-bottom: 0;
+}
+
 /* circle edit page */
 .circle-actions {
 	margin-top: 4px;

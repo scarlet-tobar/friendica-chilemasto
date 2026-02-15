@@ -18,6 +18,7 @@
 		<span class="dirsearch-desc">{{$desc}}</span>
 		<input type="text" name="search" id="directory-search" class="search-input" onfocus="this.select();" value="{{$search}}" />
 		<input type="submit" name="submit" id="directory-search-submit" value="{{$submit}}" class="button" />
+		<p id="num-results">{{$num_results_text}}</p>
 	</form>
 </div>
 
