@@ -17,7 +17,7 @@
 			<div class="col-xs-12">
 				<div id="admin-logs-search" class="form-group form-group-search">
 					<input accesskey="s" id="nav-search-input-field" class="form-control form-search"
-						type="text" name="q" data-toggle="tooltip" title="{{$l10n.Search_in_logs}}"
+						type="text" name="q"
 						placeholder="{{$l10n.Search}}" value="{{$q}}">
 					<button class="btn btn-lg btn-primary"
 						type="submit"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i></button>
