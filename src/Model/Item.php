@@ -3016,6 +3016,9 @@ class Item
 					$quote_uri_id = $shared_item['uri-id'];
 				}
 			}
+		} elseif (!empty($item['quote-uri'])) {
+			DI::logger()->notice('Quote-uri specified, but it had not been found on the system.', ['uri-id' => $item['uri-id'], 'quote-uri' => $item['quote-uri']]);
+			$item['body'] .= "\n[hr]\nRE: [url]" . $item['quote-uri'] . '[/url]';
 		}
 
 		if (!empty($quote_uri_id)) {
