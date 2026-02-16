@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-14 16:25+0100\n"
+"POT-Creation-Date: 2026-02-15 19:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -274,8 +274,8 @@ msgstr ""
 
 #: mod/message.php:188 mod/message.php:345 mod/photos.php:91 mod/photos.php:682
 #: mod/photos.php:826 src/Content/Conversation.php:371
-#: src/Module/Post/Edit.php:129 src/Module/Profile/Photos.php:442
-#: src/Module/Profile/Photos.php:445
+#: src/Module/Post/Edit.php:129 src/Module/Profile/Photos.php:422
+#: src/Module/Profile/Photos.php:442 src/Module/Profile/Photos.php:445
 msgid "Upload photo"
 msgstr ""
 
@@ -433,12 +433,12 @@ msgstr ""
 msgid "The maximum accepted image size is %s"
 msgstr ""
 
-#: mod/photos.php:686 mod/photos.php:775
-msgid "New album name: "
+#: mod/photos.php:686
+msgid "Album name: "
 msgstr ""
 
 #: mod/photos.php:687
-msgid "or select existing album:"
+msgid "If you want to add this photo to an album, begin typing its name, and existing albums will be suggested, which you can select. If you choose something new, it will be created."
 msgstr ""
 
 #: mod/photos.php:688
@@ -466,6 +466,10 @@ msgstr ""
 #: src/Module/Post/Tag/Remove.php:96 src/Module/Profile/RemoteFollow.php:120
 #: src/Module/Security/TwoFactor/SignOut.php:106
 msgid "Cancel"
+msgstr ""
+
+#: mod/photos.php:775
+msgid "New album name: "
 msgstr ""
 
 #: mod/photos.php:779 mod/photos.php:1055
@@ -738,7 +742,7 @@ msgstr ""
 msgid "toggle mobile"
 msgstr ""
 
-#: src/App/Page.php:356 src/Module/Admin/Logs/View.php:92
+#: src/App/Page.php:356 src/Module/Admin/Logs/View.php:91
 #: src/Module/Media/Attachment/Browser.php:69
 #: src/Module/Media/Photo/Browser.php:81 view/theme/frio/php/minimal.php:39
 #: view/theme/frio/php/standard.php:138
@@ -1369,7 +1373,7 @@ msgstr ""
 
 #: src/Content/Conversation.php:426 src/Content/Item.php:442
 #: src/Content/Widget/VCard.php:120 src/Model/Contact.php:1307
-#: src/Model/Profile.php:460 src/Module/Admin/Logs/View.php:80
+#: src/Model/Profile.php:460 src/Module/Admin/Logs/View.php:79
 #: src/Module/Post/Edit.php:179
 msgid "Message"
 msgstr ""
@@ -1846,7 +1850,7 @@ msgstr ""
 msgid "Find groups to join"
 msgstr ""
 
-#: src/Content/Item.php:336 src/Model/Item.php:2841
+#: src/Content/Item.php:336 src/Model/Item.php:2844
 msgid "event"
 msgstr ""
 
@@ -1854,7 +1858,7 @@ msgstr ""
 msgid "status"
 msgstr ""
 
-#: src/Content/Item.php:345 src/Model/Item.php:2843
+#: src/Content/Item.php:345 src/Model/Item.php:2846
 #: src/Module/Post/Tag/Add.php:112
 msgid "photo"
 msgstr ""
@@ -2077,7 +2081,7 @@ msgid "Addon applications, utilities, games"
 msgstr ""
 
 #: src/Content/Nav.php:266 src/Content/Text/HTML.php:862
-#: src/Module/Admin/Logs/View.php:74 src/Module/Search/Index.php:99
+#: src/Module/Search/Index.php:99
 msgid "Search"
 msgstr ""
 
@@ -2263,8 +2267,8 @@ msgstr ""
 msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:945 src/Model/Item.php:3731
-#: src/Model/Item.php:3737 src/Model/Item.php:3738
+#: src/Content/Text/BBCode.php:945 src/Model/Item.php:3734
+#: src/Model/Item.php:3740 src/Model/Item.php:3741
 msgid "Link to source"
 msgstr ""
 
@@ -3409,84 +3413,84 @@ msgstr ""
 msgid "Happy Birthday %s"
 msgstr ""
 
-#: src/Model/Item.php:2845
+#: src/Model/Item.php:2848
 msgid "activity"
 msgstr ""
 
-#: src/Model/Item.php:2847
+#: src/Model/Item.php:2850
 msgid "comment"
 msgstr ""
 
-#: src/Model/Item.php:2850 src/Module/Post/Tag/Add.php:112
+#: src/Model/Item.php:2853 src/Module/Post/Tag/Add.php:112
 msgid "post"
 msgstr ""
 
-#: src/Model/Item.php:3039
+#: src/Model/Item.php:3042
 #, php-format
 msgid "%s is blocked"
 msgstr ""
 
-#: src/Model/Item.php:3041
+#: src/Model/Item.php:3044
 #, php-format
 msgid "%s is ignored"
 msgstr ""
 
-#: src/Model/Item.php:3043
+#: src/Model/Item.php:3046
 #, php-format
 msgid "Content from %s is collapsed"
 msgstr ""
 
-#: src/Model/Item.php:3047
+#: src/Model/Item.php:3050
 msgid "Sensitive content"
 msgstr ""
 
-#: src/Model/Item.php:3601
+#: src/Model/Item.php:3604
 msgid "bytes"
 msgstr ""
 
-#: src/Model/Item.php:3635
+#: src/Model/Item.php:3638
 #, php-format
 msgid "The media in this post is not displayed to visitors. To view it, please go to the <a href=\"%s\">original post</a>."
 msgstr ""
 
-#: src/Model/Item.php:3637
+#: src/Model/Item.php:3640
 msgid "The media in this post is not displayed to visitors. To view it, please log in."
 msgstr ""
 
-#: src/Model/Item.php:3662
+#: src/Model/Item.php:3665
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3664
+#: src/Model/Item.php:3667
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3669
+#: src/Model/Item.php:3672
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3671
+#: src/Model/Item.php:3674
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3673
+#: src/Model/Item.php:3676
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:3714 src/Model/Item.php:3715
+#: src/Model/Item.php:3717 src/Model/Item.php:3718
 msgid "View on separate page"
 msgstr ""
 
@@ -4182,73 +4186,73 @@ msgstr ""
 msgid "View Logs"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:75
+#: src/Module/Admin/Logs/View.php:74
 msgid "Search in logs"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:76
+#: src/Module/Admin/Logs/View.php:75
 #: src/Module/Notifications/Notifications.php:134
 msgid "Show all"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:77
+#: src/Module/Admin/Logs/View.php:76
 msgid "Date"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:78
+#: src/Module/Admin/Logs/View.php:77
 msgid "Level"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:79
+#: src/Module/Admin/Logs/View.php:78
 msgid "Context"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:81
+#: src/Module/Admin/Logs/View.php:80
 msgid "ALL"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:82
+#: src/Module/Admin/Logs/View.php:81
 msgid "View details"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:83
+#: src/Module/Admin/Logs/View.php:82
 msgid "Click to view details"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:84 src/Module/Calendar/Event/Form.php:195
+#: src/Module/Admin/Logs/View.php:83 src/Module/Calendar/Event/Form.php:195
 msgid "Event details"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:85
+#: src/Module/Admin/Logs/View.php:84
 msgid "Data"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:86
+#: src/Module/Admin/Logs/View.php:85
 #: src/Module/Debug/ActivityPubConversion.php:49
 msgid "Source"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:87
+#: src/Module/Admin/Logs/View.php:86
 msgid "File"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:88
+#: src/Module/Admin/Logs/View.php:87
 msgid "Line"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:89
+#: src/Module/Admin/Logs/View.php:88
 msgid "Function"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:90
+#: src/Module/Admin/Logs/View.php:89
 msgid "UID"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:91
+#: src/Module/Admin/Logs/View.php:90
 msgid "Process ID"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:99
+#: src/Module/Admin/Logs/View.php:98
 #, php-format
 msgid "Current log path: %s"
 msgstr ""
@@ -5705,7 +5709,7 @@ msgid "ActivityPub Conversion"
 msgstr ""
 
 #: src/Module/BaseAdmin.php:115
-msgid "Addon Features"
+msgid "Addon settings"
 msgstr ""
 
 #: src/Module/BaseAdmin.php:116 src/Module/BaseModeration.php:118
@@ -8650,10 +8654,6 @@ msgstr ""
 
 #: src/Module/Profile/Photos.php:396
 msgid "View Album"
-msgstr ""
-
-#: src/Module/Profile/Photos.php:422
-msgid "Upload Photos"
 msgstr ""
 
 #: src/Module/Profile/Profile.php:121 src/Module/Profile/Profile.php:156

@@ -891,13 +891,13 @@ class Transmitter
 	 * Store the receivers for the given item
 	 *
 	 * @param array $item
-	 * @return void
+	 * @return array List of receiers
 	 */
-	public static function storeReceiversForItem(array $item)
+	public static function storeReceiversForItem(array $item): array
 	{
 		$receivers = self::createPermissionBlockForItem($item, true);
 		if (empty($receivers)) {
-			return;
+			return [];
 		}
 
 		foreach (['to' => Tag::TO, 'cc' => Tag::CC, 'bto' => Tag::BTO, 'bcc' => Tag::BCC, 'audience' => Tag::AUDIENCE] as $element => $type) {
@@ -912,6 +912,7 @@ class Transmitter
 				}
 			}
 		}
+		return $receivers;
 	}
 
 	/**

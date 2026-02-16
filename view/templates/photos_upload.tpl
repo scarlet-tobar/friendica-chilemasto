@@ -12,15 +12,15 @@
 <form action="profile/{{$nickname}}/photos" enctype="multipart/form-data" method="post" name="photos-upload-form" id="photos-upload-form">
 	<div id="photos-upload-new-wrapper">
 		<div id="photos-upload-newalbum-div">
-			<label id="photos-upload-newalbum-text" for="photos-upload-newalbum">{{$newalbum}}</label>
+			<label id="photos-upload-newalbum-text" for="photos-upload-newalbum">{{$albumtext_label}}</label>
 		</div>
 		<input id="photos-upload-newalbum" type="text" name="newalbum" />
 	</div>
 	<div id="photos-upload-new-end"></div>
 	<div id="photos-upload-exist-wrapper">
-		<div id="photos-upload-existing-album-text">{{$existalbumtext}}</div>
+		<div id="photos-upload-existing-album-text">{{$albumtext_description}}</div>
 		<select id="photos-upload-album-select" name="album" size="4">
-		{{$albumselect  nofilter}}
+		{{$albumselect nofilter}}
 		</select>
 	</div>
 	<div id="photos-upload-exist-end"></div>

@@ -21,7 +21,7 @@
 	{{if $tools.view}}
 		<a id="photo-edit-link" class="btn btn-primary photo-back-link" href="{{$tools.view.0}}">
 			<i class="page-action fa fa-mail-reply"></i>
-			 {{$back_to_viewing_text}}
+			 {{$back_text}}
 		</a>
 	{{/if}}
 	{{if $tools.edit}}

@@ -217,7 +217,6 @@ class Statuses extends BaseApi
 		$item['body']       = $this->formatStatus($request['status'], $uid);
 		$item['app']        = $this->getApp();
 		$item['sensitive']  = $request['sensitive'];
-		$item['visibility'] = $request['visibility'];
 
 		switch ($request['visibility']) {
 			case 'public':
@@ -238,11 +237,15 @@ class Statuses extends BaseApi
 				if ($request['in_reply_to_id']) {
 					$parent_item = Post::selectFirst(Item::ITEM_FIELDLIST, ['uri-id' => $request['in_reply_to_id'], 'uid' => $uid, 'private' => Item::PRIVATE]);
 					if (!empty($parent_item)) {
-						$item['allow_cid'] = $parent_item['allow_cid'];
-						$item['allow_gid'] = $parent_item['allow_gid'];
-						$item['deny_cid']  = $parent_item['deny_cid'];
-						$item['deny_gid']  = $parent_item['deny_gid'];
-						$item['private']   = $parent_item['private'];
+						// When 'visibility' is set to 'private' we want the permissions be copied from the parent post in the "insert" function.
+						// But this must only happen when the parent post was private as well.
+						// In all other cases we want to keep the permissions we defined here. The copying is controlled via the 'visibility' field.
+						$item['visibility'] = $request['visibility'];
+						$item['allow_cid']  = $parent_item['allow_cid'];
+						$item['allow_gid']  = $parent_item['allow_gid'];
+						$item['deny_cid']   = $parent_item['deny_cid'];
+						$item['deny_gid']   = $parent_item['deny_gid'];
+						$item['private']    = $parent_item['private'];
 						break;
 					}
 				}

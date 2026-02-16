@@ -419,7 +419,7 @@ class Photos extends \Friendica\Module\BaseProfile
 				'$title'    => $this->t('Photo Albums'),
 				'$recent'   => $this->t('Recent Photos'),
 				'$albums'   => $albums,
-				'$upload'   => [$this->t('Upload Photos'), 'photos/' . $this->owner['nickname'] . '/upload'],
+				'$upload'   => [$this->t('Upload photo'), 'photos/' . $this->owner['nickname'] . '/upload'],
 				'$can_post' => $this->session->getLocalUserId() && $this->owner['uid'] == $this->session->getLocalUserId(),
 			]);
 		}
