@@ -2386,7 +2386,7 @@ msgstr ""
 msgid "Relationships"
 msgstr ""
 
-#: src/Content/Widget.php:273 src/Module/Circle.php:282
+#: src/Content/Widget.php:273 src/Module/Circle.php:300
 #: src/Module/Contact.php:329
 msgid "All Contacts"
 msgstr ""
@@ -3211,7 +3211,7 @@ msgstr ""
 msgid "Edit circle"
 msgstr ""
 
-#: src/Model/Circle.php:592 src/Module/Circle.php:186
+#: src/Model/Circle.php:592 src/Module/Circle.php:184
 msgid "Contacts not in any circle"
 msgstr ""
 
@@ -3219,8 +3219,8 @@ msgstr ""
 msgid "Create a new circle"
 msgstr ""
 
-#: src/Model/Circle.php:595 src/Module/Circle.php:169 src/Module/Circle.php:191
-#: src/Module/Circle.php:266
+#: src/Model/Circle.php:595 src/Module/Circle.php:167 src/Module/Circle.php:189
+#: src/Module/Circle.php:282
 msgid "Circle Name: "
 msgstr ""
 
@@ -6019,7 +6019,7 @@ msgstr ""
 msgid "Could not create circle."
 msgstr ""
 
-#: src/Module/Circle.php:54 src/Module/Circle.php:204 src/Module/Circle.php:228
+#: src/Module/Circle.php:54 src/Module/Circle.php:202 src/Module/Circle.php:244
 msgid "Circle not found."
 msgstr ""
 
@@ -6073,47 +6073,51 @@ msgstr ""
 msgid "Bad request."
 msgstr ""
 
-#: src/Module/Circle.php:161
+#: src/Module/Circle.php:159
 msgid "Save Circle"
 msgstr ""
 
-#: src/Module/Circle.php:162
+#: src/Module/Circle.php:160
 msgid "Filter"
 msgstr ""
 
-#: src/Module/Circle.php:168
+#: src/Module/Circle.php:166
 msgid "Create a circle of contacts/friends."
 msgstr ""
 
-#: src/Module/Circle.php:209
+#: src/Module/Circle.php:207
 msgid "Unable to remove circle."
 msgstr ""
 
-#: src/Module/Circle.php:260
+#: src/Module/Circle.php:276
 msgid "Delete Circle"
 msgstr ""
 
-#: src/Module/Circle.php:270
+#: src/Module/Circle.php:287
 msgid "Edit Circle Name"
 msgstr ""
 
-#: src/Module/Circle.php:280
+#: src/Module/Circle.php:288
+msgid "Mark all as read"
+msgstr ""
+
+#: src/Module/Circle.php:298
 msgid "Members"
 msgstr ""
 
-#: src/Module/Circle.php:283
+#: src/Module/Circle.php:301
 msgid "Circle is empty"
 msgstr ""
 
-#: src/Module/Circle.php:299
+#: src/Module/Circle.php:317
 msgid "Remove contact from circle"
 msgstr ""
 
-#: src/Module/Circle.php:322
+#: src/Module/Circle.php:340
 msgid "Click on a contact to add or remove."
 msgstr ""
 
-#: src/Module/Circle.php:339
+#: src/Module/Circle.php:358
 msgid "Add contact to circle"
 msgstr ""
 
