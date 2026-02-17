@@ -160,13 +160,13 @@ function photos_post()
 
 	if (DI::args()->getArgc() > 3 && DI::args()->getArgv()[2] === 'album') {
 		if (!Strings::isHex(DI::args()->getArgv()[3] ?? '')) {
-			DI::baseUrl()->redirect('photos/' . $user['nickname'] . '/album');
+			DI::baseUrl()->redirect('profile/' . $user['nickname'] . '/photos');
 		}
 		$album = hex2bin(DI::args()->getArgv()[3]);
 
 		if (!DBA::exists('photo', ['album' => $album, 'uid' => $page_owner_uid, 'photo-type' => Photo::DEFAULT])) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('Album not found.'));
-			DI::baseUrl()->redirect('photos/' . $user['nickname'] . '/album');
+			DI::baseUrl()->redirect('profile/' . $user['nickname'] . '/photos');
 			return; // NOTREACHED
 		}
 
@@ -227,7 +227,7 @@ function photos_post()
 			}
 		}
 
-		DI::baseUrl()->redirect('photos/' . $user['nickname'] . '/album');
+		DI::baseUrl()->redirect('profile/' . $user['nickname'] . '/photos');
 	}
 
 	if (DI::args()->getArgc() > 3 && DI::args()->getArgv()[2] === 'image') {
@@ -712,7 +712,7 @@ function photos_content()
 	if ($datatype === 'album') {
 		// if $datum is not a valid hex, redirect to the default page
 		if (is_null($datum) || !Strings::isHex($datum)) {
-			DI::baseUrl()->redirect('photos/' . $user['nickname'] . '/album');
+			DI::baseUrl()->redirect('profile/' . $user['nickname'] . '/photos');
 		}
 		$album = hex2bin($datum);
 
