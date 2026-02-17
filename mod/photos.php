@@ -654,9 +654,12 @@ function photos_content()
 			new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_FORM, $ret)
 		);
 
+		// Determine if we're in album context (uploading to a specific album)
+		$is_album_context = !empty($selname);
+
 		$default_upload_box    = Renderer::replaceMacros(Renderer::getMarkupTemplate('photos_default_uploader_box.tpl'), []);
 		$default_upload_submit = Renderer::replaceMacros(Renderer::getMarkupTemplate('photos_default_uploader_submit.tpl'), [
-			'$submit' => DI::l10n()->t('Upload selected photo'),
+			'$submit' => $is_album_context ? DI::l10n()->t('Upload photo to this album') : DI::l10n()->t('Upload selected photo'),
 		]);
 
 		// Get the relevant size limits for uploads. Abbreviated var names: MaxImageSize -> mis; upload_max_filesize -> umf
@@ -679,7 +682,7 @@ function photos_content()
 		$aclselect_e = ($visitor ? '' : ACL::getFullSelectorHTML(DI::page(), DI::userSession()->getLocalUserId()));
 
 		$o .= Renderer::replaceMacros($tpl, [
-			'$pagename'              => DI::l10n()->t('Upload photo'),
+			'$pagename'              => $is_album_context ? DI::l10n()->t('Upload Photos to %s', $selname) : DI::l10n()->t('Upload Photos'),
 			'$sessid'                => session_id(),
 			'$usage'                 => $usage_message,
 			'$nickname'              => $user['nickname'],
@@ -695,6 +698,8 @@ function photos_content()
 			'$default_upload_box'    => ($ret['default_upload'] ? $default_upload_box : ''),
 			'$default_upload_submit' => ($ret['default_upload'] ? $default_upload_submit : ''),
 			'$uploadurl'             => $ret['post_url'],
+			'$is_album_context'      => $is_album_context,
+			'$preselected_album'     => $selname,
 
 			// ACL permissions box
 			'$return_path' => DI::args()->getQueryString(),

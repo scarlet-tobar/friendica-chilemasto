@@ -11,6 +11,9 @@
 	<div id="photos-usage-message">{{$usage}}</div>
 
 	<form action="profile/{{$nickname}}/photos" enctype="multipart/form-data" method="post" name="photos-upload-form" id="photos-upload-form">
+{{if $is_album_context}}
+		<input type="hidden" name="album" value="{{$preselected_album}}" />
+{{else}}
 		<div id="photos-upload-div" class="form-group">
 			<label for="photos-upload-newalbum">{{$albumtext_label}}</label>
 			<input id="photos-upload-album-select" class="form-control" list="dl-photo-upload" type="text" name="album">
@@ -22,6 +25,7 @@
 			<p><small>{{$albumtext_description}}</small></p>
 		</div>
 		<div id="photos-upload-end" class="clearfix"></div>
+{{/if}}
 
 		<div id="photos-upload-noshare-div" class="photos-upload-noshare-div checkbox pull-left">
 			<input id="photos-upload-noshare" type="checkbox" name="not_visible" value="1" checked/>
