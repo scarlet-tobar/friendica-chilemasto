@@ -901,7 +901,7 @@ class Processor
 	 */
 	public static function createEvent(array $activity, array $item): int
 	{
-		$event['summary'] = HTML::toBBCode($activity['name'] ?: $activity['summary']);
+		$event['summary'] = HTML::toBBCode($activity['name'] ?: $activity['summary'] ?? '');
 		$event['desc']    = HTML::toBBCode($activity['content'] ?? '');
 		if (!empty($activity['start-time'])) {
 			$event['start'] = DateTimeFormat::utc($activity['start-time']);
@@ -1973,7 +1973,7 @@ class Processor
 			if (is_array($reply)) {
 				$ldobject = JsonLD::compact($reply);
 				$id       = JsonLD::fetchElement($ldobject, '@id');
-				if (Processor::alreadyKnown($id, $child['id'] ?? '')) {
+				if (is_null($id) || self::alreadyKnown($id, $child['id'] ?? '')) {
 					continue;
 				}
 				if (!empty($child['children']) && in_array($id, $child['children'])) {
