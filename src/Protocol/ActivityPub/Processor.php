@@ -38,6 +38,7 @@ use Friendica\Util\HTTPSignature;
 use Friendica\Util\JsonLD;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
+use Friendica\Worker\FetchMissingActivity;
 
 /**
  * ActivityPub Processor Protocol class
@@ -972,20 +973,25 @@ class Processor
 		$content = self::addMentionLinks($content, $activity['tags']);
 
 		if (!empty($activity['quote-url'])) {
-			$id = Item::fetchByLink($activity['quote-url'], 0, ActivityPub\Receiver::COMPLETION_ASYNC);
+			$id = Item::searchByLink($activity['quote-url']);
 			if ($id) {
 				$shared_item          = Post::selectFirst(['uri-id'], ['id' => $id]);
 				$item['quote-uri-id'] = $shared_item['uri-id'];
-				DI::logger()->debug('Quote is found', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $item['quote-uri-id']]);
-			} elseif ($uri_id = ItemURI::getIdByURI($activity['quote-url'], false)) {
-				DI::logger()->info('Quote was not fetched but the uri-id existed', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $uri_id]);
-				$item['quote-uri-id'] = $uri_id;
+				DI::logger()->debug('Quoted post exists', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $item['quote-uri-id']]);
 			} elseif (Queue::exists($activity['quote-url'], 'as:Create')) {
 				$item['quote-uri-id'] = ItemURI::getIdByURI($activity['quote-url']);
-				DI::logger()->info('Quote is queued but not processed yet', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $item['quote-uri-id']]);
+				DI::logger()->info('Quoted post is queued but not processed yet', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $item['quote-uri-id']]);
+			} elseif (Fetch::hasWorker($activity['quote-url'])) {
+				$item['quote-uri-id'] = ItemURI::getIdByURI($activity['quote-url']);
+				DI::logger()->info('Quoted post will be fetched via a worker.', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $item['quote-uri-id']]);
+			} elseif ($uri_id = ItemURI::getIdByURI($activity['quote-url'], false)) {
+				DI::logger()->info('Quoted post was not fetched but the uri-id exists', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $uri_id]);
+				$item['quote-uri-id'] = $uri_id;
+				FetchMissingActivity::add(Worker::PRIORITY_HIGH, $activity['quote-url'], [], '', Receiver::COMPLETION_ASYNC);
 			} else {
-				DI::logger()->notice('Quote was not fetched, link will be added instead as attachment.', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url']]);
-				self::storeAttachmentAsMedia($item['uri-id'], ['url' => $activity['quote-url']]);
+				$item['quote-uri-id'] = ItemURI::getIdByURI($activity['quote-url']);
+				DI::logger()->notice('Quoted post was not fetched by now, a worker will be raised to fetch it.', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url']]);
+				FetchMissingActivity::add(Worker::PRIORITY_HIGH, $activity['quote-url'], [], '', Receiver::COMPLETION_ASYNC);
 			}
 		}
 
