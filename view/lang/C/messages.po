@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-17 11:01+0100\n"
+"POT-Creation-Date: 2026-02-17 11:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -274,7 +274,8 @@ msgstr ""
 
 #: mod/message.php:188 mod/message.php:345 mod/photos.php:91 mod/photos.php:831
 #: src/Content/Conversation.php:371 src/Module/Post/Edit.php:129
-#: src/Module/Profile/Photos.php:442 src/Module/Profile/Photos.php:445
+#: src/Module/Profile/Photos.php:422 src/Module/Profile/Photos.php:442
+#: src/Module/Profile/Photos.php:445
 msgid "Upload photo"
 msgstr ""
 
@@ -441,16 +442,16 @@ msgstr ""
 msgid "Upload Photos to %s"
 msgstr ""
 
-#: mod/photos.php:685 src/Module/Profile/Photos.php:422
+#: mod/photos.php:685
 msgid "Upload Photos"
 msgstr ""
 
-#: mod/photos.php:689 mod/photos.php:780
-msgid "New album name: "
+#: mod/photos.php:689
+msgid "Album name: "
 msgstr ""
 
 #: mod/photos.php:690
-msgid "or select existing album:"
+msgid "If you want to add this photo to an album, begin typing its name, and existing albums will be suggested, which you can select. If you choose something new, it will be created."
 msgstr ""
 
 #: mod/photos.php:691
@@ -478,6 +479,10 @@ msgstr ""
 #: src/Module/Post/Tag/Remove.php:96 src/Module/Profile/RemoteFollow.php:120
 #: src/Module/Security/TwoFactor/SignOut.php:106
 msgid "Cancel"
+msgstr ""
+
+#: mod/photos.php:780
+msgid "New album name: "
 msgstr ""
 
 #: mod/photos.php:784 mod/photos.php:1060
@@ -750,7 +755,7 @@ msgstr ""
 msgid "toggle mobile"
 msgstr ""
 
-#: src/App/Page.php:356 src/Module/Admin/Logs/View.php:92
+#: src/App/Page.php:356 src/Module/Admin/Logs/View.php:91
 #: src/Module/Media/Attachment/Browser.php:69
 #: src/Module/Media/Photo/Browser.php:81 view/theme/frio/php/minimal.php:39
 #: view/theme/frio/php/standard.php:138
@@ -1381,7 +1386,7 @@ msgstr ""
 
 #: src/Content/Conversation.php:426 src/Content/Item.php:442
 #: src/Content/Widget/VCard.php:120 src/Model/Contact.php:1307
-#: src/Model/Profile.php:460 src/Module/Admin/Logs/View.php:80
+#: src/Model/Profile.php:460 src/Module/Admin/Logs/View.php:79
 #: src/Module/Post/Edit.php:179
 msgid "Message"
 msgstr ""
@@ -1858,7 +1863,7 @@ msgstr ""
 msgid "Find groups to join"
 msgstr ""
 
-#: src/Content/Item.php:336 src/Model/Item.php:2841
+#: src/Content/Item.php:336 src/Model/Item.php:2858
 msgid "event"
 msgstr ""
 
@@ -1866,7 +1871,7 @@ msgstr ""
 msgid "status"
 msgstr ""
 
-#: src/Content/Item.php:345 src/Model/Item.php:2843
+#: src/Content/Item.php:345 src/Model/Item.php:2860
 #: src/Module/Post/Tag/Add.php:112
 msgid "photo"
 msgstr ""
@@ -2089,7 +2094,7 @@ msgid "Addon applications, utilities, games"
 msgstr ""
 
 #: src/Content/Nav.php:266 src/Content/Text/HTML.php:862
-#: src/Module/Admin/Logs/View.php:74 src/Module/Search/Index.php:99
+#: src/Module/Search/Index.php:99
 msgid "Search"
 msgstr ""
 
@@ -2203,8 +2208,9 @@ msgid "Manage other accounts, including groups and pages"
 msgstr ""
 
 #: src/Content/Nav.php:324 src/Module/Admin/Addons/Details.php:140
-#: src/Module/Admin/Themes/Details.php:85 src/Module/BaseSettings.php:177
-#: src/Module/Welcome.php:39 view/theme/frio/theme.php:230
+#: src/Module/Admin/Themes/Details.php:85 src/Module/BaseAdmin.php:88
+#: src/Module/BaseSettings.php:177 src/Module/Welcome.php:39
+#: view/theme/frio/theme.php:230
 msgid "Settings"
 msgstr ""
 
@@ -2274,8 +2280,8 @@ msgstr ""
 msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:945 src/Model/Item.php:3731
-#: src/Model/Item.php:3737 src/Model/Item.php:3738
+#: src/Content/Text/BBCode.php:945 src/Model/Item.php:3751
+#: src/Model/Item.php:3757 src/Model/Item.php:3758
 msgid "Link to source"
 msgstr ""
 
@@ -2393,7 +2399,7 @@ msgstr ""
 msgid "Relationships"
 msgstr ""
 
-#: src/Content/Widget.php:273 src/Module/Circle.php:282
+#: src/Content/Widget.php:273 src/Module/Circle.php:293
 #: src/Module/Contact.php:329
 msgid "All Contacts"
 msgstr ""
@@ -3218,7 +3224,7 @@ msgstr ""
 msgid "Edit circle"
 msgstr ""
 
-#: src/Model/Circle.php:592 src/Module/Circle.php:186
+#: src/Model/Circle.php:592 src/Module/Circle.php:184
 msgid "Contacts not in any circle"
 msgstr ""
 
@@ -3226,8 +3232,8 @@ msgstr ""
 msgid "Create a new circle"
 msgstr ""
 
-#: src/Model/Circle.php:595 src/Module/Circle.php:169 src/Module/Circle.php:191
-#: src/Module/Circle.php:266
+#: src/Model/Circle.php:595 src/Module/Circle.php:167 src/Module/Circle.php:189
+#: src/Module/Circle.php:275
 msgid "Circle Name: "
 msgstr ""
 
@@ -3420,84 +3426,84 @@ msgstr ""
 msgid "Happy Birthday %s"
 msgstr ""
 
-#: src/Model/Item.php:2845
+#: src/Model/Item.php:2862
 msgid "activity"
 msgstr ""
 
-#: src/Model/Item.php:2847
+#: src/Model/Item.php:2864
 msgid "comment"
 msgstr ""
 
-#: src/Model/Item.php:2850 src/Module/Post/Tag/Add.php:112
+#: src/Model/Item.php:2867 src/Module/Post/Tag/Add.php:112
 msgid "post"
 msgstr ""
 
-#: src/Model/Item.php:3039
+#: src/Model/Item.php:3059
 #, php-format
 msgid "%s is blocked"
 msgstr ""
 
-#: src/Model/Item.php:3041
+#: src/Model/Item.php:3061
 #, php-format
 msgid "%s is ignored"
 msgstr ""
 
-#: src/Model/Item.php:3043
+#: src/Model/Item.php:3063
 #, php-format
 msgid "Content from %s is collapsed"
 msgstr ""
 
-#: src/Model/Item.php:3047
+#: src/Model/Item.php:3067
 msgid "Sensitive content"
 msgstr ""
 
-#: src/Model/Item.php:3601
+#: src/Model/Item.php:3621
 msgid "bytes"
 msgstr ""
 
-#: src/Model/Item.php:3635
+#: src/Model/Item.php:3655
 #, php-format
 msgid "The media in this post is not displayed to visitors. To view it, please go to the <a href=\"%s\">original post</a>."
 msgstr ""
 
-#: src/Model/Item.php:3637
+#: src/Model/Item.php:3657
 msgid "The media in this post is not displayed to visitors. To view it, please log in."
 msgstr ""
 
-#: src/Model/Item.php:3662
+#: src/Model/Item.php:3682
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3664
+#: src/Model/Item.php:3684
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3669
+#: src/Model/Item.php:3689
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3671
+#: src/Model/Item.php:3691
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3673
+#: src/Model/Item.php:3693
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:3714 src/Model/Item.php:3715
+#: src/Model/Item.php:3734 src/Model/Item.php:3735
 msgid "View on separate page"
 msgstr ""
 
@@ -4141,9 +4147,8 @@ msgstr ""
 msgid "PHP log currently disabled."
 msgstr ""
 
-#: src/Module/Admin/Logs/Settings.php:75 src/Module/BaseAdmin.php:87
-#: src/Module/BaseAdmin.php:88
-msgid "Logs"
+#: src/Module/Admin/Logs/Settings.php:75
+msgid "Log settings"
 msgstr ""
 
 #: src/Module/Admin/Logs/Settings.php:77
@@ -4190,74 +4195,79 @@ msgstr ""
 msgid "Couldn't open <strong>%1$s</strong> log file.<br/>Check to see if file %1$s is readable."
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:72 src/Module/BaseAdmin.php:89
+#: src/Module/Admin/Logs/View.php:72
 msgid "View Logs"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:75
+#: src/Module/Admin/Logs/View.php:74
 msgid "Search in logs"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:76
+#: src/Module/Admin/Logs/View.php:75
 #: src/Module/Notifications/Notifications.php:134
 msgid "Show all"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:77
+#: src/Module/Admin/Logs/View.php:76
 msgid "Date"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:78
+#: src/Module/Admin/Logs/View.php:77
 msgid "Level"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:79
+#: src/Module/Admin/Logs/View.php:78
 msgid "Context"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:81
+#: src/Module/Admin/Logs/View.php:80
 msgid "ALL"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:82
+#: src/Module/Admin/Logs/View.php:81
 msgid "View details"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:83
+#: src/Module/Admin/Logs/View.php:82
 msgid "Click to view details"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:84 src/Module/Calendar/Event/Form.php:195
+#: src/Module/Admin/Logs/View.php:83 src/Module/Calendar/Event/Form.php:195
 msgid "Event details"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:85
+#: src/Module/Admin/Logs/View.php:84
 msgid "Data"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:86
+#: src/Module/Admin/Logs/View.php:85
 #: src/Module/Debug/ActivityPubConversion.php:49
 msgid "Source"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:87
+#: src/Module/Admin/Logs/View.php:86
 msgid "File"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:88
+#: src/Module/Admin/Logs/View.php:87
 msgid "Line"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:89
+#: src/Module/Admin/Logs/View.php:88
 msgid "Function"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:90
+#: src/Module/Admin/Logs/View.php:89
 msgid "UID"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:91
+#: src/Module/Admin/Logs/View.php:90
 msgid "Process ID"
+msgstr ""
+
+#: src/Module/Admin/Logs/View.php:98
+#, php-format
+msgid "Current log path: %s"
 msgstr ""
 
 #: src/Module/Admin/Queue.php:36
@@ -5679,6 +5689,14 @@ msgstr ""
 msgid "Inspect worker Queue"
 msgstr ""
 
+#: src/Module/BaseAdmin.php:87
+msgid "Logs"
+msgstr ""
+
+#: src/Module/BaseAdmin.php:89 src/Module/Calendar/Show.php:114
+msgid "View"
+msgstr ""
+
 #: src/Module/BaseAdmin.php:91 src/Module/BaseModeration.php:109
 msgid "Diagnostics"
 msgstr ""
@@ -5704,7 +5722,7 @@ msgid "ActivityPub Conversion"
 msgstr ""
 
 #: src/Module/BaseAdmin.php:115
-msgid "Addon Features"
+msgid "Addon settings"
 msgstr ""
 
 #: src/Module/BaseAdmin.php:116 src/Module/BaseModeration.php:118
@@ -6002,10 +6020,6 @@ msgstr ""
 msgid "calendar"
 msgstr ""
 
-#: src/Module/Calendar/Show.php:114
-msgid "View"
-msgstr ""
-
 #: src/Module/Calendar/Show.php:115
 msgid "New Event"
 msgstr ""
@@ -6018,7 +6032,7 @@ msgstr ""
 msgid "Could not create circle."
 msgstr ""
 
-#: src/Module/Circle.php:54 src/Module/Circle.php:204 src/Module/Circle.php:228
+#: src/Module/Circle.php:54 src/Module/Circle.php:202 src/Module/Circle.php:237
 msgid "Circle not found."
 msgstr ""
 
@@ -6072,47 +6086,51 @@ msgstr ""
 msgid "Bad request."
 msgstr ""
 
-#: src/Module/Circle.php:161
+#: src/Module/Circle.php:159
 msgid "Save Circle"
 msgstr ""
 
-#: src/Module/Circle.php:162
+#: src/Module/Circle.php:160
 msgid "Filter"
 msgstr ""
 
-#: src/Module/Circle.php:168
+#: src/Module/Circle.php:166
 msgid "Create a circle of contacts/friends."
 msgstr ""
 
-#: src/Module/Circle.php:209
+#: src/Module/Circle.php:207
 msgid "Unable to remove circle."
 msgstr ""
 
-#: src/Module/Circle.php:260
+#: src/Module/Circle.php:269
 msgid "Delete Circle"
 msgstr ""
 
-#: src/Module/Circle.php:270
+#: src/Module/Circle.php:280
 msgid "Edit Circle Name"
 msgstr ""
 
-#: src/Module/Circle.php:280
+#: src/Module/Circle.php:281
+msgid "Mark all as read"
+msgstr ""
+
+#: src/Module/Circle.php:291
 msgid "Members"
 msgstr ""
 
-#: src/Module/Circle.php:283
+#: src/Module/Circle.php:294
 msgid "Circle is empty"
 msgstr ""
 
-#: src/Module/Circle.php:299
+#: src/Module/Circle.php:310
 msgid "Remove contact from circle"
 msgstr ""
 
-#: src/Module/Circle.php:322
+#: src/Module/Circle.php:333
 msgid "Click on a contact to add or remove."
 msgstr ""
 
-#: src/Module/Circle.php:339
+#: src/Module/Circle.php:351
 msgid "Add contact to circle"
 msgstr ""
 
