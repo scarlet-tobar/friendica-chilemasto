@@ -801,6 +801,8 @@ class Database
 
 			$this->error   = $error;
 			$this->errorno = $errorno;
+		} elseif (!$retval) {
+			$this->logger->warning('Database execution was unsuccessful', ['sql' => $sql, 'params' => $params, 'timeout' => $timeout]);
 		}
 
 		$this->profiler->stopRecording();

@@ -908,7 +908,7 @@ class Photo
 		$fields = [
 			'allow_cid'  => $str_contact_allow, 'allow_gid' => $str_circle_allow,
 			'deny_cid'   => $str_contact_deny, 'deny_gid' => $str_circle_deny,
-			'accessible' => DI::pConfig()->get($uid, 'system', 'accessible-photos', false)
+			'accessible' => (bool)DI::pConfig()->get($uid, 'system', 'accessible-photos', false)
 		];
 
 		$condition = ['resource-id' => $image_rid, 'uid' => $uid];
