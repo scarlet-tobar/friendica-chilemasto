@@ -389,6 +389,24 @@ aside {
   border-top-color: var(--border-color);
 }
 
+#colorbox {
+  #cboxContent {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
+  #cboxTopLeft,
+  #cboxTopCenter,
+  #cboxTopRight,
+  #cboxMiddleLeft,
+  #cboxMiddleRight,
+  #cboxBottomCenter,
+  #cboxBottomLeft,
+  #cboxBottomRight {
+    background-image: none;
+    background-color: var(--bg-secondary);
+  }
+}
+
 /* Navigation Links */
 .nav > li > a {
   &:hover {
