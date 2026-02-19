@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-22 21:48+0100\n"
+"POT-Creation-Date: 2026-02-23 09:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,15 +44,15 @@ msgstr ""
 msgid "Item not found."
 msgstr ""
 
-#: mod/item.php:463 mod/message.php:56 mod/message.php:102 mod/notes.php:35
-#: mod/photos.php:117 mod/photos.php:418 src/Model/Event.php:511
-#: src/Module/Attach.php:40 src/Module/BaseApi.php:90
-#: src/Module/BaseNotifications.php:83 src/Module/BaseSettings.php:38
-#: src/Module/Calendar/Event/API.php:75 src/Module/Calendar/Event/Form.php:70
-#: src/Module/Calendar/Export.php:68 src/Module/Calendar/Show.php:71
-#: src/Module/Circle.php:27 src/Module/Circle.php:70
-#: src/Module/Contact/Advanced.php:46 src/Module/Contact/Follow.php:77
-#: src/Module/Contact/Follow.php:145 src/Module/Contact/MatchInterests.php:73
+#: mod/item.php:463 mod/message.php:56 mod/message.php:102 mod/photos.php:117
+#: mod/photos.php:418 src/Model/Event.php:511 src/Module/Attach.php:40
+#: src/Module/BaseApi.php:90 src/Module/BaseNotifications.php:83
+#: src/Module/BaseSettings.php:38 src/Module/Calendar/Event/API.php:75
+#: src/Module/Calendar/Event/Form.php:70 src/Module/Calendar/Export.php:68
+#: src/Module/Calendar/Show.php:71 src/Module/Circle.php:27
+#: src/Module/Circle.php:70 src/Module/Contact/Advanced.php:46
+#: src/Module/Contact/Follow.php:77 src/Module/Contact/Follow.php:145
+#: src/Module/Contact/MatchInterests.php:73
 #: src/Module/Contact/Suggestions.php:40 src/Module/Contact/Unfollow.php:52
 #: src/Module/Contact/Unfollow.php:66 src/Module/Contact/Unfollow.php:98
 #: src/Module/FollowConfirm.php:24 src/Module/FriendSuggest.php:44
@@ -342,20 +342,6 @@ msgid "%d message"
 msgid_plural "%d messages"
 msgstr[0] ""
 msgstr[1] ""
-
-#: mod/notes.php:42 src/Content/Nav.php:231 src/Module/BaseProfile.php:93
-msgid "Personal notes"
-msgstr ""
-
-#: mod/notes.php:46
-msgid "Personal notes are visible only by yourself."
-msgstr ""
-
-#: mod/notes.php:47 src/Module/Admin/Storage.php:127
-#: src/Module/Filer/SaveTag.php:60 src/Module/Post/Edit.php:127
-#: src/Module/Settings/Channels.php:228
-msgid "Save"
-msgstr ""
 
 #: mod/photos.php:42 mod/photos.php:99 mod/photos.php:328
 #: src/Model/Event.php:503 src/Model/Profile.php:212
@@ -1987,6 +1973,11 @@ msgstr ""
 
 #: src/Content/Nav.php:230 view/theme/frio/theme.php:224
 msgid "Your calendar"
+msgstr ""
+
+#: src/Content/Nav.php:231 src/Module/BaseProfile.php:93
+#: src/Module/Profile/Notes.php:62
+msgid "Personal notes"
 msgstr ""
 
 #: src/Content/Nav.php:231
@@ -5334,6 +5325,12 @@ msgstr ""
 msgid "Storage"
 msgstr ""
 
+#: src/Module/Admin/Storage.php:127 src/Module/Filer/SaveTag.php:60
+#: src/Module/Post/Edit.php:127 src/Module/Profile/Notes.php:67
+#: src/Module/Settings/Channels.php:228
+msgid "Save"
+msgstr ""
+
 #: src/Module/Admin/Storage.php:128
 msgid "Save & Use storage backend"
 msgstr ""
@@ -8593,6 +8590,10 @@ msgstr ""
 #: src/Protocol/Feed.php:1101
 #, php-format
 msgid "%s's timeline"
+msgstr ""
+
+#: src/Module/Profile/Notes.php:66
+msgid "Personal notes are visible only by yourself."
 msgstr ""
 
 #: src/Module/Profile/Photos.php:192 src/Module/Profile/Photos.php:195

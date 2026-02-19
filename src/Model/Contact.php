@@ -1752,7 +1752,7 @@ class Contact
 
 		$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
 
-		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll', true)) {
+		if (!$update && DI::pConfig()->get($uid, 'system', 'infinite_scroll', true)) {
 			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
 			$o   = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
 		} else {

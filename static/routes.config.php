@@ -527,6 +527,8 @@ return [
 		'/{profile}/view' => [Module\NoScrape::class, [R::GET]],
 	],
 
+	'/notes' => [Module\Profile\Notes::class,         [R::GET, R::POST]],
+
 	'/notifications' => [
 		'/network[/json]'    => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
 		'/system[/json]'     => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
@@ -678,6 +680,8 @@ return [
 	'/update_channel[/{content}]'    => [Module\Update\Channel::class,        [R::GET]],
 	'/update_community[/{content}]'  => [Module\Update\Community::class,      [R::GET]],
 
+	'/update_contact/{id:\d+}/conversations' => [Module\Update\Contact::class, [R::GET]],
+
 	'/update_display'                => [Module\Update\Display::class, [R::GET]],
 
 	'/update_network' => [
@@ -687,6 +691,7 @@ return [
 		'/circle/{circle_id:\d+}'    => [Module\Update\Network::class, [R::GET]],
 	],
 
+	'/update_notes'                  => [Module\Update\Notes::class,          [R::GET]],
 	'/update_profile'                => [Module\Update\Profile::class,        [R::GET]],
 
 	'/user/import'                   => [Module\User\Import::class,           [R::GET, R::POST]],
