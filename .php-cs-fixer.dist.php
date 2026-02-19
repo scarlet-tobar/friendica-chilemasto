@@ -58,6 +58,7 @@ return $config
 			'syntax' => 'short',
 		],
 		'lowercase_keywords'                 => true,
+		'modifier_keywords'                  => true,
 		'no_closing_tag'                     => true,
 		'no_spaces_after_function_name'      => true,
 		'spaces_inside_parentheses'          => false,
@@ -70,9 +71,6 @@ return $config
 		'single_line_after_imports'          => true,
 		'switch_case_space'                  => true,
 		'ternary_operator_spaces'            => false,
-		'visibility_required'                => [
-			'elements' => ['property', 'method']
-		],
 		'new_with_parentheses' => true,
 	])
 	->setFinder($finder)
