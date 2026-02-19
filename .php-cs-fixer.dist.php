@@ -26,8 +26,6 @@ $finder = PhpCsFixer\Finder::create()
 $config = new PhpCsFixer\Config();
 return $config
 	->setRules([
-		'@PSR1'                   => true,
-		'@PSR2'                   => true,
 		'@PSR12'                  => true,
 		'align_multiline_comment' => true,
 		'array_indentation'       => true,
