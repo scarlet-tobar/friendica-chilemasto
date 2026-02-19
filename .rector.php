@@ -21,6 +21,8 @@ return RectorConfig::configure()
 	])
 	->withIndent("\t", 4)
 	->withPhpVersion(70400)
+	->withPhpLevel(2)
+	->withDowngradeSets(php74: true)
 	// ->withPhp53Sets()
 	// ->withPhpSets()
 	// ->withTypeCoverageLevel(0)
@@ -28,5 +30,10 @@ return RectorConfig::configure()
 	// ->withCodeQualityLevel(0)
 	->withRules([
 		ListToArrayDestructRector::class,
+	])
+	->withSkip([
+		\Rector\DowngradePhp80\Rector\FuncCall\DowngradeSubstrFalsyRector::class,
+		\Rector\DowngradePhp80\Rector\FuncCall\DowngradeArrayFilterNullableCallbackRector::class,
+		\Rector\DowngradePhp82\Rector\FuncCall\DowngradeIteratorCountToArrayRector::class,
 	])
 ;
