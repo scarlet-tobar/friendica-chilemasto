@@ -19,6 +19,9 @@ return RectorConfig::configure()
 		__DIR__ . '/tests',
 		__DIR__ . '/view',
 	])
+	->withIndent("\t", 4)
+	->withPhpVersion(70400)
+	// ->withPhp53Sets()
 	// ->withPhpSets()
 	// ->withTypeCoverageLevel(0)
 	// ->withDeadCodeLevel(0)
