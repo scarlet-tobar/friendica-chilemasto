@@ -47,9 +47,9 @@ use SimpleXMLElement;
  */
 class Diaspora
 {
-	const PUSHED       = 0;
-	const FETCHED      = 1;
-	const FORCED_FETCH = 2;
+	public const PUSHED       = 0;
+	public const FETCHED      = 1;
+	public const FORCED_FETCH = 2;
 
 	/**
 	 * Return a list of participating contacts for a thread

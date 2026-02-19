@@ -12,7 +12,7 @@ namespace Friendica\Object\Log;
  */
 class ParsedLogLine
 {
-	const REGEXP = '/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[^ ]*) (\w+) \[(\w*)\]: (.*)/';
+	public const REGEXP = '/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[^ ]*) (\w+) \[(\w*)\]: (.*)/';
 
 	/** @var int */
 	public $id = 0;

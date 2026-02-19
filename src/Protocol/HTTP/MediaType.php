@@ -16,18 +16,18 @@ namespace Friendica\Protocol\HTTP;
  */
 final class MediaType
 {
-	const DQUOTE = '"';
-	const DIGIT  = '0-9';
-	const ALPHA  = 'a-zA-Z';
+	public const DQUOTE = '"';
+	public const DIGIT  = '0-9';
+	public const ALPHA  = 'a-zA-Z';
 
 	// @see https://www.charset.org/charsets/us-ascii
-	const VCHAR = "\\x21-\\x7E";
+	public const VCHAR = "\\x21-\\x7E";
 
-	const SYMBOL_NO_DELIM = "!#$%&'*+-.^_`|~";
+	public const SYMBOL_NO_DELIM = "!#$%&'*+-.^_`|~";
 
-	const OBSTEXT = "\\x80-\\xFF";
+	public const OBSTEXT = "\\x80-\\xFF";
 
-	const QDTEXT = "\t \\x21\\x23-\\x5B\\x5D-\\x7E" . self::OBSTEXT;
+	public const QDTEXT = "\t \\x21\\x23-\\x5B\\x5D-\\x7E" . self::OBSTEXT;
 
 	/**
 	 * @var string

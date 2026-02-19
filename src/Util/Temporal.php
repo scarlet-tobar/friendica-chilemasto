@@ -353,7 +353,7 @@ class Temporal
 			if ($d >= 1) {
 				$r = floor($d);
 				// translators - e.g. 22 hours ago, 1 minute ago
-				if($isfuture) {
+				if ($isfuture) {
 					$format = DI::l10n()->t('in %1$d %2$s');
 				} else {
 					$format = DI::l10n()->t('%1$d %2$s ago');

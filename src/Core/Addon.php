@@ -24,7 +24,7 @@ class Addon
 	 *
 	 * @var string
 	 */
-	const DIRECTORY = 'addon';
+	public const DIRECTORY = 'addon';
 
 	/**
 	 * List of the names of enabled addons
