@@ -47,7 +47,6 @@ return $config
 		'list_syntax'      => [
 			'syntax' => 'short',
 		],
-		'spaces_inside_parentheses'          => false,
 		'no_unused_imports'                  => true,
 		'single_import_per_statement'        => true,
 		'ternary_operator_spaces'            => false,
