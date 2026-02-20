@@ -51,7 +51,7 @@ class DiasporaContact extends BaseRepository
 	 */
 	public function selectOne(array $condition, array $params = []): DiasporaContactEntity
 	{
-		$fields = $this->_selectFirstRowAsArray( $condition, $params);
+		$fields = $this->_selectFirstRowAsArray($condition, $params);
 
 		return $this->factory->createFromTableRow($fields);
 	}

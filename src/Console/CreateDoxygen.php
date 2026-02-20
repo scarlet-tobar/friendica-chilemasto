@@ -92,7 +92,7 @@ HELP;
 					$found = false;
 				}
 
-				if ($found && ( trim($previous) == "*/")) {
+				if ($found && (trim($previous) == "*/")) {
 					$found = false;
 				}
 

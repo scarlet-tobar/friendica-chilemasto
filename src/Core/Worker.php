@@ -82,7 +82,7 @@ class Worker
 		// Kill stale processes every 5 minutes
 		$last_cleanup = DI::keyValue()->get('worker_last_cleaned') ?? 0;
 		if (time() > ($last_cleanup + 300)) {
-			DI::keyValue()->set( 'worker_last_cleaned', time());
+			DI::keyValue()->set('worker_last_cleaned', time());
 			Worker\Cron::killStaleWorkers();
 		}
 

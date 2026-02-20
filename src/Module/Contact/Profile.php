@@ -187,7 +187,7 @@ class Profile extends BaseModule
 			}
 		}
 
-		if (empty($contact['network']) && ContactModel::isLocal($contact['url']) ) {
+		if (empty($contact['network']) && ContactModel::isLocal($contact['url'])) {
 			$contact['network']  = Protocol::DFRN;
 			$contact['protocol'] = Protocol::ACTIVITYPUB;
 		}

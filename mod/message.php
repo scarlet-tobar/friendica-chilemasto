@@ -147,7 +147,7 @@ function message_content()
 				DI::baseUrl()->redirect('message');
 			}
 
-			DI::baseUrl()->redirect('message/' . $conversation['id'] );
+			DI::baseUrl()->redirect('message/' . $conversation['id']);
 		} else {
 			$parentmail = DBA::selectFirst('mail', ['parent-uri'], ['id' => DI::args()->getArgv()[2], 'uid' => DI::userSession()->getLocalUserId()]);
 			if (DBA::isResult($parentmail)) {

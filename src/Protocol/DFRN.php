@@ -1271,7 +1271,7 @@ class DFRN
 		$obj_doc               = new DOMDocument("1.0", "utf-8");
 		$obj_doc->formatOutput = true;
 
-		$obj_element = $obj_doc->createElementNS( ActivityNamespace::ATOM1, $element);
+		$obj_element = $obj_doc->createElementNS(ActivityNamespace::ATOM1, $element);
 
 		$activity_type = $xpath->query("activity:object-type/text()", $activity)->item(0)->nodeValue;
 		XML::addElement($obj_doc, $obj_element, "type", $activity_type);

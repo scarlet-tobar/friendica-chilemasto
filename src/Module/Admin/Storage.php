@@ -62,7 +62,7 @@ class Storage extends BaseAdmin
 			}
 		}
 
-		if (!empty($_POST['submit_save_set']) && DI::config()->isWritable('storage', 'name') ) {
+		if (!empty($_POST['submit_save_set']) && DI::config()->isWritable('storage', 'name')) {
 			try {
 				$newstorage = DI::storageManager()->getWritableStorageByName($storagebackend);
 

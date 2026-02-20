@@ -35,7 +35,7 @@ class Introduction extends BaseRepository
 	 */
 	private function selectOne(array $condition, array $params = []): IntroductionEntity
 	{
-		$fields = $this->_selectFirstRowAsArray( $condition, $params);
+		$fields = $this->_selectFirstRowAsArray($condition, $params);
 
 		return $this->factory->createFromTableRow($fields);
 	}

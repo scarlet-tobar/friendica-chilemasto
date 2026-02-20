@@ -25,7 +25,7 @@ function load_page(AppHelper $appHelper)
 		require 'view/theme/frio/none.php';
 	} else {
 		$template = 'view/theme/' . $appHelper->getCurrentTheme() . '/'
-			. ((DI::page()['template'] ?? '') ?: 'default' ) . '.php';
+			. ((DI::page()['template'] ?? '') ?: 'default') . '.php';
 		if (file_exists($template)) {
 			require_once $template;
 		} else {
