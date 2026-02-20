@@ -433,7 +433,7 @@ class Display extends BaseSettings
 			'$timeline_title'      => $this->t('Timelines'),
 			'$channel_title'       => $this->t('Channels'),
 			'$calendar_title'      => $this->t('Calendar'),
-			'$sortable'            => $this->t(''Drag to reorder, use arrow buttons on each item, or tab to item with keyboard and move up/down with arrow keys'),
+			'$sortable'            => $this->t('Drag to reorder, use arrow buttons on each item, or tab to item with keyboard and move up/down with arrow keys'),
 			'$reset_widget'        => [
 				'0' => 'widget_timeline_reset',
 				'1' => $this->t('Reset order')
