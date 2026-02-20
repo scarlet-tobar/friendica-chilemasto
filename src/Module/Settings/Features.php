@@ -80,7 +80,7 @@ class Features extends BaseSettings
 		return Renderer::replaceMacros($tpl, [
 			'$form_security_token' => BaseSettings::getFormSecurityToken('settings_features'),
 			'$title'               => $this->t('Additional Features'),
-			'$sortable'            => $this->t('Drag to reorder or tab to item with keyboard and move up/down with arrow keys'),
+			'$sortable'            => $this->t('Drag to reorder, use arrow buttons on each item, or tab to item with keyboard and move up/down with arrow keys'),
 			'$network_mode'        => Conversation::MODE_NETWORK,
 			'$reset'               => [
 				'0' => 'feature_resetorder',
