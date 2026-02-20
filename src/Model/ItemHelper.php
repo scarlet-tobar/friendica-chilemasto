@@ -39,7 +39,7 @@ final class ItemHelper
 		Activity $activity,
 		LoggerInterface $logger,
 		Database $database,
-		BaseURL $baseURL,
+		BaseURL $baseURL
 	) {
 		$this->itemContent = $itemContent;
 		$this->activity    = $activity;
