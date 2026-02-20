@@ -17,7 +17,7 @@ class PoToPhp extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
-	const DQ_ESCAPE = "__DQ__";
+	public const DQ_ESCAPE = "__DQ__";
 
 	protected function getHelp()
 	{
@@ -116,7 +116,7 @@ HELP;
 				$out .= self::escapePhpString($entry->getAsString(PoTokens::TRANSLATED)) . ';' . "\n";
 			} else {
 				$out .= '[' . "\n";
-				foreach($entry->getAsStringArray(PoTokens::TRANSLATED) as $key => $msgstr) {
+				foreach ($entry->getAsStringArray(PoTokens::TRANSLATED) as $key => $msgstr) {
 					$out .= "\t" . $key . ' => ' . self::escapePhpString($msgstr) . ',' . "\n";
 				};
 
@@ -191,14 +191,14 @@ HELP;
 		}
 
 		if ($q === false || $s < $q) {
-			list($then, $else) = explode(':', $string, 2);
-			$node['then']      = $then;
-			$parsedElse        = [];
+			[$then, $else] = explode(':', $string, 2);
+			$node['then']  = $then;
+			$parsedElse    = [];
 			self::parse($else, $parsedElse);
 			$node['else'] = $parsedElse;
 		} else {
-			list($if, $thenelse) = explode('?', $string, 2);
-			$node['if']          = $if;
+			[$if, $thenelse] = explode('?', $string, 2);
+			$node['if']      = $if;
 			self::parse($thenelse, $node);
 		}
 	}

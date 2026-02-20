@@ -50,16 +50,16 @@ use Psr\Log\LoggerInterface;
 
 class Conversation
 {
-	const MODE_CHANNEL       = 'channel';
-	const MODE_COMMUNITY     = 'community';
-	const MODE_CONTACTS      = 'contacts';
-	const MODE_CONTACT_POSTS = 'contact-posts';
-	const MODE_DISPLAY       = 'display';
-	const MODE_FILED         = 'filed';
-	const MODE_NETWORK       = 'network';
-	const MODE_NOTES         = 'notes';
-	const MODE_SEARCH        = 'search';
-	const MODE_PROFILE       = 'profile';
+	public const MODE_CHANNEL       = 'channel';
+	public const MODE_COMMUNITY     = 'community';
+	public const MODE_CONTACTS      = 'contacts';
+	public const MODE_CONTACT_POSTS = 'contact-posts';
+	public const MODE_DISPLAY       = 'display';
+	public const MODE_FILED         = 'filed';
+	public const MODE_NETWORK       = 'network';
+	public const MODE_NOTES         = 'notes';
+	public const MODE_SEARCH        = 'search';
+	public const MODE_PROFILE       = 'profile';
 
 	/** @var Activity */
 	private $activity;
@@ -1547,7 +1547,7 @@ class Conversation
 
 			$body_html = ItemModel::prepareBody($item, true, $preview);
 
-			list($categories, $folders) = $this->item->determineCategoriesTerms($item, $this->session->getLocalUserId());
+			[$categories, $folders] = $this->item->determineCategoriesTerms($item, $this->session->getLocalUserId());
 
 			if (!empty($item['featured'])) {
 				$pinned = $this->l10n->t('Pinned item');

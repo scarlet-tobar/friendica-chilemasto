@@ -24,7 +24,7 @@ class Addon
 	 *
 	 * @var string
 	 */
-	const DIRECTORY = 'addon';
+	public const DIRECTORY = 'addon';
 
 	/**
 	 * List of the names of enabled addons
@@ -52,8 +52,8 @@ class Addon
 		if (is_array($files)) {
 			foreach ($files as $file) {
 				if (is_dir($file)) {
-					list($tmp, $addon) = array_map('trim', explode('/', $file));
-					$info              = self::getInfo($addon);
+					[$tmp, $addon] = array_map('trim', explode('/', $file));
+					$info          = self::getInfo($addon);
 
 					if (DI::config()->get('system', 'show_unsupported_addons')
 						|| strtolower($info['status']) != 'unsupported'
@@ -277,8 +277,8 @@ class Addon
 						continue;
 					}
 
-					list($type, $v) = $addon_info;
-					$type           = strtolower($type);
+					[$type, $v] = $addon_info;
+					$type       = strtolower($type);
 					if ($type == "author" || $type == "maintainer") {
 						$r = preg_match("|([^<]+)<([^>]+)>|", $v, $m);
 						if ($r) {

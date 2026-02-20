@@ -47,9 +47,9 @@ use SimpleXMLElement;
  */
 class Diaspora
 {
-	const PUSHED       = 0;
-	const FETCHED      = 1;
-	const FORCED_FETCH = 2;
+	public const PUSHED       = 0;
+	public const FETCHED      = 1;
+	public const FORCED_FETCH = 2;
 
 	/**
 	 * Return a list of participating contacts for a thread
@@ -3915,7 +3915,7 @@ class Diaspora
 			$data['birthday'] = '';
 
 			if ($profile['dob'] && ($profile['dob'] > '0000-00-00')) {
-				list($year, $month, $day) = sscanf($profile['dob'], '%4d-%2d-%2d');
+				[$year, $month, $day] = sscanf($profile['dob'], '%4d-%2d-%2d');
 				if ($year < 1004) {
 					$year = 1004;
 				}

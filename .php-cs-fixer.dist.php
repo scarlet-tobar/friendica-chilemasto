@@ -57,7 +57,7 @@ return $config
 		'indentation_type' => true,
 		'line_ending'      => true,
 		'list_syntax'      => [
-			'syntax' => 'long',
+			'syntax' => 'short',
 		],
 		'lowercase_keywords'                 => true,
 		'no_closing_tag'                     => true,
