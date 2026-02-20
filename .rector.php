@@ -7,10 +7,7 @@
 
 declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
-use Rector\Php71\Rector\List_\ListToArrayDestructRector;
-
-return RectorConfig::configure()
+return \Rector\Config\RectorConfig::configure()
 	->withPaths([
 		__DIR__ . '/config',
 		__DIR__ . '/mod',
@@ -22,14 +19,15 @@ return RectorConfig::configure()
 	->withIndent("\t", 4)
 	->withPhpVersion(70400)
 	->withPhpLevel(9)
-	->withDowngradeSets(php74: true)
-	// ->withPhp53Sets()
-	// ->withPhpSets()
 	// ->withTypeCoverageLevel(0)
 	// ->withDeadCodeLevel(0)
 	// ->withCodeQualityLevel(0)
 	->withRules([
-		ListToArrayDestructRector::class,
+		\Rector\Php71\Rector\List_\ListToArrayDestructRector::class,
+	])
+	->withSets([
+		\Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_54,
+		\Rector\Set\ValueObject\DowngradeLevelSetList::DOWN_TO_PHP_74,
 	])
 	->withSkip([
 		\Rector\DowngradePhp80\Rector\FuncCall\DowngradeSubstrFalsyRector::class,
