@@ -35,7 +35,7 @@ class Color
 
 		// Make sure it's 6 digits
 		if (strlen($color) === 3) {
-			$color = $color[0].$color[0].$color[1].$color[1].$color[2].$color[2];
+			$color = $color[0] . $color[0] . $color[1] . $color[1] . $color[2] . $color[2];
 		} elseif (strlen($color) != 6) {
 			throw new Exception("HEX color needs to be 6 or 3 digits long");
 		}
@@ -61,9 +61,9 @@ class Color
 		$color = self::_checkHex($color);
 
 		// Convert HEX to DEC
-		$R = hexdec($color[0].$color[1]);
-		$G = hexdec($color[2].$color[3]);
-		$B = hexdec($color[4].$color[5]);
+		$R = hexdec($color[0] . $color[1]);
+		$G = hexdec($color[2] . $color[3]);
+		$B = hexdec($color[4] . $color[5]);
 
 		$HSL = [];
 
@@ -155,11 +155,11 @@ class Color
 		$b = dechex(round($b));
 
 		// Make sure we get 2 digits for decimals
-		$r = (strlen("".$r) === 1) ? "0".$r:$r;
-		$g = (strlen("".$g) === 1) ? "0".$g:$g;
-		$b = (strlen("".$b) === 1) ? "0".$b:$b;
+		$r = (strlen("" . $r) === 1) ? "0" . $r:$r;
+		$g = (strlen("" . $g) === 1) ? "0" . $g:$g;
+		$b = (strlen("" . $b) === 1) ? "0" . $b:$b;
 
-		return $r.$g.$b;
+		return $r . $g . $b;
 	}
 
 
@@ -175,9 +175,9 @@ class Color
 		$color = self::_checkHex($color);
 
 		// Convert HEX to DEC
-		$R = hexdec($color[0].$color[1]);
-		$G = hexdec($color[2].$color[3]);
-		$B = hexdec($color[4].$color[5]);
+		$R = hexdec($color[0] . $color[1]);
+		$G = hexdec($color[2] . $color[3]);
+		$B = hexdec($color[4] . $color[5]);
 
 		$RGB['R'] = $R;
 		$RGB['G'] = $G;
@@ -286,9 +286,9 @@ class Color
 		$color = ($color) ? $color : $this->_hex;
 
 		// Calculate straight from rbg
-		$r = hexdec($color[0].$color[1]);
-		$g = hexdec($color[2].$color[3]);
-		$b = hexdec($color[4].$color[5]);
+		$r = hexdec($color[0] . $color[1]);
+		$g = hexdec($color[2] . $color[3]);
+		$b = hexdec($color[4] . $color[5]);
 
 		return (($r * 299 + $g * 587 + $b * 114) / 1000 > $lighterThan);
 	}
@@ -305,9 +305,9 @@ class Color
 		$color = ($color) ? $color:$this->_hex;
 
 		// Calculate straight from rbg
-		$r = hexdec($color[0].$color[1]);
-		$g = hexdec($color[2].$color[3]);
-		$b = hexdec($color[4].$color[5]);
+		$r = hexdec($color[0] . $color[1]);
+		$g = hexdec($color[2] . $color[3]);
+		$b = hexdec($color[4] . $color[5]);
 
 		return (($r * 299 + $g * 587 + $b * 114) / 1000 <= $darkerThan);
 	}
@@ -368,31 +368,31 @@ class Color
 
 		$css = "";
 		/* fallback/image non-cover color */
-		$css .= "{$prefix}background-color: #".$this->_hex.";{$suffix}";
+		$css .= "{$prefix}background-color: #" . $this->_hex . ";{$suffix}";
 
 		/* IE Browsers */
-		$css .= "{$prefix}filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#".$g['light']."', endColorstr='#".$g['dark']."');{$suffix}";
+		$css .= "{$prefix}filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#" . $g['light'] . "', endColorstr='#" . $g['dark'] . "');{$suffix}";
 
 		/* Safari 4+, Chrome 1-9 */
 		if ($vintageBrowsers) {
-			$css .= "{$prefix}background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#".$g['light']."), to(#".$g['dark']."));{$suffix}";
+			$css .= "{$prefix}background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#" . $g['light'] . "), to(#" . $g['dark'] . "));{$suffix}";
 		}
 
 		/* Safari 5.1+, Mobile Safari, Chrome 10+ */
-		$css .= "{$prefix}background-image: -webkit-linear-gradient(top, #".$g['light'].", #".$g['dark'].");{$suffix}";
+		$css .= "{$prefix}background-image: -webkit-linear-gradient(top, #" . $g['light'] . ", #" . $g['dark'] . ");{$suffix}";
 
 		/* Firefox 3.6+ */
 		if ($vintageBrowsers) {
-			$css .= "{$prefix}background-image: -moz-linear-gradient(top, #".$g['light'].", #".$g['dark'].");{$suffix}";
+			$css .= "{$prefix}background-image: -moz-linear-gradient(top, #" . $g['light'] . ", #" . $g['dark'] . ");{$suffix}";
 		}
 
 		/* Opera 11.10+ */
 		if ($vintageBrowsers) {
-			$css .= "{$prefix}background-image: -o-linear-gradient(top, #".$g['light'].", #".$g['dark'].");{$suffix}";
+			$css .= "{$prefix}background-image: -o-linear-gradient(top, #" . $g['light'] . ", #" . $g['dark'] . ");{$suffix}";
 		}
 
 		/* Unprefixed version (standards): FF 16+, IE10+, Chrome 26+, Safari 7+, Opera 12.1+ */
-		$css .= "{$prefix}background-image: linear-gradient(to bottom, #".$g['light'].", #".$g['dark'].");{$suffix}";
+		$css .= "{$prefix}background-image: linear-gradient(to bottom, #" . $g['light'] . ", #" . $g['dark'] . ");{$suffix}";
 
 		// Return our CSS
 		return $css;
@@ -511,7 +511,7 @@ class Color
 
 		// Make sure it's 6 digits
 		if (strlen($color) == 3) {
-			$color = $color[0].$color[0].$color[1].$color[1].$color[2].$color[2];
+			$color = $color[0] . $color[0] . $color[1] . $color[1] . $color[2] . $color[2];
 		} elseif (strlen($color) != 6) {
 			throw new Exception("HEX color needs to be 6 or 3 digits long");
 		}

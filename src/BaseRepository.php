@@ -26,7 +26,7 @@ use Psr\Log\LoggerInterface;
  */
 abstract class BaseRepository
 {
-	const LIMIT = 30;
+	public const LIMIT = 30;
 
 	/**
 	 * @var string This should be set to the main database table name the depository is using
@@ -75,7 +75,7 @@ abstract class BaseRepository
 		array $params = [],
 		int $min_id = null,
 		int $max_id = null,
-		int $limit = self::LIMIT
+		int $limit = self::LIMIT,
 	): BaseCollection {
 		$totalCount = $this->count($condition);
 

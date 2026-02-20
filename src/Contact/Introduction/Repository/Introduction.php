@@ -85,7 +85,7 @@ class Introduction extends BaseRepository
 				['order' => ['id' => 'DESC']],
 				$min_id,
 				$max_id,
-				$limit
+				$limit,
 			);
 		} catch (\Exception $e) {
 			throw new IntroductionPersistenceException(sprintf('Cannot select Introductions for used %d', $uid), $e);
