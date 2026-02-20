@@ -2977,7 +2977,7 @@ class Diaspora
 
 		DI::logger()->info('transmit: ' . $logid . '-' . $guid . ' to ' . $dest_url . ' returns: ' . $return_code);
 
-		return $return_code ? $return_code : -1;
+		return $return_code ?: -1;
 	}
 
 

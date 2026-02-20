@@ -2599,7 +2599,7 @@ class BBCode
 				}
 			}
 
-			$result = sprintf('[bookmark=%s]%s[/bookmark]%s', $url, ($title) ? $title : $url, $description) . $str_tags;
+			$result = sprintf('[bookmark=%s]%s[/bookmark]%s', $url, $title ?: $url, $description) . $str_tags;
 
 			DI::logger()->info('(unparsed): returns: ' . $result);
 
