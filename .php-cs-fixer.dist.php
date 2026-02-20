@@ -28,10 +28,6 @@ return $config
 	->setRules([
 		'@PER-CS3x0'              => true,
 		'align_multiline_comment' => true,
-		'array_indentation'       => true,
-		'array_syntax'            => [
-			'syntax' => 'short',
-		],
 		'binary_operator_spaces' => [
 			'default'   => 'single_space',
 			'operators' => [
@@ -40,36 +36,20 @@ return $config
 				'??' => 'align_single_space_minimal',
 			],
 		],
-		'blank_line_after_namespace'   => true,
 		'braces_position'        => [
 			'anonymous_classes_opening_brace'  => 'same_line',
 			'control_structures_opening_brace' => 'same_line',
 			'functions_opening_brace'          => 'next_line_unless_newline_at_signature_end',
 		],
-		'elseif'               => true,
-		'encoding'             => true,
-		'full_opening_tag'     => true,
 		'function_declaration' => [
 			'closure_function_spacing' => 'one',
 		],
-		'indentation_type' => true,
-		'line_ending'      => true,
 		'list_syntax'      => [
 			'syntax' => 'short',
 		],
-		'lowercase_keywords'                 => true,
-		'modifier_keywords'                  => true,
-		'no_closing_tag'                     => true,
-		'no_spaces_after_function_name'      => true,
 		'spaces_inside_parentheses'          => false,
-		'no_trailing_whitespace'             => true,
-		'no_trailing_whitespace_in_comment'  => true,
 		'no_unused_imports'                  => true,
-		'single_blank_line_at_eof'           => true,
-		'single_class_element_per_statement' => true,
 		'single_import_per_statement'        => true,
-		'single_line_after_imports'          => true,
-		'switch_case_space'                  => true,
 		'ternary_operator_spaces'            => false,
 		'new_with_parentheses' => true,
 	])
