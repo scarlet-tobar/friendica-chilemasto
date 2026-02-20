@@ -19,21 +19,11 @@ return RectorConfig::configure()
 		__DIR__ . '/tests',
 		__DIR__ . '/view',
 	])
-	->withIndent("\t", 4)
-	->withPhpVersion(70400)
-	->withPhpLevel(2)
-	->withDowngradeSets(php74: true)
-	// ->withPhp53Sets()
 	// ->withPhpSets()
 	// ->withTypeCoverageLevel(0)
 	// ->withDeadCodeLevel(0)
 	// ->withCodeQualityLevel(0)
 	->withRules([
 		ListToArrayDestructRector::class,
-	])
-	->withSkip([
-		\Rector\DowngradePhp80\Rector\FuncCall\DowngradeSubstrFalsyRector::class,
-		\Rector\DowngradePhp80\Rector\FuncCall\DowngradeArrayFilterNullableCallbackRector::class,
-		\Rector\DowngradePhp82\Rector\FuncCall\DowngradeIteratorCountToArrayRector::class,
 	])
 ;
