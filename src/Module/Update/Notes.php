@@ -24,8 +24,17 @@ use Friendica\Network\HTTPException\NotFoundException;
  *
  * @package Friendica\Module\Update
  */
-class Notes extends ProfileModule
+final class Notes extends ProfileModule
 {
+	/**
+	 * Handle an asynchronous request for a single personal note and output
+	 * the rendered HTML for an update (AJAX) response.
+	 *
+	 * @param array $request Request data, expects an 'item' key with the note id
+	 * @return void Exits after sending the HTML update
+	 * @throws ForbiddenException If the current user is not authenticated
+	 * @throws NotFoundException If the requested item cannot be found
+	 */
 	protected function rawContent(array $request = [])
 	{
 		if (!$this->userSession->getLocalUserId()) {

@@ -15,7 +15,6 @@ use Friendica\App\BaseURL;
 use Friendica\Core\L10n;
 use Friendica\Core\Session\Model\UserSession;
 use Friendica\Core\System;
-use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact as ModelContact;
 use Friendica\Model\Post;
@@ -31,16 +30,37 @@ use Psr\Log\LoggerInterface;
  *
  * @package Friendica\Module\Update
  */
-class Contact extends ContactModule
+final class Contact extends ContactModule
 {
-	protected UserSession $userSession;
+	private UserSession $userSession;
 
+	/**
+	 * Contact update module constructor.
+	 *
+	 * @param L10n $l10n
+	 * @param BaseURL $baseUrl
+	 * @param Arguments $args
+	 * @param LoggerInterface $logger
+	 * @param Profiler $profiler
+	 * @param Response $response
+	 * @param array $server
+	 * @param array $parameters
+	 * @param UserSession $userSession
+	 */
 	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [], UserSession $userSession)
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 		$this->userSession = $userSession;
 	}
 
+	/**
+	 * Return the HTML update for a contact thread.
+	 *
+	 * @param array $request Request parameters; expects 'item' and optional 'last_received'
+	 * @return void Sends HTML update and exits
+	 * @throws ForbiddenException If no local user is logged in
+	 * @throws NotFoundException If the contact or item cannot be found
+	 */
 	protected function rawContent(array $request = [])
 	{
 		if (!$this->userSession->getLocalUserId()) {

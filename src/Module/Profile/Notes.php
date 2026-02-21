@@ -27,6 +27,14 @@ use Friendica\Network\HTTPException\ForbiddenException;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Profile page for managing personal personal notes.
+ *
+ * Provides the UI to create, view and paginate personal notes associated
+ * with the currently authenticated local user.
+ *
+ * @package Friendica\Module\Profile
+ */
 class Notes extends BaseProfile
 {
 	protected AppHelper $appHelper;
@@ -36,17 +44,42 @@ class Notes extends BaseProfile
 	protected IManageConfigValues $config;
 	protected Conversation $conversation;
 
+	/**
+	 * Notes constructor.
+	 *
+	 * @param AppHelper $appHelper
+	 * @param UserSession $userSession
+	 * @param L10n $l10n
+	 * @param BaseURL $baseUrl
+	 * @param Arguments $args
+	 * @param LoggerInterface $logger
+	 * @param Profiler $profiler
+	 * @param \Friendica\Module\Response $response
+	 * @param array $server
+	 * @param array $parameters
+	 * @param Mode $mode
+	 * @param IManagePersonalConfigValues $pConfig
+	 * @param IManageConfigValues $config
+	 * @param Conversation $conversation
+	 */
 	public function __construct(AppHelper $appHelper, UserSession $userSession, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, \Friendica\Module\Response $response, array $server, array $parameters = [], Mode $mode, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, Conversation $conversation)
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-		$this->appHelper      = $appHelper;
-		$this->userSession    = $userSession;
-		$this->mode           = $mode;
-		$this->pConfig        = $pConfig;
-		$this->config         = $config;
-		$this->conversation   = $conversation;
+		$this->appHelper    = $appHelper;
+		$this->userSession  = $userSession;
+		$this->mode         = $mode;
+		$this->pConfig      = $pConfig;
+		$this->config       = $config;
+		$this->conversation = $conversation;
 	}
 
+	/**
+	 * Render the notes page content.
+	 *
+	 * @param array $request Optional request parameters
+	 * @return string Rendered HTML for the notes page
+	 * @throws ForbiddenException If no local user is logged in
+	 */
 	protected function content(array $request = []): string
 	{
 		if (!$this->userSession->getLocalUserId()) {
@@ -74,7 +107,7 @@ class Notes extends BaseProfile
 			'uid'        => $this->userSession->getLocalUserId(),
 			'post-type'  => Item::PT_PERSONAL_NOTE,
 			'gravity'    => Item::GRAVITY_PARENT,
-			'contact-id' => $contactId
+			'contact-id' => $contactId,
 		];
 
 		if ($this->mode->isMobile()) {
@@ -82,14 +115,14 @@ class Notes extends BaseProfile
 				$this->userSession->getLocalUserId(),
 				'system',
 				'itemspage_mobile_network',
-				$this->config->get('system', 'itemspage_network_mobile')
+				$this->config->get('system', 'itemspage_network_mobile'),
 			);
 		} else {
 			$itemsPerPage = $this->pConfig->get(
 				$this->userSession->getLocalUserId(),
 				'system',
 				'itemspage_network',
-				$this->config->get('system', 'itemspage_network')
+				$this->config->get('system', 'itemspage_network'),
 			);
 		}
 
@@ -97,7 +130,7 @@ class Notes extends BaseProfile
 
 		$params = [
 			'order' => ['created' => true],
-			'limit' => [$pager->getStart(), $pager->getItemsPerPage()]
+			'limit' => [$pager->getStart(), $pager->getItemsPerPage()],
 		];
 		$r = Post::selectThreadForUser($this->userSession->getLocalUserId(), ['uri-id'], $condition, $params);
 
