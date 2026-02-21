@@ -18,7 +18,7 @@ return \Rector\Config\RectorConfig::configure()
 	])
 	->withIndent("\t", 4)
 	->withPhpVersion(70400)
-	->withPhpLevel(9)
+	->withPhpLevel(15)
 	// ->withTypeCoverageLevel(0)
 	// ->withDeadCodeLevel(0)
 	// ->withCodeQualityLevel(0)
@@ -26,7 +26,7 @@ return \Rector\Config\RectorConfig::configure()
 		\Rector\Php71\Rector\List_\ListToArrayDestructRector::class,
 	])
 	->withSets([
-		\Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_54,
+		\Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_55,
 		\Rector\Set\ValueObject\DowngradeLevelSetList::DOWN_TO_PHP_74,
 	])
 ;
