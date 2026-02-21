@@ -29,9 +29,4 @@ return \Rector\Config\RectorConfig::configure()
 		\Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_54,
 		\Rector\Set\ValueObject\DowngradeLevelSetList::DOWN_TO_PHP_74,
 	])
-	->withSkip([
-		\Rector\DowngradePhp80\Rector\FuncCall\DowngradeSubstrFalsyRector::class,
-		\Rector\DowngradePhp80\Rector\FuncCall\DowngradeArrayFilterNullableCallbackRector::class,
-		\Rector\DowngradePhp82\Rector\FuncCall\DowngradeIteratorCountToArrayRector::class,
-	])
 ;
