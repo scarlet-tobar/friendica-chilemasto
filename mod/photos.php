@@ -74,7 +74,7 @@ function photos_init()
 				'$recent'   => DI::l10n()->t('Recent Photos'),
 				'$albums'   => $ret['albums'],
 				'$upload'   => [DI::l10n()->t('Upload photo'), 'photos/' . $owner['nickname'] . '/upload'],
-				'$can_post' => (DI::userSession()->getLocalUserId() && $owner['uid'] == DI::userSession()->getLocalUserId())
+				'$can_post' => (DI::userSession()->getLocalUserId() && $owner['uid'] === DI::userSession()->getLocalUserId())
 			]);
 		}
 
