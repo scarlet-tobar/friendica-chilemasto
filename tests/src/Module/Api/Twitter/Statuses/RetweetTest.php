@@ -76,7 +76,7 @@ class RetweetTest extends ApiTestCase
 	public function testApiStatusesRepeatWithSharedId()
 	{
 		// @todo: This call is needed for this test
-		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
 		$response = (new Retweet(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [

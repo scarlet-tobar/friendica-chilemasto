@@ -339,7 +339,7 @@ class App
 
 	private function registerTemplateEngine(): void
 	{
-		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 	}
 
 	/**

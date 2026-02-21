@@ -819,7 +819,7 @@ Lucas: For the right price, yes.[/share]',
 	 */
 	public function testConvertAttachment(string $expected, array $data)
 	{
-		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
 		$actual = BBCode::convertAttachment('', BBCode::INTERNAL, $data, 0, BBCode::PREVIEW_LARGE, true);
 

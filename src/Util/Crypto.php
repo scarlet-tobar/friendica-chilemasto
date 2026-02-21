@@ -163,7 +163,7 @@ class Crypto
 			DI::logger()->notice('no key. data: '.$data);
 		}
 		$fn = 'encrypt' . strtoupper($alg);
-		if (method_exists(__CLASS__, $fn)) {
+		if (method_exists(self::class, $fn)) {
 			$result         = ['encrypted' => true];
 			$key            = random_bytes(256);
 			$iv             = random_bytes(256);
@@ -262,7 +262,7 @@ class Crypto
 	{
 		$fn = 'decrypt' . strtoupper($alg);
 
-		if (method_exists(__CLASS__, $fn)) {
+		if (method_exists(self::class, $fn)) {
 			openssl_private_decrypt(Strings::base64UrlDecode($data['key']), $k, $prvkey);
 			openssl_private_decrypt(Strings::base64UrlDecode($data['iv']), $i, $prvkey);
 

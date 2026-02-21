@@ -77,7 +77,7 @@ class ApiResponse extends Response
 
 		if (is_array($data2)) {
 			$key = key($data2);
-			Arrays::walkRecursive($data2, ['Friendica\Module\Api\ApiResponse', 'reformatXML']);
+			Arrays::walkRecursive($data2, [\Friendica\Module\Api\ApiResponse::class, 'reformatXML']);
 
 			if ($key == '0') {
 				$data4 = [];
