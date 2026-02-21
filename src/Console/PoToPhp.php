@@ -130,7 +130,7 @@ HELP;
 	private function createPluralSelectFunctionString(string $pluralForms, string $lang): string
 	{
 		$return = $this->convertCPluralConditionToPhpReturnStatement(
-			$pluralForms
+			$pluralForms,
 		);
 
 		$fnname = 'string_plural_select_' . $lang;

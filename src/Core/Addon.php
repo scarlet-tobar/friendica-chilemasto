@@ -93,7 +93,7 @@ class Addon
 			$addons_admin[$name] = [
 				'url'   => 'admin/addons/' . $name,
 				'name'  => $name,
-				'class' => 'addon'
+				'class' => 'addon',
 			];
 		}
 
@@ -254,7 +254,7 @@ class Addon
 			'author'      => [],
 			'maintainer'  => [],
 			'version'     => "",
-			'status'      => ""
+			'status'      => "",
 		];
 
 		if (!is_file("addon/$addon/$addon.php")) {

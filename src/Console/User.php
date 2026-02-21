@@ -490,9 +490,9 @@ HELP;
 					}
 				}
 
-				if (array_key_exists($category, $values) and
-					array_key_exists($key, $values[$category]) and
-					$values[$category][$key] == $value) {
+				if (array_key_exists($category, $values)
+					and array_key_exists($key, $values[$category])
+					and $values[$category][$key] == $value) {
 					throw new RuntimeException('Value not changed');
 				}
 

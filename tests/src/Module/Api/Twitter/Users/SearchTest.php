@@ -28,7 +28,7 @@ class SearchTest extends ApiTestCase
 
 		$response = (new Search(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'q' => static::OTHER_USER['name']
+				'q' => static::OTHER_USER['name'],
 			]);
 
 		$json = $this->toJson($response);
@@ -47,12 +47,12 @@ class SearchTest extends ApiTestCase
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
 		$response = (new Search(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [
-			'extension' => ICanCreateResponses::TYPE_XML
+			'extension' => ICanCreateResponses::TYPE_XML,
 		]))->run($this->httpExceptionMock, [
-			'q' => static::OTHER_USER['name']
+			'q' => static::OTHER_USER['name'],
 		]);
 
-		self::assertXml((string)$response->getBody(), 'users');
+		self::assertXml((string) $response->getBody(), 'users');
 	}
 
 	/**

@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
  */
 class AddonLoader implements ICanLoadAddons
 {
-	const STATIC_PATH = 'static';
+	public const STATIC_PATH = 'static';
 	/** @var string */
 	protected $basePath;
 	/** @var IManageConfigValues */

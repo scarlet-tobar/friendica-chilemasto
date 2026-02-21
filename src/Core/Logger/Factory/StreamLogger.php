@@ -80,8 +80,8 @@ class StreamLogger extends AbstractLoggerTypeFactory
 		$logfile     = $config->get('system', 'dlogfile');
 		$developerIp = $config->get('system', 'dlogip');
 
-		if ((!isset($developerIp) || !$debugging) &&
-			(!is_file($logfile) || is_writable($logfile))) {
+		if ((!isset($developerIp) || !$debugging)
+			&& (!is_file($logfile) || is_writable($logfile))) {
 			return new NullLogger();
 		}
 

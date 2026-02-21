@@ -40,7 +40,7 @@ class StatusesTest extends ApiTestCase
 			->run($this->httpExceptionMock, [
 				'list_id' => 1,
 				'page'    => -1,
-				'max_id'  => 10
+				'max_id'  => 10,
 			]);
 
 		$json = $this->toJson($response);
@@ -61,10 +61,10 @@ class StatusesTest extends ApiTestCase
 
 		$response = (new Statuses(DI::dba(), DI::twitterStatus(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'rss']))
 			->run($this->httpExceptionMock, [
-				'list_id' => 1
+				'list_id' => 1,
 			]);
 
-		self::assertXml((string)$response->getBody());
+		self::assertXml((string) $response->getBody());
 	}
 
 	/**
