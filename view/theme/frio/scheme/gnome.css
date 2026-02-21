@@ -265,7 +265,10 @@ button.btn-primary {
 input,
 textarea,
 select,
-.form-control {
+.form-control,
+.form-control[disabled],
+.form-control[readonly],
+fieldset[disabled] {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   border-color: var(--accent-color);
