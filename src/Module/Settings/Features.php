@@ -67,7 +67,7 @@ class Features extends BaseSettings
 			// iterate through widgetorder and network items
 			foreach ($widgetorder as $widget) {
 				foreach ($arr['network'][1] as $list_item) {
-					if ($list_item[0] == 'feature_'.$widget) {
+					if ($list_item[0] == 'feature_' . $widget) {
 						$tmp[] = $list_item;
 					}
 				}
@@ -84,7 +84,7 @@ class Features extends BaseSettings
 			'$network_mode'        => Conversation::MODE_NETWORK,
 			'$reset'               => [
 				'0' => 'feature_resetorder',
-				'1' => $this->t('Reset order')
+				'1' => $this->t('Reset order'),
 			],
 			'$features' => $arr,
 			'$submit'   => $this->t('Save Settings'),
