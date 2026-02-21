@@ -26,7 +26,7 @@ use Psr\Log\LoggerInterface;
  */
 abstract class BaseRepository
 {
-	const LIMIT = 30;
+	public const LIMIT = 30;
 
 	/**
 	 * @var string This should be set to the main database table name the depository is using
@@ -156,7 +156,7 @@ abstract class BaseRepository
 	{
 		@trigger_error('`' . __METHOD__ . '()` is deprecated since 2025.07 and will be removed after 5 months, use `\Friendica\BaseRepository::_selectFirstRowAsArray()` instead.', E_USER_DEPRECATED);
 
-		$fields = $this->_selectFirstRowAsArray( $condition, $params);
+		$fields = $this->_selectFirstRowAsArray($condition, $params);
 
 		return $this->factory->createFromTableRow($fields);
 	}

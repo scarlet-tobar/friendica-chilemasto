@@ -187,7 +187,7 @@ class Profile extends BaseModule
 			}
 		}
 
-		if (empty($contact['network']) && ContactModel::isLocal($contact['url']) ) {
+		if (empty($contact['network']) && ContactModel::isLocal($contact['url'])) {
 			$contact['network']  = Protocol::DFRN;
 			$contact['protocol'] = Protocol::ACTIVITYPUB;
 		}
@@ -320,9 +320,9 @@ class Profile extends BaseModule
 			$this->logger->notice('Empty gsid for contact', ['contact' => $contact]);
 		}
 
-		$serverIgnored = $contact['gsid'] &&
-			$this->userGServer->isIgnoredByUser($this->session->getLocalUserId(), $contact['gsid']) ?
-				$this->t('This contact is on a server you ignored.')
+		$serverIgnored = $contact['gsid']
+			&& $this->userGServer->isIgnoredByUser($this->session->getLocalUserId(), $contact['gsid'])
+				? $this->t('This contact is on a server you ignored.')
 				: '';
 
 		$last_update = (($contact['last-update'] <= DBA::NULL_DATETIME) ? $this->t('Never') : DateTimeFormat::local($contact['last-update'], 'D, j M Y, g:i A'));
@@ -354,8 +354,8 @@ class Profile extends BaseModule
 					LocalRelationshipEntity::FFI_NONE        => $this->t('Disabled'),
 					LocalRelationshipEntity::FFI_INFORMATION => $this->t('Fetch information'),
 					LocalRelationshipEntity::FFI_KEYWORD     => $this->t('Fetch keywords'),
-					LocalRelationshipEntity::FFI_BOTH        => $this->t('Fetch information and keywords')
-				]
+					LocalRelationshipEntity::FFI_BOTH        => $this->t('Fetch information and keywords'),
+				],
 			];
 		}
 
@@ -365,23 +365,23 @@ class Profile extends BaseModule
 		if ($contact['network'] == Protocol::FEED) {
 			$remote_self_options = [
 				LocalRelationshipEntity::MIRROR_DEACTIVATED => $this->t('No mirroring'),
-				LocalRelationshipEntity::MIRROR_OWN_POST    => $this->t('Mirror as my own posting')
+				LocalRelationshipEntity::MIRROR_OWN_POST    => $this->t('Mirror as my own posting'),
 			];
 		} elseif ($contact['network'] == Protocol::ACTIVITYPUB) {
 			$remote_self_options = [
 				LocalRelationshipEntity::MIRROR_DEACTIVATED    => $this->t('No mirroring'),
-				LocalRelationshipEntity::MIRROR_NATIVE_RESHARE => $this->t('Native reshare')
+				LocalRelationshipEntity::MIRROR_NATIVE_RESHARE => $this->t('Native reshare'),
 			];
 		} elseif ($contact['network'] == Protocol::DFRN) {
 			$remote_self_options = [
 				LocalRelationshipEntity::MIRROR_DEACTIVATED    => $this->t('No mirroring'),
 				LocalRelationshipEntity::MIRROR_OWN_POST       => $this->t('Mirror as my own posting'),
-				LocalRelationshipEntity::MIRROR_NATIVE_RESHARE => $this->t('Native reshare')
+				LocalRelationshipEntity::MIRROR_NATIVE_RESHARE => $this->t('Native reshare'),
 			];
 		} else {
 			$remote_self_options = [
 				LocalRelationshipEntity::MIRROR_DEACTIVATED => $this->t('No mirroring'),
-				LocalRelationshipEntity::MIRROR_OWN_POST    => $this->t('Mirror as my own posting')
+				LocalRelationshipEntity::MIRROR_OWN_POST    => $this->t('Mirror as my own posting'),
 			];
 		}
 
@@ -475,7 +475,7 @@ class Profile extends BaseModule
 				$this->t('Mirror postings from this contact'),
 				$localRelationship->remoteSelf,
 				$this->t('Mark this contact as remote_self, this will cause friendica to repost new entries from this contact.'),
-				$remote_self_options
+				$remote_self_options,
 			],
 			'$channel_settings_label' => $this->t('Channel Settings'),
 			'$frequency_label'        => $this->t('Frequency of this contact in relevant channels'),

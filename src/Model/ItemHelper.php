@@ -92,7 +92,7 @@ final class ItemHelper
 				$item['uid'],
 				Protocol::ACTIVITYPUB,
 				Protocol::DIASPORA,
-				Protocol::DFRN
+				Protocol::DFRN,
 			];
 
 			$existing = Post::selectFirst(['id', 'network'], $condition);
@@ -105,7 +105,7 @@ final class ItemHelper
 						'uid'              => $item['uid'],
 						'network'          => $item['network'],
 						'existing_id'      => $existing['id'],
-						'existing_network' => $existing['network']
+						'existing_network' => $existing['network'],
 					]);
 				}
 
@@ -134,7 +134,7 @@ final class ItemHelper
 
 		$condition = [
 			'uri-id'  => $item['uri-id'], 'uid' => $item['uid'],
-			'network' => [$item['network'], Protocol::DFRN]
+			'network' => [$item['network'], Protocol::DFRN],
 		];
 		if (Post::exists($condition)) {
 			$this->logger->notice('duplicated item with the same uri found.', $condition);
@@ -214,15 +214,15 @@ final class ItemHelper
 		}
 
 		// We haven't invented time travel by now.
-		if ($item['edited'] > $item['received'] ) {
+		if ($item['edited'] > $item['received']) {
 			$item['edited'] = $item['received'] ;
 		}
 
-		if ($item['changed'] > $item['received'] ) {
+		if ($item['changed'] > $item['received']) {
 			$item['changed'] = $item['received'] ;
 		}
 
-		if ($item['commented'] > $item['received'] ) {
+		if ($item['commented'] > $item['received']) {
 			$item['commented'] = $item['received'] ;
 		}
 
@@ -236,13 +236,13 @@ final class ItemHelper
 
 		$default = [
 			'url'   => $item['author-link'], 'name' => $item['author-name'],
-			'photo' => $item['author-avatar'], 'network' => $item['network']
+			'photo' => $item['author-avatar'], 'network' => $item['network'],
 		];
 		$item['author-id'] = ($item['author-id'] ?? 0) ?: Contact::getIdForURL($item['author-link'], 0, null, $default);
 
 		$default = [
 			'url'   => $item['owner-link'], 'name' => $item['owner-name'],
-			'photo' => $item['owner-avatar'], 'network' => $item['network']
+			'photo' => $item['owner-avatar'], 'network' => $item['network'],
 		];
 		$item['owner-id'] = ($item['owner-id'] ?? 0) ?: Contact::getIdForURL($item['owner-link'], 0, null, $default);
 
@@ -264,7 +264,7 @@ final class ItemHelper
 			'uid', 'uri', 'parent-uri', 'id', 'deleted',
 			'uri-id', 'parent-uri-id', 'restrictions', 'verb',
 			'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid',
-			'wall', 'private', 'origin', 'author-id'
+			'wall', 'private', 'origin', 'author-id',
 		];
 
 		$uids = $item['verb'] === Activity::VIEW ? [0, $item['uid']] : $item['uid'];
@@ -301,7 +301,7 @@ final class ItemHelper
 		$condition = [
 			'uri-id'        => $parent['parent-uri-id'],
 			'parent-uri-id' => $parent['parent-uri-id'],
-			'uid'           => $parent['uid']
+			'uid'           => $parent['uid'],
 		];
 		$params          = ['order' => ['id' => false]];
 		$toplevel_parent = Post::selectFirst($fields, $condition, $params);
