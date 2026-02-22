@@ -91,32 +91,32 @@ class Display extends BaseSettings
 
 		$theme                   = trim($request['theme']);
 		$mobile_theme            = trim($request['mobile_theme'] ?? '');
-		$enable_smile            = (bool)$request['enable_smile'];
-		$enable                  = (array)$request['enable'];
-		$bookmark                = (array)$request['bookmark'];
-		$channel_languages       = (array)$request['channel_languages'];
-		$timeline_channels       = isset($request['timeline_channels']) ? (array)$request['timeline_channels'] : null;
-		$filter_channels         = isset($request['filter_channels']) ? (array)$request['filter_channels'] : null;
-		$first_day_of_week       = (int)$request['first_day_of_week'];
+		$enable_smile            = (bool) $request['enable_smile'];
+		$enable                  = (array) $request['enable'];
+		$bookmark                = (array) $request['bookmark'];
+		$channel_languages       = (array) $request['channel_languages'];
+		$timeline_channels       = isset($request['timeline_channels']) ? (array) $request['timeline_channels'] : null;
+		$filter_channels         = isset($request['filter_channels']) ? (array) $request['filter_channels'] : null;
+		$first_day_of_week       = (int) $request['first_day_of_week'];
 		$calendar_default_view   = trim($request['calendar_default_view']);
-		$infinite_scroll         = (bool)$request['infinite_scroll'];
-		$enable_smart_threading  = (bool)$request['enable_smart_threading'];
-		$enable_dislike          = (bool)$request['enable_dislike'];
-		$display_resharer        = (bool)$request['display_resharer'];
-		$stay_local              = (bool)$request['stay_local'];
-		$hide_empty_descriptions = (bool)$request['hide_empty_descriptions'];
-		$hide_custom_emojis      = (bool)$request['hide_custom_emojis'];
-		$platform_icon_style     = (int)$request['platform_icon_style'];
-		$show_page_drop          = (bool)$request['show_page_drop'];
-		$display_eventlist       = (bool)$request['display_eventlist'];
-		$preview_mode            = (int)$request['preview_mode'];
-		$update_content          = (int)$request['update_content'];
-		$embed_remote_media      = (bool)$request['embed_remote_media'];
-		$embed_media             = (bool)$request['embed_media'];
+		$infinite_scroll         = (bool) $request['infinite_scroll'];
+		$enable_smart_threading  = (bool) $request['enable_smart_threading'];
+		$enable_dislike          = (bool) $request['enable_dislike'];
+		$display_resharer        = (bool) $request['display_resharer'];
+		$stay_local              = (bool) $request['stay_local'];
+		$hide_empty_descriptions = (bool) $request['hide_empty_descriptions'];
+		$hide_custom_emojis      = (bool) $request['hide_custom_emojis'];
+		$platform_icon_style     = (int) $request['platform_icon_style'];
+		$show_page_drop          = (bool) $request['show_page_drop'];
+		$display_eventlist       = (bool) $request['display_eventlist'];
+		$preview_mode            = (int) $request['preview_mode'];
+		$update_content          = (int) $request['update_content'];
+		$embed_remote_media      = (bool) $request['embed_remote_media'];
+		$embed_media             = (bool) $request['embed_media'];
 		$widget_timelineorder    = trim($request['widget_timelineorder']);
 		$menu_timelineorder      = trim($request['menu_timelineorder']);
-		$widget_timeline_reset   = (bool)$request['widget_timeline_reset'];
-		$menu_timeline_reset     = (bool)$request['menu_timeline_reset'];
+		$widget_timeline_reset   = (bool) $request['widget_timeline_reset'];
+		$menu_timeline_reset     = (bool) $request['menu_timeline_reset'];
 
 		$enabled_timelines = [];
 		foreach ($enable as $code => $enabled) {
@@ -132,15 +132,15 @@ class Display extends BaseSettings
 			}
 		}
 
-		$itemspage_network = !empty($request['itemspage_network']) ?
-			intval($request['itemspage_network']) :
-			$this->config->get('system', 'itemspage_network');
+		$itemspage_network = !empty($request['itemspage_network'])
+			? intval($request['itemspage_network'])
+			: $this->config->get('system', 'itemspage_network');
 		if ($itemspage_network > 100) {
 			$itemspage_network = 100;
 		}
-		$itemspage_mobile_network = !empty($request['itemspage_mobile_network']) ?
-			intval($request['itemspage_mobile_network']) :
-			$this->config->get('system', 'itemspage_network_mobile');
+		$itemspage_mobile_network = !empty($request['itemspage_mobile_network'])
+			? intval($request['itemspage_mobile_network'])
+			: $this->config->get('system', 'itemspage_network_mobile');
 		if ($itemspage_mobile_network > 100) {
 			$itemspage_mobile_network = 100;
 		}
@@ -404,7 +404,7 @@ class Display extends BaseSettings
 			3 => $this->t('Wednesday'),
 			4 => $this->t('Thursday'),
 			5 => $this->t('Friday'),
-			6 => $this->t('Saturday')
+			6 => $this->t('Saturday'),
 		];
 
 		$calendar_default_view = $this->pConfig->get($uid, 'calendar', 'default_view', 'month');
@@ -412,7 +412,7 @@ class Display extends BaseSettings
 			'month'      => $this->t('month'),
 			'agendaWeek' => $this->t('week'),
 			'agendaDay'  => $this->t('day'),
-			'listMonth'  => $this->t('list')
+			'listMonth'  => $this->t('list'),
 		];
 
 		$theme_config = '';
@@ -433,14 +433,14 @@ class Display extends BaseSettings
 			'$timeline_title'      => $this->t('Timelines'),
 			'$channel_title'       => $this->t('Channels'),
 			'$calendar_title'      => $this->t('Calendar'),
-			'$sortable'            => $this->t('Drag to reorder or tab to item with keyboard and move up/down with arrow keys'),
+			'$sortable'            => $this->t('Drag to reorder, use arrow buttons on each item, or tab to item with keyboard and move up/down with arrow keys'),
 			'$reset_widget'        => [
 				'0' => 'widget_timeline_reset',
-				'1' => $this->t('Reset order')
+				'1' => $this->t('Reset order'),
 			],
 			'$reset_menu' => [
 				'0' => 'menu_timeline_reset',
-				'1' => $this->t('Reset order')
+				'1' => $this->t('Reset order'),
 			],
 
 			'$form_security_token' => self::getFormSecurityToken('settings_display'),
