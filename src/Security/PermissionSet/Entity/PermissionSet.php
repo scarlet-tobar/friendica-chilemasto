@@ -72,8 +72,6 @@ class PermissionSet extends BaseEntity
 	 * Creates a new Entity with a new allowed_cid list (wipes the id because it isn't the same entity anymore)
 	 *
 	 * @param array $allow_cid
-	 *
-	 * @return $this
 	 */
 	public function withAllowedContacts(array $allow_cid): PermissionSet
 	{
