@@ -9,6 +9,7 @@ namespace Friendica\Model;
 
 use Friendica\App\Mode;
 use Friendica\AppHelper;
+use Friendica\Content\Feature;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Widget\ContactBlock;
 use Friendica\Core\Cache\Enum\Duration;
@@ -309,7 +310,7 @@ class Profile
 		}
 
 		$local_user_is_self       = DI::userSession()->getMyUrl() && ($profile['url'] == DI::userSession()->getMyUrl());
-		$visitor_is_authenticated = (bool)DI::userSession()->getMyUrl();
+		$visitor_is_authenticated = (bool) DI::userSession()->getMyUrl();
 		$visitor_is_following     = in_array($visitor_contact['rel'] ?? 0, [Contact::FOLLOWER, Contact::FRIEND])
 			|| in_array($profile_contact['rel'] ?? 0, [Contact::SHARING, Contact::FRIEND]);
 		$visitor_is_followed = in_array($visitor_contact['rel'] ?? 0, [Contact::SHARING, Contact::FRIEND])
@@ -319,7 +320,7 @@ class Profile
 		if (!$local_user_is_self) {
 			if (!$visitor_is_authenticated) {
 				// Remote follow is only available for local profiles
-				if (!empty($profile['nickname']) && strpos($profile_url, (string)DI::baseUrl()) === 0) {
+				if (!empty($profile['nickname']) && strpos($profile_url, (string) DI::baseUrl()) === 0) {
 					$follow_link = 'profile/' . $profile['nickname'] . '/remote_follow';
 				}
 			} else {
@@ -444,12 +445,18 @@ class Profile
 		}
 		$network_url = 'contact/' . $cid . '/conversations';
 
+		$member_since = null;
+		if (Feature::isEnabled($p['uid'], Feature::MEMBER_SINCE)) {
+			$member_since = [ DI::l10n()->t('Joined:'), DateTimeFormat::local($p['register_date']) ];
+		}
+
 		$tpl = Renderer::getMarkupTemplate('profile/vcard.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
 			'$profile'                     => $p,
 			'$picture_dest_url'            => $picture_dest_url,
 			'$change_profile_picture_text' => $change_profile_picture_text,
 			'$xmpp'                        => $xmpp,
+			'$member_since'                => $member_since,
 			'$matrix'                      => $matrix,
 			'$follow'                      => DI::l10n()->t('Follow'),
 			'$follow_link'                 => $follow_link,
@@ -542,7 +549,7 @@ class Profile
 				Contact::FRIEND,
 				$uid,
 				DateTimeFormat::utc('now + 6 days'),
-				DateTimeFormat::utcNow()
+				DateTimeFormat::utcNow(),
 			);
 			if (DBA::isResult($result)) {
 				$events = DBA::toArray($result);
@@ -585,7 +592,7 @@ class Profile
 						'id'    => $event['id'],
 						'link'  => Contact::magicLinkById($event['cid']),
 						'title' => $event['name'],
-						'date'  => DI::l10n()->getDay(DateTimeFormat::local($event['start'], $bd_short)) . (($today) ? ' ' . DI::l10n()->t('[today]') : '')
+						'date'  => DI::l10n()->getDay(DateTimeFormat::local($event['start'], $bd_short)) . (($today) ? ' ' . DI::l10n()->t('[today]') : ''),
 					];
 				}
 			}
@@ -598,7 +605,7 @@ class Profile
 			'$event_title'     => DI::l10n()->t('Birthdays this week:'),
 			'$events'          => $tpl_events,
 			'$lbr'             => '{', // raw brackets mess up if/endif macro processing
-			'$rbr'             => '}'
+			'$rbr'             => '}',
 		]);
 	}
 
@@ -616,7 +623,7 @@ class Profile
 
 		$condition = [
 			"`uid` = ? AND `type` != 'birthday' AND `start` < ? AND `start` >= ?",
-			$uid, DateTimeFormat::utc('now + 7 days'), DateTimeFormat::utc('now - 1 days')
+			$uid, DateTimeFormat::utc('now + 7 days'), DateTimeFormat::utc('now - 1 days'),
 		];
 		$s = DBA::select('event', [], $condition, ['order' => ['start']]);
 
@@ -630,7 +637,7 @@ class Profile
 				$condition = [
 					'parent-uri' => $rr['uri'], 'uid' => $rr['uid'], 'author-id' => $pcid,
 					'vid'        => [Verb::getID(Activity::ATTEND), Verb::getID(Activity::ATTENDMAYBE)],
-					'visible'    => true, 'deleted' => false
+					'visible'    => true, 'deleted' => false,
 				];
 				if (!Post::exists($condition)) {
 					continue;
@@ -730,7 +737,7 @@ class Profile
 				(`pub_keywords` LIKE ?) OR
 				(`prv_keywords` LIKE ?))",
 				$searchTerm, $searchTerm, $searchTerm, $searchTerm,
-				$searchTerm, $searchTerm, $searchTerm, $searchTerm
+				$searchTerm, $searchTerm, $searchTerm, $searchTerm,
 			];
 		} else {
 			$condition = ['verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false];
@@ -772,7 +779,7 @@ class Profile
 		if (!$profile['is-default']) {
 			$contacts = Contact::selectToArray(['id'], [
 				'uid'        => $profile['uid'],
-				'profile-id' => $profile['id']
+				'profile-id' => $profile['id'],
 			]);
 			if (!count($contacts)) {
 				// No contact visibility selected defaults to user-only permission
@@ -783,8 +790,8 @@ class Profile
 		$permissionSet = DI::permissionSet()->selectOrCreate(
 			new PermissionSet(
 				$profile['uid'],
-				array_column($contacts, 'id') ?? []
-			)
+				array_column($contacts, 'id') ?? [],
+			),
 		);
 
 		$order = 1;
@@ -819,7 +826,7 @@ class Profile
 					$order,
 					trim($label, ':'),
 					$profile[$field],
-					$permissionSet
+					$permissionSet,
 				));
 			}
 

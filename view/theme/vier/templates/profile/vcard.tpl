@@ -33,6 +33,13 @@
 		</dl>
 	{{/if}}
 
+	{{if $member_since}}
+			<p class="member-since">
+				<strong>{{$member_since.0}}</strong>
+				<span>{{$member_since.1}}</span>
+			</p>
+	{{/if}}
+
 	{{if $profile.xmpp}}
 		<dl class="xmpp">
 			<dt class="xmpp-label">{{$xmpp}}</dt>
