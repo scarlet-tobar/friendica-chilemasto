@@ -27,11 +27,6 @@
 		<div id="photos-upload-end" class="clearfix"></div>
 {{/if}}
 
-		<div id="photos-upload-noshare-div" class="photos-upload-noshare-div checkbox pull-left">
-			<input id="photos-upload-noshare" type="checkbox" name="not_visible" value="1" checked/>
-			<label id="photos-upload-noshare-text" for="photos-upload-noshare">{{$nosharetext}}</label>
-		</div>
-
 		{{if $alt_uploader}}
 			<div id="photos-upload-perms" class="pull-right">
 				<button class="btn btn-default btn-sm" data-toggle="modal" data-target="#photo-upload-permission-acl" onclick="return false;">
