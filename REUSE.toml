@@ -7,8 +7,6 @@ SPDX-PackageDownloadLocation = "https://friendi.ca"
 path = [
      "database.sql",
      "composer.*",
-     "bin/dev/php-cs-fixer/composer.*",
-     "bin/dev/rector/composer.*",
      "doc/**",
      "spec/*",
      "tests/**",

@@ -174,21 +174,14 @@
 		"lint": "find . -name \\*.php -not -path './vendor/*' -not -path './view/asset/*' -print0 | xargs -0 -n1 php -l",
 		"docker:translate": "docker run --rm -v $PWD:/data -w /data friendicaci/transifex bin/run_xgettext.sh",
 		"lang:recreate": "bin/run_xgettext.sh",
-		"cs:install": "@composer install --working-dir=bin/dev/php-cs-fixer",
-		"cs:check": [
-			"@cs:install",
-			"bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer check --diff"
-		],
-		"cs:fix": [
-			"@cs:install",
-			"bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer fix"
-		],
+		"cs:check": "php-cs-fixer check --diff",
+		"cs:fix": "php-cs-fixer fix",
 		"cs:fix-develop": "TARGET_BRANCH=develop COMMAND=fix bin/dev/fix-codestyle.sh",
-		"rector:install": "@composer install -d bin/dev/rector",
 		"rector:check": "@rector:run --dry-run",
-		"rector:run": "bin/dev/rector/vendor/bin/rector --config=\".rector.php\"",
+		"rector:run": "rector --config=\".rector.php\"",
 		"rectify": [
 			"@rector:run",
+			"@lang:recreate",
 			"@cs:fix-develop"
 		],
 		"db:update-structure": "bin/console.php dbstructure dumpsql > database.sql",
