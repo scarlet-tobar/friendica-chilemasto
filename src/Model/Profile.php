@@ -452,7 +452,12 @@ class Profile
 
 		$tpl = Renderer::getMarkupTemplate('profile/vcard.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
-			'$profile'                     => $p,
+			'$is_owner'          => DI::userSession()->getLocalUserId() == $profile['uid'],
+			'$profile'           => $p,
+			'$edit_profile_link' => [
+				'url'  => 'settings/profile',
+				'text' => DI::l10n()->t('Edit profile'),
+			],
 			'$picture_dest_url'            => $picture_dest_url,
 			'$change_profile_picture_text' => $change_profile_picture_text,
 			'$xmpp'                        => $xmpp,
