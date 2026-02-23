@@ -1306,6 +1306,9 @@ aside .vcard .detail {
 aside .xmpp, aside .matrix {
 	display: table;
 }
+aside .member-since {
+	padding-top: 5px;
+}
 aside .vcard .icon {
 	display: table-cell;
 	padding-right: 10px;
