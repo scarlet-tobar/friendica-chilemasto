@@ -133,6 +133,13 @@
 			</div>
 		{{/if}}
 
+		{{if $member_since}}
+				<p class="member-since">
+					<strong>{{$member_since.0}}</strong>
+					<span>{{$member_since.1}}</span>
+				</p>
+		{{/if}}
+
 		{{if $about}}<dl class="about" style="display:none;">
 				<dt class="about-label">{{$about}}</dt>
 				<dd class="x-network">{{$profile.about nofilter}}</dd>
