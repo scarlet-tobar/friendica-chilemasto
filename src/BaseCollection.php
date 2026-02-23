@@ -135,7 +135,7 @@ class BaseCollection extends \ArrayIterator
 
 				return new $class($array);
 			},
-			array_chunk($this->getArrayCopy(), $length)
+			array_chunk($this->getArrayCopy(), $length),
 		);
 	}
 

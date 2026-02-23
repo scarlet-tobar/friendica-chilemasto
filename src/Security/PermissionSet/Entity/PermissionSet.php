@@ -60,12 +60,12 @@ class PermissionSet extends BaseEntity
 	 */
 	public function isPublic(): bool
 	{
-		return (($this->id === PermissionSetRepository::PUBLIC) ||
-				(is_null($this->id) &&
-				 empty($this->allow_cid) &&
-				 empty($this->allow_gid) &&
-				 empty($this->deny_cid) &&
-				 empty($this->deny_gid)));
+		return (($this->id === PermissionSetRepository::PUBLIC)
+				|| (is_null($this->id)
+				 && empty($this->allow_cid)
+				 && empty($this->allow_gid)
+				 && empty($this->deny_cid)
+				 && empty($this->deny_gid)));
 	}
 
 	/**
