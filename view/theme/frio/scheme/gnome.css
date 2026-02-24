@@ -354,6 +354,9 @@ aside {
 .text-muted {
   color: var(--text-secondary) !important;
 }
+.hljs, .hljs-subst {
+  color: var(--text-primary) !important;
+}
 
 /* Dropdowns */
 .dropdown-menu {
