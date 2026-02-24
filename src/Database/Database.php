@@ -802,7 +802,7 @@ class Database
 			$this->error   = $error;
 			$this->errorno = $errorno;
 		} elseif (!$retval) {
-			$this->logger->warning('Database execution was unsuccessful', ['sql' => $sql, 'params' => $params, 'timeout' => $timeout]);
+			$this->logger->warning('Database execution was unsuccessful', ['sql' => $this->replaceParameters($sql, $params), 'timeout' => $timeout]);
 		}
 
 		$this->profiler->stopRecording();
@@ -1039,6 +1039,10 @@ class Database
 		$result = $this->e($sql, $param);
 		if (!$result || ($duplicate_mode != self::INSERT_IGNORE)) {
 			return $result;
+		}
+
+		if ($this->affectedRows() === 0) {
+			$this->logger->info('affectedRows is 0.', ['table' => $table, 'fields' => $param, 'sql' => $this->replaceParameters($sql, $param)]);
 		}
 
 		return $this->affectedRows() != 0;
