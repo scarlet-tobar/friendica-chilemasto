@@ -35,12 +35,13 @@ use Psr\Log\LoggerInterface;
 
 class BaseApi extends BaseModule
 {
-	const LOG_PREFIX = 'API {action} - ';
+	public const LOG_PREFIX = 'API {action} - ';
 
-	const SCOPE_READ   = 'read';
-	const SCOPE_WRITE  = 'write';
-	const SCOPE_FOLLOW = 'follow';
-	const SCOPE_PUSH   = 'push';
+	public const SCOPE_READ   = 'read';
+	public const SCOPE_WRITE  = 'write';
+	public const SCOPE_FOLLOW = 'follow';
+	public const SCOPE_PUSH   = 'push';
+	public const SCOPE_ANY    = 'any';
 
 	/**
 	 * @var array
@@ -385,14 +386,14 @@ class BaseApi extends BaseModule
 			$uid = BasicAuth::getCurrentUserID(false);
 		}
 
-		return (int)$uid;
+		return (int) $uid;
 	}
 
 	/**
 	 * Check if the provided scope does exist.
 	 * halts execution on missing scope or when not logged in.
 	 *
-	 * @param string $scope the requested scope (read, write, follow, push)
+	 * @param string $scope the requested scope (read, write, follow, push, any)
 	 */
 	public function checkAllowedScope(string $scope)
 	{
@@ -401,6 +402,10 @@ class BaseApi extends BaseModule
 		if (empty($token)) {
 			$this->logger->notice('Empty application token');
 			$this->logAndJsonError(403, $this->errorFactory->Forbidden());
+		}
+
+		if ($scope === self::SCOPE_ANY) {
+			return;
 		}
 
 		if (!isset($token[$scope])) {
