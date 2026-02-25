@@ -23,7 +23,6 @@ use Friendica\Protocol\Activity;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
-use Friendica\Util\Temporal;
 use GuzzleHttp\Psr7\Uri;
 use InvalidArgumentException;
 
@@ -165,8 +164,8 @@ class Post
 		if (strtotime($item['edited']) - strtotime($item['created']) > 1) {
 			$edited = [
 				'label'    => DI::l10n()->t('This entry was edited'),
-				'date'     => DateTimeFormat::local($item['edited'], 'r'),
-				'relative' => Temporal::getRelativeDate($item['edited']),
+				'date'     => DI::l10n()->longDateTime($item['edited']),
+				'relative' => DI::l10n()->relativeDateTime($item['edited']),
 			];
 		}
 		$sparkle = '';
@@ -485,8 +484,8 @@ class Post
 
 		$tags = Tag::populateFromItem($item);
 
-		$ago          = Temporal::getRelativeDate($item['created']);
-		$ago_received = Temporal::getRelativeDate($item['received']);
+		$ago          = DI::l10n()->relativeDateTime($item['created']);
+		$ago_received = DI::l10n()->relativeDateTime($item['received']);
 		if (DI::config()->get('system', 'show_received') && (abs(strtotime($item['created']) - strtotime($item['received'])) > DI::config()->get('system', 'show_received_seconds')) && ($ago != $ago_received)) {
 			$ago = DI::l10n()->t('%s (Received %s)', $ago, $ago_received);
 		}
@@ -567,7 +566,7 @@ class Post
 			'sparkle'                => $sparkle,
 			'title'                  => $item['title'],
 			'summary'                => $item['content-warning'],
-			'localtime'              => DateTimeFormat::local($item['created'], 'r'),
+			'localtime'              => DI::l10n()->longDateTime($item['created']),
 			'utc'                    => DateTimeFormat::utc($item['created']),
 			'ago'                    => $item['app'] ? DI::l10n()->t('%s from %s', $ago, $item['app']) : $ago,
 			'app'                    => $item['app'],

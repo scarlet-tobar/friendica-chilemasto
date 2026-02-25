@@ -7,10 +7,13 @@
 
 namespace Friendica\Core;
 
+use DateTime;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Session\Capability\IHandleSessions;
 use Friendica\Database\Database;
 use Friendica\Util\Strings;
+use IntlDateFormatter;
+use Locale;
 
 /**
  * Provide Language, Translation, and Localization functions to the application
@@ -68,6 +71,8 @@ class L10n
 	 */
 	private $lang = '';
 
+	private string $locale = '';
+
 	/**
 	 * An array of translation strings whose key is the neutral english message.
 	 *
@@ -83,13 +88,16 @@ class L10n
 	 * @var IManageConfigValues
 	 */
 	private $config;
+	private IHandleSessions $session;
 
 	public function __construct(IManageConfigValues $config, Database $dba, IHandleSessions $session, array $server, array $get)
 	{
-		$this->dba    = $dba;
-		$this->config = $config;
+		$this->dba     = $dba;
+		$this->config  = $config;
+		$this->session = $session;
 
 		$this->loadTranslationTable(L10n::detectLanguage($server, $get, $config->get('system', 'language', self::DEFAULT)));
+		$this->setLocale($server);
 		$this->setSessionVariable($session);
 		$this->setLangFromSession($session);
 	}
@@ -105,12 +113,31 @@ class L10n
 	}
 
 	/**
+	 * Set the instance locale based on the HTTP Accept-Language header.
+	 *
+	 * Reads the `HTTP_ACCEPT_LANGUAGE` value from the provided server array
+	 * and stores the accepted locale string in `$this->locale` using
+	 * `Locale::acceptFromHttp()`.
+	 *
+	 * @param array $server The $_SERVER-like array containing HTTP headers
+	 * @return void
+	 */
+	private function setLocale(array $server)
+	{
+		if (!isset($server['HTTP_ACCEPT_LANGUAGE'])) {
+			return;
+		}
+		$this->locale = Locale::acceptFromHttp($server['HTTP_ACCEPT_LANGUAGE']);
+	}
+
+	/**
 	 * Sets the language session variable
 	 */
 	private function setSessionVariable(IHandleSessions $session)
 	{
 		if ($session->get('authenticated') && !$session->get('language')) {
 			$session->set('language', $this->lang);
+			$session->set('locale', $this->locale);
 			// we haven't loaded user data yet, but we need user language
 			if ($session->get('uid')) {
 				$user = $this->dba->selectFirst('user', ['language'], ['uid' => $_SESSION['uid']]);
@@ -574,5 +601,80 @@ class L10n
 		$newL10n = clone $this;
 		$newL10n->loadTranslationTable($lang);
 		return $newL10n;
+	}
+
+	/**
+	 * Format a date/time string using RELATIVE_FULL date and MEDIUM time.
+	 *
+	 * This will produce relative strings where supported by the ICU implementation
+	 * (for example "yesterday", "in 2 days") according to the current locale.
+	 *
+	 * @param string $datestring Date/time string (e.g. ISO 8601)
+	 * @return string Formatted relative date/time string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function relativeDateTime(string $datestring): string
+	{
+		return $this->formatDateTime($datestring, IntlDateFormatter::RELATIVE_FULL, IntlDateFormatter::MEDIUM);
+	}
+
+	/**
+	 * Format a date/time string using FULL date and MEDIUM time according to current locale.
+	 *
+	 * @param string $datestring Date/time string (e.g. ISO 8601)
+	 * @return string Formatted date/time string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function longDateTime(string $datestring): string
+	{
+		return $this->formatDateTime($datestring, IntlDateFormatter::FULL, IntlDateFormatter::MEDIUM);
+	}
+
+	/**
+	 * Format a date/time string using MEDIUM date and SHORT time according to current locale.
+	 *
+	 * @param string $datestring Date/time string
+	 * @return string Formatted date/time string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function dateTime(string $datestring): string
+	{
+		return $this->formatDateTime($datestring, IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
+	}
+
+	/**
+	 * Format a date string (date only) using FULL date format according to current locale.
+	 *
+	 * @param string $datestring Date string
+	 * @return string Formatted date string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function longDate(string $datestring): string
+	{
+		return $this->formatDateTime($datestring, IntlDateFormatter::FULL, IntlDateFormatter::NONE);
+	}
+
+	/**
+	 * General date/time formatting helper.
+	 *
+	 * Creates an IntlDateFormatter using the instance locale and the timezone
+	 * stored in session (if any) and formats the provided date/time string.
+	 *
+	 * @param string $datestring Date/time string (e.g. ISO 8601)
+	 * @param int $dateType One of IntlDateFormatter::SHORT|MEDIUM|LONG|FULL|NONE
+	 * @param int $timeType One of IntlDateFormatter::SHORT|MEDIUM|LONG|FULL|NONE
+	 * @return string Formatted date/time string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function formatDateTime(string $datestring, int $dateType, int $timeType): string
+	{
+		$formatter = new IntlDateFormatter(
+			$this->session->get('language') ?? $this->locale ?: 'en_US',
+			$dateType,
+			$timeType,
+			$this->session->get('timezone') ?? null
+		);
+
+		return $formatter->format(new DateTime($datestring));
 	}
 }

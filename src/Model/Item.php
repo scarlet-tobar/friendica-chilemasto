@@ -3686,11 +3686,11 @@ class Item
 			}
 
 			if (!empty($question['voters']) && !empty($question['endtime'])) {
-				$summary = DI::l10n()->tt('%d voter. Poll end: %s', '%d voters. Poll end: %s', $question['voters'] ?? 0, Temporal::getRelativeDate($question['endtime']));
+				$summary = DI::l10n()->tt('%d voter. Poll end: %s', '%d voters. Poll end: %s', $question['voters'] ?? 0, DI::l10n()->relativeDateTime($question['endtime']));
 			} elseif (!empty($question['voters'])) {
 				$summary = DI::l10n()->tt('%d voter.', '%d voters.', $question['voters'] ?? 0);
 			} elseif (!empty($question['endtime'])) {
-				$summary = DI::l10n()->t('Poll end: %s', Temporal::getRelativeDate($question['endtime']));
+				$summary = DI::l10n()->t('Poll end: %s', DI::l10n()->relativeDateTime($question['endtime']));
 			} else {
 				$summary = '';
 			}

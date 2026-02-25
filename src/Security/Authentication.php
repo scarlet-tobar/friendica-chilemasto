@@ -337,6 +337,7 @@ class Authentication
 
 		if (strlen($user_record['timezone'])) {
 			$this->appHelper->setTimeZone($user_record['timezone']);
+			$this->session->set('timezone', $user_record['timezone']);
 		}
 
 		$contact = $this->dba->selectFirst('contact', ['id'], ['uid' => $user_record['uid'], 'self' => true]);

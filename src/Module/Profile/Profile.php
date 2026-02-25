@@ -184,7 +184,7 @@ class Profile extends BaseProfile
 			$basic_fields += self::buildField(
 				'membersince',
 				$this->t('Joined:'),
-				DateTimeFormat::local($profile['register_date']),
+				$this->l10n->longDate($profile['register_date']),
 			);
 		}
 
