@@ -297,7 +297,7 @@ class Conversation
 		$output = Renderer::replaceMacros(Renderer::getMarkupTemplate('voting_fakelink.tpl'), [
 			'$phrase' => $phrase,
 			'$type'   => $verb,
-			'$id'     => $id
+			'$id'     => $id,
 		]);
 		$output .= $expanded;
 
@@ -354,7 +354,7 @@ class Conversation
 				new \DateTime('now'),
 				null,
 				$this->l10n->t('Created at'),
-				'created_at'
+				'created_at',
 			);
 		} else {
 			$created_at = '';
@@ -396,7 +396,7 @@ class Conversation
 				new \DateTime('now + 6 months'),
 				null,
 				$this->l10n->t('Scheduled at'),
-				'scheduled_at'
+				'scheduled_at',
 			),
 			'$created_at'   => $created_at,
 			'$wait'         => $this->l10n->t('Please wait'),
@@ -487,17 +487,17 @@ class Conversation
 					. "; var netargs = '" . substr($this->args->getCommand(), 8)
 					. '?f='
 					. (!empty($_GET['contactid']) ? '&contactid=' . rawurlencode($_GET['contactid']) : '')
-					. (!empty($_GET['search'])    ? '&search='    . rawurlencode($_GET['search'])    : '')
-					. (!empty($_GET['star'])      ? '&star='      . rawurlencode($_GET['star'])      : '')
-					. (!empty($_GET['order'])     ? '&order='     . rawurlencode($_GET['order'])     : '')
-					. (!empty($_GET['bmark'])     ? '&bmark='     . rawurlencode($_GET['bmark'])     : '')
-					. (!empty($_GET['liked'])     ? '&liked='     . rawurlencode($_GET['liked'])     : '')
-					. (!empty($_GET['conv'])      ? '&conv='      . rawurlencode($_GET['conv'])      : '')
-					. (!empty($_GET['nets'])      ? '&nets='      . rawurlencode($_GET['nets'])      : '')
-					. (!empty($_GET['cmin'])      ? '&cmin='      . rawurlencode($_GET['cmin'])      : '')
-					. (!empty($_GET['cmax'])      ? '&cmax='      . rawurlencode($_GET['cmax'])      : '')
-					. (!empty($_GET['file'])      ? '&file='      . rawurlencode($_GET['file'])      : '')
-					. (!empty($_GET['channel'])   ? '&channel='   . rawurlencode($_GET['channel'])   : '')
+					. (!empty($_GET['search'])    ? '&search=' . rawurlencode($_GET['search'])    : '')
+					. (!empty($_GET['star'])      ? '&star=' . rawurlencode($_GET['star'])      : '')
+					. (!empty($_GET['order'])     ? '&order=' . rawurlencode($_GET['order'])     : '')
+					. (!empty($_GET['bmark'])     ? '&bmark=' . rawurlencode($_GET['bmark'])     : '')
+					. (!empty($_GET['liked'])     ? '&liked=' . rawurlencode($_GET['liked'])     : '')
+					. (!empty($_GET['conv'])      ? '&conv=' . rawurlencode($_GET['conv'])      : '')
+					. (!empty($_GET['nets'])      ? '&nets=' . rawurlencode($_GET['nets'])      : '')
+					. (!empty($_GET['cmin'])      ? '&cmin=' . rawurlencode($_GET['cmin'])      : '')
+					. (!empty($_GET['cmax'])      ? '&cmax=' . rawurlencode($_GET['cmax'])      : '')
+					. (!empty($_GET['file'])      ? '&file=' . rawurlencode($_GET['file'])      : '')
+					. (!empty($_GET['channel'])   ? '&channel=' . rawurlencode($_GET['channel'])   : '')
 					. (!empty($_GET['no_sharer']) ? '&no_sharer=' . rawurlencode($_GET['no_sharer']) : '')
 					. (!empty($_GET['accounttype']) ? '&accounttype=' . rawurlencode($_GET['accounttype']) : '')
 					. "'; </script>\r\n";
@@ -718,8 +718,8 @@ class Conversation
 				$row['causer-link']   = $contact['url'];
 				$row['causer-avatar'] = $contact['thumb'];
 				$row['causer-name']   = $contact['name'];
-			} elseif (($row['gravity'] == ItemModel::GRAVITY_ACTIVITY) && ($row['verb'] == Activity::ANNOUNCE) &&
-				($row['author-id'] == $activity['causer-id'])
+			} elseif (($row['gravity'] == ItemModel::GRAVITY_ACTIVITY) && ($row['verb'] == Activity::ANNOUNCE)
+				&& ($row['author-id'] == $activity['causer-id'])
 			) {
 				return $row;
 			}
@@ -892,7 +892,7 @@ class Conversation
 
 		$condition = DBA::mergeConditions(
 			$condition,
-			["`uid` IN (0, ?) AND (NOT `verb` IN (?, ?, ?) OR `verb` IS NULL)", $uid, Activity::FOLLOW, Activity::VIEW, Activity::READ]
+			["`uid` IN (0, ?) AND (NOT `verb` IN (?, ?, ?) OR `verb` IS NULL)", $uid, Activity::FOLLOW, Activity::VIEW, Activity::READ],
 		);
 
 		$condition = DBA::mergeConditions($condition, ["(`uid` != ? OR `private` != ?)", 0, ItemModel::PRIVATE]);
@@ -902,8 +902,8 @@ class Conversation
 			[
 				"`visible` AND NOT `deleted` AND NOT `author-blocked` AND NOT `owner-blocked`
 			AND ((NOT `contact-pending` AND (`contact-rel` IN (?, ?))) OR `self` OR `contact-uid` = ?)",
-				Contact::SHARING, Contact::FRIEND, 0
-			]
+				Contact::SHARING, Contact::FRIEND, 0,
+			],
 		);
 
 		$thread_parents = Post::select(['uri-id', 'causer-id'], $condition, ['order' => ['uri-id' => false, 'uid']]);
@@ -1032,8 +1032,8 @@ class Conversation
 			$items[$key]['user-collapsed-owner']  = !$always_display && in_array($row['owner-id'], $collapses);
 
 			if (
-				in_array($mode, [self::MODE_CHANNEL, self::MODE_COMMUNITY, self::MODE_NETWORK]) &&
-				(in_array($row['author-id'], $blocks) || in_array($row['owner-id'], $blocks) || in_array($row['author-id'], $ignores) || in_array($row['owner-id'], $ignores))
+				in_array($mode, [self::MODE_CHANNEL, self::MODE_COMMUNITY, self::MODE_NETWORK])
+				&& (in_array($row['author-id'], $blocks) || in_array($row['owner-id'], $blocks) || in_array($row['author-id'], $ignores) || in_array($row['owner-id'], $ignores))
 			) {
 				unset($items[$key]);
 			}
@@ -1329,7 +1329,7 @@ class Conversation
 		foreach ($parents as $i => $parent) {
 			$parents[$i]['children'] = array_merge(
 				$this->getItemChildren($item_array, $parent, true),
-				$this->getItemChildren($item_array, $parent, false)
+				$this->getItemChildren($item_array, $parent, false),
 			);
 		}
 
@@ -1588,7 +1588,7 @@ class Conversation
 				'categories'           => $categories,
 				'folders'              => $folders,
 				'text'                 => strip_tags($body_html),
-				'localtime'            => $this->l10n->longDateTime($item['created'], 'r'),
+				'localtime'            => $this->l10n->longDateTime($item['created']),
 				'utc'                  => DateTimeFormat::utc($item['created'], 'c'),
 				'ago'                  => (($item['app']) ? $this->l10n->t('%s from %s', $this->l10n->relativeDateTime($item['created']), $item['app']) : $this->l10n->relativeDateTime($item['created'])),
 				'location_html'        => $location_html,

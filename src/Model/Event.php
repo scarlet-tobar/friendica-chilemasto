@@ -458,7 +458,7 @@ class Event
 
 			'dtstart_label'  => DI::l10n()->t('Starts:'),
 			'dtend_label'    => DI::l10n()->t('Finishes:'),
-			'location_label' => DI::l10n()->t('Location:')
+			'location_label' => DI::l10n()->t('Location:'),
 		];
 	}
 
@@ -541,7 +541,7 @@ class Event
 			  AND `event`.`uid` = ?
 			  $sql_perms",
 			$event_id,
-			$owner_uid
+			$owner_uid,
 		));
 		if (empty($events)) {
 			throw new NotFoundException(DI::l10n()->t('Event not found.'));
@@ -606,7 +606,7 @@ class Event
 			$owner_uid,
 			$start,
 			$start,
-			$finish
+			$finish,
 		));
 
 		$events = self::removeDuplicates($events);
@@ -709,11 +709,11 @@ class Event
 					$time_format = "%H:%M:%S";
 					$date_format = "%Y-%m-%d";
 
-					$o .= '"' . $event['summary'] . '", "' . strftime($date_format, $tmp1) .
-						'", "' . strftime($time_format, $tmp1) . '", "' . $event['desc'] .
-						'", "' . strftime($date_format, $tmp2) .
-						'", "' . strftime($time_format, $tmp2) .
-						'", "' . $event['location'] . '"' . PHP_EOL;
+					$o .= '"' . $event['summary'] . '", "' . strftime($date_format, $tmp1)
+						. '", "' . strftime($time_format, $tmp1) . '", "' . $event['desc']
+						. '", "' . strftime($date_format, $tmp2)
+						. '", "' . strftime($time_format, $tmp2)
+						. '", "' . $event['location'] . '"' . PHP_EOL;
 				}
 				break;
 
@@ -922,7 +922,7 @@ class Event
 			'id'      => $item['author-id'],
 			'network' => $item['author-network'],
 			'url'     => $item['author-link'],
-			'alias'   => $item['author-alias']
+			'alias'   => $item['author-alias'],
 		];
 		$profile_link = Contact::magicLinkByContact($author);
 
@@ -1026,7 +1026,7 @@ class Event
 			'uid'   => $contact['uid'],
 			'cid'   => $contact['id'],
 			'start' => DateTimeFormat::utc($birthday),
-			'type'  => 'birthday'
+			'type'  => 'birthday',
 		];
 		if (DBA::exists('event', $condition)) {
 			return false;
