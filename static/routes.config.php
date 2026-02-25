@@ -161,7 +161,6 @@ return [
 	'/' => [Module\Home::class, [R::GET]],
 
 	'/.well-known' => [
-		'/host-meta'      => [Module\WellKnown\HostMeta::class,     [R::GET]],
 		'/nodeinfo'       => [Module\WellKnown\NodeInfo::class,     [R::GET]],
 		'/security.txt'   => [Module\WellKnown\SecurityTxt::class,  [R::GET]],
 		'/webfinger'      => [Module\Xrd::class,                    [R::GET]],
