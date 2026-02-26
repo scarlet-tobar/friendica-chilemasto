@@ -7,10 +7,7 @@
 
 declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
-use Rector\Php71\Rector\List_\ListToArrayDestructRector;
-
-return RectorConfig::configure()
+return \Rector\Config\RectorConfig::configure()
 	->withPaths([
 		__DIR__ . '/config',
 		__DIR__ . '/mod',
@@ -19,11 +16,17 @@ return RectorConfig::configure()
 		__DIR__ . '/tests',
 		__DIR__ . '/view',
 	])
-	// ->withPhpSets()
+	->withIndent("\t", 4)
+	->withPhpVersion(70400)
+	->withPhpLevel(9)
 	// ->withTypeCoverageLevel(0)
 	// ->withDeadCodeLevel(0)
 	// ->withCodeQualityLevel(0)
 	->withRules([
-		ListToArrayDestructRector::class,
+		\Rector\Php71\Rector\List_\ListToArrayDestructRector::class,
+	])
+	->withSets([
+		\Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_54,
+		\Rector\Set\ValueObject\DowngradeLevelSetList::DOWN_TO_PHP_74,
 	])
 ;
