@@ -28,7 +28,7 @@ class Logger
 
 	public function __construct(string $channel = LogChannel::DEFAULT)
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . self::class . '` is deprecated since 2025.07 and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.', E_USER_DEPRECATED);
 
 		$this->channel = $channel;
 	}

@@ -765,7 +765,7 @@ Lucas: For the right price, yes.[/share]',
 					'embed_html'    => '<iframe src="http://domain.tld/player"></iframe>',
 					'embed_width'   => 620,
 					'embed_height'  => 480,
-				]
+				],
 			],
 			'player-video' => [
 				'expected' => 'text <div class="type-link"><iframe class="embed" src="http://domain.tld/player" style="aspect-ratio:620/480;" height="" width="100%" scrolling="no" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen sandbox="allow-same-origin allow-scripts allow-popups"></iframe>' . "\n</div>",
@@ -806,8 +806,8 @@ Lucas: For the right price, yes.[/share]',
 					'embed_html'    => '<iframe src="http://domain.tld/player"></iframe>',
 					'embed_width'   => 620,
 					'embed_height'  => 480,
-				]
-			]
+				],
+			],
 		];
 	}
 
@@ -819,7 +819,7 @@ Lucas: For the right price, yes.[/share]',
 	 */
 	public function testConvertAttachment(string $expected, array $data)
 	{
-		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
 		$actual = BBCode::convertAttachment('', BBCode::INTERNAL, $data, 0, BBCode::PREVIEW_LARGE, true);
 

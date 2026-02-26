@@ -65,9 +65,9 @@ use Psr\Log\LoggerInterface;
  */
 class App
 {
-	const PLATFORM = 'Friendica';
-	const CODENAME = 'Blutwurz';
-	const VERSION  = '2026.04-dev';
+	public const PLATFORM = 'Friendica';
+	public const CODENAME = 'Blutwurz';
+	public const VERSION  = '2026.04-dev';
 
 	/**
 	 * @internal
@@ -195,7 +195,7 @@ class App
 			$addonHelper,
 			$this->container->create(ModuleHTTPException::class),
 			$start_time,
-			$request
+			$request,
 		);
 	}
 
@@ -339,7 +339,7 @@ class App
 
 	private function registerTemplateEngine(): void
 	{
-		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 	}
 
 	/**
@@ -467,11 +467,11 @@ class App
 
 			if (!$this->mode->isInstall()) {
 				// Force SSL redirection
-				if ($this->config->get('system', 'force_ssl') &&
-					(empty($serverVars['HTTPS']) || $serverVars['HTTPS'] === 'off') &&
-					(empty($serverVars['HTTP_X_FORWARDED_PROTO']) || $serverVars['HTTP_X_FORWARDED_PROTO'] === 'http') &&
-					!empty($serverVars['REQUEST_METHOD']) &&
-					$serverVars['REQUEST_METHOD'] === 'GET') {
+				if ($this->config->get('system', 'force_ssl')
+					&& (empty($serverVars['HTTPS']) || $serverVars['HTTPS'] === 'off')
+					&& (empty($serverVars['HTTP_X_FORWARDED_PROTO']) || $serverVars['HTTP_X_FORWARDED_PROTO'] === 'http')
+					&& !empty($serverVars['REQUEST_METHOD'])
+					&& $serverVars['REQUEST_METHOD'] === 'GET') {
 					System::externalRedirect($this->baseURL . '/' . $this->args->getQueryString());
 				}
 
@@ -484,8 +484,8 @@ class App
 			if (!empty($queryVars['zrl']) && $this->mode->isNormal() && !$this->mode->isBackend() && !$this->session->getLocalUserId()) {
 				// Only continue when the given profile link seems valid.
 				// Valid profile links contain a path with "/profile/" and no query parameters
-				if ((parse_url($queryVars['zrl'], PHP_URL_QUERY) == '') &&
-					strpos(parse_url($queryVars['zrl'], PHP_URL_PATH) ?? '', '/profile/') !== false) {
+				if ((parse_url($queryVars['zrl'], PHP_URL_QUERY) == '')
+					&& strpos(parse_url($queryVars['zrl'], PHP_URL_PATH) ?? '', '/profile/') !== false) {
 					$this->auth->setUnauthenticatedVisitor($queryVars['zrl']);
 					OpenWebAuth::zrlInit();
 				} else {
@@ -655,10 +655,10 @@ class App
 
 		@file_put_contents(
 			$logfile,
-			DateTimeFormat::utcNow() . "\t" . round($duration, 3) . "\t" .
-			$this->requestId . "\t" . $code . "\t" .
-			$request . "\t" . $agent . "\n",
-			FILE_APPEND
+			DateTimeFormat::utcNow() . "\t" . round($duration, 3) . "\t"
+			. $this->requestId . "\t" . $code . "\t"
+			. $request . "\t" . $agent . "\n",
+			FILE_APPEND,
 		);
 	}
 }

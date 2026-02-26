@@ -40,7 +40,7 @@ class StreamLogger extends AbstractLoggerTypeFactory
 	 */
 	public function create(IManageConfigValues $config, string $logfile = null, string $channel = null): LoggerInterface
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . self::class . '` is deprecated since 2025.07 and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.', E_USER_DEPRECATED);
 
 		$fileSystem = new FileSystem();
 
@@ -80,8 +80,8 @@ class StreamLogger extends AbstractLoggerTypeFactory
 		$logfile     = $config->get('system', 'dlogfile');
 		$developerIp = $config->get('system', 'dlogip');
 
-		if ((!isset($developerIp) || !$debugging) &&
-			(!is_file($logfile) || is_writable($logfile))) {
+		if ((!isset($developerIp) || !$debugging)
+			&& (!is_file($logfile) || is_writable($logfile))) {
 			return new NullLogger();
 		}
 

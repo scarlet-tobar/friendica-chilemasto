@@ -61,7 +61,7 @@ class Temporal
 
 		$o = '<select id="timezone_select" name="timezone">';
 
-		usort($timezone_identifiers, [__CLASS__, 'timezoneCompareCallback']);
+		usort($timezone_identifiers, [self::class, 'timezoneCompareCallback']);
 		$continent = '';
 		foreach ($timezone_identifiers as $value) {
 			$ex = explode("/", $value);
@@ -156,9 +156,9 @@ class Temporal
 					$value,
 					intval($age) > 0 ? DI::l10n()->t('Age: ') . DI::l10n()->tt('%d year old', '%d years old', $age) : '',
 					'',
-					'placeholder="' . DI::l10n()->t('YYYY-MM-DD or MM-DD') . '"'
-				]
-			]
+					'placeholder="' . DI::l10n()->t('YYYY-MM-DD or MM-DD') . '"',
+				],
+			],
 		);
 
 		return $o;
@@ -236,7 +236,7 @@ class Temporal
 		if (!in_array(
 			$lang,
 			['ar', 'ro', 'id', 'bg', 'fa', 'ru', 'uk', 'en', 'el', 'de', 'nl', 'tr', 'fr', 'es', 'th', 'pl', 'pt', 'ch', 'se', 'kr',
-				'it', 'da', 'no', 'ja', 'vi', 'sl', 'cs', 'hu']
+				'it', 'da', 'no', 'ja', 'vi', 'sl', 'cs', 'hu'],
 		)) {
 			$lang = 'en';
 		}
@@ -269,10 +269,10 @@ class Temporal
 				DI::l10n()->t(
 					'Time zone: <strong>%s</strong> <a href="%s">Change in Settings</a>',
 					str_replace('_', ' ', DI::appHelper()->getTimeZone()) . ' (GMT ' . DateTimeFormat::localNow('P') . ')',
-					DI::baseUrl() . '/settings'
+					DI::baseUrl() . '/settings',
 				),
 				$required ? '*' : '',
-				'placeholder="' . $readable_format . '"'
+				'placeholder="' . $readable_format . '"',
 			],
 			'$datetimepicker' => [
 				'minDate'     => $minDate,
@@ -451,7 +451,7 @@ class Temporal
 			'January', 'February', 'March',
 			'April', 'May', 'June',
 			'July', 'August', 'September',
-			'October', 'November', 'December'
+			'October', 'November', 'December',
 		];
 
 		$thisyear  = DateTimeFormat::localNow('Y');
