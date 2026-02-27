@@ -23,6 +23,7 @@ use Friendica\Util\Map;
 use Friendica\Util\Strings;
 use Friendica\Util\Temporal;
 use Friendica\Util\XML;
+use IntlDateFormatter;
 
 /**
  * functions for interacting with the event database table
@@ -37,12 +38,10 @@ class Event
 
 		$uriid = $event['uri-id'] ?? $uriid;
 
-		$bd_format = DI::l10n()->t('l F d, Y \@ g:i A \G\M\TP (e)'); // Friday October 29, 2021 @ 9:15 AM GMT-04:00 (America/New_York)
-
-		$event_start = DI::l10n()->getDay(DateTimeFormat::local($event['start'], $bd_format));
+		$event_start = DI::l10n()->formatDateTime($event['start'], IntlDateFormatter::FULL, IntlDateFormatter::LONG);
 
 		if (!empty($event['finish'])) {
-			$event_end = DI::l10n()->getDay(DateTimeFormat::local($event['finish'], $bd_format));
+			$event_end = DI::l10n()->formatDateTime($event['finish'], IntlDateFormatter::FULL, IntlDateFormatter::LONG);
 		} else {
 			$event_end = '';
 		}
@@ -459,7 +458,7 @@ class Event
 
 			'dtstart_label'  => DI::l10n()->t('Starts:'),
 			'dtend_label'    => DI::l10n()->t('Finishes:'),
-			'location_label' => DI::l10n()->t('Location:')
+			'location_label' => DI::l10n()->t('Location:'),
 		];
 	}
 
@@ -542,7 +541,7 @@ class Event
 			  AND `event`.`uid` = ?
 			  $sql_perms",
 			$event_id,
-			$owner_uid
+			$owner_uid,
 		));
 		if (empty($events)) {
 			throw new NotFoundException(DI::l10n()->t('Event not found.'));
@@ -607,7 +606,7 @@ class Event
 			$owner_uid,
 			$start,
 			$start,
-			$finish
+			$finish,
 		));
 
 		$events = self::removeDuplicates($events);
@@ -710,11 +709,11 @@ class Event
 					$time_format = "%H:%M:%S";
 					$date_format = "%Y-%m-%d";
 
-					$o .= '"' . $event['summary'] . '", "' . strftime($date_format, $tmp1) .
-						'", "' . strftime($time_format, $tmp1) . '", "' . $event['desc'] .
-						'", "' . strftime($date_format, $tmp2) .
-						'", "' . strftime($time_format, $tmp2) .
-						'", "' . $event['location'] . '"' . PHP_EOL;
+					$o .= '"' . $event['summary'] . '", "' . strftime($date_format, $tmp1)
+						. '", "' . strftime($time_format, $tmp1) . '", "' . $event['desc']
+						. '", "' . strftime($date_format, $tmp2)
+						. '", "' . strftime($time_format, $tmp2)
+						. '", "' . $event['location'] . '"' . PHP_EOL;
 				}
 				break;
 
@@ -923,7 +922,7 @@ class Event
 			'id'      => $item['author-id'],
 			'network' => $item['author-network'],
 			'url'     => $item['author-link'],
-			'alias'   => $item['author-alias']
+			'alias'   => $item['author-alias'],
 		];
 		$profile_link = Contact::magicLinkByContact($author);
 
@@ -1027,7 +1026,7 @@ class Event
 			'uid'   => $contact['uid'],
 			'cid'   => $contact['id'],
 			'start' => DateTimeFormat::utc($birthday),
-			'type'  => 'birthday'
+			'type'  => 'birthday',
 		];
 		if (DBA::exists('event', $condition)) {
 			return false;

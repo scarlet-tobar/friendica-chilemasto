@@ -34,7 +34,6 @@ use Friendica\Module\BaseSettings;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException;
-use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
@@ -478,7 +477,7 @@ class Display extends BaseSettings
 			'$channel_languages'     => ['channel_languages[]', $this->t('Channel languages:'), $channel_languages, $this->t('Select all the languages you want to see in your channels. "Unspecified" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language). If you want to see all languages, you will need to select all items in the list.'), $languages, 'multiple'],
 			'$timeline_channels'     => ['timeline_channels[]', $this->t('Timeline channels:'), $timeline_channels, $this->t('Select all the channels that you want to see in your network timeline.'), $channels, 'multiple'],
 			'$has_timeline_channels' => !empty($channels),
-			'$filter_channels'       => ['filter_channels[]', $this->t('Filter channels:'), $filter_channels, $this->t('Select all the channels that you want to use as a filter for your network timeline. All posts from these channels will be hidden. For technical reasons postings that are older than %s will not be filtered.', DateTimeFormat::local(Engagement::getCreationDateLimit(false)), 'r'), $filter, 'multiple'],
+			'$filter_channels'       => ['filter_channels[]', $this->t('Filter channels:'), $filter_channels, $this->t('Select all the channels that you want to use as a filter for your network timeline. All posts from these channels will be hidden. For technical reasons postings that are older than %s will not be filtered.', $this->l10n->dateTime(Engagement::getCreationDateLimit(false)), 'r'), $filter, 'multiple'],
 			'$has_filter_channels'   => !empty($filter),
 
 			'$first_day_of_week'     => ['first_day_of_week', $this->t('Beginning of week:'), $first_day_of_week, '', $weekdays, false],

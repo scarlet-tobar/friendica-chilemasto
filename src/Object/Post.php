@@ -23,7 +23,6 @@ use Friendica\Protocol\Activity;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
-use Friendica\Util\Temporal;
 use GuzzleHttp\Psr7\Uri;
 use InvalidArgumentException;
 
@@ -36,7 +35,7 @@ class Post
 	private $template            = null;
 	private $available_templates = [
 		'wall'      => 'wall_thread.tpl',
-		'wall2wall' => 'wallwall_thread.tpl'
+		'wall2wall' => 'wallwall_thread.tpl',
 	];
 	private $comment_box_template = 'comment_item.tpl';
 	private $toplevel             = false;
@@ -80,7 +79,7 @@ class Post
 			'id'      => $this->getDataValue('author-id'),
 			'network' => $this->getDataValue('author-network'),
 			'url'     => $this->getDataValue('author-link'),
-			'alias'   => $this->getDataValue('author-alias')
+			'alias'   => $this->getDataValue('author-alias'),
 		];
 		$this->redirect_url = Contact::magicLinkByContact($author);
 		if (!$this->isToplevel()) {
@@ -165,8 +164,8 @@ class Post
 		if (strtotime($item['edited']) - strtotime($item['created']) > 1) {
 			$edited = [
 				'label'    => DI::l10n()->t('This entry was edited'),
-				'date'     => DateTimeFormat::local($item['edited'], 'r'),
-				'relative' => Temporal::getRelativeDate($item['edited']),
+				'date'     => DI::l10n()->longDateTime($item['edited']),
+				'relative' => DI::l10n()->relativeDateTime($item['edited']),
 			];
 		}
 		$sparkle = '';
@@ -485,8 +484,8 @@ class Post
 
 		$tags = Tag::populateFromItem($item);
 
-		$ago          = Temporal::getRelativeDate($item['created']);
-		$ago_received = Temporal::getRelativeDate($item['received']);
+		$ago          = DI::l10n()->relativeDateTime($item['created']);
+		$ago_received = DI::l10n()->relativeDateTime($item['received']);
 		if (DI::config()->get('system', 'show_received') && (abs(strtotime($item['created']) - strtotime($item['received'])) > DI::config()->get('system', 'show_received_seconds')) && ($ago != $ago_received)) {
 			$ago = DI::l10n()->t('%s (Received %s)', $ago, $ago_received);
 		}
@@ -495,7 +494,7 @@ class Post
 		if (!DI::userSession()->getLocalUserId() && ($item['network'] != Protocol::DIASPORA) && !empty(DI::session()->get('remote_comment'))) {
 			$remote_comment = [
 				DI::l10n()->t('Comment this item on your system'), DI::l10n()->t('Remote comment'),
-				str_replace('{uri}', urlencode($item['uri']), DI::session()->get('remote_comment'))
+				str_replace('{uri}', urlencode($item['uri']), DI::session()->get('remote_comment')),
 			];
 
 			// Ensure to either display the remote comment or the local activities
@@ -567,7 +566,7 @@ class Post
 			'sparkle'                => $sparkle,
 			'title'                  => $item['title'],
 			'summary'                => $item['content-warning'],
-			'localtime'              => DateTimeFormat::local($item['created'], 'r'),
+			'localtime'              => DI::l10n()->longDateTime($item['created']),
 			'utc'                    => DateTimeFormat::utc($item['created']),
 			'ago'                    => $item['app'] ? DI::l10n()->t('%s from %s', $ago, $item['app']) : $ago,
 			'app'                    => $item['app'],
@@ -815,8 +814,8 @@ class Post
 			DI::logger()->warning('Post object does not belong to local user', ['post' => $item, 'local_user' => DI::userSession()->getLocalUserId()]);
 			return false;
 		} elseif (
-			DI::activity()->match($item->getDataValue('verb'), Activity::LIKE) ||
-			DI::activity()->match($item->getDataValue('verb'), Activity::DISLIKE)
+			DI::activity()->match($item->getDataValue('verb'), Activity::LIKE)
+			|| DI::activity()->match($item->getDataValue('verb'), Activity::DISLIKE)
 		) {
 			DI::logger()->warning('Post objects is a like/dislike', ['post' => $item]);
 			return false;
@@ -1100,8 +1099,8 @@ class Post
 
 			$profile = Contact::getByURL($term['url'], false, ['addr', 'contact-type']);
 			if (
-				!empty($profile['addr']) && (($profile['contact-type'] ?? Contact::TYPE_UNKNOWN) != Contact::TYPE_COMMUNITY) &&
-				($profile['addr'] != $owner['addr']) && !strstr($text, $profile['addr'])
+				!empty($profile['addr']) && (($profile['contact-type'] ?? Contact::TYPE_UNKNOWN) != Contact::TYPE_COMMUNITY)
+				&& ($profile['addr'] != $owner['addr']) && !strstr($text, $profile['addr'])
 			) {
 				$text .= '@' . $profile['addr'] . ' ';
 			}
@@ -1179,7 +1178,7 @@ class Post
 				'$prompttext'  => DI::l10n()->t('Please enter a image/video/audio/webpage URL:'),
 				'$preview'     => DI::l10n()->t('Preview'),
 				'$indent'      => $indent,
-				'$rand_num'    => Crypto::randomDigits(12)
+				'$rand_num'    => Crypto::randomDigits(12),
 			]);
 		}
 
