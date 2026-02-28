@@ -35,7 +35,6 @@ use Friendica\Network\HTTPException;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Profile\ProfileField\Repository\ProfileField;
 use Friendica\Protocol\ActivityPub;
-use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
@@ -184,19 +183,15 @@ class Profile extends BaseProfile
 			$basic_fields += self::buildField(
 				'membersince',
 				$this->t('Joined:'),
-				$this->l10n->longDate($profile['register_date']),
+				$this->l10n->fullDate($profile['register_date']),
 			);
 		}
 
 		if (!empty($profile['dob']) && $profile['dob'] > DBA::NULL_DATE) {
-			$year_bd_format  = $this->t('j F, Y');
-			$short_bd_format = $this->t('j F');
-
-			$dob = $this->l10n->getDay(
-				intval($profile['dob'])
-					? DateTimeFormat::utc($profile['dob'] . ' 00:00 +00:00', $year_bd_format)
-					: DateTimeFormat::utc('2001-' . substr($profile['dob'], 5) . ' 00:00 +00:00', $short_bd_format),
-			);
+			$short_bd_format = $this->t('d MMMM');
+			$dob             = intval($profile['dob'])
+					? $this->l10n->longDate($profile['dob'] . ' 00:00 +00:00')
+					: $this->l10n->formatDateTimeByPattern('2001-' . substr($profile['dob'], 5) . ' 00:00 +00:00', $short_bd_format);
 
 			$basic_fields += self::buildField('dob', $this->t('Birthday:'), $dob);
 
