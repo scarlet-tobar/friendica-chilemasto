@@ -183,7 +183,7 @@ class Profile extends BaseProfile
 			$basic_fields += self::buildField(
 				'membersince',
 				$this->t('Joined:'),
-				$this->l10n->fullDate($profile['register_date']),
+				$this->l10n->mediumDate($profile['register_date']),
 			);
 		}
 
