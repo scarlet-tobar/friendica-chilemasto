@@ -884,7 +884,7 @@ class Event
 		$dtstart_dt    = DI::l10n()->fullDateTime($item['event-start']);
 		$dtstart_title = DateTimeFormat::utc($item['event-start'], DateTimeFormat::ATOM);
 		// Format: Jan till Dec.
-		$month_short =  DI::l10n()->formatDateTimeByPattern($item['event-start'], 'MMM');
+		$month_short = DI::l10n()->formatDateTimeByPattern($item['event-start'], 'MMM');
 		// Format: 1 till 31.
 		$date_short  = DI::l10n()->formatDateTimeByPattern($item['event-start'], 'd');
 		$start_time  = DI::l10n()->formatDateTime($item['event-start'], IntlDateFormatter::NONE, IntlDateFormatter::SHORT);

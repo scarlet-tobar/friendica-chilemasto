@@ -27,7 +27,6 @@ use Friendica\Security\PermissionSet\Entity\PermissionSet;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy;
 use Friendica\Util\Strings;
-use IntlDateFormatter;
 
 class Profile
 {

@@ -189,7 +189,7 @@ class Profile extends BaseProfile
 
 		if (!empty($profile['dob']) && $profile['dob'] > DBA::NULL_DATE) {
 			$short_bd_format = $this->t('d MMMM');
-			$dob = intval($profile['dob'])
+			$dob             = intval($profile['dob'])
 					? $this->l10n->longDate($profile['dob'] . ' 00:00 +00:00')
 					: $this->l10n->formatDateTimeByPattern('2001-' . substr($profile['dob'], 5) . ' 00:00 +00:00', $short_bd_format);
 

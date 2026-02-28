@@ -37,7 +37,7 @@ class Widget
 			'$desc'    => DI::l10n()->t('Enter address or web location'),
 			'$hint'    => DI::l10n()->t('user@x.tld, x.tld/user'),
 			'$value'   => $value,
-			'$follow'  => DI::l10n()->t('Connect')
+			'$follow'  => DI::l10n()->t('Connect'),
 		]);
 	}
 
@@ -230,7 +230,7 @@ class Widget
 		$options = array_map(function ($circle) {
 			return [
 				'ref'  => $circle['id'],
-				'name' => $circle['name']
+				'name' => $circle['name'],
 			];
 		}, Circle::getByUserId(DI::userSession()->getLocalUserId()));
 
@@ -241,7 +241,7 @@ class Widget
 			DI::l10n()->t('Everyone'),
 			$baseurl,
 			$options,
-			$selected
+			$selected,
 		);
 	}
 
@@ -273,7 +273,7 @@ class Widget
 			DI::l10n()->t('All Contacts'),
 			$baseurl,
 			$options,
-			$selected
+			$selected,
 		);
 	}
 
@@ -314,7 +314,7 @@ class Widget
 			DI::l10n()->t('All Protocols'),
 			$baseurl,
 			$nets,
-			$selected
+			$selected,
 		);
 	}
 
@@ -344,7 +344,7 @@ class Widget
 			DI::l10n()->t('Everything'),
 			$baseurl,
 			$terms,
-			$selected
+			$selected,
 		);
 	}
 
@@ -375,7 +375,7 @@ class Widget
 			DI::l10n()->t('Everything'),
 			$baseurl,
 			$terms,
-			$selected
+			$selected,
 		);
 	}
 
@@ -432,7 +432,7 @@ class Widget
 			'$nickname' => $nickname,
 			'$linkmore' => $total > 5 ? 'true' : '',
 			'$more'     => DI::l10n()->t('show more'),
-			'$contacts' => $entries
+			'$contacts' => $entries,
 		]);
 	}
 
@@ -481,7 +481,7 @@ class Widget
 
 		$ret = [];
 
-		$cachekey = 'Widget::postedByYear' . $uid . '-' . (int)$wall;
+		$cachekey = 'Widget::postedByYear' . $uid . '-' . (int) $wall;
 		$dthen    = DI::cache()->get($cachekey);
 		if (empty($dthen)) {
 			$dthen = Item::firstPostDate($uid, $wall);
@@ -541,7 +541,7 @@ class Widget
 			'$onthisdate'  => DI::l10n()->t('On this date'),
 			'$thisday'     => $thisday,
 			'$nextday'     => $nextday,
-			'$cutoffday'   => $cutoffday
+			'$cutoffday'   => $cutoffday,
 		]);
 
 		return $o;
@@ -572,7 +572,7 @@ class Widget
 			DI::l10n()->t('All'),
 			$base,
 			$accounts,
-			$accounttype
+			$accounttype,
 		);
 	}
 
@@ -634,7 +634,7 @@ class Widget
 			'',
 			$base,
 			$channels,
-			$channelname
+			$channelname,
 		);
 	}
 }

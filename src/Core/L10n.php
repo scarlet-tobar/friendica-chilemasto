@@ -643,7 +643,7 @@ class L10n
 	 *
 	 * Creates an IntlDateFormatter using the instance locale and the timezone
 	 * stored in session (if any) and formats the provided date/time string.
-	 * 
+	 *
 	 * @see https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax for details on the supported pattern syntax when using the $pattern parameter.
 	 *
 	 * @param string $datestring Date/time string (e.g. ISO 8601)
