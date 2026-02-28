@@ -115,7 +115,7 @@ class Index extends BaseSettings
 			}
 
 			if ($ignore_year) {
-				$dob = '0000-' . DateTimeFormat::utc('1900-' . $dob, 'm-d');
+				$dob = '0000-' . DateTimeFormat::utc('1904-' . $dob, 'm-d');
 			} else {
 				$dob = DateTimeFormat::utc($dob, 'Y-m-d');
 			}
