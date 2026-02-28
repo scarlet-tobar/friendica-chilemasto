@@ -538,52 +538,6 @@ class L10n
 	}
 
 	/**
-	 * Translate days and months names.
-	 *
-	 * @param string $s String with day or month name.
-	 * @return string Translated string.
-	 */
-	public function getDay(string $s): string
-	{
-		$ret = str_replace(
-			['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-			[$this->t('Monday'), $this->t('Tuesday'), $this->t('Wednesday'), $this->t('Thursday'), $this->t('Friday'), $this->t('Saturday'), $this->t('Sunday')],
-			$s,
-		);
-
-		$ret = str_replace(
-			['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-			[$this->t('January'), $this->t('February'), $this->t('March'), $this->t('April'), $this->t('May'), $this->t('June'), $this->t('July'), $this->t('August'), $this->t('September'), $this->t('October'), $this->t('November'), $this->t('December')],
-			$ret,
-		);
-
-		return $ret;
-	}
-
-	/**
-	 * Translate short days and months names.
-	 *
-	 * @param string $s String with short day or month name.
-	 * @return string Translated string.
-	 */
-	public function getDayShort(string $s): string
-	{
-		$ret = str_replace(
-			['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-			[$this->t('Mon'), $this->t('Tue'), $this->t('Wed'), $this->t('Thu'), $this->t('Fri'), $this->t('Sat'), $this->t('Sun')],
-			$s,
-		);
-
-		$ret = str_replace(
-			['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-			[$this->t('Jan'), $this->t('Feb'), $this->t('Mar'), $this->t('Apr'), $this->t('May'), $this->t('Jun'), $this->t('Jul'), $this->t('Aug'), $this->t('Sep'), $this->t('Oct'), $this->t('Nov'), $this->t('Dec')],
-			$ret,
-		);
-
-		return $ret;
-	}
-
-	/**
 	 * Creates a new L10n instance based on the given langauge
 	 *
 	 * @param string $lang The new language
@@ -604,7 +558,7 @@ class L10n
 	}
 
 	/**
-	 * Format a date/time string using RELATIVE_FULL date and MEDIUM time.
+	 * Format a date/time string using RELATIVE_FULL date and SHORT time.
 	 *
 	 * This will produce relative strings where supported by the ICU implementation
 	 * (for example "yesterday", "in 2 days") according to the current locale.
@@ -615,19 +569,19 @@ class L10n
 	 */
 	public function relativeDateTime(string $datestring): string
 	{
-		return $this->formatDateTime($datestring, IntlDateFormatter::RELATIVE_FULL, IntlDateFormatter::MEDIUM);
+		return $this->formatDateTime($datestring, IntlDateFormatter::RELATIVE_FULL, IntlDateFormatter::SHORT);
 	}
 
 	/**
-	 * Format a date/time string using FULL date and MEDIUM time according to current locale.
+	 * Format a date/time string using FULL date and SHORT time according to current locale.
 	 *
 	 * @param string $datestring Date/time string (e.g. ISO 8601)
 	 * @return string Formatted date/time string
 	 * @throws \Exception If the date string cannot be parsed into a DateTime
 	 */
-	public function longDateTime(string $datestring): string
+	public function fullDateTime(string $datestring): string
 	{
-		return $this->formatDateTime($datestring, IntlDateFormatter::FULL, IntlDateFormatter::MEDIUM);
+		return $this->formatDateTime($datestring, IntlDateFormatter::FULL, IntlDateFormatter::SHORT);
 	}
 
 	/**
@@ -649,9 +603,39 @@ class L10n
 	 * @return string Formatted date string
 	 * @throws \Exception If the date string cannot be parsed into a DateTime
 	 */
-	public function longDate(string $datestring): string
+	public function fullDate(string $datestring): string
 	{
 		return $this->formatDateTime($datestring, IntlDateFormatter::FULL, IntlDateFormatter::NONE);
+	}
+
+	/**
+	 * Format a date string (date only) using LONG date format according to current locale.
+	 *
+	 * @param string $datestring Date string
+	 * @return string Formatted date string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function longDate(string $datestring): string
+	{
+		return $this->formatDateTime($datestring, IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+	}
+
+	/**
+	 * Format a date/time string using a custom ICU pattern.
+	 * @see https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax
+	 *
+	 * The provided pattern is passed directly to the underlying
+	 * `IntlDateFormatter` instance. This allows callers to specify
+	 * arbitrary formatting rules beyond the standard date/time styles.
+	 *
+	 * @param string $datestring Date/time string (e.g. ISO 8601)
+	 * @param string $pattern ICU date/time pattern
+	 * @return string Formatted date/time string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function formatDateTimeByPattern(string $datestring, string $pattern): string
+	{
+		return $this->formatDateTime($datestring, IntlDateFormatter::NONE, IntlDateFormatter::NONE, $pattern);
 	}
 
 	/**
@@ -659,20 +643,25 @@ class L10n
 	 *
 	 * Creates an IntlDateFormatter using the instance locale and the timezone
 	 * stored in session (if any) and formats the provided date/time string.
+	 * 
+	 * @see https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax for details on the supported pattern syntax when using the $pattern parameter.
 	 *
 	 * @param string $datestring Date/time string (e.g. ISO 8601)
 	 * @param int $dateType One of IntlDateFormatter::SHORT|MEDIUM|LONG|FULL|NONE
 	 * @param int $timeType One of IntlDateFormatter::SHORT|MEDIUM|LONG|FULL|NONE
+	 * @param string $pattern Optional ICU date/time pattern to use instead of the standard styles
 	 * @return string Formatted date/time string
 	 * @throws \Exception If the date string cannot be parsed into a DateTime
 	 */
-	public function formatDateTime(string $datestring, int $dateType, int $timeType): string
+	public function formatDateTime(string $datestring, int $dateType, int $timeType, ?string $pattern = null): string
 	{
 		$formatter = new IntlDateFormatter(
-			$this->session->get('language') ?? $this->locale ?: 'en_US',
+			$this->session->get('language') ?? $this->locale ?: $this->config->get('system', 'language', 'en_US'),
 			$dateType,
 			$timeType,
 			$this->session->get('timezone') ?? null,
+			null,
+			$pattern,
 		);
 
 		return $formatter->format(new DateTime($datestring));

@@ -635,8 +635,7 @@ class Event
 
 		$start = DateTimeFormat::local($event['start'], 'c');
 		$j     = DateTimeFormat::local($event['start'], 'j');
-		$day   = DateTimeFormat::local($event['start'], $fmt);
-		$day   = DI::l10n()->getDay($day);
+		$day   = DI::l10n()->fullDate($event['start']);
 
 		if ($event['nofinish']) {
 			$end = null;
@@ -881,30 +880,26 @@ class Event
 		$same_date = false;
 		$finish    = false;
 
-		// Set the different time formats.
-		$dformat       = DI::l10n()->t('l F d, Y \@ g:i A'); // Friday January 18, 2011 @ 8:01 AM.
-		$dformat_short = DI::l10n()->t('D g:i A'); // Fri 8:01 AM.
-		$tformat       = DI::l10n()->t('g:i A'); // 8:01 AM.
-		$tzformat      = DI::l10n()->t('e'); // Atlantic/Azores.
-
 		// Convert the time to different formats.
-		$dtstart_dt    = DI::l10n()->getDay(DateTimeFormat::local($item['event-start'], $dformat));
+		$dtstart_dt    = DI::l10n()->fullDateTime($item['event-start']);
 		$dtstart_title = DateTimeFormat::utc($item['event-start'], DateTimeFormat::ATOM);
 		// Format: Jan till Dec.
-		$month_short = DI::l10n()->getDayShort(DateTimeFormat::local($item['event-start'], 'M'));
+		$month_short =  DI::l10n()->formatDateTimeByPattern($item['event-start'], 'MMM');
 		// Format: 1 till 31.
-		$date_short  = DateTimeFormat::local($item['event-start'], 'j');
-		$start_time  = DateTimeFormat::local($item['event-start'], $tformat);
-		$start_short = DI::l10n()->getDayShort(DateTimeFormat::local($item['event-start'], $dformat_short));
-		$timezone    = DateTimeFormat::local($item['event-start'], $tzformat);
+		$date_short  = DI::l10n()->formatDateTimeByPattern($item['event-start'], 'd');
+		$start_time  = DI::l10n()->formatDateTime($item['event-start'], IntlDateFormatter::NONE, IntlDateFormatter::SHORT);
+		$start_day   = DI::l10n()->formatDateTimeByPattern($item['event-start'], 'eeee');
+		$start_short = $start_day . ' ' . $start_time;
+		$timezone    = DI::l10n()->formatDateTimeByPattern($item['event-start'], 'vvvv');
 
 		// If the option 'nofinisch' isn't set, we need to format the finish date/time.
 		if (!$item['event-nofinish']) {
 			$finish      = true;
-			$dtend_dt    = DI::l10n()->getDay(DateTimeFormat::local($item['event-finish'], $dformat));
+			$dtend_dt    = DI::l10n()->fullDateTime($item['event-finish']);
 			$dtend_title = DateTimeFormat::utc($item['event-finish'], DateTimeFormat::ATOM);
-			$end_short   = DI::l10n()->getDayShort(DateTimeFormat::utc($item['event-finish'], $dformat_short));
-			$end_time    = DateTimeFormat::local($item['event-finish'], $tformat);
+			$end_time    = DI::l10n()->formatDateTime($item['event-finish'], IntlDateFormatter::NONE, IntlDateFormatter::SHORT);
+			$end_day     = DI::l10n()->formatDateTimeByPattern($item['event-finish'], 'eeee');
+			$end_short   = $end_day . ' ' . $end_time;
 			// Check if start and finish time is at the same day.
 			if (substr($dtstart_title, 0, 10) === substr($dtend_title, 0, 10)) {
 				$same_date = true;

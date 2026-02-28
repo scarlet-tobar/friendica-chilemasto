@@ -164,7 +164,7 @@ class Post
 		if (strtotime($item['edited']) - strtotime($item['created']) > 1) {
 			$edited = [
 				'label'    => DI::l10n()->t('This entry was edited'),
-				'date'     => DI::l10n()->longDateTime($item['edited']),
+				'date'     => DI::l10n()->fullDateTime($item['edited']),
 				'relative' => DI::l10n()->relativeDateTime($item['edited']),
 			];
 		}
@@ -566,7 +566,7 @@ class Post
 			'sparkle'                => $sparkle,
 			'title'                  => $item['title'],
 			'summary'                => $item['content-warning'],
-			'localtime'              => DI::l10n()->longDateTime($item['created']),
+			'localtime'              => DI::l10n()->fullDateTime($item['created']),
 			'utc'                    => DateTimeFormat::utc($item['created']),
 			'ago'                    => $item['app'] ? DI::l10n()->t('%s from %s', $ago, $item['app']) : $ago,
 			'app'                    => $item['app'],

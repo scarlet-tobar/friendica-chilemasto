@@ -1588,7 +1588,7 @@ class Conversation
 				'categories'           => $categories,
 				'folders'              => $folders,
 				'text'                 => strip_tags($body_html),
-				'localtime'            => $this->l10n->longDateTime($item['created']),
+				'localtime'            => $this->l10n->fullDateTime($item['created']),
 				'utc'                  => DateTimeFormat::utc($item['created'], 'c'),
 				'ago'                  => (($item['app']) ? $this->l10n->t('%s from %s', $this->l10n->relativeDateTime($item['created']), $item['app']) : $this->l10n->relativeDateTime($item['created'])),
 				'location_html'        => $location_html,

@@ -27,6 +27,7 @@ use Friendica\Security\PermissionSet\Entity\PermissionSet;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy;
 use Friendica\Util\Strings;
+use IntlDateFormatter;
 
 class Profile
 {
@@ -528,8 +529,6 @@ class Profile
 	 */
 	public static function getBirthdays(int $uid): string
 	{
-		$bd_short = DI::l10n()->t('F d');
-
 		$cacheKey = 'get_birthdays:' . $uid;
 		$events   = DI::cache()->get($cacheKey);
 		if (is_null($events)) {
@@ -592,7 +591,7 @@ class Profile
 						'id'    => $event['id'],
 						'link'  => Contact::magicLinkById($event['cid']),
 						'title' => $event['name'],
-						'date'  => DI::l10n()->getDay(DateTimeFormat::local($event['start'], $bd_short)) . (($today) ? ' ' . DI::l10n()->t('[today]') : ''),
+						'date'  => DI::l10n()->longDate($event['start']) . (($today) ? ' ' . DI::l10n()->t('[today]') : ''),
 					];
 				}
 			}
@@ -618,7 +617,6 @@ class Profile
 	 */
 	public static function getEventsReminderHTML(int $uid, int $pcid): string
 	{
-		$bd_format  = DI::l10n()->t('g A l F d'); // 8 AM Friday January 18
 		$classtoday = '';
 
 		$condition = [
@@ -673,7 +671,7 @@ class Profile
 
 				$rr['title']       = $title;
 				$rr['description'] = $description;
-				$rr['date']        = DI::l10n()->getDay(DateTimeFormat::local($rr['start'], $bd_format)) . (($today) ? ' ' . DI::l10n()->t('[today]') : '');
+				$rr['date']        = DI::l10n()->fullDateTime($rr['start']) . ($today ? ' ' . DI::l10n()->t('[today]') : '');
 				$rr['startime']    = $strt;
 				$rr['today']       = $today;
 
