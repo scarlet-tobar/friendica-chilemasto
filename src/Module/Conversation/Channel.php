@@ -128,7 +128,7 @@ class Channel extends Timeline
 			$this->args->getQueryString(),
 			$items[array_key_first($items)][$order],
 			$items[array_key_last($items)][$order],
-			$this->itemsPerPage
+			$this->itemsPerPage,
 		);
 
 		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {

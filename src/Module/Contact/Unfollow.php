@@ -116,7 +116,7 @@ class Unfollow extends \Friendica\BaseModule
 			'$myaddr'         => $self['url'],
 			'$action'         => $this->baseUrl . '/contact/unfollow',
 			'$keywords'       => '',
-			'$keywords_label' => ''
+			'$keywords_label' => '',
 		]);
 
 		$this->page['aside'] = Widget\VCard::getHTML(Contact::getByURL($contact['url'], false), false, true);

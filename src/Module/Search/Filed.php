@@ -12,7 +12,6 @@ use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\HTML;
 use Friendica\Content\Widget;
-use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
@@ -43,14 +42,14 @@ class Filed extends BaseSearch
 				DI::userSession()->getLocalUserId(),
 				'system',
 				'itemspage_mobile_network',
-				DI::config()->get('system', 'itemspage_network_mobile')
+				DI::config()->get('system', 'itemspage_network_mobile'),
 			);
 		} else {
 			$itemspage_network = DI::pConfig()->get(
 				DI::userSession()->getLocalUserId(),
 				'system',
 				'itemspage_network',
-				DI::config()->get('system', 'itemspage_network')
+				DI::config()->get('system', 'itemspage_network'),
 			);
 		}
 

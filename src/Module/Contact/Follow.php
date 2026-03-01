@@ -175,7 +175,7 @@ class Follow extends BaseModule
 
 			$output .= Renderer::replaceMacros(
 				Renderer::getMarkupTemplate('section_title.tpl'),
-				['$title' => $this->t('Posts and Replies')]
+				['$title' => $this->t('Posts and Replies')],
 			);
 
 			// Show last public posts

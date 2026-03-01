@@ -41,11 +41,11 @@ class Community extends Timeline
 	 * Type of the community page
 	 * @{
 	 */
-	const DISABLED         = -2;
-	const DISABLED_VISITOR = -1;
-	const LOCAL            = 0;
-	const GLOBAL           = 1;
-	const LOCAL_AND_GLOBAL = 2;
+	public const DISABLED         = -2;
+	public const DISABLED_VISITOR = -1;
+	public const LOCAL            = 0;
+	public const GLOBAL           = 1;
+	public const LOCAL_AND_GLOBAL = 2;
 
 	protected $pageStyle;
 
@@ -77,7 +77,7 @@ class Community extends Timeline
 			'$content'                    => '',
 			'$header'                     => '',
 			'$show_global_community_hint' => ($this->selectedTab == CommunityEntity::GLOBAL) && $this->config->get('system', 'show_global_community_hint'),
-			'$global_community_hint'      => $this->l10n->t("This community stream shows all public posts received by this node. They may not reflect the opinions of this node’s users.")
+			'$global_community_hint'      => $this->l10n->t("This community stream shows all public posts received by this node. They may not reflect the opinions of this node’s users."),
 		]);
 
 		if (!$this->raw) {
@@ -107,7 +107,7 @@ class Community extends Timeline
 
 		if (!$this->database->isResult($items)) {
 			$o .= Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
-				'$title' => $this->l10n->t('No results.')
+				'$title' => $this->l10n->t('No results.'),
 			]);
 			return $o;
 		}
@@ -119,7 +119,7 @@ class Community extends Timeline
 			$this->args->getQueryString(),
 			$items[array_key_first($items)]['received'],
 			$items[array_key_last($items)]['received'],
-			$this->itemsPerPage
+			$this->itemsPerPage,
 		);
 
 		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
