@@ -772,10 +772,17 @@ class HTML
 	 * @return string html for loader
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function scrollLoader(): string
+	public static function scrollLoader(array $request = []): string
 	{
+		if (in_array($request['mode'] ?? '', ['minimal', 'raw'])) {
+			return '';
+		}
+
+		$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
+		$loader = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
+
 		$tpl = Renderer::getMarkupTemplate("scroll_loader.tpl");
-		return Renderer::replaceMacros($tpl, [
+		return $loader . Renderer::replaceMacros($tpl, [
 			'wait' => DI::l10n()->t('Loading more entries...'),
 			'end'  => DI::l10n()->t('The end')
 		]);

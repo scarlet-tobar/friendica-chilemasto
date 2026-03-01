@@ -195,11 +195,6 @@ class Index extends BaseSearch
 			return $o;
 		}
 
-		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll', true)) {
-			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
-			$o .= Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
-		}
-
 		if ($tag) {
 			$title = DI::l10n()->t('Items tagged with: %s', $search);
 		} else {
@@ -215,7 +210,7 @@ class Index extends BaseSearch
 		$o .= DI::conversation()->render($items, Conversation::MODE_SEARCH, false, false, 'commented', DI::userSession()->getLocalUserId());
 
 		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll', true)) {
-			$o .= HTML::scrollLoader();
+			$o .= HTML::scrollLoader($request);
 		} else {
 			$o .= $pager->renderMinimal($count);
 		}

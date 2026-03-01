@@ -77,6 +77,6 @@ final class Contact extends ContactModule
 			throw new NotFoundException();
 		}
 
-		System::htmlUpdateExit(ModelContact::getThreadsFromId($pcid, $this->userSession->getLocalUserId(), true, $item['parent'] ?? 0, $request['last_received'] ?? ''));
+		System::htmlUpdateExit(ModelContact::getThreadsFromId($pcid, $this->userSession->getLocalUserId(), true, $item['parent'] ?? 0, $request));
 	}
 }

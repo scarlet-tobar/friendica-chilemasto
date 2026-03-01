@@ -179,7 +179,7 @@ class Follow extends BaseModule
 			);
 
 			// Show last public posts
-			$output .= Contact::getPostsFromUrl($contact['url'], $this->session->getLocalUserId());
+			$output .= Contact::getPostsFromUrl($contact['url'], $this->session->getLocalUserId(), false, $request);
 		}
 
 		return $output;

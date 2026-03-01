@@ -80,11 +80,6 @@ class Community extends Timeline
 			'$global_community_hint'      => $this->l10n->t("This community stream shows all public posts received by this node. They may not reflect the opinions of this node’s users.")
 		]);
 
-		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
-			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
-			$o .= Renderer::replaceMacros($tpl, ['$reload_uri' => $this->args->getQueryString()]);
-		}
-
 		if (!$this->raw) {
 			$tabs    = $this->getTabArray($this->community->getTimelines($this->session->isAuthenticated()), 'community');
 			$tab_tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
@@ -117,7 +112,7 @@ class Community extends Timeline
 			return $o;
 		}
 
-		$o .= $this->conversation->render($items, Conversation::MODE_COMMUNITY, false, false, 'received', $this->session->getLocalUserId());
+		$o .= $this->conversation->render($items, Conversation::MODE_COMMUNITY, $this->raw, false, 'received', $this->session->getLocalUserId());
 
 		$pager = new BoundariesPager(
 			$this->l10n,
@@ -128,7 +123,7 @@ class Community extends Timeline
 		);
 
 		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
-			$o .= HTML::scrollLoader();
+			$o .= HTML::scrollLoader($request);
 		} else {
 			$o .= $pager->renderMinimal(count($items));
 		}

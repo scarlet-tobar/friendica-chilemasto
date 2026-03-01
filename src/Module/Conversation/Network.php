@@ -224,11 +224,6 @@ class Network extends Timeline
 			}
 		}
 
-		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true) && ($_GET['mode'] ?? '') != 'minimal') {
-			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
-			$o .= Renderer::replaceMacros($tpl, ['$reload_uri' => $this->args->getQueryString()]);
-		}
-
 		if (!$this->raw) {
 			$o .= $this->getTabsHTML();
 
@@ -294,7 +289,7 @@ class Network extends Timeline
 				$items = $this->getItems();
 			}
 
-			$o .= $this->conversation->render($items, Conversation::MODE_NETWORK, false, false, $this->getOrder(), $this->session->getLocalUserId());
+			$o .= $this->conversation->render($items, Conversation::MODE_NETWORK, $this->raw, false, $this->getOrder(), $this->session->getLocalUserId());
 		} catch (\Exception $e) {
 			$this->logger->error('Exception when fetching items', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
 			$o .= $this->l10n->t('Error %d (%s) while fetching the timeline.', $e->getCode(), $e->getMessage());
@@ -302,7 +297,7 @@ class Network extends Timeline
 		}
 
 		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
-			$o .= HTML::scrollLoader();
+			$o .= HTML::scrollLoader($request);
 		} else {
 			$pager = new BoundariesPager(
 				$this->l10n,
