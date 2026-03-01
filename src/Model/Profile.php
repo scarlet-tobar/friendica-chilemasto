@@ -447,7 +447,7 @@ class Profile
 
 		$member_since = null;
 		if (Feature::isEnabled($p['uid'], Feature::MEMBER_SINCE)) {
-			$member_since = [ DI::l10n()->t('Joined:'), DateTimeFormat::local($p['register_date']) ];
+			$member_since = [ DI::l10n()->t('Joined:'), DI::l10n()->mediumDate($p['register_date']) ];
 		}
 
 		$tpl = Renderer::getMarkupTemplate('profile/vcard.tpl');

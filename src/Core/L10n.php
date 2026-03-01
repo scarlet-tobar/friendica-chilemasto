@@ -609,6 +609,18 @@ class L10n
 	}
 
 	/**
+	 * Format a date string (date only) using MEDIUM date format according to current locale.
+	 *
+	 * @param string $datestring Date string
+	 * @return string Formatted date string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function mediumDate(string $datestring): string
+	{
+		return $this->formatDateTime($datestring, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE);
+	}
+
+	/**
 	 * Format a date string (date only) using LONG date format according to current locale.
 	 *
 	 * @param string $datestring Date string
