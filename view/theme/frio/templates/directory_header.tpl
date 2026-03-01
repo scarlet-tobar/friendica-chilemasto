@@ -23,6 +23,7 @@
 					<div class="form-group form-group-search">
 						<input type="text" name="search" id="directory-search" class="search-input form-control form-search" onfocus="this.select();" value="{{$search}}" placeholder="{{$desc}}"/>
 						<button class="btn btn-default btn-sm form-button-search" type="submit" id="directory-search-submit">{{$submit}}</button>
+						<p id="num-results">{{$num_results_text}}</p>
 					</div>
 				</div>
 				<div class="col-md-2"></div>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-28 11:44+0000\n"
+"POT-Creation-Date: 2026-02-28 16:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -344,7 +344,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: mod/photos.php:42 mod/photos.php:99 mod/photos.php:328
-#: src/Model/Event.php:502 src/Model/Profile.php:213
+#: src/Model/Event.php:502 src/Model/Profile.php:212
 #: src/Module/Calendar/Export.php:60 src/Module/Calendar/Show.php:63
 #: src/Module/Feed.php:52 src/Module/HCard.php:37
 #: src/Module/Profile/Common.php:50 src/Module/Profile/Common.php:59
@@ -1302,7 +1302,7 @@ msgstr ""
 
 #: src/Content/Conversation.php:426 src/Content/Item.php:442
 #: src/Content/Widget/VCard.php:120 src/Model/Contact.php:1307
-#: src/Model/Profile.php:468 src/Module/Admin/Logs/View.php:79
+#: src/Model/Profile.php:467 src/Module/Admin/Logs/View.php:79
 #: src/Module/Post/Edit.php:179
 msgid "Message"
 msgstr ""
@@ -1815,7 +1815,7 @@ msgstr ""
 
 #: src/Content/Item.php:438 src/Content/Item.php:461 src/Model/Contact.php:1237
 #: src/Model/Contact.php:1293 src/Model/Contact.php:1303
-#: src/Module/Directory.php:143 src/Module/Settings/Profile/Index.php:279
+#: src/Module/Directory.php:144 src/Module/Settings/Profile/Index.php:279
 msgid "View Profile"
 msgstr ""
 
@@ -1824,7 +1824,7 @@ msgid "View Photos"
 msgstr ""
 
 #: src/Content/Item.php:440 src/Model/Contact.php:1271
-#: src/Model/Profile.php:445
+#: src/Model/Profile.php:444
 msgid "Network Posts"
 msgstr ""
 
@@ -2428,51 +2428,51 @@ msgid "Show Less"
 msgstr ""
 
 #: src/Content/Widget/VCard.php:94 src/Model/Contact.php:1265
-#: src/Model/Profile.php:439
+#: src/Model/Profile.php:438
 msgid "Post to group"
 msgstr ""
 
 #: src/Content/Widget/VCard.php:99 src/Model/Contact.php:1269
-#: src/Model/Profile.php:443 src/Module/Moderation/Item/Source.php:81
+#: src/Model/Profile.php:442 src/Module/Moderation/Item/Source.php:81
 msgid "Mention"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:109 src/Model/Profile.php:358
+#: src/Content/Widget/VCard.php:109 src/Model/Profile.php:357
 #: src/Module/Contact/Profile.php:460 src/Module/Profile/Profile.php:208
 msgid "XMPP:"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:110 src/Model/Profile.php:359
+#: src/Content/Widget/VCard.php:110 src/Model/Profile.php:358
 #: src/Module/Contact/Profile.php:462 src/Module/Profile/Profile.php:212
 msgid "Matrix:"
 msgstr ""
 
 #: src/Content/Widget/VCard.php:111 src/Model/Event.php:67
 #: src/Model/Event.php:94 src/Model/Event.php:461 src/Model/Event.php:947
-#: src/Model/Profile.php:353 src/Module/Contact/Profile.php:458
-#: src/Module/Directory.php:133 src/Module/Notifications/Introductions.php:187
+#: src/Model/Profile.php:352 src/Module/Contact/Profile.php:458
+#: src/Module/Directory.php:134 src/Module/Notifications/Introductions.php:187
 #: src/Module/Profile/Profile.php:230
 msgid "Location:"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:114 src/Model/Profile.php:475
+#: src/Content/Widget/VCard.php:114 src/Model/Profile.php:474
 #: src/Module/Notifications/Introductions.php:201
 msgid "Network:"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:116 src/Model/Profile.php:462
+#: src/Content/Widget/VCard.php:116 src/Model/Profile.php:461
 #: src/Module/Contact/Profile.php:529
 msgid "Follow"
 msgstr ""
 
 #: src/Content/Widget/VCard.php:118 src/Model/Contact.php:1297
-#: src/Model/Contact.php:1309 src/Model/Profile.php:464
+#: src/Model/Contact.php:1309 src/Model/Profile.php:463
 #: src/Module/Contact/Profile.php:521
 msgid "Unfollow"
 msgstr ""
 
 #: src/Content/Widget/VCard.php:124 src/Model/Contact.php:1267
-#: src/Model/Profile.php:441
+#: src/Model/Profile.php:440
 msgid "View group"
 msgstr ""
 
@@ -3414,139 +3414,139 @@ msgstr ""
 msgid "Wall Photos"
 msgstr ""
 
-#: src/Model/Profile.php:343 src/Module/Settings/Profile/Index.php:273
+#: src/Model/Profile.php:342 src/Module/Settings/Profile/Index.php:273
 msgid "Change profile picture"
 msgstr ""
 
-#: src/Model/Profile.php:356 src/Module/Directory.php:138
+#: src/Model/Profile.php:355 src/Module/Directory.php:139
 #: src/Module/Profile/Profile.php:218
 msgid "Homepage:"
 msgstr ""
 
-#: src/Model/Profile.php:357 src/Module/Contact/Profile.php:464
+#: src/Model/Profile.php:356 src/Module/Contact/Profile.php:464
 #: src/Module/Notifications/Introductions.php:189
 msgid "About:"
 msgstr ""
 
-#: src/Model/Profile.php:451 src/Module/Profile/Profile.php:185
+#: src/Model/Profile.php:450 src/Module/Profile/Profile.php:185
 msgid "Joined:"
 msgstr ""
 
-#: src/Model/Profile.php:466
+#: src/Model/Profile.php:465
 msgid "Atom feed"
 msgstr ""
 
-#: src/Model/Profile.php:473 src/Module/Profile/Profile.php:291
+#: src/Model/Profile.php:472 src/Module/Profile/Profile.php:291
 msgid "This website has been verified to belong to the same person."
 msgstr ""
 
-#: src/Model/Profile.php:594 src/Model/Profile.php:674
+#: src/Model/Profile.php:593 src/Model/Profile.php:673
 msgid "[today]"
 msgstr ""
 
-#: src/Model/Profile.php:603
+#: src/Model/Profile.php:602
 msgid "Birthday Reminders"
 msgstr ""
 
-#: src/Model/Profile.php:604
+#: src/Model/Profile.php:603
 msgid "Birthdays this week:"
 msgstr ""
 
-#: src/Model/Profile.php:661
+#: src/Model/Profile.php:660
 msgid "[No description]"
 msgstr ""
 
-#: src/Model/Profile.php:687
+#: src/Model/Profile.php:686
 msgid "Event Reminders"
 msgstr ""
 
-#: src/Model/Profile.php:688
+#: src/Model/Profile.php:687
 msgid "Upcoming events the next 7 days:"
 msgstr ""
 
-#: src/Model/Profile.php:798
+#: src/Model/Profile.php:797
 msgid "Hometown:"
 msgstr ""
 
-#: src/Model/Profile.php:799
+#: src/Model/Profile.php:798
 msgid "Marital Status:"
 msgstr ""
 
-#: src/Model/Profile.php:800
+#: src/Model/Profile.php:799
 msgid "With:"
 msgstr ""
 
-#: src/Model/Profile.php:801
+#: src/Model/Profile.php:800
 msgid "Since:"
 msgstr ""
 
-#: src/Model/Profile.php:802
+#: src/Model/Profile.php:801
 msgid "Sexual Preference:"
 msgstr ""
 
-#: src/Model/Profile.php:803
+#: src/Model/Profile.php:802
 msgid "Political Views:"
 msgstr ""
 
-#: src/Model/Profile.php:804
+#: src/Model/Profile.php:803
 msgid "Religious Views:"
 msgstr ""
 
-#: src/Model/Profile.php:805
+#: src/Model/Profile.php:804
 msgid "Likes:"
 msgstr ""
 
-#: src/Model/Profile.php:806
+#: src/Model/Profile.php:805
 msgid "Dislikes:"
 msgstr ""
 
-#: src/Model/Profile.php:807
+#: src/Model/Profile.php:806
 msgid "Title/Description:"
 msgstr ""
 
-#: src/Model/Profile.php:808 src/Module/Admin/Summary.php:207
+#: src/Model/Profile.php:807 src/Module/Admin/Summary.php:207
 #: src/Module/Moderation/Report/Create.php:282
 #: src/Module/Moderation/Summary.php:65
 msgid "Summary"
 msgstr ""
 
-#: src/Model/Profile.php:809
+#: src/Model/Profile.php:808
 msgid "Musical interests"
 msgstr ""
 
-#: src/Model/Profile.php:810
+#: src/Model/Profile.php:809
 msgid "Books, literature"
 msgstr ""
 
-#: src/Model/Profile.php:811
+#: src/Model/Profile.php:810
 msgid "Television"
 msgstr ""
 
-#: src/Model/Profile.php:812
+#: src/Model/Profile.php:811
 msgid "Film/dance/culture/entertainment"
 msgstr ""
 
-#: src/Model/Profile.php:813
+#: src/Model/Profile.php:812
 msgid "Hobbies/Interests"
 msgstr ""
 
-#: src/Model/Profile.php:814
+#: src/Model/Profile.php:813
 msgid "Love/romance"
 msgstr ""
 
-#: src/Model/Profile.php:815
+#: src/Model/Profile.php:814
 msgid "Work/employment"
 msgstr ""
 
-#: src/Model/Profile.php:816
+#: src/Model/Profile.php:815
 msgid "School/education"
 msgstr ""
 
-#: src/Model/Profile.php:817
+#: src/Model/Profile.php:816
 msgid "Contact information and Social Networks"
 msgstr ""
 
-#: src/Model/Profile.php:865
+#: src/Model/Profile.php:864
 #, php-format
 msgid "Responsible account: %s"
 msgstr ""
@@ -6861,6 +6861,11 @@ msgstr ""
 
 #: src/Module/Directory.php:80
 msgid "Site Directory"
+msgstr ""
+
+#: src/Module/Directory.php:84
+#, php-format
+msgid "Accounts listed: %s"
 msgstr ""
 
 #: src/Module/Filer/RemoveTag.php:90
