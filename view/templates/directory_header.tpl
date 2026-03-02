@@ -30,6 +30,8 @@
 
 {{foreach $contacts as $contact}}
 	{{include file="contact/entry.tpl"}}
+{{foreachelse}}
+	<div class="no-results">{{$no_results}}</div>
 {{/foreach}}
 
 <div class="directory-end"></div>
