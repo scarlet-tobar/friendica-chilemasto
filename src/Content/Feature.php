@@ -12,25 +12,26 @@ use Friendica\Event\ArrayFilterEvent;
 
 class Feature
 {
-	const ADD_ABSTRACT      = 'add_abstract';
-	const CATEGORIES        = 'categories';
-	const COMMUNITY         = 'community';
-	const EXPLICIT_MENTIONS = 'explicit_mentions';
-	const MEMBER_SINCE      = 'profile_membersince';
-	const PHOTO_LOCATION    = 'photo_location';
-	const PUBLIC_CALENDAR   = 'public_calendar';
-	const TAGCLOUD          = 'tagadelic';
+	public const ADD_ABSTRACT      = 'add_abstract';
+	public const CATEGORIES        = 'categories';
+	public const COMMUNITY         = 'community';
+	public const EXPLICIT_MENTIONS = 'explicit_mentions';
+	public const MEMBER_SINCE      = 'profile_membersince';
+	public const PHOTO_LOCATION    = 'photo_location';
+	public const PUBLIC_CALENDAR   = 'public_calendar';
+	public const SUMMARY           = 'summary';
+	public const TAGCLOUD          = 'tagadelic';
 	// The different widgets:
-	const ACCOUNTS      = 'accounts';
-	const ARCHIVE       = 'archive';
-	const CIRCLES       = 'circles';
-	const CHANNELS      = 'channels';
-	const FOLDERS       = 'folders';
-	const GROUPS        = 'forumlist_profile';
-	const NETWORKS      = 'networks';
-	const NOSHARER      = 'nosharer';
-	const SEARCHES      = 'searches';
-	const TRENDING_TAGS = 'trending_tags';
+	public const ACCOUNTS      = 'accounts';
+	public const ARCHIVE       = 'archive';
+	public const CIRCLES       = 'circles';
+	public const CHANNELS      = 'channels';
+	public const FOLDERS       = 'folders';
+	public const GROUPS        = 'forumlist_profile';
+	public const NETWORKS      = 'networks';
+	public const NOSHARER      = 'nosharer';
+	public const SEARCHES      = 'searches';
+	public const TRENDING_TAGS = 'trending_tags';
 
 	/**
 	 * check if feature is enabled
@@ -56,10 +57,10 @@ class Feature
 		$arr = ['uid' => $uid, 'feature' => $feature, 'enabled' => $enabled];
 
 		$arr = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::FEATURE_ENABLED, $arr)
+			new ArrayFilterEvent(ArrayFilterEvent::FEATURE_ENABLED, $arr),
 		)->getArray();
 
-		return (bool)$arr['enabled'];
+		return (bool) $arr['enabled'];
 	}
 
 	/**
@@ -119,6 +120,7 @@ class Feature
 			'tools' => [
 				$l10n->t('Post/Comment Tools'),
 				[self::CATEGORIES, $l10n->t('Post Categories'),         $l10n->t('Add categories to your posts'), false, $config->get('feature_lock', self::CATEGORIES, false)],
+				[self::SUMMARY,    $l10n->t('Summary'),                 $l10n->t('Add a summary, abstract or spoiler text to your posts'), false, $config->get('feature_lock', self::SUMMARY, false)],
 			],
 
 			// Widget visibility on the network stream
@@ -147,7 +149,7 @@ class Feature
 			'advanced_calendar' => [
 				$l10n->t('Advanced Calendar Settings'),
 				[self::PUBLIC_CALENDAR, $l10n->t('Allow anonymous access to your calendar'), $l10n->t('Allows anonymous visitors to consult your calendar and your public events. Contact birthday events are private to you.'), false, $config->get('feature_lock', self::PUBLIC_CALENDAR, false)],
-			]
+			],
 		];
 
 		// removed any locked features and remove the entire category if this makes it empty
@@ -172,7 +174,7 @@ class Feature
 		}
 
 		$arr = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::FEATURE_GET, $arr)
+			new ArrayFilterEvent(ArrayFilterEvent::FEATURE_GET, $arr),
 		)->getArray();
 
 		return $arr;
