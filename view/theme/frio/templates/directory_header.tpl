@@ -39,6 +39,8 @@
 	<ul id="viewcontact_wrapper" class="viewcontact_wrapper media-list">
 	{{foreach $contacts as $contact}}
 		<li>{{include file="contact/entry.tpl"}}</li>
+	{{foreachelse}}
+		<li class="no-results">{{$no_results}}</li>
 	{{/foreach}}
 	</ul>
 
