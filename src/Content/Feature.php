@@ -17,7 +17,6 @@ class Feature
 	public const COMMUNITY         = 'community';
 	public const EXPLICIT_MENTIONS = 'explicit_mentions';
 	public const MEMBER_SINCE      = 'profile_membersince';
-	public const PHOTO_LOCATION    = 'photo_location';
 	public const PUBLIC_CALENDAR   = 'public_calendar';
 	public const SUMMARY           = 'summary';
 	public const TAGCLOUD          = 'tagadelic';
@@ -105,7 +104,6 @@ class Feature
 			'general' => [
 				$l10n->t('General Features'),
 				//array('expire', $l10n->t('Content Expiration'), $l10n->t('Remove old posts/comments after a period of time')),
-				[self::PHOTO_LOCATION, $l10n->t('Photo Location'), $l10n->t("Photo metadata is normally stripped. This extracts the location \x28if present\x29 prior to stripping metadata and links it to a map."), false, $config->get('feature_lock', self::PHOTO_LOCATION, false)],
 				[self::COMMUNITY, $l10n->t('Display the community in the navigation'), $l10n->t('If enabled, the community can be accessed via the navigation menu. Independent from this setting, the community timelines can always be accessed via the channels.'), true, $config->get('feature_lock', self::COMMUNITY, false)],
 			],
 
