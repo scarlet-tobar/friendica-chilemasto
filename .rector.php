@@ -18,15 +18,14 @@ return \Rector\Config\RectorConfig::configure()
 	])
 	->withIndent("\t", 4)
 	->withPhpVersion(70400)
-	->withPhpLevel(36)
 	// ->withTypeCoverageLevel(0)
 	// ->withDeadCodeLevel(0)
 	// ->withCodeQualityLevel(0)
 	->withSets([
-		\Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_70,
-		\Rector\Set\ValueObject\DowngradeLevelSetList::DOWN_TO_PHP_82,
+		\Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_74,
 	])
 	->withSkip([
 		\Rector\Php56\Rector\FuncCall\PowToExpRector::class,
+		\Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector::class,
 	])
 ;
