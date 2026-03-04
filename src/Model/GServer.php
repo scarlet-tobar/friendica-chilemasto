@@ -40,44 +40,44 @@ use Psr\Http\Message\UriInterface;
 class GServer
 {
 	// Directory types
-	const DT_NONE     = 0;
-	const DT_POCO     = 1;
-	const DT_MASTODON = 2;
+	public const DT_NONE     = 0;
+	public const DT_POCO     = 1;
+	public const DT_MASTODON = 2;
 
 	// Methods to detect server types
 
 	// Non endpoint specific methods
-	const DETECT_MANUAL        = 0;
-	const DETECT_HEADER        = 1;
-	const DETECT_BODY          = 2;
-	const DETECT_HOST_META     = 3;
-	const DETECT_CONTACTS      = 4;
-	const DETECT_AP_ACTOR      = 5;
-	const DETECT_AP_COLLECTION = 6;
+	public const DETECT_MANUAL        = 0;
+	public const DETECT_HEADER        = 1;
+	public const DETECT_BODY          = 2;
+	public const DETECT_HOST_META     = 3;
+	public const DETECT_CONTACTS      = 4;
+	public const DETECT_AP_ACTOR      = 5;
+	public const DETECT_AP_COLLECTION = 6;
 
-	const DETECT_UNSPECIFIC = [self::DETECT_MANUAL, self::DETECT_HEADER, self::DETECT_BODY, self::DETECT_HOST_META, self::DETECT_CONTACTS, self::DETECT_AP_ACTOR];
+	public const DETECT_UNSPECIFIC = [self::DETECT_MANUAL, self::DETECT_HEADER, self::DETECT_BODY, self::DETECT_HOST_META, self::DETECT_CONTACTS, self::DETECT_AP_ACTOR];
 
 	// Implementation specific endpoints
 	// @todo Possibly add Lemmy detection via the endpoint /api/v3/site
-	const DETECT_FRIENDIKA     = 10;
-	const DETECT_FRIENDICA     = 11;
-	const DETECT_STATUSNET     = 12;
-	const DETECT_GNUSOCIAL     = 13;
-	const DETECT_CONFIG_JSON   = 14; // Statusnet, GNU Social, Older Hubzilla/Redmatrix
-	const DETECT_SITEINFO_JSON = 15; // Newer Hubzilla
-	const DETECT_MASTODON_API  = 16;
-	const DETECT_STATUS_PHP    = 17; // Nextcloud
-	const DETECT_V1_CONFIG     = 18;
-	const DETECT_SYSTEM_ACTOR  = 20; // Mistpark, Osada, Roadhouse, Zap
-	const DETECT_THREADS       = 21;
+	public const DETECT_FRIENDIKA     = 10;
+	public const DETECT_FRIENDICA     = 11;
+	public const DETECT_STATUSNET     = 12;
+	public const DETECT_GNUSOCIAL     = 13;
+	public const DETECT_CONFIG_JSON   = 14; // Statusnet, GNU Social, Older Hubzilla/Redmatrix
+	public const DETECT_SITEINFO_JSON = 15; // Newer Hubzilla
+	public const DETECT_MASTODON_API  = 16;
+	public const DETECT_STATUS_PHP    = 17; // Nextcloud
+	public const DETECT_V1_CONFIG     = 18;
+	public const DETECT_SYSTEM_ACTOR  = 20; // Mistpark, Osada, Roadhouse, Zap
+	public const DETECT_THREADS       = 21;
 
 	// Standardized endpoints
-	const DETECT_STATISTICS_JSON = 100;
-	const DETECT_NODEINFO_10     = 101; // Nodeinfo Version 1.0
-	const DETECT_NODEINFO_20     = 102; // Nodeinfo Version 2.0
-	const DETECT_NODEINFO2_10    = 103; // Nodeinfo2 Version 1.0
-	const DETECT_NODEINFO_21     = 104; // Nodeinfo Version 2.1
-	const DETECT_NODEINFO_22     = 105; // Nodeinfo Version 2.2
+	public const DETECT_STATISTICS_JSON = 100;
+	public const DETECT_NODEINFO_10     = 101; // Nodeinfo Version 1.0
+	public const DETECT_NODEINFO_20     = 102; // Nodeinfo Version 2.0
+	public const DETECT_NODEINFO2_10    = 103; // Nodeinfo2 Version 1.0
+	public const DETECT_NODEINFO_21     = 104; // Nodeinfo Version 2.1
+	public const DETECT_NODEINFO_22     = 105; // Nodeinfo Version 2.2
 
 	private static RobotsTxt $robotsTxt;
 
@@ -194,10 +194,10 @@ class GServer
 	 */
 	private static function isDefunct(array $gserver): bool
 	{
-		return ($gserver['failed'] || in_array($gserver['network'], Protocol::FEDERATED)) &&
-			($gserver['last_contact'] >= $gserver['created']) &&
-			($gserver['last_contact'] < $gserver['last_failure']) &&
-			($gserver['last_contact'] < DateTimeFormat::utc('now - 90 days'));
+		return ($gserver['failed'] || in_array($gserver['network'], Protocol::FEDERATED))
+			&& ($gserver['last_contact'] >= $gserver['created'])
+			&& ($gserver['last_contact'] < $gserver['last_failure'])
+			&& ($gserver['last_contact'] < DateTimeFormat::utc('now - 90 days'));
 	}
 
 	/**
@@ -256,9 +256,9 @@ class GServer
 		} elseif (!empty($contact['baseurl'])) {
 			$server = $contact['baseurl'];
 		} elseif ($contact['network'] == Protocol::DIASPORA) {
-			$parts = (array)parse_url($contact['url']);
+			$parts = (array) parse_url($contact['url']);
 			unset($parts['path']);
-			$server = (string)Uri::fromParts($parts);
+			$server = (string) Uri::fromParts($parts);
 		} else {
 			return true;
 		}
@@ -482,7 +482,7 @@ class GServer
 			self::update(
 				['url'          => $url, 'failed' => true, 'blocked' => Network::isUrlBlocked($url), 'last_failure' => DateTimeFormat::utcNow(),
 					'next_contact' => $next_update, 'network' => Protocol::PHANTOM, 'detection-method' => null],
-				['nurl' => $nurl]
+				['nurl' => $nurl],
 			);
 			DI::logger()->info('Set failed status for existing server', ['url' => $url]);
 			if (self::isDefunct($gserver)) {
@@ -521,7 +521,7 @@ class GServer
 	public static function cleanURL(string $dirtyUrl): string
 	{
 		try {
-			return (string)self::cleanUri(new Uri($dirtyUrl));
+			return (string) self::cleanUri(new Uri($dirtyUrl));
 		} catch (\Throwable $e) {
 			DI::logger()->warning('Invalid URL', ['dirtyUrl' => $dirtyUrl]);
 			return '';
@@ -546,8 +546,8 @@ class GServer
 				preg_replace(
 					'#(?:^|/)index\.php#',
 					'',
-					rtrim($dirtyUri->getPath(), '/')
-				)
+					rtrim($dirtyUri->getPath(), '/'),
+				),
 			);
 	}
 
@@ -594,8 +594,8 @@ class GServer
 		if (!Strings::compareLink($url, $valid_url)) {
 			// We only follow redirects when the path stays the same or the target url has no path.
 			// Some systems have got redirects on their landing page to a single account page. This check handles it.
-			if (((parse_url($url, PHP_URL_HOST) != parse_url($valid_url, PHP_URL_HOST)) && (parse_url($url, PHP_URL_PATH) == parse_url($valid_url, PHP_URL_PATH))) ||
-			(((parse_url($url, PHP_URL_HOST) != parse_url($valid_url, PHP_URL_HOST)) || (parse_url($url, PHP_URL_PATH) != parse_url($valid_url, PHP_URL_PATH))) && empty(parse_url($valid_url, PHP_URL_PATH)))) {
+			if (((parse_url($url, PHP_URL_HOST) != parse_url($valid_url, PHP_URL_HOST)) && (parse_url($url, PHP_URL_PATH) == parse_url($valid_url, PHP_URL_PATH)))
+			|| (((parse_url($url, PHP_URL_HOST) != parse_url($valid_url, PHP_URL_HOST)) || (parse_url($url, PHP_URL_PATH) != parse_url($valid_url, PHP_URL_PATH))) && empty(parse_url($valid_url, PHP_URL_PATH)))) {
 				DI::logger()->debug('Found redirect. Mark old entry as failure', ['old' => $url, 'new' => $valid_url]);
 				self::setFailureByUrl($url);
 				$target_id = self::getID($valid_url, true);
@@ -609,12 +609,12 @@ class GServer
 				return false;
 			}
 
-			if ((parse_url($url, PHP_URL_HOST) != parse_url($valid_url, PHP_URL_HOST)) && (parse_url($url, PHP_URL_PATH) != parse_url($valid_url, PHP_URL_PATH)) &&
-			(parse_url($url, PHP_URL_PATH) == '')) {
+			if ((parse_url($url, PHP_URL_HOST) != parse_url($valid_url, PHP_URL_HOST)) && (parse_url($url, PHP_URL_PATH) != parse_url($valid_url, PHP_URL_PATH))
+			&& (parse_url($url, PHP_URL_PATH) == '')) {
 				DI::logger()->debug('Found redirect. Mark old entry as failure and redirect to the basepath.', ['old' => $url, 'new' => $valid_url]);
-				$parts = (array)parse_url($valid_url);
+				$parts = (array) parse_url($valid_url);
 				unset($parts['path']);
-				$valid_url = (string)Uri::fromParts($parts);
+				$valid_url = (string) Uri::fromParts($parts);
 
 				self::setFailureByUrl($url);
 				if (!self::getID($valid_url, true) && !Network::isUrlBlocked($valid_url)) {
@@ -625,9 +625,9 @@ class GServer
 			DI::logger()->debug('Found redirect, but ignore it.', ['old' => $url, 'new' => $valid_url]);
 		}
 
-		if ((parse_url($url, PHP_URL_HOST) == parse_url($valid_url, PHP_URL_HOST)) &&
-			(parse_url($url, PHP_URL_PATH) == parse_url($valid_url, PHP_URL_PATH)) &&
-			(parse_url($url, PHP_URL_SCHEME) != parse_url($valid_url, PHP_URL_SCHEME))) {
+		if ((parse_url($url, PHP_URL_HOST) == parse_url($valid_url, PHP_URL_HOST))
+			&& (parse_url($url, PHP_URL_PATH) == parse_url($valid_url, PHP_URL_PATH))
+			&& (parse_url($url, PHP_URL_SCHEME) != parse_url($valid_url, PHP_URL_SCHEME))) {
 			$url = $valid_url;
 		}
 
@@ -789,8 +789,8 @@ class GServer
 		// When a server is new, then there is no gserver entry yet.
 		// But in "detectNetworkViaContacts" it could happen that a contact is updated,
 		// and this can call this function here as well.
-		if (self::getID($url, true) && (in_array($serverdata['network'], [Protocol::PHANTOM, Protocol::FEED]) ||
-			in_array($serverdata['detection-method'], [self::DETECT_MANUAL, self::DETECT_HEADER, self::DETECT_BODY, self::DETECT_HOST_META]))) {
+		if (self::getID($url, true) && (in_array($serverdata['network'], [Protocol::PHANTOM, Protocol::FEED])
+			|| in_array($serverdata['detection-method'], [self::DETECT_MANUAL, self::DETECT_HEADER, self::DETECT_BODY, self::DETECT_HOST_META]))) {
 			$serverdata = self::detectNetworkViaContacts($url, $serverdata);
 		}
 
@@ -974,7 +974,7 @@ class GServer
 		}
 
 		// Sanitize incoming data, see https://github.com/friendica/friendica/issues/8565
-		$data['subscribe'] = (bool)($data['subscribe'] ?? false);
+		$data['subscribe'] = (bool) ($data['subscribe'] ?? false);
 
 		if (!$data['subscribe'] || empty($data['scope']) || !in_array(strtolower($data['scope']), ['all', 'tags'])) {
 			$data['scope']     = '';
@@ -1241,7 +1241,7 @@ class GServer
 
 		$server = [
 			'detection-method' => self::DETECT_NODEINFO_10,
-			'register_policy'  => Register::CLOSED
+			'register_policy'  => Register::CLOSED,
 		];
 
 		if (!empty($nodeinfo['openRegistrations'])) {
@@ -1472,7 +1472,7 @@ class GServer
 
 		$server = [
 			'detection-method' => self::DETECT_NODEINFO2_10,
-			'register_policy'  => Register::CLOSED
+			'register_policy'  => Register::CLOSED,
 		];
 
 		if (!empty($nodeinfo['openRegistrations'])) {
@@ -2325,8 +2325,8 @@ class GServer
 		// Test for GNU Social
 		if (self::$robotsTxt->isAllowed('/api/gnusocial/version.json')) {
 			$curlResult = DI::httpClient()->get($url . '/api/gnusocial/version.json', HttpClientAccept::JSON, [HttpClientOptions::REQUEST => HttpClientRequest::SERVERINFO]);
-			if ($curlResult->isSuccess() && ($curlResult->getBodyString() != '{"error":"not implemented"}') &&
-			($curlResult->getBodyString() != '') && (strlen($curlResult->getBodyString()) < 30)) {
+			if ($curlResult->isSuccess() && ($curlResult->getBodyString() != '{"error":"not implemented"}')
+			&& ($curlResult->getBodyString() != '') && (strlen($curlResult->getBodyString()) < 30)) {
 				$serverdata['platform'] = 'gnusocial';
 				// Remove junk that some GNU Social servers return
 				$serverdata['version'] = str_replace(chr(239) . chr(187) . chr(191), '', $curlResult->getBodyString());
@@ -2345,8 +2345,8 @@ class GServer
 		// Test for Statusnet
 		if (self::$robotsTxt->isAllowed('/api/statusnet/version.json')) {
 			$curlResult = DI::httpClient()->get($url . '/api/statusnet/version.json', HttpClientAccept::JSON, [HttpClientOptions::REQUEST => HttpClientRequest::SERVERINFO]);
-			if ($curlResult->isSuccess() && ($curlResult->getBodyString() != '{"error":"not implemented"}') &&
-				($curlResult->getBodyString() != '') && (strlen($curlResult->getBodyString()) < 30)) {
+			if ($curlResult->isSuccess() && ($curlResult->getBodyString() != '{"error":"not implemented"}')
+				&& ($curlResult->getBodyString() != '') && (strlen($curlResult->getBodyString()) < 30)) {
 
 				// Remove junk that some GNU Social servers return
 				$serverdata['version'] = str_replace(chr(239) . chr(187) . chr(191), '', $curlResult->getBodyString());
@@ -2673,7 +2673,7 @@ class GServer
 			'gserver',
 			['id', 'url', 'nurl', 'network', 'poco', 'directory-type'],
 			["NOT `blocked` AND NOT `failed` AND `directory-type` != ? AND `last_poco_query` < ?", GServer::DT_NONE, $last_update],
-			['order' => ['RAND()']]
+			['order' => ['RAND()']],
 		);
 
 		while ($gserver = DBA::fetch($gservers)) {

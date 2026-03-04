@@ -227,12 +227,12 @@ class Probe
 				unset($data['networks']);
 				if (!empty($data['network'])) {
 					$networks[$data['network']] = $data;
-					$ap_profile['guid'] ??= $data['guid'] ?? null;
-					$ap_profile['about'] ??= $data['about'] ?? null;
-					$ap_profile['keywords']     = $data['keywords']    ?? null;
-					$ap_profile['location']     = $data['location']    ?? null;
-					$ap_profile['poco']         = $data['poco']        ?? null;
-					$ap_profile['openwebauth']  = $data['openwebauth'] ?? null;
+					$ap_profile['guid'] ??= $data['guid']             ?? null;
+					$ap_profile['about'] ??= $data['about']           ?? null;
+					$ap_profile['keywords']    = $data['keywords']    ?? null;
+					$ap_profile['location']    = $data['location']    ?? null;
+					$ap_profile['poco']        = $data['poco']        ?? null;
+					$ap_profile['openwebauth'] = $data['openwebauth'] ?? null;
 				}
 				$data             = $ap_profile;
 				$data['networks'] = $networks;

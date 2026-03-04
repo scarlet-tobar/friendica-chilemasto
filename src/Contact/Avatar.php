@@ -20,7 +20,7 @@ use Friendica\Util\Proxy;
  */
 class Avatar
 {
-	const BASE_PATH = '/avatar/';
+	public const BASE_PATH = '/avatar/';
 
 	/**
 	 * Returns a field array with locally cached avatar pictures

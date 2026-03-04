@@ -811,7 +811,7 @@ class BBCode
 			function ($match) use ($callback, $uriid) {
 				$attributes = self::extractShareAttributes($match[2]);
 
-				$author_contact         = Contact::getByURL($attributes['profile'], false, ['id', 'url', 'addr', 'name', 'micro']);
+				$author_contact = Contact::getByURL($attributes['profile'], false, ['id', 'url', 'addr', 'name', 'micro']);
 				$author_contact['url'] ??= $attributes['profile'];
 				$author_contact['addr'] ??= '';
 

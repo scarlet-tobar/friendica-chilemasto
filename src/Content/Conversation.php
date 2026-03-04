@@ -318,7 +318,7 @@ class Conversation
 		$x['allow_location'] ??= $user['allow_location'];
 		$x['default_location'] ??= $user['default-location'];
 		$x['nickname'] ??= $user['nickname'];
-		$x['lockstate']        = $x['lockstate']        ?? ACL::getLockstateForUserId($user['uid']) ? 'lock' : 'unlock';
+		$x['lockstate'] = $x['lockstate'] ?? ACL::getLockstateForUserId($user['uid']) ? 'lock' : 'unlock';
 		$x['acl'] ??= ACL::getFullSelectorHTML($this->page, $user['uid'], true);
 		$x['bang'] ??= '';
 		$x['visitor'] ??= 'block';

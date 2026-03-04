@@ -51,7 +51,7 @@ class DatabaseLock extends AbstractLock
 			do {
 				$this->dba->lock('locks');
 				$lock = $this->dba->selectFirst('locks', ['locked', 'pid'], [
-					'`name` = ? AND `expires` >= ?', $key,DateTimeFormat::utcNow()
+					'`name` = ? AND `expires` >= ?', $key,DateTimeFormat::utcNow(),
 				]);
 
 				if ($this->dba->isResult($lock)) {
@@ -65,7 +65,7 @@ class DatabaseLock extends AbstractLock
 						$this->dba->update('locks', [
 							'locked'  => true,
 							'pid'     => $this->pid,
-							'expires' => DateTimeFormat::utc('now + ' . $ttl . 'seconds')
+							'expires' => DateTimeFormat::utc('now + ' . $ttl . 'seconds'),
 						], ['name' => $key]);
 						$got_lock = true;
 					}

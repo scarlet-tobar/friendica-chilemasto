@@ -42,19 +42,19 @@ class Babel extends BaseModule
 					$bbcode    = $request['text'];
 					$results[] = [
 						'title'   => 'Source input',
-						'content' => $visible_whitespace($bbcode)
+						'content' => $visible_whitespace($bbcode),
 					];
 
 					$plain     = Text\BBCode::toPlaintext($bbcode, false);
 					$results[] = [
 						'title'   => 'BBCode::toPlaintext',
-						'content' => $visible_whitespace($plain)
+						'content' => $visible_whitespace($plain),
 					];
 
 					$html      = Text\BBCode::convertForUriId(0, $bbcode);
 					$results[] = [
 						'title'   => 'BBCode::convert (raw HTML)',
-						'content' => $visible_whitespace($html)
+						'content' => $visible_whitespace($html),
 					];
 
 					$results[] = [
@@ -64,41 +64,41 @@ class Babel extends BaseModule
 
 					$results[] = [
 						'title'   => 'BBCode::convert',
-						'content' => $html
+						'content' => $html,
 					];
 
 					$bbcode2   = Text\HTML::toBBCode($html);
 					$results[] = [
 						'title'   => 'BBCode::convert => HTML::toBBCode',
-						'content' => $visible_whitespace($bbcode2)
+						'content' => $visible_whitespace($bbcode2),
 					];
 
 					$markdown  = Text\BBCode::toMarkdown($bbcode);
 					$results[] = [
 						'title'   => 'BBCode::toMarkdown',
-						'content' => $visible_whitespace($markdown)
+						'content' => $visible_whitespace($markdown),
 					];
 
 					$html2     = Text\Markdown::convert($markdown);
 					$results[] = [
 						'title'   => 'BBCode::toMarkdown => Markdown::convert (raw HTML)',
-						'content' => $visible_whitespace($html2)
+						'content' => $visible_whitespace($html2),
 					];
 					$results[] = [
 						'title'   => 'BBCode::toMarkdown => Markdown::convert',
-						'content' => $html2
+						'content' => $html2,
 					];
 
 					$bbcode3   = Text\Markdown::toBBCode($markdown);
 					$results[] = [
 						'title'   => 'BBCode::toMarkdown => Markdown::toBBCode',
-						'content' => $visible_whitespace($bbcode3)
+						'content' => $visible_whitespace($bbcode3),
 					];
 
 					$bbcode4   = Text\HTML::toBBCode($html2);
 					$results[] = [
 						'title'   => 'BBCode::toMarkdown =>  Markdown::convert => HTML::toBBCode',
-						'content' => $visible_whitespace($bbcode4)
+						'content' => $visible_whitespace($bbcode4),
 					];
 
 					$tags = Text\BBCode::getTags($bbcode);
@@ -106,7 +106,7 @@ class Babel extends BaseModule
 					$body      = Item::setHashtags($bbcode);
 					$results[] = [
 						'title'   => 'Item Body',
-						'content' => $visible_whitespace($body)
+						'content' => $visible_whitespace($body),
 					];
 					$results[] = [
 						'title'   => 'Item Tags',
@@ -116,16 +116,16 @@ class Babel extends BaseModule
 					$body2     = PageInfo::searchAndAppendToBody($bbcode, true);
 					$results[] = [
 						'title'   => 'PageInfo::appendToBody',
-						'content' => $visible_whitespace($body2)
+						'content' => $visible_whitespace($body2),
 					];
 					$html3     = Text\BBCode::convertForUriId(0, $body2);
 					$results[] = [
 						'title'   => 'PageInfo::appendToBody => BBCode::convert (raw HTML)',
-						'content' => $visible_whitespace($html3)
+						'content' => $visible_whitespace($html3),
 					];
 					$results[] = [
 						'title'   => 'PageInfo::appendToBody => BBCode::convert',
-						'content' => $html3
+						'content' => $html3,
 					];
 					break;
 				case 'diaspora':
@@ -153,7 +153,7 @@ class Babel extends BaseModule
 
 					$results[] = [
 						'title'   => 'Markdown::convert',
-						'content' => $html
+						'content' => $html,
 					];
 
 					$bbcode    = Text\Markdown::toBBCode($markdown);
@@ -171,7 +171,7 @@ class Babel extends BaseModule
 
 					$results[] = [
 						'title'   => 'HTML Input',
-						'content' => $html
+						'content' => $html,
 					];
 
 					$purified = Text\HTML::purify($html);
@@ -194,18 +194,18 @@ class Babel extends BaseModule
 					$bbcode    = Text\HTML::toBBCode($html);
 					$results[] = [
 						'title'   => 'HTML::toBBCode',
-						'content' => $visible_whitespace($bbcode)
+						'content' => $visible_whitespace($bbcode),
 					];
 
 					$html2     = Text\BBCode::convertForUriId(0, $bbcode);
 					$results[] = [
 						'title'   => 'HTML::toBBCode => BBCode::convert',
-						'content' => $html2
+						'content' => $html2,
 					];
 
 					$results[] = [
 						'title'   => 'HTML::toBBCode => BBCode::convert (raw HTML)',
-						'content' => htmlspecialchars($html2)
+						'content' => htmlspecialchars($html2),
 					];
 
 					$bbcode2plain = Text\BBCode::toPlaintext($bbcode);
@@ -217,7 +217,7 @@ class Babel extends BaseModule
 					$markdown  = Text\HTML::toMarkdown($html);
 					$results[] = [
 						'title'   => 'HTML::toMarkdown',
-						'content' => $visible_whitespace($markdown)
+						'content' => $visible_whitespace($markdown),
 					];
 
 					$text      = Text\HTML::toPlaintext($html, 0);

@@ -151,7 +151,7 @@ class Item
 				'url'       => $url,
 				'removeurl' => $this->userSession->getLocalUserId() == $uid ? 'filerm/' . $item['id'] . '?cat=' . rawurlencode($savedFolderName) : '',
 				'first'     => $first,
-				'last'      => false
+				'last'      => false,
 			];
 			$first = false;
 		}
@@ -167,7 +167,7 @@ class Item
 					'url'       => "#",
 					'removeurl' => $this->userSession->getLocalUserId() == $uid ? 'filerm/' . $item['id'] . '?term=' . rawurlencode($savedFolderName) : '',
 					'first'     => $first,
-					'last'      => false
+					'last'      => false,
 				];
 				$first = false;
 			}
@@ -303,7 +303,7 @@ class Item
 			if ($this->activity->match($item['verb'], Activity::TAG)) {
 				$fields = [
 					'author-id', 'author-link', 'author-name', 'author-network', 'author-link', 'author-alias',
-					'verb', 'object-type', 'resource-id', 'body', 'plink'
+					'verb', 'object-type', 'resource-id', 'body', 'plink',
 				];
 				$obj = Post::selectFirst($fields, ['uri' => $item['parent-uri']]);
 				if (!DBA::isResult($obj)) {
@@ -452,8 +452,8 @@ class Item
 
 			$menu[$this->l10n->t('Raw content')] = 'javascript:displaySearchText(' . $item['uri-id'] . ');';
 
-			if ((($cid == 0) || ($rel == Contact::FOLLOWER)) &&
-				in_array($item['network'], Protocol::FEDERATED)
+			if ((($cid == 0) || ($rel == Contact::FOLLOWER))
+				&& in_array($item['network'], Protocol::FEDERATED)
 			) {
 				$menu[$this->l10n->t('Connect/Follow')] = 'contact/follow?url=' . urlencode($item['author-link']) . '&auto=1';
 			}
@@ -496,10 +496,10 @@ class Item
 		}
 
 		// Check conditions
-		return (!($this->activity->match($item['verb'], Activity::FOLLOW) &&
-			$item['object-type'] === Activity\ObjectType::NOTE &&
-			empty($item['self']) &&
-			$item['uid'] == $this->userSession->getLocalUserId())
+		return (!($this->activity->match($item['verb'], Activity::FOLLOW)
+			&& $item['object-type'] === Activity\ObjectType::NOTE
+			&& empty($item['self'])
+			&& $item['uid'] == $this->userSession->getLocalUserId())
 		);
 	}
 
@@ -741,7 +741,7 @@ class Item
 			if (is_array($shared)) {
 				return [
 					'comment' => BBCode::removeSharedData($item['body'] ?? ''),
-					'post'    => $shared
+					'post'    => $shared,
 				];
 			}
 		}
@@ -752,7 +752,7 @@ class Item
 			if (is_array($shared)) {
 				return [
 					'comment' => $attributes['comment'],
-					'post'    => $shared
+					'post'    => $shared,
 				];
 			}
 		}
@@ -845,8 +845,8 @@ class Item
 				0 => [
 					'src'    => $attachment_img_src,
 					'width'  => $attachment_img_width,
-					'height' => $attachment_img_height
-				]
+					'height' => $attachment_img_height,
+				],
 			];
 		} else {
 			unset($attachment['images']);
@@ -940,11 +940,11 @@ class Item
 
 	public function initializePost(array $post): array
 	{
-		$post['network']    = Protocol::DFRN;
-		$post['protocol']   = Conversation::PARCEL_DIRECT;
-		$post['direction']  = Conversation::PUSH;
-		$post['received']   = DateTimeFormat::utcNow();
-		$post['origin']     = true;
+		$post['network']   = Protocol::DFRN;
+		$post['protocol']  = Conversation::PARCEL_DIRECT;
+		$post['direction'] = Conversation::PUSH;
+		$post['received']  = DateTimeFormat::utcNow();
+		$post['origin']    = true;
 		$post['wall'] ??= true;
 		$post['guid'] ??= System::createUUID();
 		$post['verb'] ??= Activity::POST;
@@ -1031,7 +1031,7 @@ class Item
 		];
 
 		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, $hook_data)
+			new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, $hook_data),
 		)->getArray();
 
 		$post = $hook_data['item'] ?? $post;
@@ -1050,7 +1050,7 @@ class Item
 				$this->baseURL,
 				$post,
 				$address,
-				$author['thumb'] ?? ''
+				$author['thumb'] ?? '',
 			));
 		}
 	}
@@ -1335,7 +1335,7 @@ class Item
 			\IntlChar::BLOCK_CODE_BASIC_LATIN, \IntlChar::BLOCK_CODE_LATIN_1_SUPPLEMENT,
 			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_A, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_B,
 			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_C, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_D,
-			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_E, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_ADDITIONAL
+			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_E, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_ADDITIONAL,
 		]);
 	}
 

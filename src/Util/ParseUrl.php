@@ -32,18 +32,18 @@ use Friendica\Model\Post;
  */
 class ParseUrl
 {
-	const DEFAULT_EXPIRATION_FAILURE = 'now + 1 day';
-	const DEFAULT_EXPIRATION_SUCCESS = 'now + 3 months';
+	public const DEFAULT_EXPIRATION_FAILURE = 'now + 1 day';
+	public const DEFAULT_EXPIRATION_SUCCESS = 'now + 3 months';
 
 	/**
 	 * Maximum number of characters for the description
 	 */
-	const MAX_DESC_COUNT = 250;
+	public const MAX_DESC_COUNT = 250;
 
 	/**
 	 * Minimum number of characters for the description
 	 */
-	const MIN_DESC_COUNT = 100;
+	public const MIN_DESC_COUNT = 100;
 
 	/**
 	 * Fetch the content type of the given url
@@ -147,7 +147,7 @@ class ParseUrl
 				'created'  => DateTimeFormat::utcNow(),
 				'expires'  => $expires,
 			],
-			Database::INSERT_UPDATE
+			Database::INSERT_UPDATE,
 		);
 
 		return $data;
@@ -268,7 +268,7 @@ class ParseUrl
 
 		if ($cacheControlHeader = $curlResult->getHeader('Cache-Control')[0] ?? '') {
 			if (preg_match('/max-age=([0-9]+)/i', $cacheControlHeader, $matches)) {
-				$maxAge = max(86400, (int)array_pop($matches));
+				$maxAge = max(86400, (int) array_pop($matches));
 
 				$siteinfo['expires'] = DateTimeFormat::utc("now + $maxAge seconds");
 			}
@@ -285,7 +285,7 @@ class ParseUrl
 			if (isset($mediaType->parameters['charset'])) {
 				$charset = $mediaType->parameters['charset'];
 			}
-		} catch(\InvalidArgumentException $e) {
+		} catch (\InvalidArgumentException $e) {
 		}
 
 		$siteinfo['charset'] = $charset;
@@ -1394,7 +1394,7 @@ class ParseUrl
 			DI::logger()->debug('Found oEmbed JSON from Embera', ['url' => $url]);
 		}
 
-		if  (!isset($data['type']) || !isset($data['provider_url'])) {
+		if (!isset($data['type']) || !isset($data['provider_url'])) {
 			return [];
 		}
 

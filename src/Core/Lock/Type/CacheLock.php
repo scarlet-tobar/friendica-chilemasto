@@ -19,7 +19,7 @@ class CacheLock extends AbstractLock
 	 *
 	 * @var string
 	 */
-	const CACHE_PREFIX = 'lock:';
+	public const CACHE_PREFIX = 'lock:';
 
 	/**
 	 * @var ICanCacheInMemory
@@ -50,7 +50,7 @@ class CacheLock extends AbstractLock
 			do {
 				$lock = $this->cache->get($lockKey);
 				// When we do want to lock something that was already locked by us.
-				if ((int)$lock == getmypid()) {
+				if ((int) $lock == getmypid()) {
 					$got_lock = true;
 				}
 

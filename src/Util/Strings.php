@@ -96,17 +96,17 @@ class Strings
 			'v',
 			'w', 'wh',
 			'x',
-			'z', 'zh'
+			'z', 'zh',
 		];
 
 		$midcons = [
 			'ck', 'ct', 'gn', 'ld', 'lf', 'lm', 'lt', 'mb', 'mm', 'mn', 'mp',
-			'nd', 'ng', 'nk', 'nt', 'rn', 'rp', 'rt'
+			'nd', 'ng', 'nk', 'nt', 'rn', 'rp', 'rt',
 		];
 
 		$noend = [
 			'bl', 'br', 'cl', 'cr', 'dr', 'fl', 'fr', 'gl', 'gr',
-			'kh', 'kl', 'kr', 'mn', 'pl', 'pr', 'rh', 'tr', 'qu', 'wh', 'q'
+			'kh', 'kl', 'kr', 'mn', 'pl', 'pr', 'rh', 'tr', 'qu', 'wh', 'q',
 		];
 
 		$start = mt_rand(0, 2);
@@ -494,7 +494,7 @@ class Strings
 
 				return $return;
 			},
-			$text
+			$text,
 		);
 
 		if (is_null($return)) {
@@ -513,7 +513,7 @@ class Strings
 				}
 				return $return;
 			},
-			$text
+			$text,
 		);
 
 		return $text;
