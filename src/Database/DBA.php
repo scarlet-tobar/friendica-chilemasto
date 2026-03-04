@@ -571,9 +571,7 @@ class DBA
 		if (count($condition) < 1) {
 			return ['1'];
 		}
-
-		reset($condition);
-		$first_key = key($condition);
+		$first_key = array_key_first($condition);
 
 		if (is_int($first_key)) {
 			// Already collapsed

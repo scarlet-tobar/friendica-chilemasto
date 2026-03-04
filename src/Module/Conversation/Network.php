@@ -427,7 +427,7 @@ class Network extends Timeline
 			$this->order = 'commented';
 		}
 
-		$this->selectedTab = $this->selectedTab ?? $this->order;
+		$this->selectedTab ??= $this->order;
 
 		// Upon updates in the background and order by last comment we order by received date,
 		// since otherwise the feed will optically jump, when some already visible thread has been updated.

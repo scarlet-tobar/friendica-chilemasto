@@ -294,7 +294,7 @@ class Worker
 
 		$file = realpath($file);
 
-		if (strpos($file, getcwd()) !== 0) {
+		if (strpos($file, (string) getcwd()) !== 0) {
 			return false;
 		}
 

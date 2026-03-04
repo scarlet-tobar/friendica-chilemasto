@@ -235,7 +235,7 @@ abstract class MailBuilder
 			throw new UnprocessableEntityException('Sender address or name is missing.');
 		}
 
-		$this->senderNoReply = $this->senderNoReply ?? $this->senderAddress;
+		$this->senderNoReply ??= $this->senderAddress;
 
 		$msgHtml = $this->getHtmlMessage() ?? '';
 

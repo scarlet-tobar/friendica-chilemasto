@@ -1411,7 +1411,7 @@ class Feed
 				$entry->setAttribute('xmlns:activity', ActivityNamespace::ACTIVITY);
 
 				$contact             = Contact::getByURL($item['author-link']) ?: $owner;
-				$contact['nickname'] = $contact['nickname'] ?? $contact['nick'];
+				$contact['nickname'] ??= $contact['nick'];
 				$author              = self::addAuthor($doc, $contact);
 				$entry->appendChild($author);
 			}

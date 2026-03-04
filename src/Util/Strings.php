@@ -444,7 +444,7 @@ class Strings
 	{
 		$string_length = mb_strlen($string);
 
-		$length = $length ?? $string_length;
+		$length ??= $string_length;
 
 		if ($start < 0) {
 			$start = max(0, $string_length + $start);

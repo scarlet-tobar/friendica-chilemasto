@@ -170,8 +170,8 @@ class Plaintext
 
 			// If the link is already contained in the post, then it needn't to be added again
 			// But: if the link is beyond the limit, then it has to be added.
-			if (($link != '') && strstr($msg, $link)) {
-				$pos = strpos($msg, $link);
+			if (($link != '') && strstr($msg, (string) $link)) {
+				$pos = strpos($msg, (string) $link);
 
 				// Will the text be shortened in the link?
 				// Or is the link the last item in the post?
@@ -200,7 +200,7 @@ class Plaintext
 				$msg = str_replace('  ', ' ', $msg);
 			}
 
-			if (!in_array($link, ['', $item['plink']]) && ($post['type'] != 'photo') && (strpos($complete_msg, $link) === false)) {
+			if (!in_array($link, ['', $item['plink']]) && ($post['type'] != 'photo') && (strpos($complete_msg, (string) $link) === false)) {
 				$complete_msg .= "\n" . $link;
 			}
 

@@ -240,7 +240,7 @@ class StorageManager
 	 */
 	public function isValidBackend(string $name = null, array $validBackends = null): bool
 	{
-		$validBackends = $validBackends ?? array_merge(
+		$validBackends ??= array_merge(
 			$this->validBackends,
 			[
 				Type\SystemResource::getName(),

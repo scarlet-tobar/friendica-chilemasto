@@ -198,7 +198,7 @@ class HttpClient implements ICanSendHttpRequests
 	public function get(string $url, string $accept_content = HttpClientAccept::DEFAULT, array $opts = []): ICanHandleHttpResponses
 	{
 		// In case there is no
-		$opts[HttpClientOptions::ACCEPT_CONTENT] = $opts[HttpClientOptions::ACCEPT_CONTENT] ?? $accept_content;
+		$opts[HttpClientOptions::ACCEPT_CONTENT] ??= $accept_content;
 
 		return $this->request('get', $url, $opts);
 	}

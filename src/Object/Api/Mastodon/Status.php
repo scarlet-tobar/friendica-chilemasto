@@ -116,8 +116,7 @@ class Status extends BaseDataTransferObject
 
 		$languages = json_decode($item['language'] ?? '', true);
 		if (is_array($languages)) {
-			reset($languages);
-			$this->language = key($languages);
+			$this->language = array_key_first($languages);
 		} else {
 			$this->language = null;
 		}

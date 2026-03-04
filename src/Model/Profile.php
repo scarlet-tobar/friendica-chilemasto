@@ -855,7 +855,7 @@ class Profile
 		}
 
 		$parent = User::getOwnerDataById($parent_uid);
-		if (strpos($about, $parent['addr']) || strpos($about, $parent['url'])) {
+		if (strpos($about, (string) $parent['addr']) || strpos($about, (string) $parent['url'])) {
 			return $about;
 		}
 

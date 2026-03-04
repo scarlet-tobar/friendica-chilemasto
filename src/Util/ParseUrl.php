@@ -546,7 +546,7 @@ class ParseUrl
 		}
 
 		if (!empty($siteinfo['image'])) {
-			$siteinfo['images'] = $siteinfo['images'] ?? [];
+			$siteinfo['images'] ??= [];
 			array_unshift($siteinfo['images'], ['url' => $siteinfo['image']]);
 			unset($siteinfo['image']);
 		}

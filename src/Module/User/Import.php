@@ -233,8 +233,8 @@ class Import extends \Friendica\BaseModule
 		}
 
 		// Backward compatibility
-		$account['circle']        = $account['circle']        ?? $account['group'];
-		$account['circle_member'] = $account['circle_member'] ?? $account['group_member'];
+		$account['circle'] ??= $account['group'];
+		$account['circle_member'] ??= $account['group_member'];
 
 		$oldBaseUrl = $account['baseurl'];
 		$newBaseUrl = (string)$this->baseUrl;

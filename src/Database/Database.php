@@ -831,9 +831,7 @@ class Database
 		if (empty($condition)) {
 			return DBStructure::existsTable($table);
 		}
-
-		reset($condition);
-		$first_key = key($condition);
+		$first_key = array_key_first($condition);
 		if (!is_int($first_key)) {
 			$fields = [$first_key];
 		}

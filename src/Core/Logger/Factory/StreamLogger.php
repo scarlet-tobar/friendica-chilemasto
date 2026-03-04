@@ -44,7 +44,7 @@ class StreamLogger extends AbstractLoggerTypeFactory
 
 		$fileSystem = new FileSystem();
 
-		$logfile = $logfile ?? $config->get('system', 'logfile');
+		$logfile ??= $config->get('system', 'logfile');
 		if (!@file_exists($logfile) || !@is_writable($logfile)) {
 			throw new LoggerArgumentException(sprintf('%s is not a valid logfile', $logfile));
 		}

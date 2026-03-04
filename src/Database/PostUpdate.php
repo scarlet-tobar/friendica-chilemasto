@@ -357,7 +357,7 @@ class PostUpdate
 		}
 
 		while ($term = DBA::fetch($terms)) {
-			if (($term['type'] == Tag::MENTION) && !empty($term['url']) && !strstr($term['body'], $term['url'])) {
+			if (($term['type'] == Tag::MENTION) && !empty($term['url']) && !strstr($term['body'], (string) $term['url'])) {
 				$condition = ['nurl' => Strings::normaliseLink($term['url']), 'uid' => 0, 'deleted' => false];
 				$contact   = DBA::selectFirst('contact', ['url', 'alias'], $condition, ['order' => ['id']]);
 				if (!DBA::isResult($contact)) {
@@ -366,7 +366,7 @@ class PostUpdate
 					$contact   = DBA::selectFirst('contact', ['url', 'alias'], $condition, ['order' => ['id']]);
 				}
 
-				if (DBA::isResult($contact) && (!strstr($term['body'], $contact['url']) && (empty($contact['alias']) || !strstr($term['body'], $contact['alias'])))) {
+				if (DBA::isResult($contact) && (!strstr($term['body'], (string) $contact['url']) && (empty($contact['alias']) || !strstr($term['body'], (string) $contact['alias'])))) {
 					$term['type'] = Tag::IMPLICIT_MENTION;
 				}
 			}

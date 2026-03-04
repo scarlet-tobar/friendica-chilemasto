@@ -1100,7 +1100,7 @@ class Post
 			$profile = Contact::getByURL($term['url'], false, ['addr', 'contact-type']);
 			if (
 				!empty($profile['addr']) && (($profile['contact-type'] ?? Contact::TYPE_UNKNOWN) != Contact::TYPE_COMMUNITY)
-				&& ($profile['addr'] != $owner['addr']) && !strstr($text, $profile['addr'])
+				&& ($profile['addr'] != $owner['addr']) && !strstr($text, (string) $profile['addr'])
 			) {
 				$text .= '@' . $profile['addr'] . ' ';
 			}

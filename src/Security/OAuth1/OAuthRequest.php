@@ -87,7 +87,7 @@ class OAuthRequest
 		}
 		// fix for friendica redirect system
 
-		$http_url = substr($http_url, 0, strpos($http_url, $parameters['pagename']) + strlen($parameters['pagename']));
+		$http_url = substr($http_url, 0, strpos($http_url, (string) $parameters['pagename']) + strlen($parameters['pagename']));
 		unset($parameters['pagename']);
 
 		return new OAuthRequest($http_method, $http_url, $parameters);

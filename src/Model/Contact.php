@@ -1506,17 +1506,13 @@ class Contact
 		if ($data['network'] == Protocol::DIASPORA) {
 			try {
 				DI::dsprContact()->updateFromProbeArray($data);
-			} catch (NotFoundException $e) {
-				DI::logger()->notice($e->getMessage(), ['url' => $url, 'data' => $data]);
-			} catch (\InvalidArgumentException $e) {
+			} catch (NotFoundException|\InvalidArgumentException $e) {
 				DI::logger()->notice($e->getMessage(), ['url' => $url, 'data' => $data]);
 			}
 		} elseif (!empty($data['networks'][Protocol::DIASPORA])) {
 			try {
 				DI::dsprContact()->updateFromProbeArray($data['networks'][Protocol::DIASPORA]);
-			} catch (NotFoundException $e) {
-				DI::logger()->notice($e->getMessage(), ['url' => $url, 'data' => $data['networks'][Protocol::DIASPORA]]);
-			} catch (\InvalidArgumentException $e) {
+			} catch (NotFoundException|\InvalidArgumentException $e) {
 				DI::logger()->notice($e->getMessage(), ['url' => $url, 'data' => $data['networks'][Protocol::DIASPORA]]);
 			}
 		}
@@ -2764,17 +2760,13 @@ class Contact
 		if ($data['network'] == Protocol::DIASPORA) {
 			try {
 				DI::dsprContact()->updateFromProbeArray($data);
-			} catch (NotFoundException $e) {
-				DI::logger()->notice($e->getMessage(), ['id' => $id, 'network' => $network, 'contact' => $contact, 'data' => $data]);
-			} catch (\InvalidArgumentException $e) {
+			} catch (NotFoundException|\InvalidArgumentException $e) {
 				DI::logger()->notice($e->getMessage(), ['id' => $id, 'network' => $network, 'contact' => $contact, 'data' => $data]);
 			}
 		} elseif (!empty($data['networks'][Protocol::DIASPORA])) {
 			try {
 				DI::dsprContact()->updateFromProbeArray($data['networks'][Protocol::DIASPORA]);
-			} catch (NotFoundException $e) {
-				DI::logger()->notice($e->getMessage(), ['id' => $id, 'network' => $network, 'contact' => $contact, 'data' => $data]);
-			} catch (\InvalidArgumentException $e) {
+			} catch (NotFoundException|\InvalidArgumentException $e) {
 				DI::logger()->notice($e->getMessage(), ['id' => $id, 'network' => $network, 'contact' => $contact, 'data' => $data]);
 			}
 		}

@@ -184,7 +184,7 @@ class Media
 		}
 
 		$media['modified']  = DateTimeFormat::utc($lastModified);
-		$media['published'] = $media['published'] ?? $media['modified'];
+		$media['published'] ??= $media['modified'];
 
 		return $media;
 	}
@@ -1375,7 +1375,7 @@ class Media
 			return $body;
 		}
 
-		if (strpos($body, $links[0]['url'])) {
+		if (strpos($body, (string) $links[0]['url'])) {
 			return $body;
 		}
 

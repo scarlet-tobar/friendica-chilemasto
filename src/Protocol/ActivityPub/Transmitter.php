@@ -2607,8 +2607,8 @@ class Transmitter
 			if (
 				!empty($profile['addr'])
 				&& $profile['contact-type'] != Contact::TYPE_COMMUNITY
-				&& !strstr($body, $profile['addr'])
-				&& !strstr($body, $tag['url'])
+				&& !strstr($body, (string) $profile['addr'])
+				&& !strstr($body, (string) $tag['url'])
 				&& $tag['url'] !== $authorLink
 			) {
 				$mentions[] = '@[url=' . $tag['url'] . ']' . $profile['nick'] . '[/url]';

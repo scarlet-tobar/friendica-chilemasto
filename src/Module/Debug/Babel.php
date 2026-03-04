@@ -138,7 +138,7 @@ class Babel extends BaseModule
 					$markdown = XML::unescape($diaspora);
 					// no break
 				case 'markdown':
-					$markdown = $markdown ?? trim($request['text']);
+					$markdown ??= trim($request['text']);
 
 					$results[] = [
 						'title'   => 'Source input (Markdown)',

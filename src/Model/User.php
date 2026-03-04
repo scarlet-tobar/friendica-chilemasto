@@ -503,7 +503,7 @@ class User
 			// Check if the avatar field is filled and the photo directs to the correct path
 			$avatar = Photo::selectFirst(['resource-id'], ['uid' => $uid, 'profile' => true]);
 			if (DBA::isResult($avatar)) {
-				$repair = empty($owner['avatar']) || !strpos($owner['photo'], $avatar['resource-id']);
+				$repair = empty($owner['avatar']) || !strpos($owner['photo'], (string) $avatar['resource-id']);
 			}
 		}
 

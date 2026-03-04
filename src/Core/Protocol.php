@@ -131,7 +131,7 @@ class Protocol
 			return true;
 		}
 
-		$protocol = $protocol ?? $contact['protocol'];
+		$protocol ??= $contact['protocol'];
 
 		if ($protocol == self::DIASPORA) {
 			$contact = Diaspora::sendShare($owner, $contact);

@@ -945,11 +945,11 @@ class Item
 		$post['direction']  = Conversation::PUSH;
 		$post['received']   = DateTimeFormat::utcNow();
 		$post['origin']     = true;
-		$post['wall']       = $post['wall']       ?? true;
-		$post['guid']       = $post['guid']       ?? System::createUUID();
-		$post['verb']       = $post['verb']       ?? Activity::POST;
-		$post['uri']        = $post['uri']        ?? ItemModel::newURI($post['guid']);
-		$post['thr-parent'] = $post['thr-parent'] ?? $post['uri'];
+		$post['wall'] ??= true;
+		$post['guid'] ??= System::createUUID();
+		$post['verb'] ??= Activity::POST;
+		$post['uri'] ??= ItemModel::newURI($post['guid']);
+		$post['thr-parent'] ??= $post['uri'];
 
 		if (empty($post['gravity'])) {
 			$post['gravity'] = ($post['uri'] == $post['thr-parent']) ? ItemModel::GRAVITY_PARENT : ItemModel::GRAVITY_COMMENT;

@@ -183,7 +183,7 @@ class BBCode
 				$attach_data = self::getAttachmentData($match[0]);
 				if (empty($attach_data['url'])) {
 					return $match[0];
-				} elseif (strpos(str_replace($match[0], '', $body), $attach_data['url']) !== false) {
+				} elseif (strpos(str_replace($match[0], '', $body), (string) $attach_data['url']) !== false) {
 					return '';
 				} elseif (empty($attach_data['title']) || $no_link_desc) {
 					return " \n[url]" . $attach_data['url'] . "[/url]\n";
@@ -245,12 +245,12 @@ class BBCode
 		// Add text from attached media
 		if (!empty($uri_id)) {
 			foreach (Post\Media::getByURIId($uri_id) as $media) {
-				if (!empty($media['description']) && (stripos($text, $media['description']) === false)) {
+				if (!empty($media['description']) && (stripos($text, (string) $media['description']) === false)) {
 					$text .= ' ' . $media['description'];
 				}
 				if (in_array($media['type'], [Post\Media::HTML, Post\Media::ACTIVITY])) {
 					foreach (['name', 'author-name', 'publisher-name'] as $key) {
-						if (!empty($media[$key] && stripos($text, $media[$key]) === false)) {
+						if (!empty($media[$key] && stripos($text, (string) $media[$key]) === false)) {
 							$text .= ' ' . $media[$key];
 						}
 					}
@@ -535,7 +535,7 @@ class BBCode
 		}
 
 		// If the link already is included in the post, don't add it again
-		if (!empty($data['url']) && strpos($data['text'], $data['url'])) {
+		if (!empty($data['url']) && strpos($data['text'], (string) $data['url'])) {
 			DI::profiler()->stopRecording();
 			return $data['text'] . $data['after'];
 		}
@@ -812,8 +812,8 @@ class BBCode
 				$attributes = self::extractShareAttributes($match[2]);
 
 				$author_contact         = Contact::getByURL($attributes['profile'], false, ['id', 'url', 'addr', 'name', 'micro']);
-				$author_contact['url']  = ($author_contact['url'] ?? $attributes['profile']);
-				$author_contact['addr'] = ($author_contact['addr'] ?? '');
+				$author_contact['url'] ??= $attributes['profile'];
+				$author_contact['addr'] ??= '';
 
 				$attributes['author']  = ($author_contact['name'] ?? '') ?: $attributes['author'];
 				$attributes['avatar']  = ($author_contact['micro'] ?? '') ?: $attributes['avatar'];
@@ -1027,7 +1027,7 @@ class BBCode
 	 */
 	private static function expandLinksCallback(array $match): string
 	{
-		if (($match[3] == '') || ($match[2] == $match[3]) || stristr($match[2], $match[3])) {
+		if (($match[3] == '') || ($match[2] == $match[3]) || stristr($match[2], (string) $match[3])) {
 			return ($match[1] . '[url]' . $match[2] . '[/url]');
 		} else {
 			return ($match[1] . $match[3] . ' [url]' . $match[2] . '[/url]');

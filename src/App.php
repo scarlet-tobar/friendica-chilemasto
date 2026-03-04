@@ -616,7 +616,7 @@ class App
 		/** @var Router $router */
 		$router = $this->container->create(Router::class);
 
-		$moduleClass = $moduleClass ?? $router->getModuleClass();
+		$moduleClass ??= $router->getModuleClass();
 		$parameters  = $router->getParameters();
 
 		$dice_profiler_threshold = $this->config->get('system', 'dice_profiler_threshold', 0);
