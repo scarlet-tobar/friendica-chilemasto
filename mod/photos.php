@@ -603,7 +603,7 @@ function photos_content()
 
 				$photos[] = [
 					'id'    => $rr['id'],
-					'twist' => ' ' . ($twist ? 'rotleft' : 'rotright') . rand(2, 4),
+					'twist' => ' ' . ($twist ? 'rotleft' : 'rotright') . random_int(2, 4),
 					'link'  => 'photos/' . $user['nickname'] . '/image/' . $rr['resource-id']
 						. ($order_field === 'created' ? '?order=created' : ''),
 					'title' => DI::l10n()->t('View Photo'),

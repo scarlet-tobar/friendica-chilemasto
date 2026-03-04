@@ -303,8 +303,8 @@ class XML
 			$tag        = $data['tag'];
 			$type       = $data['type'];
 			$level      = $data['level'];
-			$attributes = isset($data['attributes']) ? $data['attributes'] : null;
-			$value      = isset($data['value']) ? $data['value'] : null;
+			$attributes = $data['attributes'] ?? null;
+			$value      = $data['value'] ?? null;
 
 			$result          = [];
 			$attributes_data = [];

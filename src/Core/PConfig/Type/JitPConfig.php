@@ -86,7 +86,7 @@ class JitPConfig extends AbstractPConfigValues
 		// use the config cache for return
 		$result = $this->configCache->get($uid, $cat, $key);
 
-		return (isset($result)) ? $result : $default_value;
+		return $result ?? $default_value;
 	}
 
 	/**

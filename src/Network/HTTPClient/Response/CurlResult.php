@@ -266,11 +266,7 @@ class CurlResult implements ICanHandleHttpResponses
 
 		$headers = $this->getHeaderArray();
 
-		if (isset($headers[$header])) {
-			return $headers[$header];
-		}
-
-		return [];
+		return $headers[$header] ?? [];
 	}
 
 	/** {@inheritDoc} */

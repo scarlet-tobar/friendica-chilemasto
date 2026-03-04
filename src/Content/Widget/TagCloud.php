@@ -150,9 +150,6 @@ class TagCloud
 	 */
 	private static function tagsSort($a, $b)
 	{
-		if (strtolower($a[0]) == strtolower($b[0])) {
-			return 0;
-		}
-		return ((strtolower($a[0]) < strtolower($b[0])) ? -1 : 1);
+		return strtolower($a[0]) <=> strtolower($b[0]);
 	}
 }

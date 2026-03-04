@@ -66,7 +66,7 @@ class CacheLock extends AbstractLock
 				}
 
 				if (!$got_lock && ($timeout > 0)) {
-					usleep(rand(10000, 200000));
+					usleep(random_int(10000, 200000));
 				}
 			} while (!$got_lock && ((time() - $start) < $timeout));
 		} catch (CachePersistenceException $exception) {

@@ -82,7 +82,7 @@ class DatabaseLock extends AbstractLock
 				$this->dba->unlock();
 
 				if (!$got_lock && ($timeout > 0)) {
-					usleep(rand(100000, 2000000));
+					usleep(random_int(100000, 2000000));
 				}
 			} while (!$got_lock && ((time() - $start) < $timeout));
 		} catch (\Exception $exception) {

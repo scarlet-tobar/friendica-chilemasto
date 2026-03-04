@@ -160,7 +160,7 @@ class ErrorHandler
 		register_shutdown_function([$this, 'handleFatalError']);
 
 		$this->reservedMemory       = str_repeat(' ', 1024 * $reservedMemorySize);
-		$this->fatalLevel           = null === $level ? LogLevel::ALERT : $level;
+		$this->fatalLevel           = $level ?? LogLevel::ALERT;
 		$this->hasFatalErrorHandler = true;
 
 		return $this;

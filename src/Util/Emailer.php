@@ -158,10 +158,10 @@ class Emailer
 		$messageSubject = Email::encodeHeader(html_entity_decode($email->getSubject(), ENT_QUOTES, 'UTF-8'), 'UTF-8');
 
 		// generate a mime boundary
-		$mimeBoundary = rand(0, 9) . '-'
-						. rand(100000000, 999999999) . '-'
-						. rand(100000000, 999999999) . '=:'
-						. rand(10000, 99999);
+		$mimeBoundary = random_int(0, 9) . '-'
+						. random_int(100000000, 999999999) . '-'
+						. random_int(100000000, 999999999) . '=:'
+						. random_int(10000, 99999);
 
 		$messageHeader = $email->getAdditionalMailHeaderString();
 		if ($countMessageId === 0) {

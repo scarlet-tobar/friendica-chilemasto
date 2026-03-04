@@ -267,7 +267,7 @@ class Notify extends BaseRepository
 		// with $params['show_in_notification_page'] == false, the notification isn't inserted into
 		// the database, and an email is sent if applicable.
 		// default, if not specified: true
-		$show_in_notification_page = isset($params['show_in_notification_page']) ? $params['show_in_notification_page'] : true;
+		$show_in_notification_page = $params['show_in_notification_page'] ?? true;
 
 		$title = $params['item']['title'] ?? '';
 		$body  = $params['item']['body']  ?? '';

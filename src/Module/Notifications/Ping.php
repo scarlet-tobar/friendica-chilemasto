@@ -227,11 +227,7 @@ class Ping extends BaseModule
 
 				// Unseen messages are kept at the top
 				if ($a['seen'] == $b['seen']) {
-					if ($a['timestamp'] == $b['timestamp']) {
-						return 0;
-					} else {
-						return $a['timestamp'] < $b['timestamp'] ? 1 : -1;
-					}
+					return $b['timestamp'] <=> $a['timestamp'];
 				} else {
 					return $a['seen'] ? 1 : -1;
 				}
