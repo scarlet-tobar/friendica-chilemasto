@@ -27,6 +27,6 @@ return \Rector\Config\RectorConfig::configure()
 	])
 	->withSets([
 		\Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_55,
-		\Rector\Set\ValueObject\DowngradeLevelSetList::DOWN_TO_PHP_74,
+		\Rector\Set\ValueObject\DowngradeLevelSetList::DOWN_TO_PHP_82,
 	])
 ;
