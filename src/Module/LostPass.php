@@ -22,12 +22,32 @@ use Friendica\Util\Emailer;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Lost password module
+ *
+ * This module handles password reset functionality for users who have forgotten their passwords.
+ */
 final class LostPass extends BaseModule
 {
 	private SystemMessages $sysMessages;
 	private IManageConfigValues $config;
 	private Emailer $emailer;
 
+	/**
+	 * Initialize the module
+	 *
+	 * @param L10n $l10n
+	 * @param BaseURL $baseUrl
+	 * @param Arguments $args
+	 * @param LoggerInterface $logger
+	 * @param Profiler $profiler
+	 * @param Response $response
+	 * @param SystemMessages $sysMessages
+	 * @param IManageConfigValues $config
+	 * @param Emailer $emailer
+	 * @param array $server
+	 * @param array $parameters
+	 */
 	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, SystemMessages $sysMessages, IManageConfigValues $config, Emailer $emailer, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
@@ -37,6 +57,12 @@ final class LostPass extends BaseModule
 		$this->emailer     = $emailer;
 	}
 
+	/**
+	 * Handle POST requests for password reset form submission
+	 *
+	 * @param array $request
+	 * @return void
+	 */
 	protected function post(array $request = [])
 	{
 		$loginame = trim($request['login-name'] ?? '');
@@ -99,6 +125,12 @@ final class LostPass extends BaseModule
 		$this->baseUrl->redirect();
 	}
 
+	/**
+	 * Render page content
+	 *
+	 * @param array $request
+	 * @return string Rendered page content
+	 */
 	protected function content(array $request = []): string
 	{
 		if (isset($this->parameters['token'])) {
@@ -130,6 +162,11 @@ final class LostPass extends BaseModule
 		}
 	}
 
+	/**
+	 * Render the password reset form
+	 *
+	 * @return string Rendered form HTML
+	 */
 	private function form(): string
 	{
 		$tpl = Renderer::getMarkupTemplate('lostpass.tpl');
@@ -143,6 +180,12 @@ final class LostPass extends BaseModule
 		return $o;
 	}
 
+	/**
+	 * Generate and send a new password to the user
+	 *
+	 * @param array $user User data array
+	 * @return string Rendered success message HTML
+	 */
 	private function generatePassword(array $user): string
 	{
 		$o = '';
