@@ -708,7 +708,7 @@ class GServer
 				}
 			}
 
-			if (($serverdata['network'] == Protocol::PHANTOM) && in_array($url, ['https://www.threads.net', 'https://threads.net'])) {
+			if (($serverdata['network'] === Protocol::PHANTOM) && in_array($url, ['https://www.threads.net', 'https://threads.net'])) {
 				$serverdata['detection-method'] = self::DETECT_THREADS;
 				$serverdata['network']          = Protocol::ACTIVITYPUB;
 				$serverdata['platform']         = 'threads';
