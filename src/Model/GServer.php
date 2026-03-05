@@ -703,15 +703,15 @@ class GServer
 					return false;
 				}
 
-				if (in_array($url, ['https://www.threads.net', 'https://threads.net'])) {
-					$serverdata['detection-method'] = self::DETECT_THREADS;
-					$serverdata['network']          = Protocol::ACTIVITYPUB;
-					$serverdata['platform']         = 'threads';
-				}
-
 				if (($serverdata['network'] == Protocol::PHANTOM) || in_array($serverdata['detection-method'], self::DETECT_UNSPECIFIC)) {
 					$serverdata = self::detectMastodonAlikes($url, $serverdata);
 				}
+			}
+
+			if (($serverdata['network'] == Protocol::PHANTOM) && in_array($url, ['https://www.threads.net', 'https://threads.net'])) {
+				$serverdata['detection-method'] = self::DETECT_THREADS;
+				$serverdata['network']          = Protocol::ACTIVITYPUB;
+				$serverdata['platform']         = 'threads';
 			}
 
 			// All following checks are done for systems that always have got a "host-meta" endpoint.
