@@ -22,11 +22,11 @@ use Friendica\Util\Emailer;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
-class LostPass extends BaseModule
+final class LostPass extends BaseModule
 {
-	protected SystemMessages $sysMessages;
-	protected IManageConfigValues $config;
-	protected Emailer $emailer;
+	private SystemMessages $sysMessages;
+	private IManageConfigValues $config;
+	private Emailer $emailer;
 
 	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, SystemMessages $sysMessages, IManageConfigValues $config, Emailer $emailer, array $server, array $parameters = [])
 	{
