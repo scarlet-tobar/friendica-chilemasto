@@ -473,14 +473,19 @@ class BBCode
 
 		if (!empty($data['title']) && !empty($data['url'])) {
 			$preview_class = in_array($preview_mode, [self::PREVIEW_AUTO, self::PREVIEW_LARGE]) ? 'attachment-image' : 'attachment-preview';
-			if (!empty($data['image']) && empty($data['text']) && ($data['type'] == 'photo')) {
-				$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="' . $preview_class . '" /></a>', $data['url'], self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title']);
+
+			$is_photo = ($data['type'] === 'photo');
+			$link_attributes = $is_photo ? 'data-fancybox="gallery" rel="noopener noreferrer"' : 'target="_blank" rel="noopener noreferrer"';
+
+			if (!empty($data['image']) && empty($data['text']) && $is_photo) {
+				$return .= sprintf('<a href="%s" %s><img src="%s" alt="" title="%s" class="%s" /></a>', $data['url'], $link_attributes, self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title'], $preview_class);
 			} else {
 				if (!empty($data['image'])) {
-					$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="' . $preview_class . '" /></a><br>', $data['url'], self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title']);
+					$return .= sprintf('<a href="%s" %s><img src="%s" alt="" title="%s" class="%s" /></a><br>', $data['url'], $link_attributes, self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title'], $preview_class);
 				} elseif (!empty($data['preview'])) {
-					$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br>', $data['url'], self::proxyUrl($data['preview'], $simplehtml, $uriid), $data['title']);
+					$return .= sprintf('<a href="%s" %s><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br>', $data['url'], $link_attributes, self::proxyUrl($data['preview'], $simplehtml, $uriid), $data['title']);
 				}
+
 				$return .= sprintf('<h4><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></h4>', $data['url'], $data['title']);
 			}
 		}
