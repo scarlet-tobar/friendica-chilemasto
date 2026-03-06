@@ -82,134 +82,6 @@ msgstr ""
 msgid "Permission denied."
 msgstr ""
 
-#: mod/lostpass.php:28
-msgid "No valid account found."
-msgstr ""
-
-#: mod/lostpass.php:40
-msgid "Password reset request issued. Check your email."
-msgstr ""
-
-#: mod/lostpass.php:46
-#, php-format
-msgid ""
-"\n"
-"\t\tDear %1$s,\n"
-"\t\t\tA request was recently received at \"%2$s\" to reset your account\n"
-"\t\tpassword. In order to confirm this request, please select the verification link\n"
-"\t\tbelow or paste it into your web browser address bar.\n"
-"\n"
-"\t\tIf you did NOT request this change, please DO NOT follow the link\n"
-"\t\tprovided and ignore and/or delete this email, the request will expire shortly.\n"
-"\n"
-"\t\tYour password will not be changed unless we can verify that you\n"
-"\t\tissued this request."
-msgstr ""
-
-#: mod/lostpass.php:57
-#, php-format
-msgid ""
-"\n"
-"\t\tFollow this link soon to verify your identity:\n"
-"\n"
-"\t\t%1$s\n"
-"\n"
-"\t\tYou will then receive a follow-up message containing the new password.\n"
-"\t\tYou may change that password from your account settings page after logging in.\n"
-"\n"
-"\t\tThe login details are as follows:\n"
-"\n"
-"\t\tSite Location:\t%2$s\n"
-"\t\tLogin Name:\t%3$s"
-msgstr ""
-
-#: mod/lostpass.php:72
-#, php-format
-msgid "Password reset requested at %s"
-msgstr ""
-
-#: mod/lostpass.php:88
-msgid "Request could not be verified. (You may have previously submitted it.) Password reset failed."
-msgstr ""
-
-#: mod/lostpass.php:101
-msgid "Request has expired, please make a new one."
-msgstr ""
-
-#: mod/lostpass.php:116
-msgid "Forgot your Password?"
-msgstr ""
-
-#: mod/lostpass.php:117
-msgid "Enter your email address and submit to have your password reset. Then check your email for further instructions."
-msgstr ""
-
-#: mod/lostpass.php:118 src/Module/Security/Login.php:167
-msgid "Nickname or email"
-msgstr ""
-
-#: mod/lostpass.php:119
-msgid "Reset my password"
-msgstr ""
-
-#: mod/lostpass.php:134 src/Module/Security/Login.php:179
-msgid "Password Reset"
-msgstr ""
-
-#: mod/lostpass.php:135
-msgid "Your password has been reset as requested."
-msgstr ""
-
-#: mod/lostpass.php:136
-msgid "Your new password is"
-msgstr ""
-
-#: mod/lostpass.php:137
-msgid "Save or copy your new password - and then"
-msgstr ""
-
-#: mod/lostpass.php:138
-msgid "click here to login"
-msgstr ""
-
-#: mod/lostpass.php:139
-msgid "Your password may be changed from the <em>Settings</em> page after successful login."
-msgstr ""
-
-#: mod/lostpass.php:143
-msgid "Your password has been reset."
-msgstr ""
-
-#: mod/lostpass.php:146
-#, php-format
-msgid ""
-"\n"
-"\t\t\tDear %1$s,\n"
-"\t\t\t\tYour password has been changed as requested. Please retain this\n"
-"\t\t\tinformation for your records (or change your password immediately to\n"
-"\t\t\tsomething that you will remember).\n"
-"\t\t"
-msgstr ""
-
-#: mod/lostpass.php:152
-#, php-format
-msgid ""
-"\n"
-"\t\t\tYour login details are as follows:\n"
-"\n"
-"\t\t\tSite Location:\t%1$s\n"
-"\t\t\tLogin Name:\t%2$s\n"
-"\t\t\tPassword:\t%3$s\n"
-"\n"
-"\t\t\tYou may change that password from your account settings page after logging in.\n"
-"\t\t"
-msgstr ""
-
-#: mod/lostpass.php:164
-#, php-format
-msgid "Your password has been changed at %s"
-msgstr ""
-
 #: mod/message.php:28 mod/message.php:124 src/Content/Nav.php:315
 #: view/theme/frio/theme.php:229
 msgid "Messages"
@@ -7235,6 +7107,134 @@ msgstr ""
 
 #: src/Module/Item/Follow.php:37
 msgid "Unable to follow this item."
+msgstr ""
+
+#: src/Module/LostPass.php:50
+msgid "No valid account found."
+msgstr ""
+
+#: src/Module/LostPass.php:62
+msgid "Password reset request issued. Check your email."
+msgstr ""
+
+#: src/Module/LostPass.php:68
+#, php-format
+msgid ""
+"\n"
+"\t\t\tDear %1$s,\n"
+"\t\t\t\tA request was recently received at \"%2$s\" to reset your account\n"
+"\t\t\tpassword. In order to confirm this request, please select the verification link\n"
+"\t\t\tbelow or paste it into your web browser address bar.\n"
+"\n"
+"\t\t\tIf you did NOT request this change, please DO NOT follow the link\n"
+"\t\t\tprovided and ignore and/or delete this email, the request will expire shortly.\n"
+"\n"
+"\t\t\tYour password will not be changed unless we can verify that you\n"
+"\t\t\tissued this request."
+msgstr ""
+
+#: src/Module/LostPass.php:79
+#, php-format
+msgid ""
+"\n"
+"\t\t\tFollow this link soon to verify your identity:\n"
+"\n"
+"\t\t\t%1$s\n"
+"\n"
+"\t\t\tYou will then receive a follow-up message containing the new password.\n"
+"\t\t\tYou may change that password from your account settings page after logging in.\n"
+"\n"
+"\t\t\tThe login details are as follows:\n"
+"\n"
+"\t\t\tSite Location:\t%2$s\n"
+"\t\t\tLogin Name:\t%3$s"
+msgstr ""
+
+#: src/Module/LostPass.php:93
+#, php-format
+msgid "Password reset requested at %s"
+msgstr ""
+
+#: src/Module/LostPass.php:109
+msgid "Request could not be verified. (You may have previously submitted it.) Password reset failed."
+msgstr ""
+
+#: src/Module/LostPass.php:122
+msgid "Request has expired, please make a new one."
+msgstr ""
+
+#: src/Module/LostPass.php:137
+msgid "Forgot your Password?"
+msgstr ""
+
+#: src/Module/LostPass.php:138
+msgid "Enter your email address and submit to have your password reset. Then check your email for further instructions."
+msgstr ""
+
+#: src/Module/LostPass.php:139 src/Module/Security/Login.php:167
+msgid "Nickname or email"
+msgstr ""
+
+#: src/Module/LostPass.php:140
+msgid "Reset my password"
+msgstr ""
+
+#: src/Module/LostPass.php:155 src/Module/Security/Login.php:179
+msgid "Password Reset"
+msgstr ""
+
+#: src/Module/LostPass.php:156
+msgid "Your password has been reset as requested."
+msgstr ""
+
+#: src/Module/LostPass.php:157
+msgid "Your new password is"
+msgstr ""
+
+#: src/Module/LostPass.php:158
+msgid "Save or copy your new password - and then"
+msgstr ""
+
+#: src/Module/LostPass.php:159
+msgid "click here to login"
+msgstr ""
+
+#: src/Module/LostPass.php:160
+msgid "Your password may be changed from the <em>Settings</em> page after successful login."
+msgstr ""
+
+#: src/Module/LostPass.php:164
+msgid "Your password has been reset."
+msgstr ""
+
+#: src/Module/LostPass.php:167
+#, php-format
+msgid ""
+"\n"
+"\t\t\t\tDear %1$s,\n"
+"\t\t\t\t\tYour password has been changed as requested. Please retain this\n"
+"\t\t\t\tinformation for your records (or change your password immediately to\n"
+"\t\t\t\tsomething that you will remember).\n"
+"\t\t\t"
+msgstr ""
+
+#: src/Module/LostPass.php:173
+#, php-format
+msgid ""
+"\n"
+"\t\t\t\tYour login details are as follows:\n"
+"\n"
+"\t\t\t\tSite Location:\t%1$s\n"
+"\t\t\t\tLogin Name:\t%2$s\n"
+"\t\t\t\tPassword:\t%3$s\n"
+"\n"
+"\t\t\t\tYou may change that password from your account settings page after logging in.\n"
+"\t\t\t"
+msgstr ""
+
+#: src/Module/LostPass.php:184
+#, php-format
+msgid "Your password has been changed at %s"
 msgstr ""
 
 #: src/Module/Maintenance.php:34 src/Module/Maintenance.php:39
