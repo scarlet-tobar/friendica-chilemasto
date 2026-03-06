@@ -15,7 +15,6 @@ use Friendica\Content\Conversation as ConversationContent;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Protocol;
-use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\Database;
@@ -1625,29 +1624,29 @@ class Contact
 	/**
 	 * Returns posts from a given contact url
 	 *
-	 * @param string $contact_url  Contact URL
-	 * @param int    $uid          User ID
-	 * @param bool   $only_media   Only display media content
-	 * @param string $last_created Newest creation date, used for paging
+	 * @param string $contact_url Contact URL
+	 * @param int    $uid         User ID
+	 * @param bool   $only_media  Only display media content
+	 * @param array  $request     Request variables
 	 * @return string posts in HTML
 	 * @throws Exception
 	 */
-	public static function getPostsFromUrl(string $contact_url, int $uid, bool $only_media = false, ?string $last_created = null): string
+	public static function getPostsFromUrl(string $contact_url, int $uid, bool $only_media = false, array $request = []): string
 	{
-		return self::getPostsFromId(self::getIdForURL($contact_url), $uid, $only_media, $last_created);
+		return self::getPostsFromId(self::getIdForURL($contact_url), $uid, $only_media, $request);
 	}
 
 	/**
 	 * Returns posts from a given contact id
 	 *
-	 * @param int    $cid          Contact ID
-	 * @param int    $uid          User ID
-	 * @param bool   $only_media   Only display media content
-	 * @param string $last_created Newest creation date, used for paging
+	 * @param int  $cid        Contact ID
+	 * @param int  $uid        User ID
+	 * @param bool $only_media Only display media content
+	 * @param array $request   Request variables
 	 * @return string posts in HTML
 	 * @throws Exception
 	 */
-	public static function getPostsFromId(int $cid, int $uid, bool $only_media = false, ?string $last_created = null): string
+	public static function getPostsFromId(int $cid, int $uid, bool $only_media = false, array $request = []): string
 	{
 		$contact = DBA::selectFirst('contact', ['contact-type', 'network', 'name', 'nick'], ['id' => $cid]);
 		if (!DBA::isResult($contact)) {
@@ -1668,8 +1667,8 @@ class Contact
 
 		$condition = DBA::mergeConditions($condition, ["`$contact_field` = ? AND `gravity` IN (?, ?)", $cid, Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT]);
 
-		if (!empty($last_created)) {
-			$condition = DBA::mergeConditions($condition, ["`created` < ?", $last_created]);
+		if (!empty($request['last_created'])) {
+			$condition = DBA::mergeConditions($condition, ["`created` < ?", $request['last_created']]);
 		}
 
 		if ($only_media) {
@@ -1688,21 +1687,13 @@ class Contact
 		$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
 
 		$params = ['order' => ['created' => true], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];
-
-		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll', true)) {
-			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
-			$o   = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
-		} else {
-			$o = '';
-		}
-
 		$fields = array_merge(Item::DISPLAY_FIELDLIST, ['featured']);
 		$items  = Post::toArray(Post::selectForUser($uid, $fields, $condition, $params));
 
-		$o .= DI::conversation()->render($items, ConversationContent::MODE_CONTACT_POSTS);
+		$o = DI::conversation()->render($items, ConversationContent::MODE_CONTACT_POSTS, isset($request['mode']) && ($request['mode'] == 'raw'));
 
 		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll', true)) {
-			$o .= HTML::scrollLoader();
+			$o .= HTML::scrollLoader($request);
 		} else {
 			$o .= $pager->renderMinimal(count($items));
 		}
@@ -1713,13 +1704,14 @@ class Contact
 	/**
 	 * Returns threads from a given contact id
 	 *
-	 * @param int  $cid         Contact ID
-	 * @param int  $update      Update mode
-	 * @param int  $parent      Item parent ID for the update mode
+	 * @param int   $cid     Contact ID
+	 * @param int   $update  Update mode
+	 * @param int   $parent  Item parent ID for the update mode
+	 * @param array $request Request variables
 	 * @return string posts in HTML
 	 * @throws Exception
 	 */
-	public static function getThreadsFromId(int $cid, int $uid, int $update = 0, int $parent = 0, string $last_created = ''): string
+	public static function getThreadsFromId(int $cid, int $uid, int $update = 0, int $parent = 0, array $request = []): string
 	{
 		$contact = DBA::selectFirst('contact', ['contact-type', 'network', 'name', 'nick'], ['id' => $cid]);
 		if (!DBA::isResult($contact)) {
@@ -1738,8 +1730,8 @@ class Contact
 
 		if (!empty($parent)) {
 			$condition = DBA::mergeConditions($condition, ['parent' => $parent]);
-		} elseif (!empty($last_created)) {
-			$condition = DBA::mergeConditions($condition, ["`created` < ?", $last_created]);
+		} elseif (isset($request['last_created'])) {
+			$condition = DBA::mergeConditions($condition, ["`created` < ?", $request['last_created']]);
 		}
 
 		$contact_field = ((($contact["contact-type"] == self::TYPE_COMMUNITY) || ($contact['network'] == Protocol::MAIL)) ? 'owner-id' : 'author-id');
@@ -1751,13 +1743,6 @@ class Contact
 		}
 
 		$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
-
-		if (!$update && DI::pConfig()->get($uid, 'system', 'infinite_scroll', true)) {
-			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
-			$o   = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
-		} else {
-			$o = '';
-		}
 
 		$condition1 = DBA::mergeConditions($condition, ["`$contact_field` = ? AND `gravity` = ?", $cid, Item::GRAVITY_PARENT]);
 
@@ -1776,17 +1761,19 @@ class Contact
 		$union = array_merge($union, [$pager->getStart(), $pager->getItemsPerPage()]);
 		$items = Post::toArray(DBA::p($sql, $union));
 
-		if (empty($last_created) && ($pager->getStart() == 0)) {
+		$raw = isset($request['mode']) && ($request['mode'] == 'raw');
+
+		if (!$raw && !$update && ($pager->getStart() == 0)) {
 			$fields = ['uri-id', 'thr-parent-id', 'gravity', 'author-id', 'created'];
 			$pinned = Post\Collection::selectToArrayForContact($cid, Post\Collection::FEATURED, $fields);
 			$items  = array_merge($items, $pinned);
 		}
 
-		$o .= DI::conversation()->render($items, ConversationContent::MODE_CONTACTS, $update, false, 'pinned_created', $uid);
+		$o = DI::conversation()->render($items, ConversationContent::MODE_CONTACTS, $update || $raw, false, 'pinned_created', $uid);
 
 		if (!$update) {
 			if (DI::pConfig()->get($uid, 'system', 'infinite_scroll', true)) {
-				$o .= HTML::scrollLoader();
+				$o .= HTML::scrollLoader($request);
 			} else {
 				$o .= $pager->renderMinimal(count($items));
 			}

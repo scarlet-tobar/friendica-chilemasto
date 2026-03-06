@@ -163,7 +163,7 @@ class Network extends Timeline
 		];
 
 		$this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_CONTENT_START, $hook_data)
+			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_CONTENT_START, $hook_data),
 		);
 
 		$o           = '';
@@ -180,7 +180,7 @@ class Network extends Timeline
 				Feature::SEARCHES,
 				Feature::FOLDERS,
 				Feature::NOSHARER,
-				Feature::TRENDING_TAGS
+				Feature::TRENDING_TAGS,
 			];
 		}
 
@@ -215,18 +215,13 @@ class Network extends Timeline
 						$this->page['aside'] .= TrendingTags::getHTML($this->selectedTab);
 						break;
 					case Feature::NOSHARER:
-						if (($this->channel->isTimeline($this->selectedTab) || $this->userDefinedChannel->isTimeline($this->selectedTab, $this->session->getLocalUserId())) &&
-							!in_array($this->selectedTab, [Channel::FOLLOWERS, Channel::FORYOU, Channel::DISCOVER])) {
+						if (($this->channel->isTimeline($this->selectedTab) || $this->userDefinedChannel->isTimeline($this->selectedTab, $this->session->getLocalUserId()))
+							&& !in_array($this->selectedTab, [Channel::FOLLOWERS, Channel::FORYOU, Channel::DISCOVER])) {
 							$this->page['aside'] .= $this->getNoSharerWidget('network');
 						}
 						break;
 				}
 			}
-		}
-
-		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true) && ($_GET['mode'] ?? '') != 'minimal') {
-			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
-			$o .= Renderer::replaceMacros($tpl, ['$reload_uri' => $this->args->getQueryString()]);
 		}
 
 		if (!$this->raw) {
@@ -277,7 +272,7 @@ class Network extends Timeline
 				}
 
 				$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
-					'$title' => $this->l10n->t('Circle: %s', $circle['name'])
+					'$title' => $this->l10n->t('Circle: %s', $circle['name']),
 				]) . $o;
 			} elseif (Profile::shouldDisplayEventList($this->session->getLocalUserId(), $this->mode)) {
 				$o .= Profile::getBirthdays($this->session->getLocalUserId());
@@ -294,7 +289,7 @@ class Network extends Timeline
 				$items = $this->getItems();
 			}
 
-			$o .= $this->conversation->render($items, Conversation::MODE_NETWORK, false, false, $this->getOrder(), $this->session->getLocalUserId());
+			$o .= $this->conversation->render($items, Conversation::MODE_NETWORK, $this->raw, false, $this->getOrder(), $this->session->getLocalUserId());
 		} catch (\Exception $e) {
 			$this->logger->error('Exception when fetching items', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
 			$o .= $this->l10n->t('Error %d (%s) while fetching the timeline.', $e->getCode(), $e->getMessage());
@@ -302,14 +297,14 @@ class Network extends Timeline
 		}
 
 		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
-			$o .= HTML::scrollLoader();
+			$o .= HTML::scrollLoader($request);
 		} else {
 			$pager = new BoundariesPager(
 				$this->l10n,
 				$this->args->getQueryString(),
 				$items[array_key_first($items)][$this->order] ?? null,
 				$items[array_key_last($items)][$this->order]  ?? null,
-				$this->itemsPerPage
+				$this->itemsPerPage,
 			);
 
 			$o .= $pager->renderMinimal(count($items));
@@ -364,7 +359,7 @@ class Network extends Timeline
 		];
 
 		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_CONTENT_TABS, $hook_data)
+			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_CONTENT_TABS, $hook_data),
 		)->getArray();
 
 		if (!empty($network_timelines)) {
@@ -388,7 +383,7 @@ class Network extends Timeline
 	{
 		parent::parseRequest($request);
 
-		$this->circleId = (int)($this->parameters['circle_id'] ?? 0);
+		$this->circleId = (int) ($this->parameters['circle_id'] ?? 0);
 
 		if (!$this->selectedTab) {
 			$this->selectedTab = $this->getTimelineOrderBySession();
@@ -565,7 +560,7 @@ class Network extends Timeline
 		if (!$this->mention && !$this->star) {
 			foreach ($this->pConfig->get($this->session->getLocalUserId(), 'channel', 'timeline_channels') ?? [] as $channel) {
 				if (is_numeric($channel)) {
-					$userchannels[] = (int)$channel;
+					$userchannels[] = (int) $channel;
 				} else {
 					$systemchannels[] = $channel;
 				}

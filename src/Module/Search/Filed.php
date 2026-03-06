@@ -12,7 +12,6 @@ use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\HTML;
 use Friendica\Content\Widget;
-use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
@@ -31,13 +30,6 @@ class Filed extends BaseSearch
 
 		DI::page()['aside'] .= Widget::fileAs(DI::args()->getCommand(), $_GET['file'] ?? '');
 
-		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll', true) && ($_GET['mode'] ?? '') != 'minimal') {
-			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
-			$o   = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
-		} else {
-			$o = '';
-		}
-
 		$file = $_GET['file'] ?? '';
 
 		// Rawmode is used for fetching new content at the end of the page
@@ -50,14 +42,14 @@ class Filed extends BaseSearch
 				DI::userSession()->getLocalUserId(),
 				'system',
 				'itemspage_mobile_network',
-				DI::config()->get('system', 'itemspage_network_mobile')
+				DI::config()->get('system', 'itemspage_network_mobile'),
 			);
 		} else {
 			$itemspage_network = DI::pConfig()->get(
 				DI::userSession()->getLocalUserId(),
 				'system',
 				'itemspage_network',
-				DI::config()->get('system', 'itemspage_network')
+				DI::config()->get('system', 'itemspage_network'),
 			);
 		}
 
@@ -93,10 +85,10 @@ class Filed extends BaseSearch
 
 		$items = Post::toArray(Post::selectForUser(DI::userSession()->getLocalUserId(), Item::DISPLAY_FIELDLIST, $item_condition, $item_params));
 
-		$o .= DI::conversation()->render($items, Conversation::MODE_FILED, false, false, '', DI::userSession()->getLocalUserId());
+		$o = DI::conversation()->render($items, Conversation::MODE_FILED, false, false, '', DI::userSession()->getLocalUserId());
 
 		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll', true)) {
-			$o .= HTML::scrollLoader();
+			$o .= HTML::scrollLoader($request);
 		} else {
 			$o .= $pager->renderMinimal($count);
 		}

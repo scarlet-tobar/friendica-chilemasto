@@ -84,11 +84,6 @@ class Channel extends Timeline
 			'$header'  => '',
 		]);
 
-		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
-			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
-			$o .= Renderer::replaceMacros($tpl, ['$reload_uri' => $this->args->getQueryString()]);
-		}
-
 		if (!$this->raw) {
 			$tabs = $this->getTabArray($this->channel->getTimelines($this->session->getLocalUserId()), 'channel');
 			$tabs = array_merge($tabs, $this->getTabArray($this->channelRepository->selectByUid($this->session->getLocalUserId()), 'channel'));
@@ -126,18 +121,18 @@ class Channel extends Timeline
 			return $o;
 		}
 
-		$o .= $this->conversation->render($items, Conversation::MODE_CHANNEL, false, false, $order, $this->session->getLocalUserId());
+		$o .= $this->conversation->render($items, Conversation::MODE_CHANNEL, $this->raw, false, $order, $this->session->getLocalUserId());
 
 		$pager = new BoundariesPager(
 			$this->l10n,
 			$this->args->getQueryString(),
 			$items[array_key_first($items)][$order],
 			$items[array_key_last($items)][$order],
-			$this->itemsPerPage
+			$this->itemsPerPage,
 		);
 
 		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
-			$o .= HTML::scrollLoader();
+			$o .= HTML::scrollLoader($request);
 		} else {
 			$o .= $pager->renderMinimal(count($items));
 		}
