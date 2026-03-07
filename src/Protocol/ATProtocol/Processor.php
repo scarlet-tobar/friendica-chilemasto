@@ -61,7 +61,7 @@ class Processor
 		$fields = [
 			'archive' => !$data->account->active,
 			'failed'  => !$data->account->active,
-			'updated' => DateTimeFormat::utc($data->account->time, DateTimeFormat::MYSQL)
+			'updated' => DateTimeFormat::utc($data->account->time, DateTimeFormat::MYSQL),
 		];
 
 		$this->logger->notice('Process account', ['did' => $data->identity->did, 'fields' => $fields]);
@@ -71,6 +71,11 @@ class Processor
 
 	public function processIdentity(stdClass $data)
 	{
+		if (!isset($data->identity->handle)) {
+			$this->logger->warning('No handle provided', ['data' => $data]);
+			return;
+		}
+
 		$fields = [
 			'alias'   => ATProtocol::WEB . '/profile/' . $data->identity->did,
 			'nick'    => $data->identity->handle,
