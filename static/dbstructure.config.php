@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1589);
+	define('DB_UPDATE_VERSION', 1590);
 }
 
 return [
@@ -1496,6 +1496,46 @@ return [
 			"uri-id-id" => ["uri-id", "id"],
 			"media-uri-id" => ["media-uri-id"],
 			"attach-id" => ["attach-id"],
+		]
+	],
+	"post-media-exif" => [
+		"comment" => "Exif data for attached media, see https://exiv2.org/tags.html",
+		"fields" => [
+			"media-id" => ["type" => "int unsigned", "not null" => "1", "foreign" => ["post-media" => "id"], "primary" => "1", "comment" => "If of the post-media entry with EXIF data"],
+			"uri-id" => ["type" => "int unsigned", "not null" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the item uri"],
+			"raw-data" => ["type" => "text", "comment" => "JSON array with the raw exif data"],
+			"coord" => ["type" => "varchar(255)", "comment" => "GPS coordinates (latitude and longitude) representing the location where the picture was taken."],
+			"FocalLength" => ["type" => "varchar(16)", "comment" => "The focal length of the lens in mm."],
+			"ExposureTime" => ["type" => "varchar(16)", "comment" => "The exposure time in fractions of 1/x or full seconds."],
+			"ApertureFNumber" => ["type" => "varchar(16)", "comment" => "The lens aperture calculated as f number"],
+			"ISOSpeedRatings" => ["type" => "smallint unsigned", "comment" => "The ISO speed used to expose the image."],
+			"LensSpecification" => ["type" => "varchar(32)", "comment" => "Lens specifications, for example 35mm f/2.8 or 70-200mm f/2.8-6.3"],
+			"FocusDistance"     => ["type" => "varchar(16)", "comment" => "The distance to the subject, given in meters."],
+			"CCDWidth"          => ["type" => "varchar(16)", "comment" => ""],
+			"BodySerialNumber" => ["type" => "varchar(255)", "comment" => "The serial number of the body of the camera."],
+			"Artist" => ["type" => "varchar(255)", "comment" => "The name of the camera owner, photographer or image creator."],
+			"Copyright" => ["type" => "varchar(255)", "comment" => "Copyright information.  In this standard the tag is used to indicate both the photographer and editor copyrights."],
+			"DateTime" => ["type" => "datetime", "comment" => "The date and time of image creation. In Exif standard, it is the time the file was changed."],
+			"DateTimeOriginal" => ["type" => "datetime", "comment" => "The date and time when the original image data was generated."],
+			"DateTimeDigitized" => ["type" => "datetime", "comment" => "The date and time when the image was stored as digital data."],
+			"ExpandFilm" => ["type" => "varchar(255)", "comment" => "The type or brand of film used for the image, such as analog film types (e.g., Kodak E100SW)."],
+			"ExpandLens" => ["type" => "varchar(255)", "comment" => "The lens model or description used for the image (e.g., Nikkor 20-35mm f/2.8 zoom)."],
+			"HostComputer" => ["type" => "varchar(255)", "comment" => "Information about the host computer used to generate the image."],
+			"ImageDescription" => ["type" => "text", "comment" => "A character string giving the title of the image."],
+			"ImageUniqueID" => ["type" => "varchar(255)", "comment" => "A unique identifier for each image, typically in the form of a UUID or other unique string."],
+			"LensMake" => ["type" => "varchar(255)", "comment" => "The name of the lens manufacturer."],
+			"LensModel" => ["type" => "varchar(255)", "comment" => "The model name or model number of the lens used."],
+			"Make" => ["type" => "varchar(255)", "comment" => "The manufacturer of the recording equipment."],
+			"MakerNote" => ["type" => "varchar(255)", "comment" => "A tag for manufacturers of Exif writers to record any desired information. The contents are up to the manufacturer."],
+			"Model" => ["type" => "varchar(255)", "comment" => "The model name or model number of the equipment."],
+			"OwnerName" => ["type" => "varchar(255)", "comment" => "The owner of the camera."],
+			"Orientation" => ["type" => "tinyint unsigned", "comment" => "The image orientation in terms of rows and columns."],
+			"Software" => ["type" => "varchar(255)", "comment" => "The name and version of the software or firmware of the camera or image input device used to generate the image."],
+			"UserComment" => ["type" => "text", "comment" => "A comment provided by the user about the image."],
+		],
+		"indexes" => [
+			"PRIMARY" => ["media-id"],
+			"uri-id" => ["uri-id"],
 		]
 	],
 	"post-origin" => [

@@ -105,14 +105,21 @@ class Media
 		$stored = $media;
 
 		$media = self::fetchAdditionalData($media);
+		$exif  = $media['exif'] ?? null;
 		$media = self::unsetEmptyFields($media);
 		$media = DI::dbaDefinition()->truncateFieldsForTable('post-media', $media);
 
 		if (array_diff_assoc($media, $stored)) {
 			$result = DBA::insert('post-media', $media, Database::INSERT_UPDATE);
-			DI::logger()->info('Updated media', ['result' => $result, 'media' => $media]);
+			$id     = $media['id'] ?? DBA::lastInsertId();
+			DI::logger()->info('Updated media', ['result' => $result, 'id' => $id, 'media' => $media]);
 		} else {
+			$id = null;
 			DI::logger()->info('Nothing to update', ['media' => $media]);
+		}
+
+		if (isset($id) && isset($exif)) {
+			MediaExif::insert($id, $media['uri-id'], $exif);
 		}
 		return $result;
 	}
@@ -253,6 +260,7 @@ class Media
 				$media['width']    = $imagedata[0];
 				$media['height']   = $imagedata[1];
 				$media['blurhash'] = $imagedata['blurhash'] ?? null;
+				$media['exif']     = $imagedata['exif'] ?? null;
 				if (!empty($imagedata['description']) && empty($media['description'])) {
 					$media['description'] = $imagedata['description'];
 					DI::logger()->debug('Detected text for image', $media);
