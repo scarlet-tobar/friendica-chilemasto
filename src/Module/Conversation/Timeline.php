@@ -30,6 +30,7 @@ use Friendica\Database\DBA;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Post\SearchIndex;
+use Friendica\Model\Verb;
 use Friendica\Module\Response;
 use Friendica\Network\HTTPException\BadRequestException;
 use Friendica\Network\HTTPException\ForbiddenException;
@@ -116,14 +117,14 @@ class Timeline extends BaseModule
 				$this->session->getLocalUserId(),
 				'system',
 				'itemspage_mobile_network',
-				$this->config->get('system', 'itemspage_network_mobile')
+				$this->config->get('system', 'itemspage_network_mobile'),
 			);
 		} else {
 			$this->itemsPerPage = $this->pConfig->get(
 				$this->session->getLocalUserId(),
 				'system',
 				'itemspage_network',
-				$this->config->get('system', 'itemspage_network')
+				$this->config->get('system', 'itemspage_network'),
 			);
 		}
 
@@ -334,7 +335,7 @@ class Timeline extends BaseModule
 					((`comments` >= ? OR `activities` >= ? OR `views` >= ?) AND `owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?)) OR
 					(`owner-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`notify_new_posts` OR `channel-frequency` = ?))))",
 					$cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4), $this->channelRepository->getMedianComments($uid, 4), $this->channelRepository->getMedianActivities($uid, 4), $this->channelRepository->getMedianViews($uid, 4), $cid,
-					$uid, Contact\User::FREQUENCY_ALWAYS
+					$uid, Contact\User::FREQUENCY_ALWAYS,
 				];
 			}
 		} elseif ($this->selectedTab == ChannelEntity::DISCOVER) {
@@ -349,7 +350,7 @@ class Timeline extends BaseModule
 					(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `cid` = ? AND `relation-thread-score` > ?)) OR
 					(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `relation-thread-score` > ?))))",
 					$cid, $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4), $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4),
-					$this->channelRepository->getMedianComments($uid, 4), $this->channelRepository->getMedianActivities($uid, 4), $this->channelRepository->getMedianViews($uid, 4), $cid, 0, $cid, 0
+					$this->channelRepository->getMedianComments($uid, 4), $this->channelRepository->getMedianActivities($uid, 4), $this->channelRepository->getMedianViews($uid, 4), $cid, 0, $cid, 0,
 				];
 			}
 		} elseif ($this->selectedTab == ChannelEntity::FOLLOWERS) {
@@ -365,7 +366,7 @@ class Timeline extends BaseModule
 					"`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `last-interaction` > ?
 					AND `relation-cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ? AND `relation-thread-score` >= ?)
 					AND NOT `cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?))",
-					DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4), $cid
+					DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4), $cid,
 				];
 			}
 		} elseif ($this->selectedTab == ChannelEntity::QUIETSHARERS) {
@@ -374,7 +375,7 @@ class Timeline extends BaseModule
 
 				$condition = [
 					"`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ? AND `post-score` <= ?)",
-					$cid, $this->channelRepository->getMedianPostScore($cid, 2)
+					$cid, $this->channelRepository->getMedianPostScore($cid, 2),
 				];
 			}
 		} elseif ($this->selectedTab == ChannelEntity::IMAGE) {
@@ -408,9 +409,9 @@ class Timeline extends BaseModule
 				$orders = [
 					EntityUserDefinedChannel::CIRCLE_CREATION => 'created',
 					EntityUserDefinedChannel::CIRCLE_POSTS    => 'received',
-					EntityUserDefinedChannel::CIRCLE_ACTIVITY => 'commented'
+					EntityUserDefinedChannel::CIRCLE_ACTIVITY => 'commented',
 				];
-				$this->order = $orders[(int)$channel->circle];
+				$this->order = $orders[(int) $channel->circle];
 			}
 		}
 
@@ -498,10 +499,10 @@ class Timeline extends BaseModule
 
 		$maxpostperauthor = 0;
 		if ($this->selectedTab == Community::LOCAL) {
-			$maxpostperauthor = (int)$this->config->get('system', 'max_author_posts_community_page');
+			$maxpostperauthor = (int) $this->config->get('system', 'max_author_posts_community_page');
 			$key              = 'author-id';
 		} elseif ($this->selectedTab == Community::GLOBAL) {
-			$maxpostperauthor = (int)$this->config->get('system', 'max_server_posts_community_page');
+			$maxpostperauthor = (int) $this->config->get('system', 'max_server_posts_community_page');
 			$key              = 'author-gsid';
 		}
 
@@ -617,7 +618,7 @@ class Timeline extends BaseModule
 
 		$uriids = array_keys($items);
 
-		foreach (Post\Counts::get(['parent-uri-id' => $uriids, 'verb' => Activity::POST]) as $count) {
+		foreach (Post\Counts::get(['parent-uri-id' => $uriids, 'vid' => Verb::getID(Activity::POST)]) as $count) {
 			$items[$count['parent-uri-id']]['comments'] += $count['count'];
 		}
 
