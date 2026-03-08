@@ -44,22 +44,22 @@ use GuzzleHttp\Psr7\Uri;
  */
 class Media
 {
-	const UNKNOWN     = 0;
-	const IMAGE       = 1;
-	const VIDEO       = 2;
-	const AUDIO       = 3;
-	const TEXT        = 4;
-	const APPLICATION = 5;
-	const TORRENT     = 16;
-	const HTML        = 17;
-	const XML         = 18;
-	const PLAIN       = 19;
-	const ACTIVITY    = 20;
-	const ACCOUNT     = 21;
-	const HLS         = 22;
-	const JSON        = 23;
-	const LD          = 24;
-	const DOCUMENT    = 128;
+	public const UNKNOWN     = 0;
+	public const IMAGE       = 1;
+	public const VIDEO       = 2;
+	public const AUDIO       = 3;
+	public const TEXT        = 4;
+	public const APPLICATION = 5;
+	public const TORRENT     = 16;
+	public const HTML        = 17;
+	public const XML         = 18;
+	public const PLAIN       = 19;
+	public const ACTIVITY    = 20;
+	public const ACCOUNT     = 21;
+	public const HLS         = 22;
+	public const JSON        = 23;
+	public const LD          = 24;
+	public const DOCUMENT    = 128;
 
 	/**
 	 * Insert a post-media record
@@ -173,11 +173,11 @@ class Media
 			'url'         => $href,
 			'size'        => $length,
 			'mimetype'    => $type,
-			'description' => $title
+			'description' => $title,
 		]);
 
-		return '[attach]href="' . $media['url'] . '" length="' . $media['size'] .
-			'" type="' . $media['mimetype'] . '" title="' . $media['description'] . '"[/attach]';
+		return '[attach]href="' . $media['url'] . '" length="' . $media['size']
+			. '" type="' . $media['mimetype'] . '" title="' . $media['description'] . '"[/attach]';
 	}
 
 	private static function setModified(array $media, string $lastModified): array
@@ -235,7 +235,7 @@ class Media
 						$media['mimetype'] = $curlResult->getContentType();
 					}
 					if (empty($media['size']) && $is_head) {
-						$media['size'] = (int)($curlResult->getHeader('Content-Length')[0] ?? strlen($curlResult->getBodyString() ?? ''));
+						$media['size'] = (int) ($curlResult->getHeader('Content-Length')[0] ?? strlen($curlResult->getBodyString() ?? ''));
 					}
 					$media = self::setModified($media, $curlResult->getHeader('Last-Modified')[0] ?? '');
 				} else {
@@ -260,7 +260,7 @@ class Media
 				$media['width']    = $imagedata[0];
 				$media['height']   = $imagedata[1];
 				$media['blurhash'] = $imagedata['blurhash'] ?? null;
-				$media['exif']     = $imagedata['exif'] ?? null;
+				$media['exif']     = $imagedata['exif']     ?? null;
 				if (!empty($imagedata['description']) && empty($media['description'])) {
 					$media['description'] = $imagedata['description'];
 					DI::logger()->debug('Detected text for image', $media);
@@ -373,8 +373,8 @@ class Media
 		}
 
 		if (
-			!empty($item['plink']) && Strings::compareLink($item['plink'], $media['url']) &&
-			parse_url($item['plink'], PHP_URL_HOST) != parse_url($item['uri'], PHP_URL_HOST)
+			!empty($item['plink']) && Strings::compareLink($item['plink'], $media['url'])
+			&& parse_url($item['plink'], PHP_URL_HOST) != parse_url($item['uri'], PHP_URL_HOST)
 		) {
 			DI::logger()->debug('Not a link to an activity', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'plink' => $item['plink'], 'uri' => $item['uri']]);
 			$media['type'] = $media['type'] == self::ACTIVITY ? self::JSON : $media['type'];
@@ -794,7 +794,7 @@ class Media
 		foreach (explode("\n", $curlResult->getBodyString() ?? '') as $line) {
 			if (strpos(trim($line), '#EXT-X-STREAM-INF') === 0) {
 				if (preg_match('/RESOLUTION=([\d]+)x([\d]+)/', $line, $matches)) {
-					$resolutions[$matches[1]] = [(int)$matches[1], (int)$matches[2]];
+					$resolutions[$matches[1]] = [(int) $matches[1], (int) $matches[2]];
 				}
 			}
 		}
@@ -893,7 +893,7 @@ class Media
 						'type'        => self::IMAGE,
 						'url'         => $image,
 						'preview'     => $picture[2],
-						'description' => $picture[3]
+						'description' => $picture[3],
 					];
 				} elseif (self::isLinkToPhoto($picture[1], $picture[2])) {
 					$body = str_replace($picture[0], '', $body);
@@ -903,7 +903,7 @@ class Media
 						'type'        => self::IMAGE,
 						'url'         => $picture[1],
 						'preview'     => $picture[2],
-						'description' => $picture[3]
+						'description' => $picture[3],
 					];
 				} elseif ($removepicturelinks) {
 					$body = str_replace($picture[0], '', $body);
@@ -913,7 +913,7 @@ class Media
 						'type'        => self::UNKNOWN,
 						'url'         => $picture[1],
 						'preview'     => $picture[2],
-						'description' => $picture[3]
+						'description' => $picture[3],
 					];
 				}
 			}
@@ -938,7 +938,7 @@ class Media
 						'type'        => self::IMAGE,
 						'url'         => $image,
 						'preview'     => $picture[2],
-						'description' => null
+						'description' => null,
 					];
 				} elseif (self::isLinkToPhoto($picture[1], $picture[2])) {
 					$body = str_replace($picture[0], '', $body);
@@ -948,7 +948,7 @@ class Media
 						'type'        => self::IMAGE,
 						'url'         => $picture[1],
 						'preview'     => $picture[2],
-						'description' => null
+						'description' => null,
 					];
 				} elseif ($removepicturelinks) {
 					$body = str_replace($picture[0], '', $body);
@@ -958,7 +958,7 @@ class Media
 						'type'        => self::UNKNOWN,
 						'url'         => $picture[1],
 						'preview'     => $picture[2],
-						'description' => null
+						'description' => null,
 					];
 				}
 			}
@@ -1362,7 +1362,7 @@ class Media
 				'src'    => $links[0]['preview'],
 				'height' => $links[0]['preview-height'],
 				'width'  => $links[0]['preview-width'],
-			]]
+			]],
 		];
 		$body .= "\n" . PageInfo::getFooterFromData($data);
 
@@ -1424,9 +1424,9 @@ class Media
 	 */
 	public static function getPreviewUrlForId(int $id, string $size = ''): string
 	{
-		return DI::baseUrl() . '/photo/preview/' .
-			(Proxy::getPixelsFromSize($size) ? Proxy::getPixelsFromSize($size) . '/' : '') .
-			$id;
+		return DI::baseUrl() . '/photo/preview/'
+			. (Proxy::getPixelsFromSize($size) ? Proxy::getPixelsFromSize($size) . '/' : '')
+			. $id;
 	}
 
 	/**
@@ -1438,9 +1438,9 @@ class Media
 	 */
 	public static function getUrlForId(int $id, string $size = ''): string
 	{
-		return DI::baseUrl() . '/photo/media/' .
-			(Proxy::getPixelsFromSize($size) ? Proxy::getPixelsFromSize($size) . '/' : '') .
-			$id;
+		return DI::baseUrl() . '/photo/media/'
+			. (Proxy::getPixelsFromSize($size) ? Proxy::getPixelsFromSize($size) . '/' : '')
+			. $id;
 	}
 
 	/**
