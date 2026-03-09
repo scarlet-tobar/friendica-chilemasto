@@ -101,7 +101,7 @@ class Counts
 			if (!empty($count['reaction'])) {
 				$count['verb'] = Activity::EMOJIREACT;
 				$count['vid']  = Verb::getID($count['verb']);
-			} elseif (in_array($count['verb'], $activity_verbs)) {
+			} elseif (in_array($count['vid'], $activity_verbs)) {
 				$count['reaction'] = $count['verb'];
 			}
 			$counts[] = $count;
