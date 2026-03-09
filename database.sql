@@ -357,6 +357,25 @@ CREATE TABLE IF NOT EXISTS `account-user` (
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Remote and local accounts';
 
 --
+-- TABLE activity
+--
+CREATE TABLE IF NOT EXISTS `activity` (
+	`uid` mediumint unsigned NOT NULL COMMENT 'User ID',
+	`network` char(4) NOT NULL COMMENT 'Network from where the activity comes from',
+	`cid` int unsigned NOT NULL DEFAULT 0 COMMENT 'the user\'s public contact',
+	`expires` datetime COMMENT 'datetime of activity statistics expiration',
+	`median-comments` int unsigned COMMENT '',
+	`median-activities` int unsigned COMMENT '',
+	`median-views` int unsigned COMMENT '',
+	`median-thread-score` int unsigned COMMENT '',
+	`median-post-score` int unsigned COMMENT '',
+	 PRIMARY KEY(`uid`,`network`),
+	 INDEX `cid` (`cid`),
+	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE,
+	FOREIGN KEY (`cid`) REFERENCES `contact` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='';
+
+--
 -- TABLE apcontact
 --
 CREATE TABLE IF NOT EXISTS `apcontact` (
@@ -2170,6 +2189,25 @@ CREATE VIEW `channel-post-view` AS SELECT
 			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread`.`author-id`
 			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread`.`owner-id`
 			WHERE NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`;
+
+--
+-- VIEW contact-relation-view
+--
+DROP VIEW IF EXISTS `contact-relation-view`;
+CREATE VIEW `contact-relation-view` AS SELECT 
+	`contact-relation`.`cid` AS `cid`,
+	`contact`.`network` AS `network`,
+	`contact-relation`.`relation-cid` AS `relation-cid`,
+	`contact-relation`.`last-interaction` AS `last-interaction`,
+	`contact-relation`.`follow-updated` AS `follow-updated`,
+	`contact-relation`.`follows` AS `follows`,
+	`contact-relation`.`score` AS `score`,
+	`contact-relation`.`relation-score` AS `relation-score`,
+	`contact-relation`.`thread-score` AS `thread-score`,
+	`contact-relation`.`relation-thread-score` AS `relation-thread-score`,
+	`contact-relation`.`post-score` AS `post-score`
+	FROM `contact-relation`
+			STRAIGHT_JOIN `contact` ON `contact`.`id` = `contact-relation`.`cid`;
 
 --
 -- VIEW system-channel-post-view

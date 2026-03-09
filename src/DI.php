@@ -467,6 +467,11 @@ abstract class DI
 		return self::$dice->create(Content\Conversation\Factory\Network::class);
 	}
 
+	public static function ActivityFactory(): Content\Conversation\Factory\Activity
+	{
+		return self::$dice->create(Content\Conversation\Factory\Activity::class);
+	}
+
 	public static function intro(): Contact\Introduction\Repository\Introduction
 	{
 		return self::$dice->create(Contact\Introduction\Repository\Introduction::class);

@@ -10,8 +10,10 @@ declare(strict_types=1);
 namespace Friendica\Content\Conversation\Factory;
 
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
+use Friendica\Content\Conversation\Factory\Activity as ActivityFactory;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Content\Conversation\Entity\Channel;
+use Friendica\Core\Protocol;
 use Friendica\Database\Database;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -36,6 +38,7 @@ final class SystemChannelPost
 	private UserDefinedChannel $channelRepository;
 	private Database $dba;
 	private IManageConfigValues $config;
+	private ActivityFactory $activityFactory;
 
 	/**
 	 * SystemChannelPost constructor.
@@ -44,13 +47,15 @@ final class SystemChannelPost
 	 * @param UserDefinedChannel $channel Channel repository.
 	 * @param LoggerInterface $logger Logger instance.
 	 * @param IManageConfigValues $config Configuration manager.
+	 * @param ActivityFactory $activityFactory Activity factory.
 	 */
-	public function __construct(Database $dba, UserDefinedChannel $channel, LoggerInterface $logger, IManageConfigValues $config)
+	public function __construct(Database $dba, UserDefinedChannel $channel, LoggerInterface $logger, IManageConfigValues $config, ActivityFactory $activityFactory)
 	{
 		$this->dba               = $dba;
 		$this->logger            = $logger;
 		$this->channelRepository = $channel;
 		$this->config            = $config;
+		$this->activityFactory   = $activityFactory;
 	}
 
 	/**
@@ -83,7 +88,11 @@ final class SystemChannelPost
 			return;
 		}
 
-		if ($gravity === Item::GRAVITY_PARENT) {
+		if (in_array($network, [Protocol::MAIL, Protocol::FEED])) {
+			$channels = [Channel::QUIETSHARERS, Channel::IMAGE, Channel::VIDEO, Channel::AUDIO, Channel::LANGUAGE];
+		} elseif ($engagement['restricted']) {
+			$channels = [Channel::FORYOU, Channel::QUIETSHARERS, Channel::IMAGE, Channel::VIDEO, Channel::AUDIO, Channel::LANGUAGE];
+		} elseif ($gravity === Item::GRAVITY_PARENT) {
 			$channels = [Channel::WHATSHOT, Channel::FORYOU, Channel::DISCOVER, Channel::FOLLOWERS, Channel::SHARERSOFSHARERS, Channel::QUIETSHARERS, Channel::IMAGE, Channel::VIDEO, Channel::AUDIO, Channel::LANGUAGE];
 		} else {
 			$channels = [Channel::WHATSHOT, Channel::FORYOU, Channel::DISCOVER];
@@ -95,6 +104,8 @@ final class SystemChannelPost
 			if ($engagement['restricted'] && !Post::exists(['parent-uri-id' => $engagement['uri-id'], 'uid' => $uid])) {
 				continue;
 			}
+
+			$activities = $this->activityFactory->getActivities($uid, $network);
 
 			foreach ($channels as $channel) {
 				if ($this->dba->exists('system-channel-post', ['channel' => $channel, 'uid' => $uid, 'uri-id' => $engagement['uri-id']])) {
@@ -109,16 +120,14 @@ final class SystemChannelPost
 				$store = false;
 				switch ($channel) {
 					case Channel::WHATSHOT:
-						$store = ($engagement['comments'] > $this->channelRepository->getMedianComments($uid, 4, $network) || $engagement['activities'] > $this->channelRepository->getMedianActivities($uid, 4, $network) || $engagement['views'] > $this->channelRepository->getMedianViews($uid, 4, $network)) && $engagement['contact-type'] != Contact::TYPE_COMMUNITY;
+						$store = ($engagement['comments'] > $activities->medianComments || $engagement['activities'] > $activities->medianActivities || $engagement['views'] > $activities->medianViews) && $engagement['contact-type'] != Contact::TYPE_COMMUNITY;
 						break;
 
 					case Channel::FORYOU:
-						$cid = Contact::getPublicIdByUserId($uid);
-
-						if ($relation = $this->dba->selectFirst('contact-relation', ['relation-thread-score', 'follows'], ['relation-cid' => $cid, 'cid' => $owner])) {
-							$store = $relation['relation-thread-score'] > $this->channelRepository->getMedianRelationThreadScore($cid, 4);
+						if ($relation = $this->dba->selectFirst('contact-relation', ['relation-thread-score', 'follows'], ['relation-cid' => $activities->cid, 'cid' => $owner])) {
+							$store = $relation['relation-thread-score'] > $activities->medianThreadScore;
 							if (!$store && $relation['follows']) {
-								$store = ($engagement['comments'] >= $this->channelRepository->getMedianComments($uid, 4, $network) || $engagement['activities'] >= $this->channelRepository->getMedianActivities($uid, 4, $network) || $engagement['views'] >= $this->channelRepository->getMedianViews($uid, 4, $network));
+								$store = ($engagement['comments'] >= $activities->medianComments || $engagement['activities'] >= $activities->medianActivities || $engagement['views'] >= $activities->medianViews);
 							}
 						}
 
@@ -128,29 +137,28 @@ final class SystemChannelPost
 						break;
 
 					case Channel::DISCOVER:
-						$cid = Contact::getPublicIdByUserId($uid);
 						if (!$this->dba->exists('account-user-view', ['pid' => $owner, 'uid' => $uid, 'rel' => [Contact::SHARING, Contact::FRIEND]])) {
 							$store = $this->dba->exists('contact-relation', ["`cid` = ? AND `relation-cid` = ? AND `relation-thread-score` > ?",
-								$owner, $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4)]);
+								$owner, $activities->cid, $activities->medianThreadScore]);
 							if (!$store) {
 								$store = $this->dba->exists('contact-relation', ["`relation-cid` = ? AND `cid` = ? AND `relation-thread-score` > ?",
-									$owner, $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4)]);
+									$owner, $activities->cid, $activities->medianThreadScore]);
 							}
 							if (!$store) {
 								$store = $this->dba->exists('contact-relation', ["`relation-cid` = ? AND `cid` = ? AND `follows` AND `relation-thread-score` > ?",
-									$owner, $cid, 0]);
+									$owner, $activities->cid, 0]);
 							}
-							if (!$store && ($engagement['comments'] >= $this->channelRepository->getMedianComments($uid, 4, $network) || $engagement['activities'] >= $this->channelRepository->getMedianActivities($uid, 4, $network)) || $engagement['views'] >= $this->channelRepository->getMedianViews($uid, 4, $network)) {
-								$store = $this->dba->exists('contact-relation', ["`relation-cid` = ? AND `cid` = ? AND `relation-thread-score` > ?", $owner, $cid, 0]);
+							if (!$store && ($engagement['comments'] >= $activities->medianComments || $engagement['activities'] >= $activities->medianActivities) || $engagement['views'] >= $activities->medianViews) {
+								$store = $this->dba->exists('contact-relation', ["`relation-cid` = ? AND `cid` = ? AND `relation-thread-score` > ?", $owner, $activities->cid, 0]);
 								if (!$store) {
-									$store = $this->dba->exists('contact-relation', ["`cid` = ? AND `relation-cid` = ? AND `relation-thread-score` > ?", $owner, $cid, 0]);
+									$store = $this->dba->exists('contact-relation', ["`cid` = ? AND `relation-cid` = ? AND `relation-thread-score` > ?", $owner, $activities->cid, 0]);
 								}
 								if (!$store) {
 									$condition = [
 										"`cid` = ? AND `follows` AND `last-interaction` > ?
 										AND `relation-cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ? AND `relation-thread-score` >= ?)
 										AND NOT `cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?)",
-										$owner, DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4), $cid
+										$owner, DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $activities->cid, $activities->medianThreadScore, $activities->cid
 									];
 									$store = $this->dba->exists('contact-relation', $condition);
 								}
@@ -163,25 +171,22 @@ final class SystemChannelPost
 						break;
 
 					case Channel::SHARERSOFSHARERS:
-						$cid = Contact::getPublicIdByUserId($uid);
-
 						$condition = [
 							"`cid` = ? AND `follows` AND `last-interaction` > ?
 							AND `relation-cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ? AND `relation-thread-score` >= ?)
 							AND NOT `cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?)",
-							$owner, DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4), $cid
+							$owner, DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $activities->cid, $activities->medianThreadScore, $activities->cid
 						];
 						$store = $this->dba->exists('contact-relation', $condition);
 						break;
 
 					case Channel::QUIETSHARERS:
-						$cid      = Contact::getPublicIdByUserId($uid);
 						$relation = $this->dba->selectFirst('contact-relation', ['post-score'], [
 							'follows'      => true,
-							'relation-cid' => $cid,
+							'relation-cid' => $activities->cid,
 							'cid'          => $owner,
 						]);
-						$store = ($relation && $relation['post-score'] <= $this->channelRepository->getMedianPostScore($cid, 2));
+						$store = ($relation && $relation['post-score'] <= $activities->medianPostScore);
 						break;
 
 					case Channel::IMAGE:
