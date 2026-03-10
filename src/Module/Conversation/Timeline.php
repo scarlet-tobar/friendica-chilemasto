@@ -314,8 +314,9 @@ class Timeline extends BaseModule
 		$cache = $this->config->get('system', 'system_channel_cache');
 
 		if ($cache) {
-			$table     = 'system-channel-post-view';
-			$condition = ["`channel` = ? AND `uid` = ?", $this->selectedTab, $uid];
+			$table      = 'system-channel-post-view';
+			$condition  = ["`channel` = ? AND `uid` = ?", $this->selectedTab, $uid];
+			$activities = null;
 		} else {
 			$table      = 'post-engagement';
 			$condition  = [];
