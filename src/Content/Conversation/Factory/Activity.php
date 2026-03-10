@@ -187,9 +187,9 @@ final class Activity
 		$condition = ["`relation-cid` = ? AND `relation-thread-score` > ?", $cid, 0];
 		$condition = $this->setNetworkFilter($condition, $network);
 
-		$limit     = $this->database->count('contact-relation-view', $condition) / $divider;
-		$relation  = $this->database->selectToArray('contact-relation-view', ['relation-thread-score'], $condition, ['order' => ['relation-thread-score' => true], 'limit' => [$limit, 1]]);
-		$score     = $relation[0]['relation-thread-score'] ?? 0;
+		$limit    = $this->database->count('contact-relation-view', $condition) / $divider;
+		$relation = $this->database->selectToArray('contact-relation-view', ['relation-thread-score'], $condition, ['order' => ['relation-thread-score' => true], 'limit' => [$limit, 1]]);
+		$score    = $relation[0]['relation-thread-score'] ?? 0;
 		if ($score === 0) {
 			return 0;
 		}

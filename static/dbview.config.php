@@ -78,20 +78,20 @@ return [
 	],
 	"contact-relation-view" => [
 		"fields" => [
-			"cid" => ["contact-relation", "cid"],
-			"network" => ["contact", "network"],
-			"relation-cid" => ["contact-relation", "relation-cid"],
-			"last-interaction" => ["contact-relation", "last-interaction"],
-			"follow-updated" => ["contact-relation", "follow-updated"],
-			"follows" => ["contact-relation", "follows"],
-			"score" => ["contact-relation", "score"],
-			"relation-score" => ["contact-relation", "relation-score"],
-			"thread-score" => ["contact-relation", "thread-score"],
+			"cid"                   => ["contact-relation", "cid"],
+			"network"               => ["contact", "network"],
+			"relation-cid"          => ["contact-relation", "relation-cid"],
+			"last-interaction"      => ["contact-relation", "last-interaction"],
+			"follow-updated"        => ["contact-relation", "follow-updated"],
+			"follows"               => ["contact-relation", "follows"],
+			"score"                 => ["contact-relation", "score"],
+			"relation-score"        => ["contact-relation", "relation-score"],
+			"thread-score"          => ["contact-relation", "thread-score"],
 			"relation-thread-score" => ["contact-relation", "relation-thread-score"],
-			"post-score" => ["contact-relation", "post-score"],
+			"post-score"            => ["contact-relation", "post-score"],
 		],
 		"query" => "FROM `contact-relation`
-			STRAIGHT_JOIN `contact` ON `contact`.`id` = `contact-relation`.`cid`"
+			STRAIGHT_JOIN `contact` ON `contact`.`id` = `contact-relation`.`cid`",
 	],
 	"system-channel-post-view" => [
 		"fields" => [

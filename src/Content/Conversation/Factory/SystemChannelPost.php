@@ -158,7 +158,7 @@ final class SystemChannelPost
 										"`cid` = ? AND `follows` AND `last-interaction` > ?
 										AND `relation-cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ? AND `relation-thread-score` >= ?)
 										AND NOT `cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?)",
-										$owner, DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $activities->cid, $activities->medianThreadScore, $activities->cid
+										$owner, DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $activities->cid, $activities->medianThreadScore, $activities->cid,
 									];
 									$store = $this->dba->exists('contact-relation', $condition);
 								}
@@ -175,7 +175,7 @@ final class SystemChannelPost
 							"`cid` = ? AND `follows` AND `last-interaction` > ?
 							AND `relation-cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ? AND `relation-thread-score` >= ?)
 							AND NOT `cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?)",
-							$owner, DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $activities->cid, $activities->medianThreadScore, $activities->cid
+							$owner, DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $activities->cid, $activities->medianThreadScore, $activities->cid,
 						];
 						$store = $this->dba->exists('contact-relation', $condition);
 						break;

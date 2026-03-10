@@ -405,21 +405,21 @@ return [
 	],
 	"activity" => [
 		"comment" => "",
-		"fields" => [
-			"uid" => ["type" => "mediumint unsigned", "not null" => "1", "primary" => "1", "foreign" => ["user" => "uid"], "comment" => "User ID"],
-			"network" => ["type" => "char(4)", "not null" => "1", "primary" => "1", "comment" => "Network from where the activity comes from"],
-			"cid" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id"], "comment" => "the user's public contact"],
-			"expires" => ["type" => "datetime", "comment" => "datetime of activity statistics expiration"],
-			"median-comments" => ["type" => "int unsigned", "comment" => ""],
-			"median-activities" => ["type" => "int unsigned", "comment" => ""],
-			"median-views" => ["type" => "int unsigned", "comment" => ""],
+		"fields"  => [
+			"uid"                 => ["type" => "mediumint unsigned", "not null" => "1", "primary" => "1", "foreign" => ["user" => "uid"], "comment" => "User ID"],
+			"network"             => ["type" => "char(4)", "not null" => "1", "primary" => "1", "comment" => "Network from where the activity comes from"],
+			"cid"                 => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id"], "comment" => "the user's public contact"],
+			"expires"             => ["type" => "datetime", "comment" => "datetime of activity statistics expiration"],
+			"median-comments"     => ["type" => "int unsigned", "comment" => ""],
+			"median-activities"   => ["type" => "int unsigned", "comment" => ""],
+			"median-views"        => ["type" => "int unsigned", "comment" => ""],
 			"median-thread-score" => ["type" => "int unsigned", "comment" => ""],
-			"median-post-score" => ["type" => "int unsigned", "comment" => ""],
-			],
+			"median-post-score"   => ["type" => "int unsigned", "comment" => ""],
+		],
 		"indexes" => [
 			"PRIMARY" => ["uid", "network"],
-			"cid" => ["cid"],
-		]
+			"cid"     => ["cid"],
+		],
 	],
 	"apcontact" => [
 		"comment" => "ActivityPub compatible contacts - used in the ActivityPub implementation",

@@ -48,15 +48,15 @@ final class Activity
 		int $medianThreadScore,
 		int $medianPostScore
 	) {
-		$this->uid                = $uid;
-		$this->network            = $network;
-		$this->cid                = $cid;
-		$this->expires            = $expires;
-		$this->medianComments     = $medianComments;
-		$this->medianActivities   = $medianActivities;
-		$this->medianViews        = $medianViews;
-		$this->medianThreadScore  = $medianThreadScore;
-		$this->medianPostScore    = $medianPostScore;
+		$this->uid               = $uid;
+		$this->network           = $network;
+		$this->cid               = $cid;
+		$this->expires           = $expires;
+		$this->medianComments    = $medianComments;
+		$this->medianActivities  = $medianActivities;
+		$this->medianViews       = $medianViews;
+		$this->medianThreadScore = $medianThreadScore;
+		$this->medianPostScore   = $medianPostScore;
 	}
 
 	/**
@@ -76,7 +76,7 @@ final class Activity
 			$data['median-activities'],
 			$data['median-views'],
 			$data['median-thread-score'],
-			$data['median-post-score']
+			$data['median-post-score'],
 		);
 	}
 
@@ -88,15 +88,15 @@ final class Activity
 	public function toArray(): array
 	{
 		return [
-			'uid'                  => $this->uid,
-			'network'              => $this->network,
-			'cid'                  => $this->cid,
-			'expires'              => $this->expires,
-			'median-comments'      => $this->medianComments,
-			'median-activities'    => $this->medianActivities,
-			'median-views'         => $this->medianViews,
-			'median-thread-score'  => $this->medianThreadScore,
-			'median-post-score'    => $this->medianPostScore,
+			'uid'                 => $this->uid,
+			'network'             => $this->network,
+			'cid'                 => $this->cid,
+			'expires'             => $this->expires,
+			'median-comments'     => $this->medianComments,
+			'median-activities'   => $this->medianActivities,
+			'median-views'        => $this->medianViews,
+			'median-thread-score' => $this->medianThreadScore,
+			'median-post-score'   => $this->medianPostScore,
 		];
 	}
 }

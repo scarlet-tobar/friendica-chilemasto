@@ -97,7 +97,7 @@ class Network extends NetworkModule
 			$profiler,
 			$response,
 			$server,
-			$parameters
+			$parameters,
 		);
 
 		$this->lock = $lock;
