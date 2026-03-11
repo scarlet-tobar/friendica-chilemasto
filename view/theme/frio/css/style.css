@@ -1292,7 +1292,7 @@ aside .vcard .fn {
 }
 aside .vcard .p-addr {
 	font-style: italic;
-	padding-bottom: 2px;
+	padding-bottom: 7px;
 	text-align: center;
 	word-wrap: break-word;
 }

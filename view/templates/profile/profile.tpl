@@ -21,11 +21,6 @@
 					<i class="fa fa-eye" aria-hidden="true"></i>&nbsp;{{$viewas_link.label}}
 				</a>
 			</li>
-			<li>
-				<a class="btn btn-primary" type="button" id="profile-edit-link" href="{{$edit_link.url}}">
-					<i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;{{$edit_link.label}}
-				</a>
-			</li>
 		</ul>
 	</div>
 {{/if}}

@@ -899,3 +899,7 @@ a:has(img.has-alt-description)::after {
 #profile-page .profile-entry a {
 	word-break: break-all;
 }
+
+.edit-profile-link-wrapper {
+	text-align: center;
+}
