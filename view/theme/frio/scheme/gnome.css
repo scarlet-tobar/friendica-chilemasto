@@ -500,3 +500,8 @@ pre, code {
     background-color: var(--accent-hover) !important;
   }
 }
+
+.adminpage .table-hover > tbody > tr:hover + tr.details,
+.table-hover > tbody > tr:hover {
+  background-color: var(--bg-tertiary);
+}
