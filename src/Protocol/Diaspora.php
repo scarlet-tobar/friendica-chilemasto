@@ -3472,7 +3472,7 @@ class Diaspora
 		$profile = Contact::getByURL($profile_url, false, ['addr', 'name']);
 		if (
 			!empty($profile['addr'])
-			&& !strstr($body, $profile['addr'])
+			&& !strstr($body, (string) $profile['addr'])
 			&& !strstr($body, $profile_url)
 		) {
 			$body = '@[url=' . $profile_url . ']' . $profile['name'] . '[/url] ' . $body;

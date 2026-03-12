@@ -34,8 +34,8 @@ use Psr\Log\LoggerInterface;
 
 class Import extends \Friendica\BaseModule
 {
-	const IMPORT_DEBUG = false;
-	const MEMORY_LIMIT = 67108864; // 64MB
+	public const IMPORT_DEBUG = false;
+	public const MEMORY_LIMIT = 67108864; // 64MB
 
 	/** @var IManageConfigValues */
 	private $config;
@@ -233,11 +233,11 @@ class Import extends \Friendica\BaseModule
 		}
 
 		// Backward compatibility
-		$account['circle']        = $account['circle']        ?? $account['group'];
-		$account['circle_member'] = $account['circle_member'] ?? $account['group_member'];
+		$account['circle'] ??= $account['group'];
+		$account['circle_member'] ??= $account['group_member'];
 
 		$oldBaseUrl = $account['baseurl'];
-		$newBaseUrl = (string)$this->baseUrl;
+		$newBaseUrl = (string) $this->baseUrl;
 
 		$oldAddr = str_replace('http://', '@', Strings::normaliseLink($oldBaseUrl));
 		$newAddr = str_replace('http://', '@', Strings::normaliseLink($newBaseUrl));
@@ -404,7 +404,7 @@ class Import extends \Friendica\BaseModule
 				$photo['allow_cid'],
 				$photo['allow_gid'],
 				$photo['deny_cid'],
-				$photo['deny_gid']
+				$photo['deny_gid'],
 			);
 
 			if ($r === false) {

@@ -294,7 +294,7 @@ class Worker
 
 		$file = realpath($file);
 
-		if (strpos($file, getcwd()) !== 0) {
+		if (strpos($file, (string) getcwd()) !== 0) {
 			return false;
 		}
 
@@ -1374,7 +1374,7 @@ class Worker
 		$new_retrial = $queue['retrial'] + 1;
 		$total       = 0;
 		for ($retrial = 0; $retrial <= $max_level + 1; ++$retrial) {
-			$delay = (($retrial + 3) ** 4) + (rand(1, 30) * ($retrial + 1));
+			$delay = (($retrial + 3) ** 4) + (random_int(1, 30) * ($retrial + 1));
 			$total += $delay;
 			if (($total < $retrial_time) && ($retrial > $queue['retrial'])) {
 				$new_retrial = $retrial;
@@ -1427,7 +1427,7 @@ class Worker
 		}
 
 		// Calculate the delay until the next trial
-		$delay = (($new_retrial + 2) ** 4) + (rand(1, 30) * ($new_retrial));
+		$delay = (($new_retrial + 2) ** 4) + (random_int(1, 30) * ($new_retrial));
 		$next  = DateTimeFormat::utc('now + ' . $delay . ' seconds');
 
 		if (($priority < self::PRIORITY_MEDIUM) && ($new_retrial > 3)) {

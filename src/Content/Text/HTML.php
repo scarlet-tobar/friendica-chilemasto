@@ -660,7 +660,7 @@ class HTML
 
 		if (!$compact && ($message != '')) {
 			foreach ($urls as $id => $url) {
-				if ($url != '' && strpos($message, $url) === false) {
+				if ($url != '' && strpos($message, (string) $url) === false) {
 					$message .= "\n" . $url . ' ';
 				}
 			}

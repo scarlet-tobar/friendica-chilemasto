@@ -310,7 +310,7 @@ class Temporal
 			return DI::l10n()->t('never');
 		}
 
-		$clock = $clock ?? new SystemClock();
+		$clock ??= new SystemClock();
 
 		$localtime = $posted_date . ' UTC';
 		$abs       = strtotime($localtime);

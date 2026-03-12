@@ -213,7 +213,7 @@ class ApiResponse extends Response
 	 */
 	public function addFormattedContent(string $root_element, array $data, string $format = null, int $cid = 0)
 	{
-		$format = $format ?? 'json';
+		$format ??= 'json';
 
 		$return = $this->formatData($root_element, $format, $data, $cid);
 

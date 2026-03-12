@@ -227,12 +227,12 @@ class Probe
 				unset($data['networks']);
 				if (!empty($data['network'])) {
 					$networks[$data['network']] = $data;
-					$ap_profile['guid']         = $ap_profile['guid']  ?? $data['guid'] ?? null;
-					$ap_profile['about']        = $ap_profile['about'] ?? $data['about'] ?? null;
-					$ap_profile['keywords']     = $data['keywords']    ?? null;
-					$ap_profile['location']     = $data['location']    ?? null;
-					$ap_profile['poco']         = $data['poco']        ?? null;
-					$ap_profile['openwebauth']  = $data['openwebauth'] ?? null;
+					$ap_profile['guid'] ??= $data['guid']             ?? null;
+					$ap_profile['about'] ??= $data['about']           ?? null;
+					$ap_profile['keywords']    = $data['keywords']    ?? null;
+					$ap_profile['location']    = $data['location']    ?? null;
+					$ap_profile['poco']        = $data['poco']        ?? null;
+					$ap_profile['openwebauth'] = $data['openwebauth'] ?? null;
 				}
 				$data             = $ap_profile;
 				$data['networks'] = $networks;
@@ -1440,9 +1440,9 @@ class Probe
 
 		// And put them together again
 		$scheme   = isset($parts['scheme'])   ? $parts['scheme'] . '://' : '';
-		$host     = isset($parts['host'])     ? $parts['host']           : '';
+		$host     = $parts['host'] ?? '';
 		$port     = isset($parts['port'])     ? ':' . $parts['port']     : '';
-		$path     = isset($parts['path'])     ? $parts['path']           : '';
+		$path     = $parts['path'] ?? '';
 		$query    = isset($parts['query'])    ? '?' . $parts['query']    : '';
 		$fragment = isset($parts['fragment']) ? '#' . $parts['fragment'] : '';
 

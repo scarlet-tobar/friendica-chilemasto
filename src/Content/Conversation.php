@@ -315,15 +315,15 @@ class Conversation
 		$this->profiler->startRecording('rendering');
 		$o = '';
 
-		$x['allow_location']   = $x['allow_location']   ?? $user['allow_location'];
-		$x['default_location'] = $x['default_location'] ?? $user['default-location'];
-		$x['nickname']         = $x['nickname']         ?? $user['nickname'];
-		$x['lockstate']        = $x['lockstate']        ?? ACL::getLockstateForUserId($user['uid']) ? 'lock' : 'unlock';
-		$x['acl']              = $x['acl']              ?? ACL::getFullSelectorHTML($this->page, $user['uid'], true);
-		$x['bang']             = $x['bang']             ?? '';
-		$x['visitor']          = $x['visitor']          ?? 'block';
-		$x['is_owner']         = $x['is_owner']         ?? true;
-		$x['profile_uid']      = $x['profile_uid']      ?? $this->session->getLocalUserId();
+		$x['allow_location'] ??= $user['allow_location'];
+		$x['default_location'] ??= $user['default-location'];
+		$x['nickname'] ??= $user['nickname'];
+		$x['lockstate'] = $x['lockstate'] ?? ACL::getLockstateForUserId($user['uid']) ? 'lock' : 'unlock';
+		$x['acl'] ??= ACL::getFullSelectorHTML($this->page, $user['uid'], true);
+		$x['bang'] ??= '';
+		$x['visitor'] ??= 'block';
+		$x['is_owner'] ??= true;
+		$x['profile_uid'] ??= $this->session->getLocalUserId();
 
 
 		$geotag = !empty($x['allow_location']) ? Renderer::replaceMacros(Renderer::getMarkupTemplate('jot_geotag.tpl'), []) : '';

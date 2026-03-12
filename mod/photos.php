@@ -61,7 +61,7 @@ function photos_init()
 					'total'     => $album['total'],
 					'url'       => 'photos/' . $owner['nickname'] . '/album/' . bin2hex($album['album']),
 					'urlencode' => urlencode($album['album']),
-					'bin2hex'   => bin2hex($album['album'])
+					'bin2hex'   => bin2hex($album['album']),
 				];
 				$ret['albums'][] = $entry;
 			}
@@ -74,7 +74,7 @@ function photos_init()
 				'$recent'   => DI::l10n()->t('Recent Photos'),
 				'$albums'   => $ret['albums'],
 				'$upload'   => [DI::l10n()->t('Upload photo'), 'photos/' . $owner['nickname'] . '/upload'],
-				'$can_post' => (DI::userSession()->getLocalUserId() && $owner['uid'] === DI::userSession()->getLocalUserId())
+				'$can_post' => (DI::userSession()->getLocalUserId() && $owner['uid'] === DI::userSession()->getLocalUserId()),
 			]);
 		}
 
@@ -85,7 +85,7 @@ function photos_init()
 		$tpl = Renderer::getMarkupTemplate("photos_head.tpl");
 
 		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
-			'$ispublic' => DI::l10n()->t('everybody')
+			'$ispublic' => DI::l10n()->t('everybody'),
 		]);
 	}
 
@@ -183,13 +183,13 @@ function photos_post()
 					"SELECT distinct(`resource-id`) AS `rid` FROM `photo` WHERE `contact-id` = ? AND `uid` = ? AND `album` = ?",
 					$visitor,
 					$page_owner_uid,
-					$album
+					$album,
 				));
 			} else {
 				$r = DBA::toArray(DBA::p(
 					"SELECT distinct(`resource-id`) AS `rid` FROM `photo` WHERE `uid` = ? AND `album` = ?",
 					DI::userSession()->getLocalUserId(),
-					$album
+					$album,
 				));
 			}
 
@@ -297,7 +297,7 @@ function photos_post()
 			$photo = $photos[0];
 			Photo::update(
 				['desc' => $desc, 'album' => $albname, 'allow_cid' => $str_contact_allow, 'allow_gid' => $str_circle_allow, 'deny_cid' => $str_contact_deny, 'deny_gid' => $str_circle_deny],
-				['resource-id' => $resource_id, 'uid' => $page_owner_uid]
+				['resource-id' => $resource_id, 'uid' => $page_owner_uid],
 			);
 
 			// Update the photo albums cache if album name was changed
@@ -439,13 +439,13 @@ function photos_content()
 		$ret = [
 			'post_url'       => 'profile/' . $user['nickname'] . '/photos',
 			'addon_text'     => $uploader,
-			'default_upload' => true
+			'default_upload' => true,
 		];
 
 		$eventDispatcher = DI::eventDispatcher();
 
 		$eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_FORM, $ret)
+			new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_FORM, $ret),
 		);
 
 		// Determine if we're in album context (uploading to a specific album)
@@ -518,7 +518,7 @@ function photos_content()
 			"SELECT `resource-id`, MAX(`scale`) AS `scale` FROM `photo` WHERE `uid` = ? AND `album` = ?
 			AND `scale` <= 4 $sql_extra GROUP BY `resource-id`",
 			$owner_uid,
-			$album
+			$album,
 		));
 		if (DBA::isResult($r)) {
 			$total = count($r);
@@ -543,7 +543,7 @@ function photos_content()
 			intval($owner_uid),
 			DBA::escape($album),
 			$pager->getStart(),
-			$pager->getItemsPerPage()
+			$pager->getItemsPerPage(),
 		));
 
 		if ($cmd === 'drop') {
@@ -603,7 +603,7 @@ function photos_content()
 
 				$photos[] = [
 					'id'    => $rr['id'],
-					'twist' => ' ' . ($twist ? 'rotleft' : 'rotright') . rand(2, 4),
+					'twist' => ' ' . ($twist ? 'rotleft' : 'rotright') . random_int(2, 4),
 					'link'  => 'photos/' . $user['nickname'] . '/image/' . $rr['resource-id']
 						. ($order_field === 'created' ? '?order=created' : ''),
 					'title' => DI::l10n()->t('View Photo'),
@@ -715,7 +715,7 @@ function photos_content()
 				$tpl = Renderer::getMarkupTemplate('photo_edit_head.tpl');
 				DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
 					'$prevlink' => $prevlink,
-					'$nextlink' => $nextlink
+					'$nextlink' => $nextlink,
 				]);
 
 				if ($prevlink) {

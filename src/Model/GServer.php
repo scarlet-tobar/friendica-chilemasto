@@ -822,7 +822,7 @@ class GServer
 			$serverdata = self::fetchWeeklyUsage($url, $serverdata);
 		}
 
-		$serverdata['registered-users'] = $serverdata['registered-users'] ?? 0;
+		$serverdata['registered-users'] ??= 0;
 
 		// On an active server there has to be at least a single user
 		if (!in_array($serverdata['network'], [Protocol::PHANTOM, Protocol::FEED]) && ($serverdata['registered-users'] <= 0)) {
