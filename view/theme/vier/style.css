@@ -25,6 +25,16 @@ img {
 	/* width: 80%; */
 }
 
+/* Fix text overflow in admin queue page */
+#adminpage td,
+.adminpage td,
+#adminpage .table td,
+.adminpage .table td {
+	word-break: break-all !important;
+	white-space: normal !important;
+	vertical-align: top !important;
+}
+
 #adminpage .screenshot img {
 	width: 640px;
 }

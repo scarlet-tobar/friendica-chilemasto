@@ -3642,6 +3642,17 @@ li.addon {
 		width: 60%;
 	}
 }
+#adminpage td,
+.adminpage td,
+#adminpage .table td,
+.adminpage .table td,
+#adminpage.table > tbody > tr > td,
+.adminpage.table > tbody > tr > td,
+.table#adminpage > tbody > tr > td {
+	word-break: break-all !important;
+	white-space: normal !important;
+	vertical-align: top !important;
+}
 #admin-users #users tr.blocked {
 	background-color: #f8efc0;
 }
@@ -4342,3 +4353,4 @@ div.login-form, .login-content-wrapper,
 		padding-left: 3px;
 	}
 }
+
