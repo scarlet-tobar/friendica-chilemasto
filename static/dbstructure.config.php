@@ -602,6 +602,7 @@ return [
 		"fields"  => [
 			"cid"                   => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id"], "primary" => "1", "comment" => "contact the related contact had interacted with"],
 			"relation-cid"          => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id"], "primary" => "1", "comment" => "related contact who had interacted with the contact"],
+			"network"               => ["type" => "char(4)", "comment" => "The network that is used between these contacts"],
 			"last-interaction"      => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Date of the last interaction by relation-cid on cid"],
 			"follow-updated"        => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Date of the last update of the contact relationship"],
 			"follows"               => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "if true, relation-cid follows cid"],
@@ -612,8 +613,8 @@ return [
 			"post-score"            => ["type" => "smallint unsigned", "comment" => "score for the amount of posts from cid that can be seen by relation-cid"],
 		],
 		"indexes" => [
-			"PRIMARY"      => ["cid", "relation-cid"],
-			"relation-cid" => ["relation-cid"],
+			"PRIMARY"              => ["cid", "relation-cid"],
+			"relation-cid-network" => ["relation-cid", "network"],
 		],
 	],
 	"conv" => [

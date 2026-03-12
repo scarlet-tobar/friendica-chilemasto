@@ -76,30 +76,6 @@ final class Activity
 	}
 
 	/**
-	 * Compute a median-like post score for a contact id.
-	 *
-	 * @param int $cid Contact id.
-	 * @param int $divider Divider to compute the median index.
-	 * @param string $network Optional network filter.
-	 * @return int Median post score.
-	 */
-	private function getMedianPostScore(int $cid, int $divider, string $network = ''): int
-	{
-		$condition = ["`relation-cid` = ? AND `post-score` > ?", $cid, 0];
-		$condition = $this->setNetworkFilter($condition, $network);
-
-		$limit    = $this->database->count('contact-relation-view', $condition) / $divider;
-		$relation = $this->database->selectToArray('contact-relation-view', ['post-score'], $condition, ['order' => ['post-score' => true], 'limit' => [$limit, 1]]);
-		$score    = $relation[0]['post-score'] ?? 0;
-		if ($score === 0) {
-			return 0;
-		}
-
-		$this->logger->debug('Calculated median score', ['cid' => $cid, 'network' => $network, 'divider' => $divider, 'median' => $score, 'condition' => $condition]);
-		return $score;
-	}
-
-	/**
 	 * Compute median comments for a user's wanted languages.
 	 *
 	 * @param int $uid User id.
@@ -116,9 +92,6 @@ final class Activity
 		$limit    = $this->database->count('post-engagement', $condition) / $divider;
 		$post     = $this->database->selectToArray('post-engagement', ['comments'], $condition, ['order' => ['comments' => true], 'limit' => [$limit, 1]]);
 		$comments = $post[0]['comments'] ?? 0;
-		if (empty($comments)) {
-			return 0;
-		}
 
 		$this->logger->debug('Calculated median comments', ['uid' => $uid, 'network' => $network, 'divider' => $divider, 'median' => $comments, 'condition' => $condition]);
 		return $comments;
@@ -132,7 +105,7 @@ final class Activity
 	 * @param string $network Optional network filter.
 	 * @return int Median activities value.
 	 */
-	public function getMedianActivities(int $uid, int $divider, string $network = ''): int
+	private function getMedianActivities(int $uid, int $divider, string $network = ''): int
 	{
 		$condition = ["`contact-type` != ? AND `activities` > ?", Contact::TYPE_COMMUNITY, 0];
 		$condition = $this->channelRepository->addLanguageCondition($uid, $condition);
@@ -141,9 +114,6 @@ final class Activity
 		$limit      = $this->database->count('post-engagement', $condition) / $divider;
 		$post       = $this->database->selectToArray('post-engagement', ['activities'], $condition, ['order' => ['activities' => true], 'limit' => [$limit, 1]]);
 		$activities = $post[0]['activities'] ?? 0;
-		if (empty($activities)) {
-			return 0;
-		}
 
 		$this->logger->debug('Calculated median activities', ['uid' => $uid, 'network' => $network, 'divider' => $divider, 'median' => $activities, 'condition' => $condition]);
 		return $activities;
@@ -166,9 +136,6 @@ final class Activity
 		$limit = $this->database->count('post-engagement', $condition) / $divider;
 		$post  = $this->database->selectToArray('post-engagement', ['views'], $condition, ['order' => ['views' => true], 'limit' => [$limit, 1]]);
 		$views = $post[0]['views'] ?? 0;
-		if (empty($views)) {
-			return 0;
-		}
 
 		$this->logger->debug('Calculated median views', ['uid' => $uid, 'network' => $network, 'divider' => $divider, 'median' => $views, 'condition' => $condition]);
 		return $views;
@@ -187,12 +154,30 @@ final class Activity
 		$condition = ["`relation-cid` = ? AND `relation-thread-score` > ?", $cid, 0];
 		$condition = $this->setNetworkFilter($condition, $network);
 
-		$limit    = $this->database->count('contact-relation-view', $condition) / $divider;
-		$relation = $this->database->selectToArray('contact-relation-view', ['relation-thread-score'], $condition, ['order' => ['relation-thread-score' => true], 'limit' => [$limit, 1]]);
+		$limit    = $this->database->count('contact-relation', $condition) / $divider;
+		$relation = $this->database->selectToArray('contact-relation', ['relation-thread-score'], $condition, ['order' => ['relation-thread-score' => true], 'limit' => [$limit, 1]]);
 		$score    = $relation[0]['relation-thread-score'] ?? 0;
-		if ($score === 0) {
-			return 0;
-		}
+
+		$this->logger->debug('Calculated median score', ['cid' => $cid, 'network' => $network, 'divider' => $divider, 'median' => $score, 'condition' => $condition]);
+		return $score;
+	}
+
+	/**
+	 * Compute a median-like post score for a contact id.
+	 *
+	 * @param int $cid Contact id.
+	 * @param int $divider Divider to compute the median index.
+	 * @param string $network Optional network filter.
+	 * @return int Median post score.
+	 */
+	private function getMedianPostScore(int $cid, int $divider, string $network = ''): int
+	{
+		$condition = ["`relation-cid` = ? AND `post-score` > ?", $cid, 0];
+		$condition = $this->setNetworkFilter($condition, $network);
+
+		$limit    = $this->database->count('contact-relation', $condition) / $divider;
+		$relation = $this->database->selectToArray('contact-relation', ['post-score'], $condition, ['order' => ['post-score' => true], 'limit' => [$limit, 1]]);
+		$score    = $relation[0]['post-score'] ?? 0;
 
 		$this->logger->debug('Calculated median score', ['cid' => $cid, 'network' => $network, 'divider' => $divider, 'median' => $score, 'condition' => $condition]);
 		return $score;
@@ -209,23 +194,20 @@ final class Activity
 	{
 		switch ($network) {
 			case '':
-				$network_condition = ['network' => Protocol::FEDERATED];
+			case Protocol::DFRN:
+				$network_condition = ["(`network` IN (?, ?, ?) OR `network` IS NULL)", Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA];
 				break;
 
 			case Protocol::ACTIVITYPUB:
-				$network_condition = ['network' => [Protocol::ACTIVITYPUB, Protocol::DFRN]];
-				break;
-
-			case Protocol::DFRN:
-				$network_condition = ['network' => [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA]];
+				$network_condition = ["(`network` IN (?, ?) OR `network` IS NULL)", Protocol::ACTIVITYPUB, Protocol::DFRN];
 				break;
 
 			case Protocol::DIASPORA:
-				$network_condition = ['network' => [Protocol::DFRN, Protocol::DIASPORA]];
+				$network_condition = ["(`network` IN (?, ?) OR `network` IS NULL)", Protocol::DFRN, Protocol::DIASPORA];
 				break;
 
 			default:
-				$network_condition = ['network' => $network];
+				$network_condition = ["(`network` = ? OR `network` IS NULL)", $network];
 		}
 
 		return DBA::mergeConditions($condition, $network_condition);

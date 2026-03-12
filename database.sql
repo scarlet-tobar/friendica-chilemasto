@@ -557,6 +557,7 @@ CREATE TABLE IF NOT EXISTS `config` (
 CREATE TABLE IF NOT EXISTS `contact-relation` (
 	`cid` int unsigned NOT NULL DEFAULT 0 COMMENT 'contact the related contact had interacted with',
 	`relation-cid` int unsigned NOT NULL DEFAULT 0 COMMENT 'related contact who had interacted with the contact',
+	`network` char(4) COMMENT 'The network that is used between these contacts',
 	`last-interaction` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Date of the last interaction by relation-cid on cid',
 	`follow-updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Date of the last update of the contact relationship',
 	`follows` boolean NOT NULL DEFAULT '0' COMMENT 'if true, relation-cid follows cid',
@@ -566,7 +567,7 @@ CREATE TABLE IF NOT EXISTS `contact-relation` (
 	`relation-thread-score` smallint unsigned COMMENT 'score for interactions of relation-cid on threads of cid',
 	`post-score` smallint unsigned COMMENT 'score for the amount of posts from cid that can be seen by relation-cid',
 	 PRIMARY KEY(`cid`,`relation-cid`),
-	 INDEX `relation-cid` (`relation-cid`),
+	 INDEX `relation-cid-network` (`relation-cid`,`network`),
 	FOREIGN KEY (`cid`) REFERENCES `contact` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
 	FOREIGN KEY (`relation-cid`) REFERENCES `contact` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Contact relations';
@@ -2189,25 +2190,6 @@ CREATE VIEW `channel-post-view` AS SELECT
 			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread`.`author-id`
 			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread`.`owner-id`
 			WHERE NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`;
-
---
--- VIEW contact-relation-view
---
-DROP VIEW IF EXISTS `contact-relation-view`;
-CREATE VIEW `contact-relation-view` AS SELECT 
-	`contact-relation`.`cid` AS `cid`,
-	`contact`.`network` AS `network`,
-	`contact-relation`.`relation-cid` AS `relation-cid`,
-	`contact-relation`.`last-interaction` AS `last-interaction`,
-	`contact-relation`.`follow-updated` AS `follow-updated`,
-	`contact-relation`.`follows` AS `follows`,
-	`contact-relation`.`score` AS `score`,
-	`contact-relation`.`relation-score` AS `relation-score`,
-	`contact-relation`.`thread-score` AS `thread-score`,
-	`contact-relation`.`relation-thread-score` AS `relation-thread-score`,
-	`contact-relation`.`post-score` AS `post-score`
-	FROM `contact-relation`
-			STRAIGHT_JOIN `contact` ON `contact`.`id` = `contact-relation`.`cid`;
 
 --
 -- VIEW system-channel-post-view
