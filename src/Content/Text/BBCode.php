@@ -475,7 +475,7 @@ class BBCode
 			$preview_class = in_array($preview_mode, [self::PREVIEW_AUTO, self::PREVIEW_LARGE]) ? 'attachment-image' : 'attachment-preview';
 
 			$is_photo = ($data['type'] === 'photo');
-			$link_attributes = $is_photo ? 'data-fancybox="gallery" rel="noopener noreferrer"' : 'target="_blank" rel="noopener noreferrer"';
+			$link_attributes = $is_photo ? 'data-fancybox="gallery" rel="noopener noreferrer"' : 'target="_blank" rel="noopener noreferrer';
 
 			if (!empty($data['image']) && empty($data['text']) && $is_photo) {
 				$return .= sprintf('<a href="%s" %s><img src="%s" alt="" title="%s" class="%s" /></a>', $data['url'], $link_attributes, self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title'], $preview_class);
