@@ -474,7 +474,7 @@ class BBCode
 		if (!empty($data['title']) && !empty($data['url'])) {
 			$preview_class = in_array($preview_mode, [self::PREVIEW_AUTO, self::PREVIEW_LARGE]) ? 'attachment-image' : 'attachment-preview';
 
-			$is_photo = ($data['type'] === 'photo');
+			$is_photo        = ($data['type'] === 'photo');
 			$link_attributes = $is_photo ? 'data-fancybox="gallery" rel="noopener noreferrer"' : 'target="_blank" rel="noopener noreferrer"';
 
 			if (!empty($data['image']) && empty($data['text']) && $is_photo) {
