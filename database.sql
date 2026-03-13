@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2026.04-dev (Blutwurz)
--- DB_UPDATE_VERSION 1589
+-- DB_UPDATE_VERSION 1590
 -- ------------------------------------------
 
 
@@ -1497,6 +1497,47 @@ CREATE TABLE IF NOT EXISTS `post-media` (
 	FOREIGN KEY (`media-uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
 	FOREIGN KEY (`attach-id`) REFERENCES `attach` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Attached media';
+
+--
+-- TABLE post-media-exif
+--
+CREATE TABLE IF NOT EXISTS `post-media-exif` (
+	`media-id` int unsigned NOT NULL COMMENT 'If of the post-media entry with EXIF data',
+	`uri-id` int unsigned NOT NULL COMMENT 'Id of the item-uri table entry that contains the item uri',
+	`raw-data` text COMMENT 'JSON array with the raw exif data',
+	`coord` varchar(255) COMMENT 'GPS coordinates (latitude and longitude) representing the location where the picture was taken.',
+	`FocalLength` varchar(16) COMMENT 'The focal length of the lens in mm.',
+	`ExposureTime` varchar(16) COMMENT 'The exposure time in fractions of 1/x or full seconds.',
+	`ApertureFNumber` varchar(16) COMMENT 'The lens aperture calculated as f number',
+	`ISOSpeedRatings` smallint unsigned COMMENT 'The ISO speed used to expose the image.',
+	`LensSpecification` varchar(32) COMMENT 'Lens specifications, for example 35mm f/2.8 or 70-200mm f/2.8-6.3',
+	`FocusDistance` varchar(16) COMMENT 'The distance to the subject, given in meters.',
+	`CCDWidth` varchar(16) COMMENT '',
+	`BodySerialNumber` varchar(255) COMMENT 'The serial number of the body of the camera.',
+	`Artist` varchar(255) COMMENT 'The name of the camera owner, photographer or image creator.',
+	`Copyright` varchar(255) COMMENT 'Copyright information.  In this standard the tag is used to indicate both the photographer and editor copyrights.',
+	`DateTime` datetime COMMENT 'The date and time of image creation. In Exif standard, it is the time the file was changed.',
+	`DateTimeOriginal` datetime COMMENT 'The date and time when the original image data was generated.',
+	`DateTimeDigitized` datetime COMMENT 'The date and time when the image was stored as digital data.',
+	`ExpandFilm` varchar(255) COMMENT 'The type or brand of film used for the image, such as analog film types (e.g., Kodak E100SW).',
+	`ExpandLens` varchar(255) COMMENT 'The lens model or description used for the image (e.g., Nikkor 20-35mm f/2.8 zoom).',
+	`HostComputer` varchar(255) COMMENT 'Information about the host computer used to generate the image.',
+	`ImageDescription` text COMMENT 'A character string giving the title of the image.',
+	`ImageUniqueID` varchar(255) COMMENT 'A unique identifier for each image, typically in the form of a UUID or other unique string.',
+	`LensMake` varchar(255) COMMENT 'The name of the lens manufacturer.',
+	`LensModel` varchar(255) COMMENT 'The model name or model number of the lens used.',
+	`Make` varchar(255) COMMENT 'The manufacturer of the recording equipment.',
+	`MakerNote` varchar(255) COMMENT 'A tag for manufacturers of Exif writers to record any desired information. The contents are up to the manufacturer.',
+	`Model` varchar(255) COMMENT 'The model name or model number of the equipment.',
+	`OwnerName` varchar(255) COMMENT 'The owner of the camera.',
+	`Orientation` tinyint unsigned COMMENT 'The image orientation in terms of rows and columns.',
+	`Software` varchar(255) COMMENT 'The name and version of the software or firmware of the camera or image input device used to generate the image.',
+	`UserComment` text COMMENT 'A comment provided by the user about the image.',
+	 PRIMARY KEY(`media-id`),
+	 INDEX `uri-id` (`uri-id`),
+	FOREIGN KEY (`media-id`) REFERENCES `post-media` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
+	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Exif data for attached media, see https://exiv2.org/tags.html';
 
 --
 -- TABLE post-origin
