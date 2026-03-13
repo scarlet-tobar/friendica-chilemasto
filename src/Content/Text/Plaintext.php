@@ -122,8 +122,8 @@ class Plaintext
 				$abstract = BBCode::getAbstract($item['body'], Protocol::TWITTER);
 				break;
 
-			case BBCode::BLUESKY:
-				$abstract = BBCode::getAbstract($item['body'], Protocol::BLUESKY);
+			case BBCode::ATPROTOCOL:
+				$abstract = BBCode::getAbstract($item['body'], Protocol::ATPROTO);
 				break;
 
 			default: // We don't know the exact target.

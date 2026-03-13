@@ -70,11 +70,11 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 			$row['embed-width'],
 			$row['embed-height'],
 			$row['page-type'],
-			$row['schematypes'] ? json_decode($row['schematypes'], true) : null
+			$row['schematypes'] ? json_decode($row['schematypes'], true) : null,
 		);
 	}
 
-	public function createFromBlueskyImageEmbed(int $uriId, stdClass $image): PostMediaEntity
+	public function createFromATProtocolImageEmbed(int $uriId, stdClass $image): PostMediaEntity
 	{
 		return new PostMediaEntity(
 			$uriId,
@@ -93,7 +93,7 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 	}
 
 
-	public function createFromBlueskyExternalEmbed(int $uriId, stdClass $external): PostMediaEntity
+	public function createFromATProtocolExternalEmbed(int $uriId, stdClass $external): PostMediaEntity
 	{
 		return new PostMediaEntity(
 			$uriId,
@@ -108,7 +108,7 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 			null,
 			null,
 			$external->description,
-			$external->title
+			$external->title,
 		);
 	}
 

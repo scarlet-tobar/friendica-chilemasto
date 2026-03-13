@@ -18,11 +18,11 @@ use Friendica\Util\Strings;
  */
 class ContactSelector
 {
-	const SVG_DISABLED    = -1;
-	const SVG_COLOR_BLACK = 0;
-	const SVG_BLACK       = 1;
-	const SVG_COLOR_WHITE = 2;
-	const SVG_WHITE       = 3;
+	public const SVG_DISABLED    = -1;
+	public const SVG_COLOR_BLACK = 0;
+	public const SVG_BLACK       = 1;
+	public const SVG_COLOR_WHITE = 2;
+	public const SVG_WHITE       = 3;
 
 	public static $serverdata = [];
 	public static $server_id  = [];
@@ -44,7 +44,7 @@ class ContactSelector
 			2 => DI::l10n()->t('Twice daily'),
 			3 => DI::l10n()->t('Daily'),
 			4 => DI::l10n()->t('Weekly'),
-			5 => DI::l10n()->t('Monthly')
+			5 => DI::l10n()->t('Monthly'),
 		];
 
 		foreach ($rep as $k => $v) {
@@ -134,7 +134,7 @@ class ContactSelector
 			Protocol::ACTIVITYPUB => DI::l10n()->t('ActivityPub'),
 			Protocol::PNUT        => DI::l10n()->t('pnut'),
 			Protocol::TUMBLR      => DI::l10n()->t('Tumblr'),
-			Protocol::BLUESKY     => DI::l10n()->t('Bluesky'),
+			Protocol::ATPROTO     => DI::l10n()->t('AT Protocol'),
 		];
 
 		$nets = $eventDispatcher->dispatch(
@@ -194,7 +194,7 @@ class ContactSelector
 
 		$nets = [
 			Protocol::ACTIVITYPUB => 'activitypub', // https://commons.wikimedia.org/wiki/File:ActivityPub-logo-symbol.svg
-			Protocol::BLUESKY     => 'bluesky', // https://commons.wikimedia.org/wiki/File:Bluesky_Logo.svg
+			Protocol::ATPROTO     => 'atprotocol', // https://freesvg.org/at-sign-symbol
 			Protocol::DFRN        => 'friendica',
 			Protocol::DIASPORA    => 'diaspora', // https://www.svgrepo.com/svg/362315/diaspora
 			Protocol::DIASPORA2   => 'diaspora', // https://www.svgrepo.com/svg/362315/diaspora
@@ -220,7 +220,7 @@ class ContactSelector
 			$platform = $gserver['platform'];
 		}
 
-		$svg = ['aardwolf', 'activitypods', 'activitypub', 'akkoma', 'anfora', 'awakari', 'azorius',
+		$svg = ['aardwolf', 'activitypods', 'activitypub', 'akkoma', 'anfora', 'atprotocol', 'awakari', 'azorius',
 			'bluesky', 'bonfire', 'bookwyrm', 'bridgy_fed', 'brighteon_social', 'brutalinks', 'calckey',
 			'castopod', 'catodon', 'chatter_net', 'chuckya', 'clubsall', 'communecter', 'decodon',
 			'diaspora', 'discourse', 'dolphin', 'drupal', 'email', 'emissary', 'epicyon', 'f2ap',
@@ -238,7 +238,7 @@ class ContactSelector
 			'wildebeest', 'wordpress', 'write.as', 'writefreely', 'wxwclub', 'xwiki', 'zap'];
 
 		if (in_array($platform_icon_style, [self::SVG_WHITE, self::SVG_COLOR_WHITE])) {
-			$svg = ['activitypub', 'akkoma', 'andstatus', 'bluesky', 'bonfire', 'bookwyrm', 'bridgy_fed',
+			$svg = ['activitypub', 'akkoma', 'andstatus', 'atprotocol', 'bluesky', 'bonfire', 'bookwyrm', 'bridgy_fed',
 				'calckey', 'castopod', 'diaspora', 'discourse', 'dolphin', 'drupal', 'email', 'firefish',
 				'flipboard', 'flohmarkt', 'forgejo', 'friendica', 'funkwhale', 'ghost', 'gitlab',
 				'glitch-soc', 'gnusocial', 'gotosocial', 'guppe', 'hollo', 'hubzilla', 'iceshrimp', 'kbin',
@@ -273,8 +273,8 @@ class ContactSelector
 			return '';
 		}
 
-		$color = ['aardwolf', 'activitypods', 'activitypub', 'akkoma', 'bluesky', 'chuckya', 'decodon',
-			'discourse', 'fedify', 'firefish', 'flipboard', 'friendica', 'gitlab', 'gnusocial', 'kookie',
+		$color = ['aardwolf', 'activitypods', 'activitypub', 'akkoma', 'atprotocol', 'bluesky', 'chuckya', 'decodon',
+			'discourse', 'fedify', 'firefish', 'flipboard', 'friendica', 'gitlab', 'gnusocial', 'iceshrimp', 'kookie',
 			'loops', 'mastodon', 'mbin', 'misskey', 'neodb', 'newsmast', 'nodebb', 'peertube', 'pixelfed',
 			'pleroma', 'rss', 'sharky', 'tumblr', 'vervis', 'vocata', 'wordpress'];
 

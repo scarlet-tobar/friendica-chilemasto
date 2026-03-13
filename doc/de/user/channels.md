@@ -78,9 +78,9 @@ Alternativen werden durch "|" dargestellt.
     * network:dspr | network:diaspora - Das Diaspora-Protokoll wird hauptsächlich von Diaspora selbst genutzt. Ein paar andere Systeme unterstützen dieses Protokoll ebenfalls, wie Hubzilla, Socialhome or Ganggo.
     * network:feed - RSS/Atom feeds
     * network:mail - Mails die via IMAP importiert worden sind.
-    * network:dscs | network:discourse - Beiträge, die über den Discourse connector empfangen werden.
-    * network:tmbl | network:tumblr - Beiträge, die über den Tumblr connector empfangen werden.
-    * network:bsky | network:bluesky - Beiträge, die über den Bluesky connector empfangen werden.
+    * network:dscs | network:discourse - Beiträge, die über den Discourse Connector empfangen werden.
+    * network:tmbl | network:tumblr - Beiträge, die über den Tumblr Connector empfangen werden.
+    * network:bsky | network:bluesky - Beiträge, die über den AT Protokoll Connector empfangen werden.
 * platform - Benutze dies, um Plattformen in deinen Kanal einzuschließen, oder von ihm auszuschließen, d.h. "+platform:friendica". Im Falle eines Gruppen-Postings enthält der Suchtext beides, die Plattform des Gruppen-Servers und die Plattform des Autors.
 * visibility - Du hast die Wahl zwischen verschiedenen Sichtbarkeiten. Du kannst nur die ungelisteten oder privaten Beiträge sehen, zu denen du Zugang hast.
     * visibility:public - (öffentlich)

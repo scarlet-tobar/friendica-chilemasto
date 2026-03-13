@@ -48,7 +48,8 @@ class BBCode
 	public const TWITTER      = 8;
 	public const BACKLINK     = 8;
 	public const ACTIVITYPUB  = 9;
-	public const BLUESKY      = 10;
+	public const ATPROTOCOL   = 10;
+	public const BLUESKY      = 10; // @deprecated
 
 	public const SHARED_ANCHOR = '<hr class="shared-anchor">';
 	public const TOP_ANCHOR    = '<br class="top-anchor">';
@@ -1999,7 +2000,7 @@ class BBCode
 			$text,
 		);
 
-		if (in_array($simple_html, [self::TWITTER, self::BLUESKY])) {
+		if (in_array($simple_html, [self::TWITTER, self::ATPROTOCOL])) {
 			$text = preg_replace_callback("/([^#@!])\[url\=([^\]]*)\](.*?)\[\/url\]/ism", [self::class, 'expandLinksCallback'], $text);
 			//$text = preg_replace("/[^#@!]\[url\=([^\]]*)\](.*?)\[\/url\]/ism", ' $2 [url]$1[/url]', $text);
 			$text = preg_replace("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism", ' $2 [url]$1[/url]', $text);

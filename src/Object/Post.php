@@ -194,7 +194,7 @@ class Post
 		$connector = !in_array($item['network'], Protocol::NATIVE_SUPPORT) && ($item['protocol'] != Conversation::PARCEL_JETSTREAM) ? DI::l10n()->t('Connector Message') : false;
 
 		$shareable    = in_array($conv->getProfileOwner(), [0, DI::userSession()->getLocalUserId()]) && $item['private'] != Item::PRIVATE;
-		$announceable = $shareable && in_array($item['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, Protocol::TWITTER, Protocol::TUMBLR, Protocol::BLUESKY]);
+		$announceable = $shareable && in_array($item['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, Protocol::TWITTER, Protocol::TUMBLR, Protocol::ATPROTO]);
 		$commentable  = ($item['network'] != Protocol::TUMBLR);
 		$likeable     = true;
 

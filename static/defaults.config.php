@@ -792,4 +792,20 @@ return [
 		// The higher the number, the more likely the system won't be able to process the posts on time.
 		'did_limit' => 1000,
 	],
+	'atprotocol' => [
+		// appview_api (URL)
+		// Path to the public Bluesky AppView API.
+		'appview_api' => 'https://public.api.bsky.app',
+		// jetstream (URL)
+		// Path to the jetstream service. Available servers are:
+		// jetstream1.us-east.bsky.network, jetstream2.us-east.bsky.network, jetstream1.us-west.bsky.network, jetstream2.us-west.bsky.network
+		'jetstream' => 'jetstream1.us-west.bsky.network',
+		// directory (URL)
+		// Path to the directory server service to fetch the PDS of a given DID
+		'plc_directory' => 'https://plc.directory',
+		// web (URL)
+		// Path to the web interface with the user profile and posts.
+		// Other options are https://reddwarf.app or https://blacksky.community
+		'web' => 'https://bsky.app',
+	],
 ];

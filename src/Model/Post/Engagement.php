@@ -24,19 +24,20 @@ use Friendica\Util\DateTimeFormat;
 
 class Engagement
 {
-	const KEYWORDS     = ['source', 'server', 'from', 'to', 'group', 'application', 'tag', 'network', 'platform', 'visibility', 'language', 'media'];
-	const SHORTCUTS    = ['lang' => 'language', 'net' => 'network', 'relay' => 'application'];
-	const ALTERNATIVES = ['source:news' => 'source:service', 'source:relay' => 'source:application',
-		'media:picture'                    => 'media:image', 'media:photo' => 'media:image',
-		'network:activitypub'              => 'network:apub', 'network:friendica' => 'network:dfrn',
-		'network:diaspora'                 => 'network:dspr', 'network:discourse' => 'network:dscs',
-		'network:tumblr'                   => 'network:tmbl', 'network:bluesky' => 'network:bsky'];
-	const MEDIA_NONE  = 0;
-	const MEDIA_IMAGE = 1;
-	const MEDIA_VIDEO = 2;
-	const MEDIA_AUDIO = 4;
-	const MEDIA_CARD  = 8;
-	const MEDIA_POST  = 16;
+	public const KEYWORDS     = ['source', 'server', 'from', 'to', 'group', 'application', 'tag', 'network', 'platform', 'visibility', 'language', 'media'];
+	public const SHORTCUTS    = ['lang' => 'language', 'net' => 'network', 'relay' => 'application'];
+	public const ALTERNATIVES = ['source:news' => 'source:service', 'source:relay' => 'source:application',
+		'media:picture'                           => 'media:image', 'media:photo' => 'media:image',
+		'network:activitypub'                     => 'network:apub', 'network:friendica' => 'network:dfrn',
+		'network:diaspora'                        => 'network:dspr', 'network:discourse' => 'network:dscs',
+		'network:tumblr'                          => 'network:tmbl', 'network:bluesky' => 'network:bsky',
+		'network:atprotocol'                      => 'network:bsky', 'network:atproto' => 'network:bsky'];
+	public const MEDIA_NONE  = 0;
+	public const MEDIA_IMAGE = 1;
+	public const MEDIA_VIDEO = 2;
+	public const MEDIA_AUDIO = 4;
+	public const MEDIA_CARD  = 8;
+	public const MEDIA_POST  = 16;
 
 	/**
 	 * Store engagement data from an item array
@@ -56,7 +57,7 @@ class Engagement
 				'contact-contact-type', 'network', 'title', 'content-warning', 'body', 'language',
 				'author-id', 'author-contact-type', 'author-nick', 'author-addr', 'author-gsid',
 				'owner-id', 'owner-contact-type', 'owner-nick', 'owner-addr', 'owner-gsid'],
-			['uri-id' => $item['parent-uri-id']]
+			['uri-id' => $item['parent-uri-id']],
 		);
 
 		if ($parent['created'] < self::getCreationDateLimit(false)) {
@@ -112,7 +113,7 @@ class Engagement
 			'activities'   => DBA::count('post', [
 				"`parent-uri-id` = ? AND `gravity` = ? AND NOT `vid` IN (?, ?, ?)",
 				$item['parent-uri-id'], Item::GRAVITY_ACTIVITY,
-				Verb::getID(Activity::FOLLOW), Verb::getID(Activity::VIEW), Verb::getID(Activity::READ)
+				Verb::getID(Activity::FOLLOW), Verb::getID(Activity::VIEW), Verb::getID(Activity::READ),
 			]),
 		];
 		if (!$store && ($engagement['comments'] == 0) && ($engagement['activities'] == 0)) {
@@ -319,7 +320,7 @@ class Engagement
 	{
 		$result = Post::selectPosts(
 			['author-addr', 'author-nick', 'author-contact-type'],
-			['thr-parent-id' => $uri_id, 'gravity' => Item::GRAVITY_ACTIVITY, 'verb' => Activity::ANNOUNCE, 'author-contact-type' => [Contact::TYPE_RELAY, Contact::TYPE_COMMUNITY]]
+			['thr-parent-id' => $uri_id, 'gravity' => Item::GRAVITY_ACTIVITY, 'verb' => Activity::ANNOUNCE, 'author-contact-type' => [Contact::TYPE_RELAY, Contact::TYPE_COMMUNITY]],
 		);
 		while ($reshare = Post::fetch($result)) {
 			$prefix = '';

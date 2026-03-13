@@ -24,7 +24,7 @@ use Psr\Log\LoggerInterface;
 use stdClass;
 
 /**
- * Class to handle the Bluesky Jetstream firehose
+ * Class to handle the AT Protocol Jetstream firehose
  *
  * Existing collections:
  * app.bsky.feed.like, app.bsky.graph.follow, app.bsky.feed.repost, app.bsky.feed.post, app.bsky.graph.block,
@@ -44,18 +44,18 @@ class Jetstream
 	 * Maximum drift values in seconds for the threads completion.
 	 * If the drift is higher than this value, only a few posts in a thread will be fetched.
 	 */
-	const MAX_DRIFT_THREAD_COMPLETION = 30;
+	public const MAX_DRIFT_THREAD_COMPLETION = 30;
 	/**
 	 * Maximum drift values in seconds for the DID cap.
 	 * If the drift is higher than this value, the number of DIDs will be capped.
 	 */
-	const MAX_DRIFT_DID_CAP = 60;
+	public const MAX_DRIFT_DID_CAP = 60;
 	/**
 	 * Maximum drift values in seconds for creating posts.
 	 * If the drift is higher than this value, posts and reshares will not be created.
 	 * The other collections will still be processed.
 	 */
-	const MAX_DRIFT_CREATE_POSTS = 1200;
+	public const MAX_DRIFT_CREATE_POSTS = 1200;
 
 	private $uids   = [];
 	private $self   = [];
@@ -90,6 +90,8 @@ class Jetstream
 		$this->atprotocol = $atprotocol;
 		$this->actor      = $actor;
 		$this->processor  = $processor;
+
+		$this->atprotocol->setPublicApiForUser(0);
 	}
 
 	/**
@@ -114,7 +116,7 @@ class Jetstream
 			$this->syncContacts();
 			try {
 				// @todo make the path configurable
-				$this->client = new \WebSocket\Client('wss://jetstream1.us-west.bsky.network/subscribe?requireHello=true' . $cursor);
+				$this->client = new \WebSocket\Client('wss://' . $this->atprotocol->getJetstream() . '/subscribe?requireHello=true' . $cursor);
 				$this->client->setTimeout($timeout);
 				$this->client->setLogger($this->logger);
 			} catch (\WebSocket\ConnectionException $e) {
@@ -177,7 +179,7 @@ class Jetstream
 	 */
 	private function incrementMessages(): void
 	{
-		$packets = (int)($this->keyValue->get('jetstream_messages') ?? 0);
+		$packets = (int) ($this->keyValue->get('jetstream_messages') ?? 0);
 		if ($packets >= PHP_INT_MAX) {
 			$packets = 0;
 		}
@@ -213,7 +215,7 @@ class Jetstream
 			return;
 		}
 
-		$contacts = Contact::selectToArray(['uid', 'url'], ['uid' => $active_uids, 'network' => Protocol::BLUESKY, 'rel' => [Contact::FRIEND, Contact::SHARING]]);
+		$contacts = Contact::selectToArray(['uid', 'url'], ['uid' => $active_uids, 'network' => Protocol::ATPROTO, 'rel' => [Contact::FRIEND, Contact::SHARING]]);
 
 		$self = [];
 		foreach ($active_uids as $uid) {
@@ -233,17 +235,17 @@ class Jetstream
 
 		$dids = array_keys($uids);
 		if (count($dids) > $did_limit) {
-			$contacts = Contact::selectToArray(['url'], ['uid' => $active_uids, 'network' => Protocol::BLUESKY, 'rel' => [Contact::FRIEND, Contact::SHARING]], ['order' => ['last-item' => true]]);
+			$contacts = Contact::selectToArray(['url'], ['uid' => $active_uids, 'network' => Protocol::ATPROTO, 'rel' => [Contact::FRIEND, Contact::SHARING]], ['order' => ['last-item' => true]]);
 			$dids     = $this->addDids($contacts, $uids, $did_limit, array_keys($self));
 		}
 
 		if (count($dids) < $did_limit) {
-			$contacts = Contact::selectToArray(['url'], ['uid' => $active_uids, 'network' => Protocol::BLUESKY, 'rel' => Contact::FOLLOWER], ['order' => ['last-item' => true]]);
+			$contacts = Contact::selectToArray(['url'], ['uid' => $active_uids, 'network' => Protocol::ATPROTO, 'rel' => Contact::FOLLOWER], ['order' => ['last-item' => true]]);
 			$dids     = $this->addDids($contacts, $uids, $did_limit, $dids);
 		}
 
 		if (!$this->capped && count($dids) < $did_limit) {
-			$condition = ["`uid` = ? AND `network` = ? AND EXISTS(SELECT `author-id` FROM `post-user` WHERE `author-id` = `contact`.`id` AND `post-user`.`uid` != ?)", 0, Protocol::BLUESKY, 0];
+			$condition = ["`uid` = ? AND `network` = ? AND EXISTS(SELECT `author-id` FROM `post-user` WHERE `author-id` = `contact`.`id` AND `post-user`.`uid` != ?)", 0, Protocol::ATPROTO, 0];
 			$contacts  = Contact::selectToArray(['url'], $condition, ['order' => ['last-item' => true], 'limit' => $did_limit]);
 			$dids      = $this->addDids($contacts, $uids, $did_limit, $dids);
 		}
@@ -257,8 +259,8 @@ class Jetstream
 			'payload' => [
 				'wantedCollections'   => ['app.bsky.feed.post', 'app.bsky.feed.repost', 'app.bsky.feed.like', 'app.bsky.graph.block', 'app.bsky.actor.profile', 'app.bsky.graph.follow'],
 				'wantedDids'          => $dids,
-				'maxMessageSizeBytes' => 1000000
-			]
+				'maxMessageSizeBytes' => 1000000,
+			],
 		];
 		try {
 			$this->client->send(json_encode($update));
@@ -271,7 +273,7 @@ class Jetstream
 	 * Returns an array of DIDs provided by an array of contacts
 	 *
 	 * @param array   $contacts  Array of contact records
-	 * @param array   $uids      Array with the user ids with enabled bluesky timeline import
+	 * @param array   $uids      Array with the user ids with enabled AT Protocol timeline import
 	 * @param integer $did_limit Maximum limit of entries
 	 * @param array   $dids      Array of DIDs that are added to the output list
 	 * @return array DIDs
@@ -306,7 +308,7 @@ class Jetstream
 			]);
 		}
 
-		Item::incrementInbound(Protocol::BLUESKY);
+		Item::incrementInbound(Protocol::ATPROTO);
 
 		switch ($data->kind) {
 			case 'account':
@@ -497,11 +499,11 @@ class Jetstream
 				break;
 
 			case 'create':
-				$this->actor->updateContactByDID($data->did, 0);
+				$this->actor->updateContactByDID($data->did, 0, 0);
 				break;
 
 			case 'update':
-				$this->actor->updateContactByDID($data->did, 0);
+				$this->actor->updateContactByDID($data->did, 0, 0);
 				break;
 
 			default:

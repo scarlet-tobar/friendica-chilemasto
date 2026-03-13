@@ -26,7 +26,6 @@ use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
 use Friendica\Object\Image;
 use Friendica\Protocol\ActivityPub;
-use Friendica\Protocol\ATProtocol;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
 use Friendica\Util\Network;
@@ -309,10 +308,6 @@ class Media
 				return false;
 			}
 
-			if (Strings::compareLink($baseurl, ATProtocol::WEB)) {
-				return true;
-			}
-
 			return DBA::exists('gserver', ['nurl' => Strings::normaliseLink($baseurl), 'network' => Protocol::FEDERATED]);
 		} catch (\Throwable $e) {
 			DI::logger()->notice('Invalid URL provided', ['url' => $url, 'exception' => $e, 'callstack' => System::callstack(10)]);
@@ -474,6 +469,7 @@ class Media
 	private static function addPage(array $media): array
 	{
 		$data = ParseUrl::getSiteinfoCached($media['url'], $media['mimetype'] ?? '');
+		// @todo Add detected AT Protocol activities and accounts here
 		if (empty($data['images'][0]['src']) && empty($data['text']) && empty($data['title'])) {
 			if (!empty($media['preview'])) {
 				$media = self::addPreviewData($media);

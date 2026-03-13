@@ -1,8 +1,8 @@
 # Konnektoren (Connectors)
 
 Konnektoren erlauben es Dir, Dich mit anderen sozialen Netzwerken zu verbinden.
-Mit diesen Konnektoren kannst Du z.B. zu Bluesky, Tumblr oder Twitter posten.
-Für Bluesky und Tumblr gibt es eine bidirektionale Verbindung, d.h. du kannst Friendica nutzen, um deine Timeline von diesen Diensten zu lesen.
+Mit diesen Konnektoren kannst Du z.B. über das AT Protokoll mit Bluesky, Eurosky oder Blacksky verbinden oder zu Tumblr oder Twitter posten.
+Für das AT Protokoll und Tumblr gibt es eine bidirektionale Verbindung, d.h. du kannst Friendica nutzen, um deine Timeline von diesen Diensten zu lesen.
 Außerdem gibt es einen Konnektor, um Deinen Email-Posteingang zu nutzen.
 Wenn Du keinen eigenen Knoten betreibst und wissen willst, ob der Server Deiner Wahl diese Konnektoren installiert hat, kannst Du Dich darüber auf der Seite '&lt;domain_des_friendica-servers&gt;/friendica' informieren.
 
