@@ -24,9 +24,9 @@ class StrategiesFileManager
 	 * The default hook-file-key of strategies
 	 * -> it's an empty string to cover empty/missing config values
 	 */
-	const STRATEGY_DEFAULT_KEY = '';
-	const STATIC_DIR           = 'static';
-	const CONFIG_NAME          = 'strategies';
+	public const STRATEGY_DEFAULT_KEY = '';
+	public const STATIC_DIR           = 'static';
+	public const CONFIG_NAME          = 'strategies';
 
 	private IManageConfigValues $configuration;
 	protected array $config = [];

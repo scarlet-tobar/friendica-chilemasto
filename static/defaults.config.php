@@ -675,7 +675,7 @@ return [
 			Friendica\Core\Worker::PRIORITY_HIGH       => 10,
 			Friendica\Core\Worker::PRIORITY_MEDIUM     => 60,
 			Friendica\Core\Worker::PRIORITY_LOW        => 180,
-			Friendica\Core\Worker::PRIORITY_NEGLIGIBLE => 720
+			Friendica\Core\Worker::PRIORITY_NEGLIGIBLE => 720,
 		],
 
 		// worker_max_idletime (Integer)
