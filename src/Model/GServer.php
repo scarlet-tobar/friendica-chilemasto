@@ -70,6 +70,7 @@ class GServer
 	public const DETECT_V1_CONFIG     = 18;
 	public const DETECT_SYSTEM_ACTOR  = 20; // Mistpark, Osada, Roadhouse, Zap
 	public const DETECT_THREADS       = 21;
+	public const DETECT_ATPROTO_PDS   = 22;
 
 	// Standardized endpoints
 	public const DETECT_STATISTICS_JSON = 100;
@@ -712,6 +713,10 @@ class GServer
 				$serverdata['detection-method'] = self::DETECT_THREADS;
 				$serverdata['network']          = Protocol::ACTIVITYPUB;
 				$serverdata['platform']         = 'threads';
+			}
+
+			if ($serverdata['network'] === Protocol::PHANTOM) {
+				$serverdata = self::detectATProto($url, $serverdata);
 			}
 
 			// All following checks are done for systems that always have got a "host-meta" endpoint.
@@ -1638,6 +1643,24 @@ class GServer
 					$serverdata['register_policy'] = Register::CLOSED;
 					break;
 			}
+		}
+
+		return $serverdata;
+	}
+
+	private static function detectATProto(string $url, array $serverdata): array
+	{
+		$data = DI::atProtocol()->get($url . '/xrpc/com.atproto.server.describeServer');
+		if (!isset($data->did)) {
+			return $serverdata;
+		}
+
+		$serverdata['detection-method'] = self::DETECT_ATPROTO_PDS;
+		$serverdata['network']          = Protocol::ATPROTO;
+		$serverdata['platform']         = 'atproto';
+
+		if (isset($data->inviteCodeRequired)) {
+			$serverdata['register_policy'] = Register::APPROVE;
 		}
 
 		return $serverdata;

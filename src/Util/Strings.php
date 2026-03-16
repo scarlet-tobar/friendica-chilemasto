@@ -147,15 +147,16 @@ class Strings
 	 *
 	 * @param string $network Network name of the contact (e.g. dfrn, rss and so on)
 	 * @param string $url	  The contact url
+	 * @param int    $gsid    Server id
 	 *
 	 * @return string Formatted network name
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function formatNetworkName(string $network, string $url = ''): string
+	public static function formatNetworkName(string $network, string $url = '', ?int $gsid = null): string
 	{
 		if ($network != '') {
 			if ($url != '') {
-				$gsid         = ContactSelector::getServerIdForProfile($url);
+				$gsid         = $gsid ?? ContactSelector::getServerIdForProfile($url);
 				$network_name = '<a href="' . $url . '">' . ContactSelector::networkToName($network, '', $gsid) . '</a>';
 			} else {
 				$network_name = ContactSelector::networkToName($network);
