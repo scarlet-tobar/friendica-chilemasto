@@ -149,14 +149,14 @@ class Processor
 
 		foreach ($uids as $uid) {
 			$item = [];
-			$item = $this->getHeaderFromJetstream($data, $uid, Conversation::PARCEL_JETSTREAM);
+			$item = $this->getHeaderFromJetstream($data, $uid);
 			if (empty($item)) {
 				continue;
 			}
 
 			if (!empty($root)) {
 				$item['parent-uri'] = $root;
-				$item['thr-parent'] = $this->fetchMissingPost($parent, $uid, Item::PR_FETCHED, $item['contact-id'], 0, $parent, !$dont_fetch, Conversation::PARCEL_JETSTREAM, 0);
+				$item['thr-parent'] = $this->fetchMissingPost($parent, $uid, Item::PR_FETCHED, $item['contact-id'], 0, $parent, !$dont_fetch, Conversation::PARCEL_JETSTREAM);
 				$item['gravity']    = Item::GRAVITY_COMMENT;
 			} else {
 				$item['gravity'] = Item::GRAVITY_PARENT;
@@ -168,7 +168,7 @@ class Processor
 			if (!empty($data->commit->record->embed)) {
 				if (empty($post)) {
 					$uri  = 'at://' . $data->did . '/' . $data->commit->collection . '/' . $data->commit->rkey;
-					$post = $this->atprotocol->XRPCGet('app.bsky.feed.getPostThread', ['uri' => $uri], $uid);
+					$post = $this->atprotocol->XRPCGet('app.bsky.feed.getPostThread', ['uri' => $uri]);
 					if (empty($post->thread->post->embed)) {
 						$this->logger->notice('Post was not fetched', ['uri' => $uri, 'post' => $post]);
 						return;
@@ -198,7 +198,7 @@ class Processor
 		}
 
 		foreach ($uids as $uid) {
-			$item = $this->getHeaderFromJetstream($data, $uid, Conversation::PARCEL_JETSTREAM);
+			$item = $this->getHeaderFromJetstream($data, $uid);
 			if (empty($item)) {
 				continue;
 			}
@@ -206,7 +206,7 @@ class Processor
 			$item['gravity']    = Item::GRAVITY_ACTIVITY;
 			$item['body']       = $item['verb'] = Activity::ANNOUNCE;
 			$item['thr-parent'] = $this->getUri($data->commit->record->subject);
-			$item['thr-parent'] = $this->fetchMissingPost($item['thr-parent'], 0, Item::PR_FETCHED, $item['contact-id'], 0, $item['thr-parent'], !$dont_fetch);
+			$item['thr-parent'] = $this->fetchMissingPost($item['thr-parent'], 0, Item::PR_FETCHED, $item['contact-id'], 0, $item['thr-parent'], !$dont_fetch, Conversation::PARCEL_JETSTREAM);
 
 			$id = Item::insert($item);
 
@@ -228,7 +228,7 @@ class Processor
 			return;
 		}
 		foreach ($uids as $uid) {
-			$item = $this->getHeaderFromJetstream($data, $uid, Conversation::PARCEL_JETSTREAM);
+			$item = $this->getHeaderFromJetstream($data, $uid);
 			if (empty($item)) {
 				continue;
 			}
@@ -592,7 +592,7 @@ class Processor
 				}
 				$fetched_uri = $this->getPostUri($uri, $item['uid']);
 				if (!$fetched_uri) {
-					$uri = $this->fetchMissingPost($uri, 0, Item::PR_FETCHED, $item['contact-id'], $level, $uri, false, Conversation::PARCEL_JETSTREAM, $item['uid']);
+					$uri = $this->fetchMissingPost($uri, 0, Item::PR_FETCHED, $item['contact-id'], $level, $uri);
 				} else {
 					$uri = $fetched_uri;
 				}
@@ -610,7 +610,7 @@ class Processor
 			case 'app.bsky.embed.recordWithMedia#view':
 				$this->addMedia($embed->media, $item, $level);
 				$original_uri = $uri = $this->getUri($embed->record->record);
-				$uri          = $this->fetchMissingPost($uri, 0, Item::PR_FETCHED, $item['contact-id'], $level, $uri, false, Conversation::PARCEL_JETSTREAM, $item['uid']);
+				$uri          = $this->fetchMissingPost($uri, 0, Item::PR_FETCHED, $item['contact-id'], $level, $uri);
 				if ($uri) {
 					$shared = Post::selectFirst(['uri-id'], ['uri' => $uri, 'uid' => [$item['uid'], 0]]);
 					$uri_id = $shared['uri-id'] ?? 0;
@@ -699,7 +699,7 @@ class Processor
 		return $restrict ? Item::CANT_REPLY : null;
 	}
 
-	public function fetchMissingPost(string $uri, int $uid, int $post_reason, int $causer, int $level, string $fallback = '', bool $complete_thread = false, int $Protocol = Conversation::PARCEL_JETSTREAM, int $fetch_uid = 0): string
+	public function fetchMissingPost(string $uri, int $uid, int $post_reason, int $causer, int $level, string $fallback = '', bool $complete_thread = false, int $Protocol = Conversation::PARCEL_JETSTREAM): string
 	{
 		$timestamp = microtime(true);
 		$stamp     = Strings::getRandomHex(30);
@@ -725,7 +725,7 @@ class Processor
 		$fetch_uri = $class->uri;
 
 		$this->logger->debug('Fetch missing post', ['level' => $level, 'uid' => $uid, 'uri' => $uri]);
-		$data = $this->atprotocol->XRPCGet('app.bsky.feed.getPostThread', ['uri' => $fetch_uri], $fetch_uid ?: $uid);
+		$data = $this->atprotocol->XRPCGet('app.bsky.feed.getPostThread', ['uri' => $fetch_uri]);
 		if (empty($data) || empty($data->thread)) {
 			$this->logger->info('Thread was not fetched', ['level' => $level, 'uid' => $uid, 'uri' => $uri, 'fallback' => $fallback]);
 			if (microtime(true) - $timestamp > 2) {
@@ -746,7 +746,7 @@ class Processor
 			if (!empty($parents)) {
 				if ($data->thread->post->record->reply->root->uri != $parents[0]->uri) {
 					$parent_uri = $this->getUri($data->thread->post->record->reply->root);
-					$this->fetchMissingPost($parent_uri, $uid, $post_reason, $causer, $level, $data->thread->post->record->reply->root->uri, $complete_thread, $Protocol, $fetch_uid);
+					$this->fetchMissingPost($parent_uri, $uid, $post_reason, $causer, $level, $data->thread->post->record->reply->root->uri, $complete_thread, $Protocol);
 				}
 			}
 

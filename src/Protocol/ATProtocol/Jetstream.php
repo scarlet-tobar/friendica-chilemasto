@@ -499,11 +499,11 @@ class Jetstream
 				break;
 
 			case 'create':
-				$this->actor->updateContactByDID($data->did, 0, 0);
+				$this->actor->updateContactByDID($data->did, 0);
 				break;
 
 			case 'update':
-				$this->actor->updateContactByDID($data->did, 0, 0);
+				$this->actor->updateContactByDID($data->did, 0);
 				break;
 
 			default:

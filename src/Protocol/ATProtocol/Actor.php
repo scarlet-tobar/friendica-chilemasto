@@ -57,7 +57,7 @@ class Actor
 				'cursor' => $cursor,
 			];
 
-			$data = $this->atprotocol->XRPCGet('app.bsky.graph.getFollows', $parameters, $uid);
+			$data = $this->atprotocol->XRPCGet('app.bsky.graph.getFollows', $parameters);
 
 			foreach ($data->follows ?? [] as $follow) {
 				$profiles[$follow->did] = $follow;
@@ -75,7 +75,7 @@ class Actor
 				'cursor' => $cursor,
 			];
 
-			$data = $this->atprotocol->XRPCGet('app.bsky.graph.getFollowers', $parameters, $uid);
+			$data = $this->atprotocol->XRPCGet('app.bsky.graph.getFollowers', $parameters);
 
 			foreach ($data->followers ?? [] as $follow) {
 				$profiles[$follow->did] = $follow;
@@ -91,7 +91,7 @@ class Actor
 		}
 
 		foreach ($follows as $did => $rel) {
-			$contact = $this->getContactByDID($did, $uid, $uid, false);
+			$contact = $this->getContactByDID($did, $uid, $uid);
 			if (($contact['rel'] != $rel) && ($contact['uid'] != 0)) {
 				Contact::update(['rel' => $rel], ['id' => $contact['id']]);
 			}
@@ -106,9 +106,9 @@ class Actor
 	 * @param integer $contact_uid User id of the contact to be updated
 	 * @return void
 	 */
-	public function updateContactByDID(string $did, int $contact_uid, int $uid = 0): void
+	public function updateContactByDID(string $did, int $contact_uid): void
 	{
-		$profile = $this->atprotocol->XRPCGet('app.bsky.actor.getProfile', ['actor' => $did], $uid);
+		$profile = $this->atprotocol->XRPCGet('app.bsky.actor.getProfile', ['actor' => $did], $contact_uid);
 		if (empty($profile) || empty($profile->did)) {
 			return;
 		}
@@ -220,7 +220,7 @@ class Actor
 			$cid = $contact['id'];
 		}
 
-		$this->updateContactByDID($did, $contact_uid, $uid);
+		$this->updateContactByDID($did, $contact_uid);
 
 		return Contact::getById($cid);
 	}
