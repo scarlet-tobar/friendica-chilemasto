@@ -56,7 +56,8 @@ final class ATProtocol
 	/** @var ICanSendHttpRequests */
 	private $httpClient;
 
-	private string $public_api;
+	private string $api;
+	private int $uid = 0;
 
 	public function __construct(LoggerInterface $logger, Database $database, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, ICanSendHttpRequests $httpClient)
 	{
@@ -67,12 +68,13 @@ final class ATProtocol
 		$this->httpClient = $httpClient;
 	}
 
-	public function getPublicApi(): string
+	public function getApi(): string
 	{
-		if (!isset($this->public_api)) {
+		if (!isset($this->api)) {
 			$this->logger->notice('Public API not set.');
+			$this->setApiForUser(0);
 		}
-		return $this->public_api ?? $this->getPublicApiForUser(0);
+		return $this->api;
 	}
 
 	/**
@@ -121,8 +123,12 @@ final class ATProtocol
 			$url .= '?' . http_build_query($parameters);
 		}
 
-		if ($uid == 0) {
-			return $this->get($this->getPublicApi() . '/xrpc/' . $url);
+		if ($uid === 0 && $this->uid !== 0) {
+			$uid = $this->uid;
+		}
+
+		if ($uid === 0) {
+			return $this->get($this->getApi() . '/xrpc/' . $url);
 		}
 
 		$pds = $this->getUserPds($uid);
@@ -142,7 +148,7 @@ final class ATProtocol
 		if ($data === null) {
 			$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_API_FAIL);
 			$this->pConfig->set($uid, 'bluesky', 'status-message', 'Unknown error occured while fetching data from Bluesky');
-			return $this->XRPCGet($url, $parameters);
+			return null;
 		}
 
 		if (!empty($data->code) && ($data->code < 200 || $data->code >= 400)) {
@@ -152,7 +158,7 @@ final class ATProtocol
 				$this->pConfig->set($uid, 'bluesky', 'status-message', 'Error Code: ' . $data->code);
 			}
 
-			return $this->XRPCGet($url, $parameters);
+			return $data;
 		}
 
 		$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_SUCCESS);
@@ -277,7 +283,7 @@ final class ATProtocol
 	private function getUserPds(int $uid): ?string
 	{
 		if ($uid == 0) {
-			return $this->getPublicApi();
+			return $this->getApi();
 		}
 
 		$pds = $this->pConfig->get($uid, 'bluesky', 'pds');
@@ -344,7 +350,7 @@ final class ATProtocol
 		}
 
 		// At first we use the AppView API which *should* cover all cases.
-		$data = $this->get($this->getPublicApi() . '/xrpc/com.atproto.identity.resolveHandle?handle=' . urlencode($handle));
+		$data = $this->get($this->getApi() . '/xrpc/com.atproto.identity.resolveHandle?handle=' . urlencode($handle));
 		if (!empty($data) && !empty($data->did)) {
 			$this->logger->debug('Got DID by system PDS call', ['handle' => $handle, 'did' => $data->did]);
 			return $data->did;
@@ -455,20 +461,12 @@ final class ATProtocol
 	 * @param integer $uid
 	 * @return void
 	 */
-	public function setPublicApiForUser(int $uid)
+	public function setApiForUser(int $uid)
 	{
-		$this->public_api = $this->pConfig->get($uid, 'bluesky', 'appview_api') ?? $this->config->get('atprotocol', 'appview_api');
-	}
-
-	/**
-	 * Get the AppView API for a given uid
-	 *
-	 * @param integer $uid
-	 * @return string
-	 */
-	public function getPublicApiForUser(int $uid): string
-	{
-		return $this->pConfig->get($uid, 'bluesky', 'appview_api') ?? $this->config->get('atprotocol', 'appview_api');
+		$this->api = $this->config->get('atprotocol', 'appview_api');
+		if ($uid !== 0 && $this->getUserPds($uid)) {
+			$this->uid = $uid;
+		}
 	}
 
 	/**

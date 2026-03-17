@@ -91,7 +91,7 @@ class Jetstream
 		$this->actor      = $actor;
 		$this->processor  = $processor;
 
-		$this->atprotocol->setPublicApiForUser(0);
+		$this->atprotocol->setApiForUser(0);
 	}
 
 	/**
