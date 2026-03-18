@@ -30,6 +30,7 @@ use Friendica\Network\HTTPException\ServiceUnavailableException;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\ActivityPub\Processor;
+use Friendica\Protocol\ATProtocol;
 use Friendica\Protocol\Delivery;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;
@@ -3713,7 +3714,14 @@ class Item
 	 */
 	public static function getPlink(array $item)
 	{
-		if (!empty($item['plink']) && Network::isValidHttpUrl($item['plink'])) {
+		if ($item['network'] === Protocol::ATPROTO) {
+			$web = DI::atProtocol()->getWebForUser(DI::userSession()->getLocalUserId());
+			if ($web) {
+				$plink = str_replace(ATProtocol::WEB, rtrim($web, '/'), $item['plink']);
+			} else {
+				$plink = $item['plink'];
+			}
+		} elseif (!empty($item['plink']) && Network::isValidHttpUrl($item['plink'])) {
 			$plink = $item['plink'];
 		} elseif (!empty($item['uri']) && Network::isValidHttpUrl($item['uri']) && !DI::baseUrl()->isLocalUrl($item['uri'])) {
 			$plink = $item['uri'];
