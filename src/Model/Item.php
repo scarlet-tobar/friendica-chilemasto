@@ -3530,7 +3530,8 @@ class Item
 				$data['author_url'] = '';
 			}
 		} elseif (preg_match("/.*(\[attachment.*?\].*?\[\/attachment\]).*/ism", $body, $match)) {
-			$data = BBCode::getAttachmentData($match[1]);
+			$data       = BBCode::getAttachmentData($match[1]);
+			$attachment = DI::postMediaFactory()->createFromAttachment($data, $uriid);
 		}
 
 		DI::profiler()->stopRecording();
@@ -3559,7 +3560,7 @@ class Item
 					$preview_mode = $is_article ? BBCode::PREVIEW_SMALL : BBCode::PREVIEW_LARGE;
 				}
 				if (!$has_media && $preview_mode != BBCode::PREVIEW_NONE && !self::containsEmbed($body, $data['url'])) {
-					$rendered = BBCode::convertAttachment('', BBCode::INTERNAL, $data, $uriid, $preview_mode, DI::pConfig()->get($uid, 'system', 'embed_remote_media', false));
+					$rendered = BBCode::convertAttachment('', BBCode::INTERNAL, $data, $uriid, $preview_mode, DI::pConfig()->get($uid, 'system', 'embed_remote_media', false), $attachment);
 				} elseif (!self::containsLink($content, $data['url'], Post\Media::HTML)) {
 					$rendered = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/link.tpl'), [
 						'$url'   => $data['url'],

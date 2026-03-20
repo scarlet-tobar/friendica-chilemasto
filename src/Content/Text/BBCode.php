@@ -12,6 +12,7 @@ use DOMXPath;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Item;
 use Friendica\Content\PageInfo;
+use Friendica\Content\Post\Entity\PostMedia;
 use Friendica\Content\Smilies;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
@@ -403,19 +404,21 @@ class BBCode
 	}
 
 	/**
-	 * Processes [attachment] tags
+	 * Processes [attachment] tags and renders them to HTML.
 	 *
-	 * Note: Can produce a [bookmark] tag in the returned string
+	 * Note: Can produce a [bookmark] tag in the returned string.
 	 *
-	 * @param string  $text
-	 * @param integer $simplehtml
-	 * @param bool    $embed
-	 * @param array   $data
-	 * @param int     $uriid
+	 * @param string          $text         Original BBCode text that may contain an attachment block.
+	 * @param int             $simplehtml   Target rendering mode (internal/external/API/connector).
+	 * @param array           $data         Optional pre-parsed attachment data; extracted from $text when empty.
+	 * @param int             $uriid        Item URI-ID used for media/link lookup and proxy handling.
+	 * @param int             $preview_mode Attachment preview strategy (see PREVIEW_* constants).
+	 * @param bool            $embed        Whether embeddable media (player/embed HTML) should be rendered inline.
+	 * @param PostMedia|null  $media        Optional media entity used to build inline player/embed output.
 	 * @return string
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function convertAttachment(string $text, int $simplehtml = self::INTERNAL, array $data = [], int $uriid = 0, int $preview_mode = self::PREVIEW_AUTO, bool $embed = false): string
+	public static function convertAttachment(string $text, int $simplehtml = self::INTERNAL, array $data = [], int $uriid = 0, int $preview_mode = self::PREVIEW_AUTO, bool $embed = false, ?PostMedia $media = null): string
 	{
 		DI::profiler()->startRecording('rendering');
 		$data = $data ?: self::getAttachmentData($text);
@@ -446,8 +449,7 @@ class BBCode
 			$return = sprintf('<div class="type-%s">', $data['type']);
 		}
 
-		if ($embed) {
-			$media = DI::postMediaFactory()->createFromAttachment($data, $uriid);
+		if ($embed && isset($media)) {
 			if ($media->hasPlayerUrl() && $media->hasPlayerHeight()) {
 				$embed_media = DI::postMediaRepository()->getPlayerIframe($media);
 			} elseif ($media->hasEmbedHtml() && !$media->isPhoto()) {
