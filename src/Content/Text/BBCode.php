@@ -449,7 +449,10 @@ class BBCode
 			$return = sprintf('<div class="type-%s">', $data['type']);
 		}
 
-		if ($embed && isset($media)) {
+		if ($embed) {
+			if (!isset($media)) {
+				$media = DI::postMediaFactory()->createFromAttachment($data, $uriid);
+			}
 			if ($media->hasPlayerUrl() && $media->hasPlayerHeight()) {
 				$embed_media = DI::postMediaRepository()->getPlayerIframe($media);
 			} elseif ($media->hasEmbedHtml() && !$media->isPhoto()) {
