@@ -446,7 +446,7 @@ class Profile
 		$network_url = 'contact/' . $cid . '/conversations';
 
 		$member_since = null;
-		if (Feature::isEnabled($p['uid'], Feature::MEMBER_SINCE)) {
+		if (isset($p['register_date']) && Feature::isEnabled($p['uid'], Feature::MEMBER_SINCE)) {
 			$member_since = [ DI::l10n()->t('Joined:'), DI::l10n()->mediumDate($p['register_date']) ];
 		}
 
