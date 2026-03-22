@@ -3454,9 +3454,9 @@ class Item
 	{
 		DI::profiler()->startRecording('rendering');
 		// Don't show a preview when there is a visual attachment (audio or video)
-		$types      = $attachments['visual']->column('type');
-		$preview    = !in_array(PostMedia::TYPE_IMAGE, $types) && !in_array(PostMedia::TYPE_VIDEO, $types);
-		$has_media  = in_array($item['post-type'] ?? null, [Item::PT_AUDIO, Item::PT_VIDEO]);
+		$types     = $attachments['visual']->column('type');
+		$preview   = !in_array(PostMedia::TYPE_IMAGE, $types) && !in_array(PostMedia::TYPE_VIDEO, $types);
+		$has_media = in_array($item['post-type'] ?? null, [Item::PT_AUDIO, Item::PT_VIDEO]);
 
 		/** @var ?PostMedia $attachment */
 		$attachment = null;
@@ -3494,7 +3494,7 @@ class Item
 					$preview_mode = $attachment->isArticle() ? BBCode::PREVIEW_SMALL : BBCode::PREVIEW_LARGE;
 				}
 				if (!$has_media && $preview_mode != BBCode::PREVIEW_NONE && !self::containsEmbed($body, $attachment->url)) {
-					$data = self::getAttachmentDataFromPostMedia($attachment, $preview, $content);
+					$data     = self::getAttachmentDataFromPostMedia($attachment, $preview, $content);
 					$rendered = BBCode::convertAttachment('', BBCode::INTERNAL, $data, $uriid, $preview_mode, DI::pConfig()->get($uid, 'system', 'embed_remote_media', false), $attachment);
 				} elseif (!self::containsLink($content, $attachment->url, Post\Media::HTML)) {
 					$rendered = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/link.tpl'), [
@@ -3525,11 +3525,11 @@ class Item
 	/**
 	 * Create an attachment array from a PostMedia entity
 	 * @todo get rid of this function and let BBCode::convertAttachment work with the PstMedia entity directly
-	 * 
-	 * @param PostMedia $attachment 
-	 * @param bool $preview 
-	 * @param string $content 
-	 * @return array 
+	 *
+	 * @param PostMedia $attachment
+	 * @param bool $preview
+	 * @param string $content
+	 * @return array
 	 */
 	private static function getAttachmentDataFromPostMedia(PostMedia $attachment, bool $preview, string $content): array
 	{
