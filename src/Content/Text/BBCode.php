@@ -408,17 +408,16 @@ class BBCode
 	 *
 	 * Note: Can produce a [bookmark] tag in the returned string.
 	 *
-	 * @param string          $text         Original BBCode text that may contain an attachment block.
-	 * @param int             $simplehtml   Target rendering mode (internal/external/API/connector).
-	 * @param array           $data         Optional pre-parsed attachment data; extracted from $text when empty.
-	 * @param int             $uriid        Item URI-ID used for media/link lookup and proxy handling.
-	 * @param int             $preview_mode Attachment preview strategy (see PREVIEW_* constants).
-	 * @param bool            $embed        Whether embeddable media (player/embed HTML) should be rendered inline.
-	 * @param PostMedia|null  $media        Optional media entity used to build inline player/embed output.
+	 * @param string $text         Original BBCode text that may contain an attachment block.
+	 * @param int    $simplehtml   Target rendering mode (internal/external/API/connector).
+	 * @param array  $data         Optional pre-parsed attachment data; extracted from $text when empty.
+	 * @param int    $uriid        Item URI-ID used for media/link lookup and proxy handling.
+	 * @param int    $preview_mode Attachment preview strategy (see PREVIEW_* constants).
+	 * @param bool   $embed        Whether embeddable media (player/embed HTML) should be rendered inline.
 	 * @return string
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function convertAttachment(string $text, int $simplehtml = self::INTERNAL, array $data = [], int $uriid = 0, int $preview_mode = self::PREVIEW_AUTO, bool $embed = false, ?PostMedia $media = null): string
+	public static function convertAttachment(string $text, int $simplehtml = self::INTERNAL, array $data = [], int $uriid = 0, int $preview_mode = self::PREVIEW_AUTO, bool $embed = false): string
 	{
 		DI::profiler()->startRecording('rendering');
 		$data = $data ?: self::getAttachmentData($text);
@@ -429,85 +428,81 @@ class BBCode
 
 		$data['url'] = Network::sanitizeUrl($data['url']);
 
-		if (isset($data['title'])) {
-			$data['title'] = strip_tags($data['title']);
-			$data['title'] = str_replace(['http://', 'https://'], '', $data['title']);
-		} else {
-			$data['title'] = '';
-		}
-
 		if (((strpos($data['text'], '[img=') !== false) || (strpos($data['text'], '[img]') !== false) || DI::config()->get('system', 'always_show_preview')) && !empty($data['image'])) {
 			$data['preview'] = $data['image'];
 			$data['image']   = '';
 		}
 
-		$return = '';
+		$media = DI::postMediaFactory()->createFromAttachment($data, $uriid);
 
-		$data['title'] = ($data['title'] ?? '') ?: $data['url'];
+		$return = self::convertAttachmentFromPostMedia($media, $simplehtml, $uriid, $preview_mode, $embed, false);
+
+		return trim(($data['text'] ?? '') . ' ' . $return . ' ' . ($data['after'] ?? ''));
+	}
+
+	/**
+	 * Processes PostMedia entity and renders it to HTML.
+	 *
+	 * @param PostMedia $media        Optional media entity used to build inline player/embed output.
+	 * @param int       $simplehtml   Target rendering mode (internal/external/API/connector).
+	 * @param int       $uriid        Item URI-ID used for media/link lookup and proxy handling.
+	 * @param int       $preview_mode Attachment preview strategy (see PREVIEW_* constants).
+	 * @param bool      $embed        Whether embeddable media (player/embed HTML) should be rendered inline.
+	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public static function convertAttachmentFromPostMedia(PostMedia $media, int $simplehtml = self::INTERNAL, int $uriid = 0, int $preview_mode = self::PREVIEW_AUTO, bool $embed = false, bool $hide_description): string
+	{
+		DI::profiler()->startRecording('rendering');
+
+		$media = DI::postMediaRepository()->sanitizeData($media);
 
 		if ($simplehtml != self::CONNECTORS) {
-			$return = sprintf('<div class="type-%s">', $data['type']);
+			$return = '<div class="type-link">';
+		} else {
+			$return = '';
 		}
 
+		$embed_media = null;
 		if ($embed) {
-			if (!isset($media)) {
-				$media = DI::postMediaFactory()->createFromAttachment($data, $uriid);
-			}
 			if ($media->hasPlayerUrl() && $media->hasPlayerHeight()) {
 				$embed_media = DI::postMediaRepository()->getPlayerIframe($media);
 			} elseif ($media->hasEmbedHtml() && !$media->isPhoto()) {
 				$embed_media = DI::postMediaRepository()->getEmbedIframe($media);
-			} else {
-				$embed_media = null;
 			}
 
 			if ($embed_media) {
 				$return .= $embed_media;
-
-				$preview_mode = self::PREVIEW_NO_IMAGE;
-				unset($data['title']);
-				unset($data['url']);
-				unset($data['description']);
-				unset($data['provider_url']);
-				unset($data['provider_name']);
 			}
 		}
 
-		if ($preview_mode == self::PREVIEW_NO_IMAGE) {
-			unset($data['image']);
-			unset($data['preview']);
-		}
-
-		if (!empty($data['title']) && !empty($data['url'])) {
+		if (!isset($embed_media) && isset($media->name) && isset($media->url)) {
 			$preview_class = in_array($preview_mode, [self::PREVIEW_AUTO, self::PREVIEW_LARGE]) ? 'attachment-image' : 'attachment-preview';
 
-			$is_photo        = ($data['type'] === 'photo');
-			$link_attributes = $is_photo ? 'data-fancybox="gallery" rel="noopener noreferrer"' : 'target="_blank" rel="noopener noreferrer"';
+			$link_attributes = 'target="_blank" rel="noopener noreferrer"';
 
-			if (!empty($data['image']) && empty($data['text']) && $is_photo) {
-				$return .= sprintf('<a href="%s" %s><img src="%s" alt="" title="%s" class="%s" /></a>', $data['url'], $link_attributes, self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title'], $preview_class);
-			} else {
-				if (!empty($data['image'])) {
-					$return .= sprintf('<a href="%s" %s><img src="%s" alt="" title="%s" class="%s" /></a><br>', $data['url'], $link_attributes, self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title'], $preview_class);
-				} elseif (!empty($data['preview'])) {
-					$return .= sprintf('<a href="%s" %s><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br>', $data['url'], $link_attributes, self::proxyUrl($data['preview'], $simplehtml, $uriid), $data['title']);
+			if ($preview_mode !== self::PREVIEW_NO_IMAGE && isset($media->preview)) {
+				if ($media->previewWidth >= 500) {
+					$return .= sprintf('<a href="%s" %s><img src="%s" alt="" title="%s" class="%s" /></a><br>', $media->url, $link_attributes, self::proxyUrl($media->preview, $simplehtml, $uriid), $media->name, $preview_class);
+				} else {
+					$return .= sprintf('<a href="%s" %s><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br>', $media->url, $link_attributes, self::proxyUrl($media->preview, $simplehtml, $uriid), $media->name);
 				}
-
-				$return .= sprintf('<h4><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></h4>', $data['url'], $data['title']);
 			}
+
+			$return .= sprintf('<h4><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></h4>', $media->url, $media->name);
 		}
 
-		if (!empty($data['description']) && $data['description'] != $data['title']) {
+		if (!isset($embed_media) && !$hide_description && !empty($media->description) && $media->description != $media->name) {
 			// Sanitize the HTML
-			$return .= sprintf('<blockquote>%s</blockquote>', trim(HTML::purify($data['description'])));
+			$return .= sprintf('<blockquote>%s</blockquote>', trim(HTML::purify($media->description)));
 		}
 
-		if (!empty($data['provider_url']) && !empty($data['provider_name'])) {
-			$data['provider_url'] = Network::sanitizeUrl($data['provider_url']);
-			if (!empty($data['author_name'])) {
-				$return .= sprintf('<sup><a href="%s" target="_blank" rel="noopener noreferrer">%s (%s)</a></sup>', $data['provider_url'], $data['author_name'], $data['provider_name']);
+		if (!isset($embed_media) && !empty($media->publisherUrl) && !empty($media->publisherName)) {
+			$provider_url = Network::sanitizeUrl((string) ($media->publisherUrl));
+			if (!empty($media->authorName)) {
+				$return .= sprintf('<sup><a href="%s" target="_blank" rel="noopener noreferrer">%s (%s)</a></sup>', $provider_url, $media->authorName, $media->publisherName);
 			} else {
-				$return .= sprintf('<sup><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></sup>', $data['provider_url'], $data['provider_name']);
+				$return .= sprintf('<sup><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></sup>', $provider_url, $media->publisherName);
 			}
 		}
 
@@ -516,7 +511,7 @@ class BBCode
 		}
 
 		DI::profiler()->stopRecording();
-		return trim(($data['text'] ?? '') . ' ' . $return . ' ' . ($data['after'] ?? ''));
+		return $return;
 	}
 
 	public static function removeShareInformation(string $text, bool $plaintext = false, bool $nolink = false): string
