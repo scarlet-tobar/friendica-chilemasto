@@ -68,6 +68,11 @@ final class ATProtocol
 		$this->httpClient = $httpClient;
 	}
 
+	/**
+	 * Get the AppView API URL
+	 *
+	 * @return string
+	 */
 	public function getApi(): string
 	{
 		if (!isset($this->api)) {
