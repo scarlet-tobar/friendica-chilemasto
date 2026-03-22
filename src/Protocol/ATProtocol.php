@@ -191,7 +191,7 @@ final class ATProtocol
 		$data = json_decode($curlResult->getBodyString());
 		if (!$curlResult->isSuccess()) {
 			$this->logger->notice('API Error', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data ?: $curlResult->getBodyString()]);
-			if (!$data) {
+			if (!$data || !is_object($data)) {
 				return null;
 			}
 			$data->code = $curlResult->getReturnCode();
