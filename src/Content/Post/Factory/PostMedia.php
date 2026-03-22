@@ -74,6 +74,13 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 		);
 	}
 
+	/**
+	 * Create a PostMedia entity from an image element
+	 *
+	 * @param integer $uriId
+	 * @param stdClass $image
+	 * @return PostMediaEntity
+	 */
 	public function createFromATProtocolImageEmbed(int $uriId, stdClass $image): PostMediaEntity
 	{
 		return new PostMediaEntity(
@@ -92,7 +99,13 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 		);
 	}
 
-
+	/**
+	 * Create a PostMedia entity from an external embed element
+	 *
+	 * @param integer $uriId
+	 * @param stdClass $external
+	 * @return PostMediaEntity
+	 */
 	public function createFromATProtocolExternalEmbed(int $uriId, stdClass $external): PostMediaEntity
 	{
 		return new PostMediaEntity(
@@ -112,6 +125,14 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 		);
 	}
 
+	/**
+	 * Create a PostMedia entity from an attachment array
+	 *
+	 * @param array $attachment
+	 * @param integer $uriId
+	 * @param integer $id
+	 * @return PostMediaEntity
+	 */
 	public function createFromAttachment(array $attachment, int $uriId = 0, int $id = 0)
 	{
 		$row = [
@@ -163,6 +184,14 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 		return $this->createFromTableRow($row);
 	}
 
+	/**
+	 * Create a PostMedia entity from parsed URL data
+	 *
+	 * @param array $data
+	 * @param integer $uriId
+	 * @param integer $id
+	 * @return PostMediaEntity
+	 */
 	public function createFromParseUrl(array $data, int $uriId = 0, int $id = 0)
 	{
 		$row = [
