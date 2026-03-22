@@ -72,12 +72,13 @@ class GroupManager
 
 		while ($contact = DBA::fetch($contacts)) {
 			$groupList[] = [
-				'url'   => $contact['url'],
-				'alias' => $contact['alias'],
-				'name'  => $contact['name'],
-				'id'    => $contact['id'],
-				'micro' => $contact['micro'],
-				'thumb' => $contact['thumb'],
+				'url'     => $contact['url'],
+				'alias'   => $contact['alias'],
+				'name'    => $contact['name'],
+				'id'      => $contact['id'],
+				'micro'   => $contact['micro'],
+				'thumb'   => $contact['thumb'],
+				'network' => $contact['network'],
 			];
 		}
 		DBA::close($contacts);
@@ -208,7 +209,7 @@ class GroupManager
 			Protocol::DFRN,
 			Protocol::ACTIVITYPUB,
 			Contact::TYPE_COMMUNITY,
-			DI::userSession()->getLocalUserId()
+			DI::userSession()->getLocalUserId(),
 		);
 
 		return DBA::toArray($stmtContacts);
