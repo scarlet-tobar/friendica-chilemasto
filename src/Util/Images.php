@@ -378,17 +378,19 @@ class Images
 				}
 			}
 
-			try {
-				$stream = fopen('php://memory', 'r+');
-				fwrite($stream, $img_str);
-				rewind($stream);
-				$exif = @exif_read_data($stream, 'ANY_TAG, IFD0, EXIF, APP12, GPS, INTEROP');
-				fclose($stream);
-				if (is_array($exif)) {
-					$data['exif'] = self::sanitizeExifArray($exif);
+			if (function_exists('exif_read_data')) {
+				try {
+					$stream = fopen('php://memory', 'r+');
+					fwrite($stream, $img_str);
+					rewind($stream);
+					$exif = @exif_read_data($stream, 'ANY_TAG, IFD0, EXIF, APP12, GPS, INTEROP');
+					fclose($stream);
+					if (is_array($exif)) {
+						$data['exif'] = self::sanitizeExifArray($exif);
+					}
+				} catch (\Exception $e) {
+					DI::logger()->error('Exception when trying to read EXIF data', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
 				}
-			} catch (\Exception $e) {
-				DI::logger()->error('Exception when trying to read EXIF data', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
 			}
 		}
 
