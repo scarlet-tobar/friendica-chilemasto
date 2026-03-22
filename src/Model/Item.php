@@ -3521,6 +3521,13 @@ class Item
 		return $content;
 	}
 
+	/**
+	 * hide the description of the media if it is very similar to the content to avoid duplicate information.
+	 *
+	 * @param PostMedia $media
+	 * @param string $content
+	 * @return boolean
+	 */
 	private static function hideDescription(PostMedia $media, string $content): bool
 	{
 		if (!empty($media->description) && !empty($content)) {
