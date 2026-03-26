@@ -31,7 +31,7 @@ class VerifyQrCodeTest extends TestCase
 		try {
 			$renderer = new ImageRenderer(
 				new RendererStyle(256),
-				new SvgImageBackEnd()
+				new SvgImageBackEnd(),
 			);
 			$writer       = new Writer($renderer);
 			$qrcode_image = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $writer->writeString($otpauthUrl));
@@ -55,19 +55,19 @@ class VerifyQrCodeTest extends TestCase
 			->method('warning')
 			->with(
 				$this->stringContains('QR code generation failed'),
-				$this->arrayHasKey('exception')
+				$this->arrayHasKey('exception'),
 			);
 
 		$qrcode_image = '';
 
 		try {
 			throw new \BaconQrCode\Exception\RuntimeException(
-				'You need to install the libxml extension to use this back end'
+				'You need to install the libxml extension to use this back end',
 			);
 		} catch (\Throwable $e) {
 			$logger->warning(
 				'QR code generation failed, libxml/XMLWriter extension may be missing.',
-				['exception' => $e]
+				['exception' => $e],
 			);
 		}
 
