@@ -95,10 +95,12 @@ class Search extends BaseApi
 		$result = ['accounts' => [], 'statuses' => [], 'hashtags' => []];
 
 		$data = ['uri-id' => -1, 'type' => Post\Media::UNKNOWN, 'url' => $q];
-		$data = Post\Media::fetchAdditionalData($data);
+		if (Network::isValidHttpUrl($q)) {
+			$data = Post\Media::fetchAdditionalData($data);
+		}
 
 		if ((empty($type) || ($type == 'statuses')) && in_array($data['type'], [Post\Media::HTML, Post\Media::ACTIVITY, Post\Media::UNKNOWN])) {
-			if (!Network::isValidAtUrl($q)) {
+			if (Network::isValidHttpUrl($q)) {
 				$q = Network::convertToIdn($q);
 			}
 			// If the user-specific search failed, we search and probe a public post
@@ -136,7 +138,8 @@ class Search extends BaseApi
 	 */
 	private function searchAccounts(int $uid, string $q, bool $resolve, int $limit, int $offset, bool $following)
 	{
-		if (($offset == 0) && (strrpos($q, '@') > 0) && $id = Contact::getIdForURL($q, 0, $resolve ? null : false)) {
+		$this->logger->debug('Search', ['q' => $q, 'resolve' => $resolve, 'offset' => $offset]);
+		if (($offset == 0) && (strrpos($q, '@') > 0) && $id = Contact::getIdForURL(ltrim($q, '@'), 0, $resolve ? null : false)) {
 			return DI::mstdnAccount()->createFromContactId($id, $uid);
 		}
 
