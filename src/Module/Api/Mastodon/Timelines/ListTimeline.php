@@ -62,7 +62,7 @@ class ListTimeline extends BaseApi
 			'only_media'      => false, // Show only statuses with media attached? Defaults to false.
 			'local'           => false, // Show only local statuses? Defaults to false.
 			'remote'          => false, // Show only remote statuses? Defaults to false.
-			'exclude_replies' => false, // Don't show comments
+			'exclude_replies' => true,  // Don't show comments
 			'friendica_order' => TimelineOrderByTypes::ID, // Sort order options (defaults to ID)
 		], $request);
 
@@ -95,7 +95,7 @@ class ListTimeline extends BaseApi
 
 	private function getStatusesForGroup(int $uid, array $request): array
 	{
-		$cid = Contact::getPublicContactId((int)substr($this->parameters['id'], 6), $uid);
+		$cid = Contact::getPublicContactId((int) substr($this->parameters['id'], 6), $uid);
 
 		$condition = ["(`uid` = ? OR (`uid` = ? AND NOT `global`))", 0, $uid];
 
@@ -103,7 +103,7 @@ class ListTimeline extends BaseApi
 
 		$condition2 = DBA::mergeConditions($condition, [
 			"`author-id` = ? AND `gravity` = ? AND `vid` = ? AND `protocol` != ? AND `thr-parent-id` = `parent-uri-id`",
-			$cid, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Conversation::PARCEL_DIASPORA
+			$cid, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Conversation::PARCEL_DIASPORA,
 		]);
 
 		$condition1 = $this->addPagingConditions($request, $condition1);
@@ -129,7 +129,7 @@ class ListTimeline extends BaseApi
 	{
 		$condition = [
 			"`uid` = ? AND `gravity` IN (?, ?) AND `contact-id` IN (SELECT `contact-id` FROM `group_member` WHERE `gid` = ?)",
-			$uid, Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT, $this->parameters['id']
+			$uid, Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT, $this->parameters['id'],
 		];
 
 		$condition = $this->addPagingConditions($request, $condition);
@@ -138,7 +138,7 @@ class ListTimeline extends BaseApi
 		if ($request['only_media']) {
 			$condition = DBA::mergeConditions($condition, [
 				"`uri-id` IN (SELECT `uri-id` FROM `post-media` WHERE `type` IN (?, ?, ?))",
-				Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO, Post\Media::HLS
+				Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO, Post\Media::HLS,
 			]);
 		}
 

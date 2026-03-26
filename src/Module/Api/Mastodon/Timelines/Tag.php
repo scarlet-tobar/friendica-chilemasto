@@ -48,7 +48,7 @@ class Tag extends BaseApi
 			'min_id'          => 0,     // Return results immediately newer than this ID.
 			'limit'           => 20,    // Maximum number of results to return. Defaults to 20.
 			'with_muted'      => false, // Pleroma extension: return activities by muted (not by blocked!) users.
-			'exclude_replies' => false, // Don't show comments
+			'exclude_replies' => true,  // Don't show comments
 		], $request);
 
 		$params = ['order' => ['uri-id' => true], 'limit' => $request['limit']];
@@ -91,7 +91,7 @@ class Tag extends BaseApi
 		if (!empty($uid)) {
 			$condition = DBA::mergeConditions(
 				$condition,
-				["NOT `author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`blocked` OR `ignored` OR `is-blocked`) AND `cid` = `author-id`)", $uid]
+				["NOT `author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`blocked` OR `ignored` OR `is-blocked`) AND `cid` = `author-id`)", $uid],
 			);
 		}
 
