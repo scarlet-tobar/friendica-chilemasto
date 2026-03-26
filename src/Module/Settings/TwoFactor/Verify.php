@@ -100,14 +100,19 @@ class Verify extends BaseSettings
 
 		$otpauthUrl = (new Google2FA())->getQRCodeUrl($company, $holder, $secret);
 
-		$renderer = new ImageRenderer(
-			new RendererStyle(256),
-			new SvgImageBackEnd()
-		);
+		$qrcode_image = '';
+		try {
+			$renderer = new ImageRenderer(
+				new RendererStyle(256),
+				new SvgImageBackEnd()
+			);
 
-		$writer = new Writer($renderer);
+			$writer = new Writer($renderer);
 
-		$qrcode_image = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $writer->writeString($otpauthUrl));
+			$qrcode_image = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $writer->writeString($otpauthUrl));
+		} catch (\Throwable $e) {
+			$this->logger->warning('QR code generation failed, libxml/XMLWriter extension may be missing.', ['exception' => $e]);
+		}
 
 		$shortOtpauthUrl = explode('?', $otpauthUrl)[0];
 
