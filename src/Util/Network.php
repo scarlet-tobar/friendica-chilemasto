@@ -619,6 +619,17 @@ class Network
 	}
 
 	/**
+	 * Check if the given URL is a valid AT Protocol URL
+	 *
+	 * @param string $url
+	 * @return bool
+	 */
+	public static function isValidAtUrl(string $url): bool
+	{
+		return str_starts_with($url, 'at://');
+	}
+
+	/**
 	 * Remove invalid parts from an URL
 	 *
 	 * @param string $url

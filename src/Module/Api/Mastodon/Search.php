@@ -50,7 +50,7 @@ class Search extends BaseApi
 
 		$limit = min($request['limit'], 40);
 
-		if (Network::isValidHttpUrl($request['q']) && ($request['offset'] == 0)) {
+		if ((Network::isValidHttpUrl($request['q']) || Network::isValidAtUrl($request['q'])) && ($request['offset'] == 0)) {
 			$this->searchLinks($uid, $request['q'], $request['type']);
 		}
 
@@ -98,7 +98,9 @@ class Search extends BaseApi
 		$data = Post\Media::fetchAdditionalData($data);
 
 		if ((empty($type) || ($type == 'statuses')) && in_array($data['type'], [Post\Media::HTML, Post\Media::ACTIVITY, Post\Media::UNKNOWN])) {
-			$q = Network::convertToIdn($q);
+			if (!Network::isValidAtUrl($q)) {
+				$q = Network::convertToIdn($q);
+			}
 			// If the user-specific search failed, we search and probe a public post
 			$item_id = Item::fetchByLink($q, $uid) ?: Item::fetchByLink($q);
 			if ($item_id && $item = Post::selectFirst(['uri-id'], ['id' => $item_id])) {
