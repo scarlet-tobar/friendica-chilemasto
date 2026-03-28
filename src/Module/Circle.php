@@ -99,7 +99,7 @@ class Circle extends BaseModule
 					throw new \Exception(DI::l10n()->t('Contact is deleted.'), 410);
 				}
 
-				switch($this->parameters['command']) {
+				switch ($this->parameters['command']) {
 					case 'add':
 						if (!Model\Circle::addMember($circle_id, $cdata['user'])) {
 							throw new \Exception(DI::l10n()->t('Unable to add the contact to the circle.'), 500);
@@ -175,8 +175,8 @@ class Circle extends BaseModule
 		$preselected = [];
 
 		// @TODO: Replace with parameter from router
-		if ((DI::args()->getArgc() == 2) && (DI::args()->getArgv()[1] === 'none') ||
-			(DI::args()->getArgc() == 1) && (DI::args()->getArgv()[0] === 'nocircle')) {
+		if ((DI::args()->getArgc() == 2) && (DI::args()->getArgv()[1] === 'none')
+			|| (DI::args()->getArgc() == 1) && (DI::args()->getArgv()[0] === 'nocircle')) {
 			$id       = -1;
 			$nocircle = true;
 			$circle   = [
@@ -310,7 +310,7 @@ class Circle extends BaseModule
 					'title'     => DI::l10n()->t('Remove contact from circle'),
 					'gid'       => $circle['id'],
 					'cid'       => $member['id'],
-					'sec_token' => $sec_token
+					'sec_token' => $sec_token,
 				];
 
 				$circle_editor['members'][] = $entry;
@@ -323,7 +323,7 @@ class Circle extends BaseModule
 			$contacts = Model\Contact\Circle::listUncircled(DI::userSession()->getLocalUserId());
 		} else {
 			$networks = Widget::unavailableNetworks();
-			$query    = "`uid` = ? AND NOT `self` AND NOT `deleted` AND NOT `blocked` AND NOT `pending` AND NOT `failed`
+			$query    = "`uid` = ? AND NOT `self` AND NOT `deleted` AND NOT `blocked` AND NOT `pending` AND (`failed` IS NULL OR NOT `failed`)
 				AND `rel` IN (?, ?, ?)
 				AND NOT `network` IN (" . substr(str_repeat('?, ', count($networks)), 0, -2) . ")";
 			$condition = array_merge([$query], [DI::userSession()->getLocalUserId(), Model\Contact::FOLLOWER, Model\Contact::FRIEND, Model\Contact::SHARING], $networks);
@@ -351,7 +351,7 @@ class Circle extends BaseModule
 							'title'     => DI::l10n()->t('Add contact to circle'),
 							'gid'       => $circle['id'],
 							'cid'       => $member['id'],
-							'sec_token' => $sec_token
+							'sec_token' => $sec_token,
 						];
 					}
 
