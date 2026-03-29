@@ -143,9 +143,10 @@ class User
 	{
 		$system = Contact::selectFirst([], ['self' => true, 'uid' => 0]);
 		if (!DBA::isResult($system)) {
-			self::createSystemAccount();
+			$id     = self::createSystemAccount();
 			$system = Contact::selectFirst([], ['self' => true, 'uid' => 0]);
 			if (!DBA::isResult($system)) {
+				DI::logger()->warning('System account not found.', ['id' => $id]);
 				return [];
 			}
 		}
@@ -202,17 +203,19 @@ class User
 	/**
 	 * Create the system account
 	 *
-	 * @return void
+	 * @return int
 	 */
-	private static function createSystemAccount()
+	private static function createSystemAccount(): int
 	{
 		$system_actor_name = self::getActorName();
 		if (empty($system_actor_name)) {
-			return;
+			DI::logger()->warning('No actor name was found.');
+			return 0;
 		}
 
 		$keys = Crypto::newKeypair(4096);
 		if ($keys === false) {
+			DI::logger()->warning('Generation of security keys failed.');
 			throw new Exception(DI::l10n()->t('SERIOUS ERROR: Generation of security keys failed.'));
 		}
 
@@ -243,7 +246,8 @@ class User
 		$system['nurl']   = Strings::normaliseLink($system['url']);
 		$system['gsid']   = GServer::getRealID($system['baseurl']);
 
-		Contact::insert($system);
+		DI::logger()->info('System account to be created', ['account' => $system]);
+		return Contact::insert($system);
 	}
 
 	/**
@@ -253,16 +257,32 @@ class User
 	 */
 	public static function getActorName(): string
 	{
+		$self              = Contact::selectFirst(['nick'], ['uid' => 0, 'self' => true]);
+		$systemuser        = DBA::selectFirst('user', ['nickname'], ['uid' => 0]);
 		$system_actor_name = DI::config()->get('system', 'actor_name');
-		if (!empty($system_actor_name)) {
-			$self = Contact::selectFirst(['nick'], ['uid' => 0, 'self' => true]);
-			if (!empty($self['nick'])) {
-				if ($self['nick'] != $system_actor_name) {
-					// Reset the actor name to the already used name
-					DI::config()->set('system', 'actor_name', $self['nick']);
-					$system_actor_name = $self['nick'];
-				}
+
+		if (isset($systemuser['nickname'])) {
+			if ($system_actor_name != $systemuser['nickname']) {
+				DI::logger()->notice('Set the actor name to the system user name', ['name' => $systemuser['nickname'], 'systemactor' => $system_actor_name]);
+				DI::config()->set('system', 'actor_name', $systemuser['nickname']);
+			} else {
+				DI::logger()->debug('Use system user name as system actor', ['name' => $systemuser['nickname']]);
 			}
+			return $systemuser['nickname'];
+		}
+
+		if (isset($self['nick'])) {
+			if ($system_actor_name != $self['nick']) {
+				DI::logger()->notice('Set the actor name to the system contact name', ['name' => $self['nick'], 'systemactor' => $system_actor_name]);
+				DI::config()->set('system', 'actor_name', $self['nick']);
+			} else {
+				DI::logger()->debug('Use system contact name as system actor', ['name' => $self['nick']]);
+			}
+			return $self['nick'];
+		}
+
+		if (isset($system_actor_name)) {
+			DI::logger()->notice('Use the stored system actor name', ['systemactor' => $system_actor_name]);
 			return $system_actor_name;
 		}
 
@@ -270,10 +290,13 @@ class User
 		$possible_accounts = ['friendica', 'actor', 'system', 'internal'];
 		foreach ($possible_accounts as $name) {
 			if (!DBA::exists('user', ['nickname' => $name]) && !DBA::exists('userd', ['username' => $name])) {
+				DI::logger()->notice('Selected system actor', ['systemactor' => $name]);
 				DI::config()->set('system', 'actor_name', $name);
 				return $name;
 			}
 		}
+
+		DI::logger()->warning('No system actor found');
 		return '';
 	}
 
