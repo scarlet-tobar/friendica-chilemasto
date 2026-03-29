@@ -147,7 +147,7 @@ class ContactSelector
 		$networkname = str_replace($search, $replace, $network);
 		$platform    = '';
 
-		if (in_array($network, Protocol::FEDERATED) && !empty($gsid)) {
+		if (in_array($network, array_merge(Protocol::FEDERATED, [Protocol::ATPROTO])) && !empty($gsid)) {
 			$gserver = self::getServerForId($gsid);
 
 			if (!empty($gserver['platform'])) {
@@ -158,11 +158,6 @@ class ContactSelector
 
 			if ($platform !== '') {
 				$networkname = $platform;
-			}
-		} elseif ($network === Protocol::ATPROTO && !empty($gsid)) {
-			$gserver = self::getServerForId($gsid);
-			if (isset($gserver['url'])) {
-				$networkname = self::getAtProviderName($gserver['url']);
 			}
 		}
 
@@ -220,12 +215,9 @@ class ContactSelector
 
 		$network_svg = str_replace($search, $replace, $network);
 
-		if (in_array($network, Protocol::FEDERATED) && !empty($gsid)) {
+		if (in_array($network, array_merge(Protocol::FEDERATED, [Protocol::ATPROTO])) && !empty($gsid)) {
 			$gserver  = self::getServerForId($gsid);
 			$platform = $gserver['platform'];
-		} elseif ($network === Protocol::ATPROTO && !empty($gsid)) {
-			$gserver  = self::getServerForId($gsid);
-			$platform = self::getAtProtoProvider($gserver['url']);
 		}
 
 		$svg = ['aardwolf', 'activitypods', 'activitypub', 'akkoma', 'anfora', 'atprotocol', 'awakari', 'azorius',
@@ -292,37 +284,6 @@ class ContactSelector
 			return 'images/platforms/white/' . $network_svg . '.svg';
 		} else {
 			return 'images/platforms/black/' . $network_svg . '.svg';
-		}
-	}
-
-	private static function getAtProtoProvider(string $pds): string
-	{
-		$host = parse_url($pds, PHP_URL_HOST);
-		if (str_ends_with($host, '.host.bsky.network')) {
-			return 'bluesky';
-		} elseif ($host === 'fed.brid.gy') {
-			return 'bridgy_fed';
-		} elseif ($host === 'eurosky.social') {
-			return 'eurosky';
-		} elseif ($host === 'blacksky.app') {
-			return 'blacksky';
-		}
-		return 'atprotocol';
-	}
-
-	private static function getAtProviderName(string $pds): string
-	{
-		switch (self::getAtProtoProvider($pds)) {
-			case 'bluesky':
-				return 'Bluesky';
-			case 'bridgy_fed':
-				return 'Bridgy Fed';
-			case 'eurosky':
-				return 'Eurosky';
-			case 'blacksky':
-				return 'Blacksky';
-			default:
-				return parse_url($pds, PHP_URL_HOST);
 		}
 	}
 }

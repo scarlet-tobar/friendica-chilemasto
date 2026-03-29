@@ -91,7 +91,7 @@ class Display extends BaseModule
 
 		$fields = ['id', 'uri-id', 'parent-uri-id', 'author-id', 'author-link', 'contact-id', 'contact-contact-type', 'body', 'uid', 'guid', 'gravity',
 			'plink', 'origin', 'uri', 'post-reason', 'owner-contact-type', 'owner-network', 'owner-id', 'guid',
-			'author-network', 'author-alias', 'private'];
+			'author-network', 'author-alias', 'private', 'network'];
 
 		// Does the local user have this item?
 		if ($this->session->getLocalUserId()) {

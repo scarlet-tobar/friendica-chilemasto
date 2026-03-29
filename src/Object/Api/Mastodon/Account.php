@@ -101,7 +101,7 @@ class Account extends BaseDataTransferObject
 		$this->created_at = DateTimeFormat::utc($account['created'] ?: DBA::NULL_DATETIME, DateTimeFormat::JSON);
 
 		$this->note            = BBCode::convertForUriId($account['uri-id'], $account['about'], BBCode::EXTERNAL);
-		$this->url             = $account['alias'] ?: $account['url'];
+		$this->url             = Contact::getProfileLink($account);
 		$this->uri             = $account['url'];
 		$this->avatar          = Contact::getAvatarUrlForId($account['id'] ?? 0 ?: $account['pid'], Proxy::SIZE_SMALL, $account['updated'], $account['guid'] ?? '');
 		$this->avatar_static   = Contact::getAvatarUrlForId($account['id'] ?? 0 ?: $account['pid'], Proxy::SIZE_SMALL, $account['updated'], $account['guid'] ?? '', true);
