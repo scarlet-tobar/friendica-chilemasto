@@ -342,7 +342,7 @@ class Network
 							'wt_mc', 'pk_campaign', 'pk_kwd', 'mc_cid', 'mc_eid',
 							'fb_action_ids', 'fb_action_types', 'fb_ref',
 							'awesm', 'wtrid',
-							'woo_campaign', 'woo_source', 'woo_medium', 'woo_content', 'woo_term']
+							'woo_campaign', 'woo_source', 'woo_medium', 'woo_content', 'woo_term'],
 					)
 					) {
 						$pair = $param . '=' . urlencode($value);
@@ -390,7 +390,7 @@ class Network
 		];
 
 		$parts = array_merge($base, parse_url('/' . ltrim($url, '/')));
-		return (string)Uri::fromParts((array)$parts);
+		return (string) Uri::fromParts((array) $parts);
 	}
 
 	/**
@@ -494,7 +494,7 @@ class Network
 		$parts = parse_url($uri);
 		if (!empty($parts['scheme']) && !empty($parts['host'])) {
 			$parts['host'] = self::idnToAscii($parts['host']);
-			$uri           = (string)Uri::fromParts($parts);
+			$uri           = (string) Uri::fromParts($parts);
 		} else {
 			$parts = explode('@', $uri);
 			if (count($parts) == 2) {
@@ -560,7 +560,7 @@ class Network
 
 		$parsed['query'] = http_build_query($params);
 
-		return (string)Uri::fromParts((array)$parsed);
+		return (string) Uri::fromParts((array) $parsed);
 	}
 
 	/**
@@ -616,6 +616,17 @@ class Network
 	{
 		$scheme = parse_url($url, PHP_URL_SCHEME);
 		return !empty($scheme) && in_array($scheme, ['http', 'https']) && parse_url($url, PHP_URL_HOST);
+	}
+
+	/**
+	 * Check if the given URL is a valid AT Protocol URL
+	 *
+	 * @param string $url
+	 * @return bool
+	 */
+	public static function isValidAtUrl(string $url): bool
+	{
+		return str_starts_with($url, 'at://');
 	}
 
 	/**
@@ -682,7 +693,7 @@ class Network
 
 		$parts['query'] = http_build_query($data);
 
-		return (string)Uri::fromParts($parts);
+		return (string) Uri::fromParts($parts);
 	}
 
 	/**
