@@ -37,7 +37,7 @@ class Home extends BaseApi
 			'with_muted'      => false, // Pleroma extension: return activities by muted (not by blocked!) users.
 			'only_media'      => false, // Show only statuses with media attached? Defaults to false.
 			'remote'          => false, // Show only remote statuses? Defaults to false.
-			'exclude_replies' => false, // Don't show comments
+			'exclude_replies' => true, // Don't show comments
 			'friendica_order' => TimelineOrderByTypes::ID, // Sort order options (defaults to ID)
 		], $request);
 
@@ -53,7 +53,7 @@ class Home extends BaseApi
 		if ($request['only_media']) {
 			$condition = DBA::mergeConditions($condition, [
 				"`uri-id` IN (SELECT `uri-id` FROM `post-media` WHERE `type` IN (?, ?, ?))",
-				Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO, Post\Media::HLS
+				Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO, Post\Media::HLS,
 			]);
 		}
 
