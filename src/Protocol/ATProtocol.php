@@ -7,8 +7,6 @@
 
 namespace Friendica\Protocol;
 
-use DOMDocument;
-use DOMXPath;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
@@ -18,8 +16,8 @@ use Friendica\Model\User;
 use Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
-use Friendica\Network\HTTPClient\Client\HttpClientRequest;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\ParseUrl;
 use Psr\Log\LoggerInterface;
 use stdClass;
 
@@ -29,18 +27,19 @@ use stdClass;
  */
 final class ATProtocol
 {
-	const STATUS_UNKNOWN    = 0;
-	const STATUS_TOKEN_OK   = 1;
-	const STATUS_SUCCESS    = 2;
-	const STATUS_API_FAIL   = 10;
-	const STATUS_DID_FAIL   = 11;
-	const STATUS_PDS_FAIL   = 12;
-	const STATUS_TOKEN_FAIL = 13;
+	public const STATUS_UNKNOWN    = 0;
+	public const STATUS_TOKEN_OK   = 1;
+	public const STATUS_SUCCESS    = 2;
+	public const STATUS_API_FAIL   = 10;
+	public const STATUS_DID_FAIL   = 11;
+	public const STATUS_PDS_FAIL   = 12;
+	public const STATUS_TOKEN_FAIL = 13;
 
-	const APPVIEW_API = 'https://public.api.bsky.app'; // Path to the public Bluesky AppView API.
-	const DIRECTORY   = 'https://plc.directory';       // Path to the directory server service to fetch the PDS of a given DID
-	const WEB         = 'https://bsky.app';            // Path to the web interface with the user profile and posts
-	const HOSTNAME    = 'bsky.social';                 // Host name to be added to the handle if incomplete
+	/**
+	 * Path to the web interface with the user profile and posts.
+	 * This string can then be replaced when displaying the post and profile url.
+	 */
+	public const WEB = 'https://bsky.app';
 
 	/** @var LoggerInterface */
 	private $logger;
@@ -57,6 +56,9 @@ final class ATProtocol
 	/** @var ICanSendHttpRequests */
 	private $httpClient;
 
+	private string $api;
+	private int $uid = 0;
+
 	public function __construct(LoggerInterface $logger, Database $database, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, ICanSendHttpRequests $httpClient)
 	{
 		$this->logger     = $logger;
@@ -67,7 +69,21 @@ final class ATProtocol
 	}
 
 	/**
-	 * Returns an array of user ids who want to import the Bluesky timeline
+	 * Get the AppView API URL
+	 *
+	 * @return string
+	 */
+	public function getApi(): string
+	{
+		if (!isset($this->api)) {
+			$this->logger->notice('Public API not set.');
+			$this->setApiForUser(0);
+		}
+		return $this->api;
+	}
+
+	/**
+	 * Returns an array of user ids who want to import the AT Protocol timeline
 	 *
 	 * @return array user ids
 	 */
@@ -112,8 +128,12 @@ final class ATProtocol
 			$url .= '?' . http_build_query($parameters);
 		}
 
-		if ($uid == 0) {
-			return $this->get(ATProtocol::APPVIEW_API . '/xrpc/' . $url);
+		if ($uid === 0 && $this->uid !== 0) {
+			$uid = $this->uid;
+		}
+
+		if ($uid === 0) {
+			return $this->get($this->getApi() . '/xrpc/' . $url);
 		}
 
 		$pds = $this->getUserPds($uid);
@@ -171,7 +191,7 @@ final class ATProtocol
 		$data = json_decode($curlResult->getBodyString());
 		if (!$curlResult->isSuccess()) {
 			$this->logger->notice('API Error', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data ?: $curlResult->getBodyString()]);
-			if (!$data) {
+			if (!$data || !is_object($data)) {
 				return null;
 			}
 			$data->code = $curlResult->getReturnCode();
@@ -180,7 +200,7 @@ final class ATProtocol
 			$data->code = $curlResult->getReturnCode();
 		}
 
-		Item::incrementInbound(Protocol::BLUESKY);
+		Item::incrementInbound(Protocol::ATPROTO);
 		return $data;
 	}
 
@@ -268,7 +288,7 @@ final class ATProtocol
 	private function getUserPds(int $uid): ?string
 	{
 		if ($uid == 0) {
-			return self::APPVIEW_API;
+			return $this->getApi();
 		}
 
 		$pds = $this->pConfig->get($uid, 'bluesky', 'pds');
@@ -334,12 +354,8 @@ final class ATProtocol
 			return '';
 		}
 
-		if (strpos($handle, '.') === false) {
-			$handle .= '.' . self::HOSTNAME;
-		}
-
 		// At first we use the AppView API which *should* cover all cases.
-		$data = $this->get(self::APPVIEW_API . '/xrpc/com.atproto.identity.resolveHandle?handle=' . urlencode($handle));
+		$data = $this->get($this->getApi() . '/xrpc/com.atproto.identity.resolveHandle?handle=' . urlencode($handle));
 		if (!empty($data) && !empty($data->did)) {
 			$this->logger->debug('Got DID by system PDS call', ['handle' => $handle, 'did' => $data->did]);
 			return $data->did;
@@ -371,51 +387,8 @@ final class ATProtocol
 	 */
 	public function getDidByProfile(string $url): string
 	{
-		if (preg_match('#^' . self::WEB . '/profile/(.+)#', $url, $matches)) {
-			$did = $this->getDid($matches[1]);
-			if (!empty($did)) {
-				return $did;
-			}
-		}
-		try {
-			$curlResult = $this->httpClient->get($url, HttpClientAccept::HTML, [HttpClientOptions::REQUEST => HttpClientRequest::CONTACTINFO]);
-		} catch (\Throwable $th) {
-			return '';
-		}
-		if (!$curlResult->isSuccess()) {
-			return '';
-		}
-		$profile = $curlResult->getBodyString();
-		if (empty($profile)) {
-			return '';
-		}
-
-		$doc = new DOMDocument();
-		try {
-			@$doc->loadHTML($profile);
-		} catch (\Throwable $th) {
-			return '';
-		}
-		$xpath = new DOMXPath($doc);
-		$list  = $xpath->query('//p[@id]');
-		foreach ($list as $node) {
-			foreach ($node->attributes as $attribute) {
-				if ($attribute->name == 'id') {
-					$ids[$attribute->value] = $node->textContent;
-				}
-			}
-		}
-
-		if (empty($ids['bsky_handle']) || empty($ids['bsky_did'])) {
-			return '';
-		}
-
-		if (!$this->isValidDid($ids['bsky_did'], $ids['bsky_handle'])) {
-			$this->logger->notice('Invalid DID', ['handle' => $ids['bsky_handle'], 'did' => $ids['bsky_did']]);
-			return '';
-		}
-
-		return $ids['bsky_did'];
+		$data = ParseUrl::getSiteinfoCached($url);
+		return $data['atprotocol']['did'] ?? '';
 	}
 
 	/**
@@ -473,7 +446,7 @@ final class ATProtocol
 	 */
 	public function getPdsOfDid(string $did): ?string
 	{
-		$data = $this->get(self::DIRECTORY . '/' . $did);
+		$data = $this->get($this->getPLCDirectory() . '/' . $did);
 		if (empty($data) || empty($data->service)) {
 			return null;
 		}
@@ -488,15 +461,60 @@ final class ATProtocol
 	}
 
 	/**
+	 * Set the AppView API for this class for a given uid
+	 *
+	 * @param integer $uid
+	 * @return void
+	 */
+	public function setApiForUser(int $uid)
+	{
+		$this->api = $this->config->get('atprotocol', 'appview_api');
+		if ($uid !== 0 && $this->getUserPds($uid)) {
+			$this->uid = $uid;
+		}
+	}
+
+	/**
+	 * Get the DID PLC Directory
+	 *
+	 * @return string
+	 */
+	public function getPLCDirectory(): string
+	{
+		return $this->config->get('atprotocol', 'plc_directory');
+	}
+
+	/**
+	 * Get the Jetstream address
+	 *
+	 * @return string
+	 */
+	public function getJetstream(): string
+	{
+		return $this->config->get('atprotocol', 'jetstream');
+	}
+
+	/**
+	 * Get the web address for a given uid
+	 *
+	 * @param integer $uid
+	 * @return string
+	 */
+	public function getWebForUser(int $uid): string
+	{
+		return $this->pConfig->get($uid, 'bluesky', 'web') ?? $this->config->get('atprotocol', 'web');
+	}
+
+	/**
 	 * Checks if the provided DID matches the handle
 	 *
 	 * @param string $did DID (did:plc:...)
 	 * @param string $handle The user handle
 	 * @return boolean
 	 */
-	private function isValidDid(string $did, string $handle): bool
+	public function isValidDid(string $did, string $handle): bool
 	{
-		$data = $this->get(self::DIRECTORY . '/' . $did);
+		$data = $this->get($this->getPLCDirectory() . '/' . $did);
 		if (empty($data) || empty($data->alsoKnownAs)) {
 			return false;
 		}

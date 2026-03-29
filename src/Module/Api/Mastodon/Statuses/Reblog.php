@@ -37,10 +37,10 @@ class Reblog extends BaseApi
 
 		if ($item['network'] == Protocol::DIASPORA) {
 			Diaspora::performReshare($this->parameters['id'], $uid);
-		} elseif (!in_array($item['network'], [Protocol::DFRN, Protocol::ACTIVITYPUB, Protocol::BLUESKY, Protocol::TUMBLR, Protocol::TWITTER])) {
+		} elseif (!in_array($item['network'], [Protocol::DFRN, Protocol::ACTIVITYPUB, Protocol::ATPROTO, Protocol::TUMBLR, Protocol::TWITTER])) {
 			$this->logAndJsonError(
 				422,
-				$this->errorFactory->UnprocessableEntity($this->t("Posts from %s can't be shared", ContactSelector::networkToName($item['network'])))
+				$this->errorFactory->UnprocessableEntity($this->t("Posts from %s can't be shared", ContactSelector::networkToName($item['network']))),
 			);
 		} else {
 			Item::performActivity($item['id'], 'announce', $uid);

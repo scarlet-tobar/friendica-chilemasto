@@ -44,7 +44,7 @@ class Actor
 	public function syncContacts(int $uid): void
 	{
 		$this->logger->info('Sync contacts for user - start', ['uid' => $uid]);
-		$contacts = Contact::selectToArray(['id', 'url', 'rel'], ['uid' => $uid, 'network' => Protocol::BLUESKY, 'rel' => [Contact::FRIEND, Contact::SHARING, Contact::FOLLOWER]]);
+		$contacts = Contact::selectToArray(['id', 'url', 'rel'], ['uid' => $uid, 'network' => Protocol::ATPROTO, 'rel' => [Contact::FRIEND, Contact::SHARING, Contact::FOLLOWER]]);
 
 		$follows  = [];
 		$cursor   = '';
@@ -54,7 +54,7 @@ class Actor
 			$parameters = [
 				'actor'  => $this->atprotocol->getUserDid($uid),
 				'limit'  => 100,
-				'cursor' => $cursor
+				'cursor' => $cursor,
 			];
 
 			$data = $this->atprotocol->XRPCGet('app.bsky.graph.getFollows', $parameters);
@@ -72,7 +72,7 @@ class Actor
 			$parameters = [
 				'actor'  => $this->atprotocol->getUserDid($uid),
 				'limit'  => 100,
-				'cursor' => $cursor
+				'cursor' => $cursor,
 			];
 
 			$data = $this->atprotocol->XRPCGet('app.bsky.graph.getFollowers', $parameters);
@@ -117,7 +117,7 @@ class Actor
 		$name = $profile->displayName ?? $nick;
 
 		$fields = [
-			'alias'   => ATProtocol::WEB . '/profile/' . $profile->did,
+			'alias'   => $this->getProfileLink($profile->did),
 			'name'    => $name ?: $nick,
 			'nick'    => $nick,
 			'addr'    => $nick,
@@ -132,7 +132,7 @@ class Actor
 			$fields['header'] = $profile->banner;
 		}
 
-		$directory = $this->atprotocol->get(ATProtocol::DIRECTORY . '/' . $profile->did);
+		$directory = $this->atprotocol->get($this->atprotocol->getPLCDirectory() . '/' . $profile->did);
 		if (!empty($directory->service)) {
 			foreach ($directory->service as $service) {
 				if (($service->id == '#atproto_pds') && ($service->type == 'AtprotoPersonalDataServer') && !empty($service->serviceEndpoint)) {
@@ -141,7 +141,7 @@ class Actor
 			}
 
 			if (!empty($fields['baseurl'])) {
-				GServer::check($fields['baseurl'], Protocol::BLUESKY);
+				GServer::check($fields['baseurl'], Protocol::ATPROTO);
 				$fields['gsid'] = GServer::getRealID($fields['baseurl'], true);
 			}
 
@@ -154,10 +154,10 @@ class Actor
 			}
 		}
 
-		Contact::update($fields, ['nurl' => $profile->did, 'network' => Protocol::BLUESKY]);
+		Contact::update($fields, ['nurl' => $profile->did, 'network' => Protocol::ATPROTO]);
 
 		if (!empty($profile->avatar)) {
-			$contact = Contact::selectFirst(['id', 'avatar'], ['network' => Protocol::BLUESKY, 'nurl' => $did, 'uid' => 0]);
+			$contact = Contact::selectFirst(['id', 'avatar'], ['network' => Protocol::ATPROTO, 'nurl' => $did, 'uid' => 0]);
 			if (!empty($contact['id']) && ($contact['avatar'] != $profile->avatar)) {
 				Contact::updateAvatar($contact['id'], $profile->avatar);
 			}
@@ -175,7 +175,7 @@ class Actor
 			} else {
 				$user_fields = ['rel' => Contact::NOTHING];
 			}
-			Contact::update($user_fields, ['nurl' => $profile->did, 'network' => Protocol::BLUESKY, 'uid' => $contact_uid]);
+			Contact::update($user_fields, ['nurl' => $profile->did, 'network' => Protocol::ATPROTO, 'uid' => $contact_uid]);
 			$this->logger->notice('Update user profile', ['uid' => $contact_uid, 'did' => $profile->did, 'fields' => $user_fields]);
 		}
 	}
@@ -191,7 +191,7 @@ class Actor
 	 */
 	public function getContactByDID(string $did, int $uid, int $contact_uid, bool $auto_update = false): array
 	{
-		$contact = Contact::selectFirst([], ['network' => Protocol::BLUESKY, 'nurl' => $did, 'uid' => [$contact_uid, $uid]], ['order' => ['uid' => true]]);
+		$contact = Contact::selectFirst([], ['network' => Protocol::ATPROTO, 'nurl' => $did, 'uid' => [$contact_uid, $uid]], ['order' => ['uid' => true]]);
 
 		if (!empty($contact) && (!$auto_update || ($contact['updated'] > DateTimeFormat::utc('now -24 hours')))) {
 			return $contact;
@@ -200,7 +200,7 @@ class Actor
 		if (empty($contact)) {
 			$fields = [
 				'uid'      => $contact_uid,
-				'network'  => Protocol::BLUESKY,
+				'network'  => Protocol::ATPROTO,
 				'priority' => 1,
 				'writable' => true,
 				'blocked'  => false,
@@ -208,7 +208,7 @@ class Actor
 				'pending'  => false,
 				'url'      => $did,
 				'nurl'     => $did,
-				'alias'    => ATProtocol::WEB . '/profile/' . $did,
+				'alias'    => $this->getProfileLink($did),
 				'name'     => $did,
 				'nick'     => $did,
 				'addr'     => $did,
@@ -223,5 +223,10 @@ class Actor
 		$this->updateContactByDID($did, $contact_uid);
 
 		return Contact::getById($cid);
+	}
+
+	public function getProfileLink(string $did): string
+	{
+		return ATProtocol::WEB . '/profile/' . $did;
 	}
 }

@@ -66,7 +66,7 @@ class Processor
 
 		$this->logger->notice('Process account', ['did' => $data->identity->did, 'fields' => $fields]);
 
-		Contact::update($fields, ['nurl' => $data->identity->did, 'network' => Protocol::BLUESKY]);
+		Contact::update($fields, ['nurl' => $data->identity->did, 'network' => Protocol::ATPROTO]);
 	}
 
 	public function processIdentity(stdClass $data)
@@ -77,7 +77,7 @@ class Processor
 		}
 
 		$fields = [
-			'alias'   => ATProtocol::WEB . '/profile/' . $data->identity->did,
+			'alias'   => $this->actor->getProfileLink($data->identity->did),
 			'nick'    => $data->identity->handle,
 			'addr'    => $data->identity->handle,
 			'updated' => DateTimeFormat::utc($data->identity->time, DateTimeFormat::MYSQL),
@@ -85,7 +85,7 @@ class Processor
 
 		$this->logger->notice('Process identity', ['did' => $data->identity->did, 'fields' => $fields]);
 
-		Contact::update($fields, ['nurl' => $data->identity->did, 'network' => Protocol::BLUESKY]);
+		Contact::update($fields, ['nurl' => $data->identity->did, 'network' => Protocol::ATPROTO]);
 	}
 
 	public function performBlocks(stdClass $data, int $uid)
@@ -120,7 +120,7 @@ class Processor
 			return;
 		}
 
-		$condition = ['uri-id' => $itemuri['id'], 'author-link' => $data->did, 'network' => Protocol::BLUESKY];
+		$condition = ['uri-id' => $itemuri['id'], 'author-link' => $data->did, 'network' => Protocol::ATPROTO];
 		if (!Post::exists($condition)) {
 			$this->logger->info('Record not found', $condition);
 			return;
@@ -339,7 +339,7 @@ class Processor
 		}
 
 		$item = [
-			'network'       => Protocol::BLUESKY,
+			'network'       => Protocol::ATPROTO,
 			'protocol'      => $protocol,
 			'uid'           => $uid,
 			'wall'          => false,
@@ -404,7 +404,7 @@ class Processor
 		}
 
 		$item = [
-			'network'       => Protocol::BLUESKY,
+			'network'       => Protocol::ATPROTO,
 			'protocol'      => $protocol,
 			'uid'           => $uid,
 			'wall'          => false,

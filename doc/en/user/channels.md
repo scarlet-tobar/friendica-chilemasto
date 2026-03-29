@@ -80,7 +80,7 @@ Alternatives are presented with "|".
     * network:mail - Mails that had been imported via IMAP.
     * network:dscs | network:discourse - Posts that are received by the Discourse connector.
     * network:tmbl | network:tumblr - Posts that are received by the Tumblr connector.
-    * network:bsky | network:bluesky - Posts that are received by the Bluesky connector.
+    * network:bsky | network:bluesky - Posts that are received by the AT Protocol connector.
 * platform - Use this to include or exclude some platforms from your channel, e.g. "+platform:friendica". In the case of group postings, the search text contains both the platform of the group server and the author's platform.
 * visibility - You have the choice between different visibilities. You can only see unlisted or private posts that you have the access for.
     * visibility:public

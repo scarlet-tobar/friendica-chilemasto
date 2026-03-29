@@ -24,7 +24,6 @@ use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
 use Friendica\Protocol\ActivityNamespace;
 use Friendica\Protocol\ActivityPub;
-use Friendica\Protocol\ATProtocol;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\Email;
 use Friendica\Protocol\Feed;
@@ -32,6 +31,7 @@ use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\Network;
+use Friendica\Util\ParseUrl;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
 use GuzzleHttp\Psr7\Uri;
@@ -1189,7 +1189,7 @@ class Probe
 	}
 
 	/**
-	 * Check for AT Protocol (Bluesky)
+	 * Check for AT Protocol
 	 *
 	 * @param string $uri Profile link
 	 * @return array Profile data or empty array
@@ -1221,13 +1221,12 @@ class Probe
 		$name = $profile->displayName ?? $nick;
 
 		$data = [
-			'network' => Protocol::BLUESKY,
+			'network' => Protocol::ATPROTO,
 			'url'     => $profile->did,
-			'alias'   => ATProtocol::WEB . '/profile/' . $profile->did,
+			'alias'   => DI::atpActor()->getProfileLink($profile->did),
 			'name'    => $name ?: $nick,
 			'nick'    => $nick,
 			'addr'    => $nick,
-			'poll'    => ATProtocol::WEB . '/profile/' . $profile->did . '/rss',
 			'photo'   => $profile->avatar ?? '',
 		];
 
@@ -1239,7 +1238,12 @@ class Probe
 			$data['header'] = $profile->banner;
 		}
 
-		$directory = DI::atProtocol()->get(ATProtocol::DIRECTORY . '/' . $profile->did);
+		$profile_page = ParseUrl::getSiteinfoCached($data['alias']);
+		if (isset($profile_page['atprotocol']['feed'])) {
+			$data['poll'] = $profile_page['atprotocol']['feed'];
+		}
+
+		$directory = DI::atProtocol()->get(DI::atProtocol()->getPLCDirectory() . '/' . $profile->did);
 		if (!empty($directory)) {
 			foreach ($directory->service as $service) {
 				if (($service->id == '#atproto_pds') && ($service->type == 'AtprotoPersonalDataServer') && !empty($service->serviceEndpoint)) {

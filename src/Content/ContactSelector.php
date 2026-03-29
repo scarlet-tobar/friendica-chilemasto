@@ -18,11 +18,11 @@ use Friendica\Util\Strings;
  */
 class ContactSelector
 {
-	const SVG_DISABLED    = -1;
-	const SVG_COLOR_BLACK = 0;
-	const SVG_BLACK       = 1;
-	const SVG_COLOR_WHITE = 2;
-	const SVG_WHITE       = 3;
+	public const SVG_DISABLED    = -1;
+	public const SVG_COLOR_BLACK = 0;
+	public const SVG_BLACK       = 1;
+	public const SVG_COLOR_WHITE = 2;
+	public const SVG_WHITE       = 3;
 
 	public static $serverdata = [];
 	public static $server_id  = [];
@@ -44,7 +44,7 @@ class ContactSelector
 			2 => DI::l10n()->t('Twice daily'),
 			3 => DI::l10n()->t('Daily'),
 			4 => DI::l10n()->t('Weekly'),
-			5 => DI::l10n()->t('Monthly')
+			5 => DI::l10n()->t('Monthly'),
 		];
 
 		foreach ($rep as $k => $v) {
@@ -111,7 +111,7 @@ class ContactSelector
 	 *
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function networkToName(string $network, string $protocol = '', int $gsid = null): string
+	public static function networkToName(string $network, string $protocol = '', ?int $gsid = null): string
 	{
 		$eventDispatcher = DI::eventDispatcher();
 
@@ -134,7 +134,7 @@ class ContactSelector
 			Protocol::ACTIVITYPUB => DI::l10n()->t('ActivityPub'),
 			Protocol::PNUT        => DI::l10n()->t('pnut'),
 			Protocol::TUMBLR      => DI::l10n()->t('Tumblr'),
-			Protocol::BLUESKY     => DI::l10n()->t('Bluesky'),
+			Protocol::ATPROTO     => DI::l10n()->t('AT Protocol'),
 		];
 
 		$nets = $eventDispatcher->dispatch(
@@ -158,6 +158,11 @@ class ContactSelector
 
 			if ($platform !== '') {
 				$networkname = $platform;
+			}
+		} elseif ($network === Protocol::ATPROTO && !empty($gsid)) {
+			$gserver = self::getServerForId($gsid);
+			if (isset($gserver['url'])) {
+				$networkname = self::getAtProviderName($gserver['url']);
 			}
 		}
 
@@ -184,7 +189,7 @@ class ContactSelector
 	 * @param integer $uid
 	 * @return string
 	 */
-	public static function networkToSVG(string $network, int $gsid = null, string $platform = '', int $uid = 0): string
+	public static function networkToSVG(string $network, ?int $gsid = null, string $platform = '', int $uid = 0): string
 	{
 		$platform_icon_style = $uid ? (DI::pConfig()->get($uid, 'accessibility', 'platform_icon_style') ?? self::SVG_COLOR_BLACK) : self::SVG_COLOR_BLACK;
 
@@ -194,7 +199,7 @@ class ContactSelector
 
 		$nets = [
 			Protocol::ACTIVITYPUB => 'activitypub', // https://commons.wikimedia.org/wiki/File:ActivityPub-logo-symbol.svg
-			Protocol::BLUESKY     => 'bluesky', // https://commons.wikimedia.org/wiki/File:Bluesky_Logo.svg
+			Protocol::ATPROTO     => 'atprotocol', // https://freesvg.org/at-sign-symbol
 			Protocol::DFRN        => 'friendica',
 			Protocol::DIASPORA    => 'diaspora', // https://www.svgrepo.com/svg/362315/diaspora
 			Protocol::DIASPORA2   => 'diaspora', // https://www.svgrepo.com/svg/362315/diaspora
@@ -218,12 +223,15 @@ class ContactSelector
 		if (in_array($network, Protocol::FEDERATED) && !empty($gsid)) {
 			$gserver  = self::getServerForId($gsid);
 			$platform = $gserver['platform'];
+		} elseif ($network === Protocol::ATPROTO && !empty($gsid)) {
+			$gserver  = self::getServerForId($gsid);
+			$platform = self::getAtProtoProvider($gserver['url']);
 		}
 
-		$svg = ['aardwolf', 'activitypods', 'activitypub', 'akkoma', 'anfora', 'awakari', 'azorius',
-			'bluesky', 'bonfire', 'bookwyrm', 'bridgy_fed', 'brighteon_social', 'brutalinks', 'calckey',
+		$svg = ['aardwolf', 'activitypods', 'activitypub', 'akkoma', 'anfora', 'atprotocol', 'awakari', 'azorius',
+			'blacksky', 'bluesky', 'bonfire', 'bookwyrm', 'bridgy_fed', 'brighteon_social', 'brutalinks', 'calckey',
 			'castopod', 'catodon', 'chatter_net', 'chuckya', 'clubsall', 'communecter', 'decodon',
-			'diaspora', 'discourse', 'dolphin', 'drupal', 'email', 'emissary', 'epicyon', 'f2ap',
+			'diaspora', 'discourse', 'dolphin', 'drupal', 'email', 'emissary', 'epicyon', 'eurosky', 'f2ap',
 			'fedibird', 'fedify', 'firefish', 'flipboard', 'flohmarkt', 'forgefriends', 'forgejo',
 			'forte', 'foundkey', 'friendica', 'funkwhale', 'gancio', 'gath.io', 'ghost', 'gitlab',
 			'glitch-soc', 'glitchsoc', 'gnu_social', 'gnusocial', 'goblin', 'go-fed', 'gotosocial',
@@ -238,8 +246,8 @@ class ContactSelector
 			'wildebeest', 'wordpress', 'write.as', 'writefreely', 'wxwclub', 'xwiki', 'zap'];
 
 		if (in_array($platform_icon_style, [self::SVG_WHITE, self::SVG_COLOR_WHITE])) {
-			$svg = ['activitypub', 'akkoma', 'andstatus', 'bluesky', 'bonfire', 'bookwyrm', 'bridgy_fed',
-				'calckey', 'castopod', 'diaspora', 'discourse', 'dolphin', 'drupal', 'email', 'firefish',
+			$svg = ['activitypub', 'akkoma', 'andstatus', 'atprotocol', 'blacksky', 'bluesky', 'bonfire', 'bookwyrm', 'bridgy_fed',
+				'calckey', 'castopod', 'diaspora', 'discourse', 'dolphin', 'drupal', 'email', 'eurosky', 'firefish',
 				'flipboard', 'flohmarkt', 'forgejo', 'friendica', 'funkwhale', 'ghost', 'gitlab',
 				'glitch-soc', 'gnusocial', 'gotosocial', 'guppe', 'hollo', 'hubzilla', 'iceshrimp', 'kbin',
 				'lemmy', 'loforo', 'loops', 'mastodon', 'mbin', 'microblog', 'minds', 'misskey', 'mobilizon',
@@ -273,8 +281,8 @@ class ContactSelector
 			return '';
 		}
 
-		$color = ['aardwolf', 'activitypods', 'activitypub', 'akkoma', 'bluesky', 'chuckya', 'decodon',
-			'discourse', 'fedify', 'firefish', 'flipboard', 'friendica', 'gitlab', 'gnusocial', 'kookie',
+		$color = ['aardwolf', 'activitypods', 'activitypub', 'akkoma', 'atprotocol', 'bluesky', 'chuckya', 'decodon',
+			'discourse', 'eurosky', 'fedify', 'firefish', 'flipboard', 'friendica', 'gitlab', 'gnusocial', 'iceshrimp', 'kookie',
 			'loops', 'mastodon', 'mbin', 'misskey', 'neodb', 'newsmast', 'nodebb', 'peertube', 'pixelfed',
 			'pleroma', 'rss', 'sharky', 'tumblr', 'vervis', 'vocata', 'wordpress'];
 
@@ -284,6 +292,37 @@ class ContactSelector
 			return 'images/platforms/white/' . $network_svg . '.svg';
 		} else {
 			return 'images/platforms/black/' . $network_svg . '.svg';
+		}
+	}
+
+	private static function getAtProtoProvider(string $pds): string
+	{
+		$host = parse_url($pds, PHP_URL_HOST);
+		if (str_ends_with($host, '.host.bsky.network')) {
+			return 'bluesky';
+		} elseif ($host === 'fed.brid.gy') {
+			return 'bridgy_fed';
+		} elseif ($host === 'eurosky.social') {
+			return 'eurosky';
+		} elseif ($host === 'blacksky.app') {
+			return 'blacksky';
+		}
+		return 'atprotocol';
+	}
+
+	private static function getAtProviderName(string $pds): string
+	{
+		switch (self::getAtProtoProvider($pds)) {
+			case 'bluesky':
+				return 'Bluesky';
+			case 'bridgy_fed':
+				return 'Bridgy Fed';
+			case 'eurosky':
+				return 'Eurosky';
+			case 'blacksky':
+				return 'Blacksky';
+			default:
+				return parse_url($pds, PHP_URL_HOST);
 		}
 	}
 }

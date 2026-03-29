@@ -110,7 +110,7 @@ class Unfollow extends \Friendica\BaseModule
 			'$invite_desc'    => '',
 			'$submit'         => $this->t('Submit Request'),
 			'$cancel'         => $this->t('Cancel'),
-			'$url'            => $contact['url'],
+			'$url'            => Contact::getProfileLink($contact),
 			'$zrl'            => Contact::magicLinkByContact($contact),
 			'$url_label'      => $this->t('Profile URL'),
 			'$myaddr'         => $self['url'],

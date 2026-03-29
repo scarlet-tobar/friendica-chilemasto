@@ -29,6 +29,7 @@ use Friendica\Network\Probe;
 use Friendica\Object\Image;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
+use Friendica\Protocol\ATProtocol;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\Images;
@@ -3592,13 +3593,23 @@ class Contact
 	}
 
 	/**
-	 * Return the link to the profile
+	 * Return the profile link for a given contact array
 	 *
-	 * @param array $contact
-	 * @return string
+	 * Returns the alias if it is set, otherwise returns the URL
+	 *
+	 * @param array $contact Contact record
+	 * @return string The profile link (alias or url)
 	 */
 	public static function getProfileLink(array $contact): string
 	{
+		if ($contact['network'] === Protocol::ATPROTO) {
+			$web = DI::atProtocol()->getWebForUser(DI::userSession()->getLocalUserId());
+			if ($web) {
+				return str_replace(ATProtocol::WEB, rtrim($web, '/'), $contact['alias']);
+			} else {
+				return $contact['alias'];
+			}
+		}
 		if (!empty($contact['alias']) && Network::isValidHttpUrl($contact['alias']) && (($contact['network'] ?? '') != Protocol::DFRN)) {
 			return $contact['alias'];
 		} else {
