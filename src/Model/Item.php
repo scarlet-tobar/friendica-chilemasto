@@ -3718,7 +3718,7 @@ class Item
 			$plink     = $item['plink'];
 			$frontends = DI::config()->get('atprotocol', 'frontends');
 			if ($web && is_array($frontends) && isset($frontends[$web])) {
-				$parts      = explode('/', $item['uri']);
+				$parts = explode('/', $item['uri']);
 				if (count($parts) === 5) {
 					$did        = $parts[2];
 					$collection = $parts[3];

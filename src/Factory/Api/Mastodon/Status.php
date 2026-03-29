@@ -137,32 +137,32 @@ class Status extends BaseFactory
 			'thr-parent-id' => $uriId,
 			'gravity'       => Item::GRAVITY_ACTIVITY,
 			'vid'           => Verb::getID(Activity::ANNOUNCE),
-			'deleted'       => false
+			'deleted'       => false,
 		]) + Post::countPosts([
 			'quote-uri-id' => $uriId,
 			'body'         => '',
-			'deleted'      => false
+			'deleted'      => false,
 		]);
 
 		$count_like = Post::countPosts([
 			'thr-parent-id' => $uriId,
 			'gravity'       => Item::GRAVITY_ACTIVITY,
 			'vid'           => Verb::getID(Activity::LIKE),
-			'deleted'       => false
+			'deleted'       => false,
 		]);
 
 		$count_dislike = Post::countPosts([
 			'thr-parent-id' => $uriId,
 			'gravity'       => Item::GRAVITY_ACTIVITY,
 			'vid'           => Verb::getID(Activity::DISLIKE),
-			'deleted'       => false
+			'deleted'       => false,
 		]);
 
 		$counts = new \Friendica\Object\Api\Mastodon\Status\Counts(
 			Post::countPosts(['thr-parent-id' => $uriId, 'gravity' => Item::GRAVITY_COMMENT, 'deleted' => false], []),
 			$count_announce,
 			$count_like,
-			$count_dislike
+			$count_dislike,
 		);
 
 		$origin_like = $count_like > 0 && Post::exists([
@@ -171,7 +171,7 @@ class Status extends BaseFactory
 			'origin'        => true,
 			'gravity'       => Item::GRAVITY_ACTIVITY,
 			'vid'           => Verb::getID(Activity::LIKE),
-			'deleted'       => false
+			'deleted'       => false,
 		]);
 		$origin_dislike = $count_dislike > 0 && Post::exists([
 			'thr-parent-id' => $uriId,
@@ -179,7 +179,7 @@ class Status extends BaseFactory
 			'origin'        => true,
 			'gravity'       => Item::GRAVITY_ACTIVITY,
 			'vid'           => Verb::getID(Activity::DISLIKE),
-			'deleted'       => false
+			'deleted'       => false,
 		]);
 		$origin_announce = $count_announce > 0 && (Post::exists([
 			'thr-parent-id' => $uriId,
@@ -187,23 +187,23 @@ class Status extends BaseFactory
 			'origin'        => true,
 			'gravity'       => Item::GRAVITY_ACTIVITY,
 			'vid'           => Verb::getID(Activity::ANNOUNCE),
-			'deleted'       => false
+			'deleted'       => false,
 		]) || Post::exists([
 			'quote-uri-id' => $uriId,
 			'uid'          => $uid,
 			'origin'       => true,
 			'body'         => '',
-			'deleted'      => false
+			'deleted'      => false,
 		]));
 		$userAttributes = new \Friendica\Object\Api\Mastodon\Status\UserAttributes(
 			$origin_like,
 			$origin_announce,
 			Post\ThreadUser::getIgnored($uriId, $uid),
 			$item['starred'] && $item['gravity'] == Item::GRAVITY_PARENT,
-			$item['featured']
+			$item['featured'],
 		);
 
-		$sensitive = (bool)$item['sensitive'];
+		$sensitive = (bool) $item['sensitive'];
 
 		$network  = ContactSelector::networkToName($item['network']);
 		$sitename = '';

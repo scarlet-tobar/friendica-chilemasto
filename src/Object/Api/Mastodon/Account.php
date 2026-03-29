@@ -86,13 +86,13 @@ class Account extends BaseDataTransferObject
 	 */
 	public function __construct(BaseURL $baseUrl, array $account, Fields $fields, ?Source $source)
 	{
-		$this->id       = (string)$account['pid'];
+		$this->id       = (string) $account['pid'];
 		$this->username = $account['nick'];
-		$this->acct     = strpos($account['url'], $baseUrl . '/') === 0 ?
-				$account['nick'] :
-				$account['addr'];
+		$this->acct     = strpos($account['url'], $baseUrl . '/') === 0
+				? $account['nick']
+				: $account['addr'];
 		$this->display_name = $account['name'];
-		$this->locked       = (bool)$account['manually-approve'];
+		$this->locked       = (bool) $account['manually-approve'];
 		$this->bot          = ($account['contact-type'] == Contact::TYPE_NEWS);
 		$this->discoverable = !$account['unsearchable'];
 		$this->indexable    = $this->discoverable;
