@@ -120,7 +120,31 @@ class Media
 		if (isset($id) && isset($exif)) {
 			MediaExif::insert($id, $media['uri-id'], $exif);
 		}
+
+		if (isset($id)) {
+			self::addLinks($media);
+		}
+
 		return $result;
+	}
+
+	/**
+	 * Add post-link entries for preview data
+	 *
+	 * @param array $media
+	 * @return void
+	 */
+	private static function addLinks(array $media)
+	{
+		if (isset($media['preview'])) {
+			Post\Link::getByLink($media['uri-id'], $media['preview']);
+		}
+		if (isset($media['author-image'])) {
+			Post\Link::getByLink($media['uri-id'], $media['author-image']);
+		}
+		if (isset($media['publisher-image'])) {
+			Post\Link::getByLink($media['uri-id'], $media['publisher-image']);
+		}
 	}
 
 	/**
