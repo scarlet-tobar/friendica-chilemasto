@@ -50,6 +50,9 @@ class OAuth extends BaseSettings
 		parent::content($request);
 
 		$applications = $this->database->selectToArray('application-view', ['id', 'uid', 'name', 'website', 'scopes', 'created_at'], ['uid' => $this->session->getLocalUserId()]);
+		foreach ($applications as $key => $row) {
+			$applications[$key]['created_at'] = $this->l10n->fullDateTime($row['created_at']);
+		}
 
 		$tpl = Renderer::getMarkupTemplate('settings/oauth.tpl');
 		return Renderer::replaceMacros($tpl, [
