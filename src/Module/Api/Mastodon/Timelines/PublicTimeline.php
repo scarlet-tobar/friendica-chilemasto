@@ -99,6 +99,8 @@ class PublicTimeline extends BaseApi
 
 		if ($request['local']) {
 			$items = Post::selectLocalTimelineForUser($uid, ['uri-id'], $condition, $params);
+		} elseif ($request['exclude_replies']) {
+			$items = Post::selectTimelineThreadForUser($uid, ['uri-id'], $condition, $params);
 		} else {
 			$items = Post::selectTimelineForUser($uid, ['uri-id'], $condition, $params);
 		}

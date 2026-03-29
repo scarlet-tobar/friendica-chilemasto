@@ -89,6 +89,8 @@ class Statuses extends BaseApi
 			$items = DBA::select('collection-view', ['uri-id'], $condition, $params);
 		} elseif ($request['only_media']) {
 			$items = DBA::select('media-view', ['uri-id'], $condition, $params);
+		} elseif ($request['exclude_replies']) {
+			$items = Post::selectTimelineThreadForUser($uid, ['uri-id'], $condition, $params);
 		} else {
 			$items = Post::selectTimelineForUser($uid, ['uri-id'], $condition, $params);
 		}

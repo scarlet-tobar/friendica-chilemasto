@@ -520,6 +520,21 @@ class Post
 		return self::selectViewForUser('post-timeline-view', $uid, $selected, $condition, $params);
 	}
 
+	/**
+	 * Select rows from the post-timeline-thread-view view for a given user
+	 * This function is used for API calls.
+	 *
+	 * @param integer $uid
+	 * @param array $selected
+	 * @param array $condition
+	 * @param array $params
+	 * @return void
+	 */
+	public static function selectTimelineThreadForUser(int $uid, array $selected = [], array $condition = [], array $params = [])
+	{
+		return self::selectViewForUser('post-timeline-thread-view', $uid, $selected, $condition, $params);
+	}
+
 	public static function selectLocalTimelineForUser(int $uid, array $selected = [], array $condition = [], array $params = [])
 	{
 		return self::selectViewForUser('post-timeline-origin-view', $uid, $selected, $condition, $params);

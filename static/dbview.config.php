@@ -268,6 +268,52 @@ return [
 			STRAIGHT_JOIN `contact` AS `owner` ON `owner`.`id` = `post-user`.`owner-id`
 			LEFT JOIN `contact` AS `causer` ON `causer`.`id` = `post-user`.`causer-id`"
 	],
+	"post-timeline-thread-view" => [
+		"fields" => [
+			"uid" => ["post-thread-user", "uid"],
+			"uri-id" => ["post-thread-user", "uri-id"],
+			"gravity" => "0",
+			"created" => ["post-thread-user", "created"],
+			"edited" => ["post-user", "edited"],
+			"commented" => ["post-thread-user", "commented"],
+			"received" => ["post-thread-user", "received"],
+			"changed" => ["post-thread-user", "changed"],
+			"private" => ["post-user", "private"],
+			"visible" => ["post-user", "visible"],
+			"deleted" => ["post-user", "deleted"],
+			"origin" => ["post-thread-user", "origin"],
+			"global" => ["post-user", "global"],
+			"network" => ["post-thread-user", "network"],
+			"protocol" => ["post-user", "protocol"],
+			"vid" => ["post-user", "vid"],
+			"contact-id" => ["post-thread-user", "contact-id"],
+			"contact-blocked" => ["contact", "blocked"],
+			"contact-readonly" => ["contact", "readonly"],
+			"contact-pending" => ["contact", "pending"],
+			"contact-rel" => ["contact", "rel"],
+			"contact-uid" => ["contact", "uid"],
+			"self" => ["contact", "self"],
+			"author-id" => ["post-thread-user", "author-id"],
+			"author-blocked" => ["author", "blocked"],
+			"author-hidden" => ["author", "hidden"],
+			"author-gsid" => ["author", "gsid"],
+			"owner-id" => ["post-thread-user", "owner-id"],
+			"owner-blocked" => ["owner", "blocked"],
+			"owner-gsid" => ["owner", "gsid"],
+			"causer-id" => ["post-thread-user", "causer-id"],
+			"causer-blocked" => ["causer", "blocked"],
+			"causer-gsid" => ["causer", "gsid"],
+			"parent-network" => ["post-thread-user", "network"],
+			"parent-owner-id" => ["post-thread-user", "owner-id"],
+			"parent-author-id" => ["post-thread-user", "author-id"],
+		],
+		"query" => "FROM `post-thread-user`
+			INNER JOIN `post-user` ON `post-user`.`uri-id` = `post-thread-user`.`uri-id` AND `post-user`.`uid` = `post-thread-user`.`uid`
+			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-thread-user`.`contact-id`
+			STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = `post-thread-user`.`author-id`
+			STRAIGHT_JOIN `contact` AS `owner` ON `owner`.`id` = `post-thread-user`.`owner-id`
+			LEFT JOIN `contact` AS `causer` ON `causer`.`id` = `post-thread-user`.`causer-id`"
+	],
 	"post-searchindex-user-view" => [
 		"fields" => [
 			"uid" => ["post-thread-user", "uid"],
