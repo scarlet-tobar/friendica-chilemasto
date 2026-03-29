@@ -1648,6 +1648,14 @@ class GServer
 		return $serverdata;
 	}
 
+	/**
+	 * Fetch server information from an AT Protocol PDS
+	 *
+	 * @param string $url        URL of the given server
+	 * @param array  $serverdata array with server data
+	 *
+	 * @return array server data
+	 */
 	private static function detectATProto(string $url, array $serverdata): array
 	{
 		$data = DI::atProtocol()->get($url . '/xrpc/com.atproto.server.describeServer');
@@ -1657,13 +1665,48 @@ class GServer
 
 		$serverdata['detection-method'] = self::DETECT_ATPROTO_PDS;
 		$serverdata['network']          = Protocol::ATPROTO;
-		$serverdata['platform']         = 'atproto';
+		$serverdata['version']          = $data->version ?? '';
 
 		if (isset($data->inviteCodeRequired)) {
 			$serverdata['register_policy'] = Register::APPROVE;
 		}
 
+		$data = DI::atProtocol()->get($url . '/xrpc/_health');
+		if (isset($data->version)) {
+			$serverdata['version'] = $data->version;
+		}
+
+		$versionparts = explode(' ', $serverdata['version']);
+		if (count($versionparts) === 2) {
+			$serverdata['platform'] = $versionparts[0];
+			$serverdata['version']  = $versionparts[1];
+		} else {
+			$serverdata['platform'] = self::getAtProtoProvider($url);
+		}
+
 		return $serverdata;
+	}
+
+	/**
+	 * Get the provider name for a given AT Protocol PDS url
+	 *
+	 * @param string $pds URL of the given server
+	 *
+	 * @return string provider name
+	 */
+	private static function getAtProtoProvider(string $pds): string
+	{
+		$host = parse_url($pds, PHP_URL_HOST);
+		if (str_ends_with($host, '.host.bsky.network')) {
+			return 'bluesky';
+		} elseif ($host === 'fed.brid.gy') {
+			return 'bridgy-fed';
+		} elseif ($host === 'eurosky.social') {
+			return 'eurosky';
+		} elseif ($host === 'blacksky.app') {
+			return 'blacksky';
+		}
+		return 'atprotocol';
 	}
 
 	/**
