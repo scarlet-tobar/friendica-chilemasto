@@ -1648,24 +1648,6 @@ class GServer
 		return $serverdata;
 	}
 
-	private static function detectATProto(string $url, array $serverdata): array
-	{
-		$data = DI::atProtocol()->get($url . '/xrpc/com.atproto.server.describeServer');
-		if (!isset($data->did)) {
-			return $serverdata;
-		}
-
-		$serverdata['detection-method'] = self::DETECT_ATPROTO_PDS;
-		$serverdata['network']          = Protocol::ATPROTO;
-		$serverdata['platform']         = 'atproto';
-
-		if (isset($data->inviteCodeRequired)) {
-			$serverdata['register_policy'] = Register::APPROVE;
-		}
-
-		return $serverdata;
-	}
-
 	/**
 	 * Fetch server information from an AT Protocol PDS
 	 *
@@ -1682,7 +1664,7 @@ class GServer
 		}
 
 		$serverdata['detection-method'] = self::DETECT_ATPROTO_PDS;
-		$serverdata['network']          = Protocol::BLUESKY;
+		$serverdata['network']          = Protocol::ATPROTO;
 		$serverdata['version']          = $data->version ?? '';
 
 		if (isset($data->inviteCodeRequired)) {
@@ -1695,7 +1677,7 @@ class GServer
 		}
 
 		$versionparts = explode(' ', $serverdata['version']);
-		if (count($versionparts) == 2) {
+		if (count($versionparts) === 2) {
 			$serverdata['platform'] = $versionparts[0];
 			$serverdata['version']  = $versionparts[1];
 		} else {
