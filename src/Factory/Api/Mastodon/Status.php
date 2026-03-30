@@ -89,12 +89,13 @@ class Status extends BaseFactory
 	 * @param int  $uid             Item user
 	 * @param bool $reblog          Check for reblogged post
 	 * @param bool $in_reply_status Add an "in_reply_status" element
+	 * @param int  $level           Recursion level for quotes
 	 *
 	 * @return \Friendica\Object\Api\Mastodon\Status
 	 * @throws InternalServerErrorException
 	 * @throws ImagickException|NotFoundException
 	 */
-	public function createFromUriId(int $uriId, int $uid = 0, bool $reblog = true, bool $in_reply_status = true): \Friendica\Object\Api\Mastodon\Status
+	public function createFromUriId(int $uriId, int $uid = 0, bool $reblog = true, bool $in_reply_status = true, int $level = 0): \Friendica\Object\Api\Mastodon\Status
 	{
 		$fields = ['uri-id', 'uid', 'author-id', 'causer-id', 'author-uri-id', 'author-link', 'author-gsid', 'causer-uri-id', 'post-reason', 'starred', 'app', 'title', 'body', 'raw-body', 'content-warning', 'question-id',
 			'created', 'edited', 'commented', 'received', 'changed', 'network', 'thr-parent-id', 'parent-author-id', 'language', 'uri', 'plink', 'private', 'vid', 'gravity', 'featured', 'has-media', 'quote-uri-id',
@@ -260,7 +261,7 @@ class Status extends BaseFactory
 			$poll = null;
 		}
 
-		$quote = self::createQuote($item, $uid);
+		$quote = self::createQuote($item, $uid, $level);
 
 		$item['body'] = BBCode::removeSharedData($item['body']);
 
@@ -316,11 +317,15 @@ class Status extends BaseFactory
 	 * Create a quote status object
 	 *
 	 * @param array $item
-	 * @param integer $uid
+	 * @param int   $uid
+	 * @param int   $level
 	 * @return array
 	 */
-	private function createQuote(array $item, int $uid): array
+	private function createQuote(array $item, int $uid, int $level): array
 	{
+		if ($level > 2) {
+			return [];
+		}
 		if (empty($item['quote-uri-id'])) {
 			$media = Post\Media::getByURIId($item['uri-id'], [Post\Media::ACTIVITY]);
 			if (!empty($media)) {
@@ -337,7 +342,7 @@ class Status extends BaseFactory
 
 		if (!empty($quote_id) && ($quote_id != $item['uri-id'])) {
 			try {
-				$quoted_status = $this->createFromUriId($quote_id, $uid, false, false)->toArray();
+				$quoted_status = $this->createFromUriId($quote_id, $uid, false, false, ++$level)->toArray();
 				$quote         = [
 					'state'         => 'accepted',
 					'quoted_status' => $quoted_status,
