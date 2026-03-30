@@ -1160,7 +1160,7 @@ class BBCode
 	public static function setMentionsToNicknames(string $body): string
 	{
 		DI::profiler()->startRecording('rendering');
-		$regexp = "/([@!])\[url\=([^\[\]]*)\].*?\[\/url\]/ism";
+		$regexp = "/([@!])\[url\=([^\[\]]*)\](.*?)\[\/url\]/ism";
 		$body   = preg_replace_callback($regexp, [self::class, 'mentionCallback'], $body);
 		DI::profiler()->stopRecording();
 		return $body;
@@ -1179,12 +1179,21 @@ class BBCode
 			return '';
 		}
 
-		$data = Contact::getByURL($match[2], false, ['url', 'nick']);
+		$data = Contact::getByURL($match[2], false, ['url', 'alias', 'nick', 'network']);
+		if (empty($data['nick']) && str_starts_with($match[2], 'did:plc:')) {
+			$data = [
+				'url'     => $match[2],
+				'alias'   => $match[2],
+				'nick'    => $match[3],
+				'network' => Protocol::ATPROTO,
+			];
+		}
+
 		if (empty($data['nick'])) {
 			return $match[0];
 		}
 
-		return $match[1] . '[url=' . $data['url'] . ']' . $data['nick'] . '[/url]';
+		return $match[1] . '[url=' . Contact::getProfileLink($data) . ']' . $data['nick'] . '[/url]';
 	}
 
 	/**
