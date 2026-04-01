@@ -3454,10 +3454,9 @@ class Item
 	{
 		DI::profiler()->startRecording('rendering');
 		// Don't show a preview when there is a visual attachment (audio or video)
-		$types      = $attachments['visual']->column('type');
-		$preview    = !in_array(PostMedia::TYPE_IMAGE, $types) && !in_array(PostMedia::TYPE_VIDEO, $types);
-		$has_media  = in_array($item['post-type'] ?? null, [Item::PT_AUDIO, Item::PT_VIDEO]);
-		$is_article = false;
+		$types     = $attachments['visual']->column('type');
+		$preview   = !in_array(PostMedia::TYPE_IMAGE, $types) && !in_array(PostMedia::TYPE_VIDEO, $types);
+		$has_media = in_array($item['post-type'] ?? null, [Item::PT_AUDIO, Item::PT_VIDEO]);
 
 		/** @var ?PostMedia $attachment */
 		$attachment = null;
@@ -3479,99 +3478,35 @@ class Item
 			}
 		}
 
-		if (!empty($attachment)) {
-			$data = [
-				'after'         => '',
-				'author_name'   => $attachment->authorName ?? '',
-				'author_url'    => (string) ($attachment->authorUrl ?? ''),
-				'description'   => $attachment->description ?? '',
-				'image'         => '',
-				'preview'       => '',
-				'provider_name' => $attachment->publisherName ?? '',
-				'provider_url'  => (string) ($attachment->publisherUrl ?? ''),
-				'text'          => '',
-				'title'         => $attachment->name ?? '',
-				'type'          => 'link',
-				'url'           => (string) $attachment->url,
-				'player_url'    => (string) $attachment->playerUrl,
-				'player_width'  => $attachment->playerWidth,
-				'player_height' => $attachment->playerHeight,
-				'embed_type'    => $attachment->embedType,
-				'embed_html'    => $attachment->embedHtml,
-				'embed_width'   => $attachment->embedWidth,
-				'embed_height'  => $attachment->embedHeight,
-				'page_type'     => $attachment->pageType,
-			];
-			$is_article = $attachment->isArticle();
-
-			if ($preview && $attachment->preview) {
-				if ($attachment->previewWidth >= 500) {
-					$data['image'] = DI::baseUrl() . $attachment->getPreviewPath(Proxy::SIZE_MEDIUM);
-				} else {
-					$data['preview'] = DI::baseUrl() . $attachment->getPreviewPath(Proxy::SIZE_MEDIUM);
-				}
-			}
-
-			if (!empty($data['description']) && !empty($content)) {
-				similar_text($data['description'], $content, $percent);
-			} else {
-				$percent = 0;
-			}
-
-			if (!empty($data['description']) && (($data['title'] == $data['description']) || ($percent > 95) || (strpos($content, $data['description']) !== false))) {
-				$data['description'] = '';
-			}
-
-			if (($data['author_name'] ?? '') == ($data['provider_name'] ?? '')) {
-				$data['author_name'] = '';
-			}
-
-			if (($data['author_url'] ?? '') == ($data['provider_url'] ?? '')) {
-				$data['author_url'] = '';
-			}
-		} elseif (preg_match("/.*(\[attachment.*?\].*?\[\/attachment\]).*/ism", $body, $match)) {
-			$data = BBCode::getAttachmentData($match[1]);
+		if (!isset($attachment) && preg_match("/.*(\[attachment.*?\].*?\[\/attachment\]).*/ism", $body, $match)) {
+			$attachment = DI::postMediaFactory()->createFromAttachment(BBCode::getAttachmentData($match[1]), $uriid);
 		}
 
 		DI::profiler()->stopRecording();
 
-		if (isset($data['url']) && !in_array(strtolower($data['url']), $ignore_links)) {
-			if (!empty($data['description']) || !empty($data['image']) || !empty($data['preview']) || (!empty($data['title']) && !Strings::compareLink($data['title'], $data['url']))) {
-				$parts = parse_url($data['url']);
-				if (!empty($parts['scheme']) && !empty($parts['host'])) {
-					if (empty($data['provider_name'])) {
-						$data['provider_name'] = $parts['host'];
-					}
-					if (empty($data['provider_url']) || empty(parse_url($data['provider_url'], PHP_URL_SCHEME))) {
-						$data['provider_url'] = $parts['scheme'] . '://' . $parts['host'];
-
-						if (!empty($parts['port'])) {
-							$data['provider_url'] .= ':' . $parts['port'];
-						}
-					}
-				}
-
+		if (isset($attachment) && isset($attachment->url) && !in_array(strtolower($attachment->url), $ignore_links)) {
+			if (isset($attachment->description) || isset($attachment->preview) || (isset($attachment->name) && !Strings::compareLink($attachment->name, $attachment->url))) {
 				// @todo Use a template
 				$preview_mode = DI::pConfig()->get($uid, 'system', 'preview_mode', BBCode::PREVIEW_AUTO);
-				if ($uid == 0) {
+				if ($uid == 0 || !$preview) {
 					$preview_mode = BBCode::PREVIEW_NO_IMAGE;
 				} elseif ($preview_mode == BBCode::PREVIEW_AUTO) {
-					$preview_mode = $is_article ? BBCode::PREVIEW_SMALL : BBCode::PREVIEW_LARGE;
+					$preview_mode = $attachment->isArticle() ? BBCode::PREVIEW_SMALL : BBCode::PREVIEW_LARGE;
 				}
-				if (!$has_media && $preview_mode != BBCode::PREVIEW_NONE && !self::containsEmbed($body, $data['url'])) {
-					$rendered = BBCode::convertAttachment('', BBCode::INTERNAL, $data, $uriid, $preview_mode, DI::pConfig()->get($uid, 'system', 'embed_remote_media', false));
-				} elseif (!self::containsLink($content, $data['url'], Post\Media::HTML)) {
+				if (!$has_media && $preview_mode != BBCode::PREVIEW_NONE && !self::containsEmbed($body, $attachment->url)) {
+					$rendered = BBCode::convertAttachmentFromPostMedia($attachment, BBCode::INTERNAL, $uriid, $preview_mode, DI::pConfig()->get($uid, 'system', 'embed_remote_media', false), self::hideDescription($attachment, $content));
+				} elseif (!self::containsLink($content, $attachment->url, Post\Media::HTML)) {
 					$rendered = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/link.tpl'), [
-						'$url'   => $data['url'],
-						'$title' => $data['title'],
+						'$url'   => $attachment->url,
+						'$title' => $attachment->name,
 					]);
 				} else {
 					$rendered = '';
 				}
-			} elseif (!self::containsLink($content, $data['url'], Post\Media::HTML)) {
+			} elseif (!self::containsLink($content, $attachment->url, Post\Media::HTML)) {
 				$rendered = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/link.tpl'), [
-					'$url'   => $data['url'],
-					'$title' => $data['title'],
+					'$url'   => $attachment->url,
+					'$title' => $attachment->name,
 				]);
 			} else {
 				return $content;
@@ -3584,6 +3519,24 @@ class Item
 			}
 		}
 		return $content;
+	}
+
+	/**
+	 * hide the description of the media if it is very similar to the content to avoid duplicate information.
+	 *
+	 * @param PostMedia $media
+	 * @param string $content
+	 * @return boolean
+	 */
+	private static function hideDescription(PostMedia $media, string $content): bool
+	{
+		if (!empty($media->description) && !empty($content)) {
+			similar_text($media->description, $content, $percent);
+		} else {
+			$percent = 0;
+		}
+
+		return (!empty($media->description) && (($media->name == $media->description) || ($percent > 95) || (strpos($content, $media->description) !== false)));
 	}
 
 	/**

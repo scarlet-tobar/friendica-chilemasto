@@ -320,7 +320,7 @@ class PostMedia extends BaseRepository
 				if ($is_torrent) {
 					// We stored older Peertube videos not as HLS, but with many different resolutions.
 					// We pick a moderate one. We detect Peertube via their also existing Torrent link.
-					$heights[$PostMedia->height]     = (string)$PostMedia->url;
+					$heights[$PostMedia->height]     = (string) $PostMedia->url;
 					$video[(string) $PostMedia->url] = $PostMedia;
 				} else {
 					$attachments['visual'][] = $PostMedia;
@@ -392,6 +392,48 @@ class PostMedia extends BaseRepository
 	{
 		$data = $this->getFields($postMedia, true);
 		$data = Post\Media::fetchAdditionalData($data);
+		return $this->factory->createFromTableRow($data);
+	}
+
+	/**
+	 * Sanitize media data and return an updated entity.
+	 *
+	 * @param PostMediaEntity $postMedia Media entity to sanitize
+	 * @return PostMediaEntity Sanitized media entity
+	 */
+	public function sanitizeData(PostMediaEntity $postMedia): PostMediaEntity
+	{
+		$data = $this->getFields($postMedia, true);
+
+		if ($data['author-name'] === $data['publisher-name']) {
+			$data['author-name'] = '';
+		}
+
+		if ($data['author-url'] === $data['publisher-url']) {
+			$data['author-url'] = '';
+		}
+
+		$parts = parse_url($data['url']);
+		if (!empty($parts['scheme']) && !empty($parts['host'])) {
+			if (empty($data['publisher-name'])) {
+				$data['publisher-name'] = $parts['host'];
+			}
+			if (empty($data['publisher-url']) || empty(parse_url($data['publisher-url'], PHP_URL_SCHEME))) {
+				$data['publisher-url'] = $parts['scheme'] . '://' . $parts['host'];
+
+				if (!empty($parts['port'])) {
+					$data['publisher-url'] .= ':' . $parts['port'];
+				}
+			}
+		}
+
+		if (isset($data['name'])) {
+			$data['name'] = strip_tags($data['name']);
+		} else {
+			$data['name'] = $data['url'];
+		}
+		$data['name'] = str_replace(['http://', 'https://'], '', $data['name']);
+
 		return $this->factory->createFromTableRow($data);
 	}
 
@@ -513,10 +555,10 @@ class PostMedia extends BaseRepository
 			$media = Renderer::replaceMacros(Renderer::getMarkupTemplate($template), [
 				'$video' => [
 					'id'          => $postMedia->id,
-					'src'         => (string)$postMedia->url,
+					'src'         => (string) $postMedia->url,
 					'name'        => $postMedia->name ?: $postMedia->url,
 					'preview'     => $preview_url,
-					'mime'        => (string)$postMedia->mimetype,
+					'mime'        => (string) $postMedia->mimetype,
 					'height'      => 'auto',
 					'width'       => '100%',
 					'style'       => 'aspect-ratio:' . $postMedia->width . '/' . $postMedia->height . ';',
@@ -625,9 +667,9 @@ class PostMedia extends BaseRepository
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('content/audio.tpl'), [
 			'$audio' => [
 				'id'   => $postMedia->id,
-				'src'  => (string)$postMedia->url,
+				'src'  => (string) $postMedia->url,
 				'name' => $postMedia->name ?: $postMedia->url,
-				'mime' => (string)$postMedia->mimetype,
+				'mime' => (string) $postMedia->mimetype,
 			],
 		]);
 	}
