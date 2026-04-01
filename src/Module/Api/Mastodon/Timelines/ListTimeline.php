@@ -142,10 +142,6 @@ class ListTimeline extends BaseApi
 			]);
 		}
 
-		if ($request['exclude_replies']) {
-			$condition = DBA::mergeConditions($condition, ['gravity' => Item::GRAVITY_PARENT]);
-		}
-
 		if ($request['local']) {
 			$condition = DBA::mergeConditions($condition, ["`uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE `origin`)"]);
 		}
@@ -154,7 +150,12 @@ class ListTimeline extends BaseApi
 			$condition = DBA::mergeConditions($condition, ["NOT `uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE `origin` AND `post-user`.`uri-id` = `post-user-view`.`uri-id`)"]);
 		}
 
-		$items = Post::selectTimelineForUser($uid, ['uri-id'], $condition, $params);
+		if ($request['exclude_replies']) {
+			$items = Post::selectTimelineThreadForUser($uid, ['uri-id'], $condition, $params);
+		} else {
+			$items = Post::selectTimelineForUser($uid, ['uri-id'], $condition, $params);
+		}
+
 		return Post::toArray($items);
 	}
 }

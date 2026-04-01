@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2026.04-dev (Blutwurz)
--- DB_UPDATE_VERSION 1590
+-- DB_UPDATE_VERSION 1591
 -- ------------------------------------------
 
 
@@ -2374,6 +2374,54 @@ CREATE VIEW `post-timeline-origin-view` AS SELECT
 			STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = `post-user`.`author-id`
 			STRAIGHT_JOIN `contact` AS `owner` ON `owner`.`id` = `post-user`.`owner-id`
 			LEFT JOIN `contact` AS `causer` ON `causer`.`id` = `post-user`.`causer-id`;
+
+--
+-- VIEW post-timeline-thread-view
+--
+DROP VIEW IF EXISTS `post-timeline-thread-view`;
+CREATE VIEW `post-timeline-thread-view` AS SELECT 
+	`post-thread-user`.`uid` AS `uid`,
+	`post-thread-user`.`uri-id` AS `uri-id`,
+	0 AS `gravity`,
+	`post-thread-user`.`created` AS `created`,
+	`post-user`.`edited` AS `edited`,
+	`post-thread-user`.`commented` AS `commented`,
+	`post-thread-user`.`received` AS `received`,
+	`post-thread-user`.`changed` AS `changed`,
+	`post-user`.`private` AS `private`,
+	`post-user`.`visible` AS `visible`,
+	`post-user`.`deleted` AS `deleted`,
+	`post-thread-user`.`origin` AS `origin`,
+	`post-user`.`global` AS `global`,
+	`post-thread-user`.`network` AS `network`,
+	`post-user`.`protocol` AS `protocol`,
+	`post-user`.`vid` AS `vid`,
+	`post-thread-user`.`contact-id` AS `contact-id`,
+	`contact`.`blocked` AS `contact-blocked`,
+	`contact`.`readonly` AS `contact-readonly`,
+	`contact`.`pending` AS `contact-pending`,
+	`contact`.`rel` AS `contact-rel`,
+	`contact`.`uid` AS `contact-uid`,
+	`contact`.`self` AS `self`,
+	`post-thread-user`.`author-id` AS `author-id`,
+	`author`.`blocked` AS `author-blocked`,
+	`author`.`hidden` AS `author-hidden`,
+	`author`.`gsid` AS `author-gsid`,
+	`post-thread-user`.`owner-id` AS `owner-id`,
+	`owner`.`blocked` AS `owner-blocked`,
+	`owner`.`gsid` AS `owner-gsid`,
+	`post-thread-user`.`causer-id` AS `causer-id`,
+	`causer`.`blocked` AS `causer-blocked`,
+	`causer`.`gsid` AS `causer-gsid`,
+	`post-thread-user`.`network` AS `parent-network`,
+	`post-thread-user`.`owner-id` AS `parent-owner-id`,
+	`post-thread-user`.`author-id` AS `parent-author-id`
+	FROM `post-thread-user`
+			INNER JOIN `post-user` ON `post-user`.`uri-id` = `post-thread-user`.`uri-id` AND `post-user`.`uid` = `post-thread-user`.`uid`
+			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-thread-user`.`contact-id`
+			STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = `post-thread-user`.`author-id`
+			STRAIGHT_JOIN `contact` AS `owner` ON `owner`.`id` = `post-thread-user`.`owner-id`
+			LEFT JOIN `contact` AS `causer` ON `causer`.`id` = `post-thread-user`.`causer-id`;
 
 --
 -- VIEW post-searchindex-user-view

@@ -60,7 +60,7 @@ class Statuses extends BaseApi
 		} elseif (!$uid) {
 			$condition = [
 				'author-id' => $id, 'private' => [Item::PUBLIC, Item::UNLISTED],
-				'uid'       => 0, 'network' => Protocol::FEDERATED
+				'uid'       => 0, 'network' => Protocol::FEDERATED,
 			];
 		} else {
 			$condition = ["`author-id` = ? AND (`uid` = 0 OR (`uid` = ? AND NOT `global`))", $id, $uid];
@@ -73,12 +73,12 @@ class Statuses extends BaseApi
 			if ($request['exclude_replies']) {
 				$condition = DBA::mergeConditions($condition, [
 					"(`gravity` = ? OR (`gravity` = ? AND `vid` = ? AND `protocol` != ?))",
-					Item::GRAVITY_PARENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Conversation::PARCEL_DIASPORA
+					Item::GRAVITY_PARENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Conversation::PARCEL_DIASPORA,
 				]);
 			} else {
 				$condition = DBA::mergeConditions($condition, [
 					"(`gravity` IN (?, ?) OR (`gravity` = ? AND `vid` = ? AND `protocol` != ?))",
-					Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Conversation::PARCEL_DIASPORA
+					Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Conversation::PARCEL_DIASPORA,
 				]);
 			}
 		} elseif ($request['exclude_replies']) {
@@ -89,6 +89,8 @@ class Statuses extends BaseApi
 			$items = DBA::select('collection-view', ['uri-id'], $condition, $params);
 		} elseif ($request['only_media']) {
 			$items = DBA::select('media-view', ['uri-id'], $condition, $params);
+		} elseif ($request['exclude_replies']) {
+			$items = Post::selectTimelineThreadForUser($uid, ['uri-id'], $condition, $params);
 		} else {
 			$items = Post::selectTimelineForUser($uid, ['uri-id'], $condition, $params);
 		}
