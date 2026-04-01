@@ -167,6 +167,8 @@ class ContactSelector
 			$networkname .= ' (DFRN)';
 		} elseif (in_array($network, ['', $protocol]) && ($network == Protocol::DIASPORA) && ($platform !== 'diaspora')) {
 			$networkname .= ' (Diaspora)';
+		} elseif ($network === Protocol::ATPROTO && isset($gserver['url'])) {
+			$networkname = DI::l10n()->t('%s (via %s)', $networkname, parse_url($gserver['url'], PHP_URL_HOST));
 		}
 
 		return $networkname;
