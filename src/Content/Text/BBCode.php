@@ -1984,12 +1984,12 @@ class BBCode
 		} elseif ($simple_html == self::MASTODON_API) {
 			$text = preg_replace(
 				"/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
-				'<a class="u-url mention status-link" href="$2" rel="nofollow noopener noreferrer" target="_blank" title="$3">$1<span>$3</span></a>',
+				'<span class="h-card"><a href="$2" class="u-url mention">$1<span>$3</span></a></span>',
 				$text,
 			);
 			$text = preg_replace(
 				"/([#])\[url\=(.*?)\](.*?)\[\/url\]/ism",
-				'<a class="mention hashtag status-link" href="$2" rel="tag">$1<span>$3</span></a>',
+				'<a href="$2" class="mention hashtag" rel="nofollow noopener" target="_blank">$1<span>$3</span></a>',
 				$text,
 			);
 		} else {
