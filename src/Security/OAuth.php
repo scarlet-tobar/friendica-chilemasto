@@ -46,7 +46,7 @@ class OAuth
 			}
 		}
 
-		return (int)self::$current_user_id;
+		return (int) self::$current_user_id;
 	}
 
 	/**
@@ -173,8 +173,16 @@ class OAuth
 	 */
 	public static function createTokenForUser(array $application, int $uid, string $scope)
 	{
-		$code         = bin2hex(random_bytes(32));
-		$access_token = bin2hex(random_bytes(32));
+		$token = DBA::selectFirst('application-token', [], ['application-id' => $application['id'], 'uid' => $uid]);
+		if ($token) {
+			DI::logger()->info('Found existing user token.', ['application' => $application, 'uid' => $uid]);
+			$code         = $token['code'];
+			$access_token = $token['access_token'];
+		} else {
+			DI::logger()->info('Create new user token.', ['application' => $application, 'uid' => $uid]);
+			$code         = bin2hex(random_bytes(32));
+			$access_token = bin2hex(random_bytes(32));
+		}
 
 		$fields = [
 			'application-id' => $application['id'],
@@ -186,7 +194,7 @@ class OAuth
 			'write'          => (stripos($scope, BaseApi::SCOPE_WRITE) !== false),
 			'follow'         => (stripos($scope, BaseApi::SCOPE_FOLLOW) !== false),
 			'push'           => (stripos($scope, BaseApi::SCOPE_PUSH) !== false),
-			'created_at'     => DateTimeFormat::utcNow()
+			'created_at'     => DateTimeFormat::utcNow(),
 		];
 
 		foreach ([BaseApi::SCOPE_READ, BaseApi::SCOPE_WRITE, BaseApi::SCOPE_FOLLOW, BaseApi::SCOPE_PUSH] as $scope) {
