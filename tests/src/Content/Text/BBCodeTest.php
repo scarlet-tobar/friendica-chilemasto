@@ -825,4 +825,29 @@ Lucas: For the right price, yes.[/share]',
 
 		self::assertEquals($expected, $actual);
 	}
+
+	public function datasetMentionsToNicknames(): array
+	{
+		return [
+			'issue-15623' => [
+				'expected' => 'Whom to believe? @[url=https://bsky.app/profile/did:plc:eclio37ymobqex2ncko63h4s]nytimes.com[/url]',
+				'text'     => 'Whom to believe? @[url=did:plc:eclio37ymobqex2ncko63h4s]nytimes.com[/url]',
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider datasetMentionsToNicknames
+	 *
+	 * @param string $expected Expected BBCode output
+	 * @param string $text     Input text
+	 */
+	public function testsetMentionsToNicknames(string $expected, string $text)
+	{
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
+
+		$actual = BBCode::setMentionsToNicknames($text);
+
+		self::assertEquals($expected, $actual);
+	}
 }
