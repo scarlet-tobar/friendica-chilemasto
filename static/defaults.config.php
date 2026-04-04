@@ -796,6 +796,17 @@ return [
 		// appview_api (URL)
 		// Path to the public Bluesky AppView API.
 		'appview_api' => 'https://public.api.bsky.app',
+		// frontends (Array)
+		// Array of various web frontends for the AT Protocol
+		'frontends' => [
+			'https://akari.blue'         => ['akari', 'https://akari.blue/profile/{did}', 'https://akari.blue/profile/{did}/post/{rkey}'],
+			'https://atsky.app'          => ['Atsky', 'https://atsky.app/profile/{did}', 'https://atsky.app/profile/{did}/post/{rkey}'],
+			'https://bsky.app'           => ['Bluesky', 'https://bsky.app/profile/{did}', 'https://bsky.app/profile/{did}/post/{rkey}'],
+			'https://blacksky.community' => ['Blacksky', 'https://blacksky.community/profile/{did}', 'https://blacksky.community/profile/{did}/post/{rkey}'],
+			'https://deer.social'        => ['Deer', 'https://deer.social/profile/{did}', 'https://deer.social/profile/{did}/post/{rkey}'],
+			'https://reddwarf.app'       => ['Red Dwarf', 'https://reddwarf.app/profile/{did}', 'https://reddwarf.app/profile/{did}/post/{rkey}'],
+			'https://klearsky.pages.dev' => ['Klearsky', 'https://klearsky.pages.dev/?ref=blueskydirectory#/profile/feeds?account={did}', 'https://klearsky.pages.dev/#/post?uri=at://{did}/{collection}/{rkey}'],
+		],
 		// jetstream (URL)
 		// Path to the jetstream service. Available servers are:
 		// jetstream1.us-east.bsky.network, jetstream2.us-east.bsky.network, jetstream1.us-west.bsky.network, jetstream2.us-west.bsky.network

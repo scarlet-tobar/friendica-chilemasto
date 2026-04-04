@@ -97,7 +97,7 @@ class Status extends BaseFactory
 	 */
 	public function createFromUriId(int $uriId, int $uid = 0, bool $reblog = true, bool $in_reply_status = true, int $level = 0): \Friendica\Object\Api\Mastodon\Status
 	{
-		$fields = ['uri-id', 'uid', 'author-id', 'causer-id', 'author-uri-id', 'author-link', 'author-gsid', 'causer-uri-id', 'post-reason', 'starred', 'app', 'title', 'body', 'raw-body', 'content-warning', 'question-id',
+		$fields = ['uri-id', 'uid', 'guid', 'author-id', 'causer-id', 'author-uri-id', 'author-link', 'author-gsid', 'author-network', 'author-alias', 'causer-uri-id', 'post-reason', 'starred', 'app', 'title', 'body', 'raw-body', 'content-warning', 'question-id',
 			'created', 'edited', 'commented', 'received', 'changed', 'network', 'thr-parent-id', 'parent-author-id', 'language', 'uri', 'plink', 'private', 'vid', 'gravity', 'featured', 'has-media', 'quote-uri-id',
 			'delivery_queue_count', 'delivery_queue_done','delivery_queue_failed', 'allow_cid', 'deny_cid', 'allow_gid', 'deny_gid', 'sensitive', 'postopts'];
 		$item = Post::selectFirst($fields, ['uri-id' => $uriId, 'uid' => [0, $uid]], ['order' => ['uid' => true]]);
@@ -304,6 +304,11 @@ class Status extends BaseFactory
 			}
 		} else {
 			$in_reply = [];
+		}
+
+		$plink = Item::getPlink($item);
+		if ($plink) {
+			$item['plink'] = $plink['href'];
 		}
 
 		$delivery_data   = $uid != $item['uid'] ? null : new FriendicaDeliveryData($item['delivery_queue_count'], $item['delivery_queue_done'], $item['delivery_queue_failed']);
