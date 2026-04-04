@@ -7,6 +7,7 @@
 | [2fa_trusted_browser](help/spec/database/db-2fa_trusted_browser) | Two-factor authentication trusted browsers |
 | [account-suggestion](help/spec/database/db-account-suggestion) | Account suggestion |
 | [account-user](help/spec/database/db-account-user) | Remote and local accounts |
+| [activity](help/spec/database/db-activity) |  |
 | [apcontact](help/spec/database/db-apcontact) | ActivityPub compatible contacts - used in the ActivityPub implementation |
 | [application](help/spec/database/db-application) | OAuth application |
 | [application-marker](help/spec/database/db-application-marker) | Timeline marker |

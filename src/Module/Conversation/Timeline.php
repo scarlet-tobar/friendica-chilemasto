@@ -15,6 +15,7 @@ use Friendica\Content\Conversation\Collection\Timelines;
 use Friendica\Content\Conversation\Entity\Channel as ChannelEntity;
 use Friendica\Content\Conversation\Entity\Community;
 use Friendica\Content\Conversation\Entity\UserDefinedChannel as EntityUserDefinedChannel;
+use Friendica\Content\Conversation\Factory\Activity as ActivityFactory;
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -84,8 +85,9 @@ class Timeline extends BaseModule
 	protected $cache;
 	/** @var UserDefinedChannel */
 	protected $channelRepository;
+	protected ActivityFactory $activityFactory;
 
-	public function __construct(UserDefinedChannel $channel, Mode $mode, IHandleUserSessions $session, Database $database, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, ICanCache $cache, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server = [], array $parameters = [])
+	public function __construct(UserDefinedChannel $channel, Mode $mode, IHandleUserSessions $session, Database $database, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, ICanCache $cache, ActivityFactory $activityFactory, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server = [], array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -96,6 +98,7 @@ class Timeline extends BaseModule
 		$this->pConfig           = $pConfig;
 		$this->config            = $config;
 		$this->cache             = $cache;
+		$this->activityFactory   = $activityFactory;
 	}
 
 	/**
@@ -311,19 +314,21 @@ class Timeline extends BaseModule
 		$cache = $this->config->get('system', 'system_channel_cache');
 
 		if ($cache) {
-			$table     = 'system-channel-post-view';
-			$condition = ["`channel` = ? AND `uid` = ?", $this->selectedTab, $uid];
+			$table      = 'system-channel-post-view';
+			$condition  = ["`channel` = ? AND `uid` = ?", $this->selectedTab, $uid];
+			$activities = null;
 		} else {
-			$table     = 'post-engagement';
-			$condition = [];
+			$table      = 'post-engagement';
+			$condition  = [];
+			$activities = $this->activityFactory->getActivities($uid);
 		}
 
 		if ($this->selectedTab == ChannelEntity::WHATSHOT) {
 			if (!$cache) {
 				if (!is_null($this->accountType)) {
-					$condition = ["(`comments` > ? OR `activities` > ? OR `views` > ?) AND `contact-type` = ?", $this->channelRepository->getMedianComments($uid, 4), $this->channelRepository->getMedianActivities($uid, 4), $this->channelRepository->getMedianViews($uid, 4), $this->accountType];
+					$condition = ["(`comments` > ? OR `activities` > ? OR `views` > ?) AND `contact-type` = ?", $activities->medianComments, $activities->medianActivities, $activities->medianViews, $this->accountType];
 				} else {
-					$condition = ["(`comments` > ? OR `activities` > ? OR `views` > ?) AND `contact-type` != ?", $this->channelRepository->getMedianComments($uid, 4), $this->channelRepository->getMedianActivities($uid, 4), $this->channelRepository->getMedianViews($uid, 4), Contact::TYPE_COMMUNITY];
+					$condition = ["(`comments` > ? OR `activities` > ? OR `views` > ?) AND `contact-type` != ?", $activities->medianComments, $activities->medianActivities, $activities->medianViews, Contact::TYPE_COMMUNITY];
 				}
 			}
 		} elseif ($this->selectedTab == ChannelEntity::FORYOU) {
@@ -334,7 +339,7 @@ class Timeline extends BaseModule
 					"(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `relation-thread-score` > ?) OR
 					((`comments` >= ? OR `activities` >= ? OR `views` >= ?) AND `owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?)) OR
 					(`owner-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`notify_new_posts` OR `channel-frequency` = ?))))",
-					$cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4), $this->channelRepository->getMedianComments($uid, 4), $this->channelRepository->getMedianActivities($uid, 4), $this->channelRepository->getMedianViews($uid, 4), $cid,
+					$cid, $activities->medianThreadScore, $activities->medianComments, $activities->medianActivities, $activities->medianViews, $cid,
 					$uid, Contact\User::FREQUENCY_ALWAYS,
 				];
 			}
@@ -349,8 +354,8 @@ class Timeline extends BaseModule
 					((`comments` >= ? OR `activities` >= ? OR `views` >= ?) AND
 					(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `cid` = ? AND `relation-thread-score` > ?)) OR
 					(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `relation-thread-score` > ?))))",
-					$cid, $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4), $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4),
-					$this->channelRepository->getMedianComments($uid, 4), $this->channelRepository->getMedianActivities($uid, 4), $this->channelRepository->getMedianViews($uid, 4), $cid, 0, $cid, 0,
+					$cid, $cid, $activities->medianThreadScore, $cid, $activities->medianThreadScore,
+					$activities->medianComments, $activities->medianActivities, $activities->medianViews, $cid, 0, $cid, 0,
 				];
 			}
 		} elseif ($this->selectedTab == ChannelEntity::FOLLOWERS) {
@@ -366,7 +371,7 @@ class Timeline extends BaseModule
 					"`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `last-interaction` > ?
 					AND `relation-cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ? AND `relation-thread-score` >= ?)
 					AND NOT `cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?))",
-					DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $cid, $this->channelRepository->getMedianRelationThreadScore($cid, 4), $cid,
+					DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $cid, $activities->medianThreadScore, $cid,
 				];
 			}
 		} elseif ($this->selectedTab == ChannelEntity::QUIETSHARERS) {
@@ -375,7 +380,7 @@ class Timeline extends BaseModule
 
 				$condition = [
 					"`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ? AND `post-score` <= ?)",
-					$cid, $this->channelRepository->getMedianPostScore($cid, 2),
+					$cid, $activities->medianPostScore,
 				];
 			}
 		} elseif ($this->selectedTab == ChannelEntity::IMAGE) {

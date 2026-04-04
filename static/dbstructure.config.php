@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1591);
+	define('DB_UPDATE_VERSION', 1592);
 }
 
 return [
@@ -403,6 +403,24 @@ return [
 			"uid_uri-id" => ["uid", "uri-id"],
 		],
 	],
+	"activity" => [
+		"comment" => "",
+		"fields"  => [
+			"uid"                 => ["type" => "mediumint unsigned", "not null" => "1", "primary" => "1", "foreign" => ["user" => "uid"], "comment" => "User ID"],
+			"network"             => ["type" => "char(4)", "not null" => "1", "primary" => "1", "comment" => "Network from where the activity comes from"],
+			"cid"                 => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id"], "comment" => "the user's public contact"],
+			"expires"             => ["type" => "datetime", "comment" => "datetime of activity statistics expiration"],
+			"median-comments"     => ["type" => "int unsigned", "comment" => ""],
+			"median-activities"   => ["type" => "int unsigned", "comment" => ""],
+			"median-views"        => ["type" => "int unsigned", "comment" => ""],
+			"median-thread-score" => ["type" => "int unsigned", "comment" => ""],
+			"median-post-score"   => ["type" => "int unsigned", "comment" => ""],
+		],
+		"indexes" => [
+			"PRIMARY" => ["uid", "network"],
+			"cid"     => ["cid"],
+		],
+	],
 	"apcontact" => [
 		"comment" => "ActivityPub compatible contacts - used in the ActivityPub implementation",
 		"fields"  => [
@@ -584,6 +602,7 @@ return [
 		"fields"  => [
 			"cid"                   => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id"], "primary" => "1", "comment" => "contact the related contact had interacted with"],
 			"relation-cid"          => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id"], "primary" => "1", "comment" => "related contact who had interacted with the contact"],
+			"network"               => ["type" => "char(4)", "comment" => "The network that is used between these contacts"],
 			"last-interaction"      => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Date of the last interaction by relation-cid on cid"],
 			"follow-updated"        => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Date of the last update of the contact relationship"],
 			"follows"               => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "if true, relation-cid follows cid"],
@@ -594,8 +613,8 @@ return [
 			"post-score"            => ["type" => "smallint unsigned", "comment" => "score for the amount of posts from cid that can be seen by relation-cid"],
 		],
 		"indexes" => [
-			"PRIMARY"      => ["cid", "relation-cid"],
-			"relation-cid" => ["relation-cid"],
+			"PRIMARY"              => ["cid", "relation-cid"],
+			"relation-cid-network" => ["relation-cid", "network"],
 		],
 	],
 	"conv" => [

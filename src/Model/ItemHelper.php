@@ -264,7 +264,7 @@ final class ItemHelper
 			'uid', 'uri', 'parent-uri', 'id', 'deleted',
 			'uri-id', 'parent-uri-id', 'restrictions', 'verb',
 			'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid',
-			'wall', 'private', 'origin', 'author-id',
+			'wall', 'private', 'origin', 'author-id', 'network',
 		];
 
 		$uids = $item['verb'] === Activity::VIEW ? [0, $item['uid']] : $item['uid'];
@@ -363,7 +363,7 @@ final class ItemHelper
 		}
 
 		// Update the contact relations
-		Contact\Relation::store($toplevel_parent['author-id'], $item['author-id'], $item['created']);
+		Contact\Relation::store($toplevel_parent['author-id'], $item['author-id'], $item['created'], $toplevel_parent['network'], $item['network']);
 
 		return $item;
 	}

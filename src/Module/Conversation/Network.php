@@ -17,6 +17,7 @@ use Friendica\Content\Conversation;
 use Friendica\Content\Conversation\Entity\Channel;
 use Friendica\Content\Conversation\Entity\Network as NetworkEntity;
 use Friendica\Content\Conversation\Factory\Timeline as TimelineFactory;
+use Friendica\Content\Conversation\Factory\Activity as ActivityFactory;
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Content\Conversation\Factory\Channel as ChannelFactory;
 use Friendica\Content\Conversation\Factory\UserDefinedChannel as UserDefinedChannelFactory;
@@ -109,6 +110,7 @@ class Network extends Timeline
 		IManagePersonalConfigValues $pConfig,
 		IManageConfigValues $config,
 		ICanCache $cache,
+		ActivityFactory $ActivityFactory,
 		L10n $l10n,
 		BaseURL $baseUrl,
 		Arguments $args,
@@ -126,6 +128,7 @@ class Network extends Timeline
 			$pConfig,
 			$config,
 			$cache,
+			$ActivityFactory,
 			$l10n,
 			$baseUrl,
 			$args,

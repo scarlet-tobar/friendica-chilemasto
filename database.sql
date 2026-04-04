@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2026.04-dev (Blutwurz)
--- DB_UPDATE_VERSION 1591
+-- DB_UPDATE_VERSION 1592
 -- ------------------------------------------
 
 
@@ -357,6 +357,25 @@ CREATE TABLE IF NOT EXISTS `account-user` (
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Remote and local accounts';
 
 --
+-- TABLE activity
+--
+CREATE TABLE IF NOT EXISTS `activity` (
+	`uid` mediumint unsigned NOT NULL COMMENT 'User ID',
+	`network` char(4) NOT NULL COMMENT 'Network from where the activity comes from',
+	`cid` int unsigned NOT NULL DEFAULT 0 COMMENT 'the user\'s public contact',
+	`expires` datetime COMMENT 'datetime of activity statistics expiration',
+	`median-comments` int unsigned COMMENT '',
+	`median-activities` int unsigned COMMENT '',
+	`median-views` int unsigned COMMENT '',
+	`median-thread-score` int unsigned COMMENT '',
+	`median-post-score` int unsigned COMMENT '',
+	 PRIMARY KEY(`uid`,`network`),
+	 INDEX `cid` (`cid`),
+	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE,
+	FOREIGN KEY (`cid`) REFERENCES `contact` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='';
+
+--
 -- TABLE apcontact
 --
 CREATE TABLE IF NOT EXISTS `apcontact` (
@@ -538,6 +557,7 @@ CREATE TABLE IF NOT EXISTS `config` (
 CREATE TABLE IF NOT EXISTS `contact-relation` (
 	`cid` int unsigned NOT NULL DEFAULT 0 COMMENT 'contact the related contact had interacted with',
 	`relation-cid` int unsigned NOT NULL DEFAULT 0 COMMENT 'related contact who had interacted with the contact',
+	`network` char(4) COMMENT 'The network that is used between these contacts',
 	`last-interaction` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Date of the last interaction by relation-cid on cid',
 	`follow-updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Date of the last update of the contact relationship',
 	`follows` boolean NOT NULL DEFAULT '0' COMMENT 'if true, relation-cid follows cid',
@@ -547,7 +567,7 @@ CREATE TABLE IF NOT EXISTS `contact-relation` (
 	`relation-thread-score` smallint unsigned COMMENT 'score for interactions of relation-cid on threads of cid',
 	`post-score` smallint unsigned COMMENT 'score for the amount of posts from cid that can be seen by relation-cid',
 	 PRIMARY KEY(`cid`,`relation-cid`),
-	 INDEX `relation-cid` (`relation-cid`),
+	 INDEX `relation-cid-network` (`relation-cid`,`network`),
 	FOREIGN KEY (`cid`) REFERENCES `contact` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
 	FOREIGN KEY (`relation-cid`) REFERENCES `contact` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Contact relations';
