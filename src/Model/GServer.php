@@ -1659,29 +1659,28 @@ class GServer
 	private static function detectATProto(string $url, array $serverdata): array
 	{
 		$data = DI::atProtocol()->get($url . '/xrpc/com.atproto.server.describeServer');
-		if (!isset($data->did)) {
-			return $serverdata;
-		}
+		if (isset($data->did)) {
+			$serverdata['detection-method'] = self::DETECT_ATPROTO_PDS;
+			$serverdata['network']          = Protocol::ATPROTO;
+			$serverdata['version']          = $data->version ?? '';
+			$serverdata['platform']         = self::getAtProtoProvider($url);
 
-		$serverdata['detection-method'] = self::DETECT_ATPROTO_PDS;
-		$serverdata['network']          = Protocol::ATPROTO;
-		$serverdata['version']          = $data->version ?? '';
-
-		if (isset($data->inviteCodeRequired)) {
-			$serverdata['register_policy'] = Register::APPROVE;
+			if (isset($data->inviteCodeRequired)) {
+				$serverdata['register_policy'] = Register::APPROVE;
+			}
 		}
 
 		$data = DI::atProtocol()->get($url . '/xrpc/_health');
 		if (isset($data->version)) {
-			$serverdata['version'] = $data->version;
-		}
+			$serverdata['detection-method'] = self::DETECT_ATPROTO_PDS;
+			$serverdata['network']          = Protocol::ATPROTO;
+			$serverdata['version']          = trim($data->version);
 
-		$versionparts = explode(' ', $serverdata['version']);
-		if (count($versionparts) === 2) {
-			$serverdata['platform'] = $versionparts[0];
-			$serverdata['version']  = $versionparts[1];
-		} else {
-			$serverdata['platform'] = self::getAtProtoProvider($url);
+			$versionparts = explode(' ', $serverdata['version']);
+			if (count($versionparts) === 2) {
+				$serverdata['platform'] = $versionparts[0];
+				$serverdata['version']  = $versionparts[1];
+			}
 		}
 
 		return $serverdata;
