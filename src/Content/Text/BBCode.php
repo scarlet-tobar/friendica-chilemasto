@@ -1160,7 +1160,7 @@ class BBCode
 	public static function setMentionsToNicknames(string $body): string
 	{
 		DI::profiler()->startRecording('rendering');
-		$regexp = "/([@!])\[url\=([^\[\]]*)\].*?\[\/url\]/ism";
+		$regexp = "/([@!])\[url\=([^\[\]]*)\](.*?)\[\/url\]/ism";
 		$body   = preg_replace_callback($regexp, [self::class, 'mentionCallback'], $body);
 		DI::profiler()->stopRecording();
 		return $body;
@@ -1179,12 +1179,21 @@ class BBCode
 			return '';
 		}
 
-		$data = Contact::getByURL($match[2], false, ['url', 'nick']);
+		$data = Contact::getByURL($match[2], false, ['url', 'alias', 'nick', 'network']);
+		if (empty($data['nick']) && str_starts_with($match[2], 'did:plc:')) {
+			$data = [
+				'url'     => $match[2],
+				'alias'   => $match[2],
+				'nick'    => $match[3],
+				'network' => Protocol::ATPROTO,
+			];
+		}
+
 		if (empty($data['nick'])) {
 			return $match[0];
 		}
 
-		return $match[1] . '[url=' . $data['url'] . ']' . $data['nick'] . '[/url]';
+		return $match[1] . '[url=' . Contact::getProfileLink($data) . ']' . $data['nick'] . '[/url]';
 	}
 
 	/**
@@ -1975,12 +1984,12 @@ class BBCode
 		} elseif ($simple_html == self::MASTODON_API) {
 			$text = preg_replace(
 				"/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
-				'<a class="u-url mention status-link" href="$2" rel="nofollow noopener noreferrer" target="_blank" title="$3">$1<span>$3</span></a>',
+				'<span class="h-card"><a href="$2" class="u-url mention">$1<span>$3</span></a></span>',
 				$text,
 			);
 			$text = preg_replace(
 				"/([#])\[url\=(.*?)\](.*?)\[\/url\]/ism",
-				'<a class="mention hashtag status-link" href="$2" rel="tag">$1<span>$3</span></a>',
+				'<a href="$2" class="mention hashtag" rel="nofollow noopener" target="_blank">$1<span>$3</span></a>',
 				$text,
 			);
 		} else {
