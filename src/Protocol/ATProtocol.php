@@ -596,12 +596,12 @@ final class ATProtocol
 	 * @param integer $uid User id to get the web for (0 for global)
 	 * @return string Profile link
 	 */
-	public function getPostLink(string $uri, int $uid = 0): string
+	public function getPostLink(string $did, int $uid = 0): string
 	{
 		$web       = $this->getWebForUser($uid);
 		$frontends = $this->config->get('atprotocol', 'frontends');
 		if ($web && is_array($frontends) && isset($frontends[$web])) {
-			$parts = explode('/', $uri);
+			$parts = explode('/', $did);
 			if (count($parts) === 5) {
 				$did        = $parts[2];
 				$collection = $parts[3];
