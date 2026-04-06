@@ -35,8 +35,6 @@ class Protocol
 	public const SUPPORT_PRIVATE = [self::DFRN, self::DIASPORA, self::MAIL, self::ACTIVITYPUB, self::PUMPIO];
 
 	// Supported through a connector
-	/** @deprecated use @see ATPROTO instead */
-	public const BLUESKY   = 'bsky';    // @deprecated name for the AT Protocol
 	public const ATPROTO   = 'bsky';    // AT Protocol, short name "atproto" (Formerly known as Bluesky)
 	public const DIASPORA2 = 'dspc';    // Diaspora connector
 	public const DISCOURSE = 'dscs';    // Discourse

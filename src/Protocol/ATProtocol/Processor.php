@@ -355,9 +355,10 @@ class Processor
 			'owner-name'    => $contact['name'],
 			'owner-link'    => $contact['url'],
 			'owner-avatar'  => $contact['avatar'],
-			'plink'         => $contact['alias'] . '/post/' . $data->commit->rkey,
 			'source'        => json_encode($data),
 		];
+
+		$item['plink'] = $this->atprotocol->getPostLink($item['uri']);
 
 		if ((time() - strtotime($item['created'])) > 600) {
 			$item['received'] = $item['created'];

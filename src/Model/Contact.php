@@ -3602,12 +3602,7 @@ class Contact
 	public static function getProfileLink(array $contact): string
 	{
 		if ($contact['network'] === Protocol::ATPROTO) {
-			$web       = DI::atProtocol()->getWebForUser(DI::userSession()->getLocalUserId());
-			$frontends = DI::config()->get('atprotocol', 'frontends');
-			if ($web && is_array($frontends) && isset($frontends[$web])) {
-				return str_replace('{did}', $contact['url'], $frontends[$web][1]);
-			}
-			return $contact['alias'];
+			return DI::atpActor()->getProfileLink($contact['url'], DI::userSession()->getLocalUserId()) ?: $contact['alias'];
 		}
 		if (!empty($contact['alias']) && Network::isValidHttpUrl($contact['alias']) && (($contact['network'] ?? '') != Protocol::DFRN)) {
 			return $contact['alias'];
