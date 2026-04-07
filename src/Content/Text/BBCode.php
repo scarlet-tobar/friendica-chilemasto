@@ -50,8 +50,6 @@ class BBCode
 	public const BACKLINK     = 8;
 	public const ACTIVITYPUB  = 9;
 	public const ATPROTOCOL   = 10;
-	/** @deprecated use @see ATPROTOCOL instead */
-	public const BLUESKY = 10; // @deprecated
 
 	public const SHARED_ANCHOR = '<hr class="shared-anchor">';
 	public const TOP_ANCHOR    = '<br class="top-anchor">';

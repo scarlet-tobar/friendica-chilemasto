@@ -35,12 +35,6 @@ final class ATProtocol
 	public const STATUS_PDS_FAIL   = 12;
 	public const STATUS_TOKEN_FAIL = 13;
 
-	/**
-	 * Path to the web interface with the user profile and posts.
-	 * This string can then be replaced when displaying the post and profile url.
-	 */
-	public const WEB = 'https://bsky.app';
-
 	/** @var LoggerInterface */
 	private $logger;
 
@@ -593,5 +587,29 @@ final class ATProtocol
 		$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_TOKEN_OK);
 		$this->pConfig->set($uid, 'bluesky', 'status-message', '');
 		return $data->accessJwt;
+	}
+
+	/**
+	 * Get the profile link for a given DID and user id
+	 *
+	 * @param string  $did The contact DID
+	 * @param integer $uid User id to get the web for (0 for global)
+	 * @return string Profile link
+	 */
+	public function getPostLink(string $did, int $uid = 0): string
+	{
+		$web       = $this->getWebForUser($uid);
+		$frontends = $this->config->get('atprotocol', 'frontends');
+		if ($web && is_array($frontends) && isset($frontends[$web])) {
+			$parts = explode('/', $did);
+			if (count($parts) === 5) {
+				$did        = $parts[2];
+				$collection = $parts[3];
+				$rkeyparts  = explode(':', $parts[4]);
+				$rkey       = $rkeyparts[0];
+				return str_replace(['{did}', '{collection}', '{rkey}'], [$did, $collection, $rkey], $frontends[$web][2]);
+			}
+		}
+		return '';
 	}
 }

@@ -3667,19 +3667,7 @@ class Item
 	public static function getPlink(array $item)
 	{
 		if ($item['network'] === Protocol::ATPROTO) {
-			$web       = DI::atProtocol()->getWebForUser(DI::userSession()->getLocalUserId());
-			$plink     = $item['plink'];
-			$frontends = DI::config()->get('atprotocol', 'frontends');
-			if ($web && is_array($frontends) && isset($frontends[$web])) {
-				$parts = explode('/', $item['uri']);
-				if (count($parts) === 5) {
-					$did        = $parts[2];
-					$collection = $parts[3];
-					$rkeyparts  = explode(':', $parts[4]);
-					$rkey       = $rkeyparts[0];
-					$plink      = str_replace(['{did}', '{collection}', '{rkey}'], [$did, $collection, $rkey], $frontends[$web][2]);
-				}
-			}
+			$plink = DI::atProtocol()->getPostLink($item['uri'], DI::userSession()->getLocalUserId()) ?: $item['plink'];
 		} elseif (!empty($item['plink']) && Network::isValidHttpUrl($item['plink'])) {
 			$plink = $item['plink'];
 		} elseif (!empty($item['uri']) && Network::isValidHttpUrl($item['uri']) && !DI::baseUrl()->isLocalUrl($item['uri'])) {

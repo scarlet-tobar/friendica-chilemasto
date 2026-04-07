@@ -11,6 +11,7 @@
 namespace Friendica\Protocol\ATProtocol;
 
 use Friendica\Content\Text\HTML;
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Model\Contact;
 use Friendica\Model\GServer;
@@ -29,10 +30,14 @@ class Actor
 	/** @var ATProtocol */
 	private $atprotocol;
 
-	public function __construct(LoggerInterface $logger, ATProtocol $atprotocol)
+	/** @var \Friendica\Core\Config\Capability\IManageConfigValues */
+	private $config;
+
+	public function __construct(LoggerInterface $logger, ATProtocol $atprotocol, IManageConfigValues $config)
 	{
 		$this->logger     = $logger;
 		$this->atprotocol = $atprotocol;
+		$this->config     = $config;
 	}
 
 	/**
@@ -225,8 +230,20 @@ class Actor
 		return Contact::getById($cid);
 	}
 
-	public function getProfileLink(string $did): string
+	/**
+	 * Get the profile link for a given DID and user id
+	 *
+	 * @param string  $did The contact DID
+	 * @param integer $uid User id to get the web for (0 for global)
+	 * @return string Profile link
+	 */
+	public function getProfileLink(string $did, int $uid = 0): string
 	{
-		return ATProtocol::WEB . '/profile/' . $did;
+		$web       = $this->atprotocol->getWebForUser($uid);
+		$frontends = $this->config->get('atprotocol', 'frontends');
+		if ($web && is_array($frontends) && isset($frontends[$web])) {
+			return str_replace('{did}', $did, $frontends[$web][1]);
+		}
+		return '';
 	}
 }
