@@ -305,7 +305,7 @@ class Photo extends BaseApi
 					return MPhoto::getPhoto($matches[1], $matches[2], self::getCurrentUserID());
 				}
 
-				return MPhoto::createPhotoForExternalResource($media['url'], (int) DI::userSession()->getLocalUserId(), $media['mimetype'], $media['blurhash'], $media['width'], $media['height']);
+				return MPhoto::createPhotoForExternalResource($media['url'], (int) DI::userSession()->getLocalUserId(), $media['mimetype'] ?? '', $media['blurhash'], $media['width'], $media['height']);
 			case 'link':
 				$link = DBA::selectFirst('post-link', ['url', 'mimetype', 'blurhash', 'width', 'height'], ['id' => $id]);
 				if (empty($link)) {
