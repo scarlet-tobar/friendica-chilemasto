@@ -33,6 +33,13 @@ class Actor
 	/** @var \Friendica\Core\Config\Capability\IManageConfigValues */
 	private $config;
 
+	/**
+	 * Initialize the actor service.
+	 *
+	 * @param LoggerInterface $logger
+	 * @param ATProtocol $atprotocol
+	 * @param IManageConfigValues $config
+	 */
 	public function __construct(LoggerInterface $logger, ATProtocol $atprotocol, IManageConfigValues $config)
 	{
 		$this->logger     = $logger;
@@ -41,7 +48,7 @@ class Actor
 	}
 
 	/**
-	 * Syncronize the contacts (followers, sharers) for the given user
+	 * Synchronize the contacts (followers, sharers) for the given user
 	 *
 	 * @param integer $uid User ID
 	 * @return void
@@ -62,7 +69,7 @@ class Actor
 				'cursor' => $cursor,
 			];
 
-			$data = $this->atprotocol->XRPCGet('app.bsky.graph.getFollows', $parameters);
+			$data = $this->atprotocol->XRPCGet('app.bsky.graph.getFollows', $parameters, $uid);
 
 			foreach ($data->follows ?? [] as $follow) {
 				$profiles[$follow->did] = $follow;
@@ -80,7 +87,7 @@ class Actor
 				'cursor' => $cursor,
 			];
 
-			$data = $this->atprotocol->XRPCGet('app.bsky.graph.getFollowers', $parameters);
+			$data = $this->atprotocol->XRPCGet('app.bsky.graph.getFollowers', $parameters, $uid);
 
 			foreach ($data->followers ?? [] as $follow) {
 				$profiles[$follow->did] = $follow;
@@ -113,7 +120,7 @@ class Actor
 	 */
 	public function updateContactByDID(string $did, int $contact_uid): void
 	{
-		$profile = $this->atprotocol->XRPCGet('app.bsky.actor.getProfile', ['actor' => $did], $contact_uid);
+		$profile = $this->atprotocol->XRPCGet('app.bsky.actor.getProfile', ['actor' => $did]);
 		if (empty($profile) || empty($profile->did)) {
 			return;
 		}
@@ -186,7 +193,7 @@ class Actor
 	}
 
 	/**
-	 * Fetch and possibly create a contact array for a given DID
+	 * Fetch and possibly create a contact for a given DID
 	 *
 	 * @param string  $did         The contact DID
 	 * @param integer $uid         "0" when either the public contact or the user contact is desired
@@ -231,10 +238,10 @@ class Actor
 	}
 
 	/**
-	 * Get the profile link for a given DID and user id
+	 * Get the profile link for a given DID and user ID
 	 *
 	 * @param string  $did The contact DID
-	 * @param integer $uid User id to get the web for (0 for global)
+	 * @param integer $uid User ID to get the web for (0 for global)
 	 * @return string Profile link
 	 */
 	public function getProfileLink(string $did, int $uid = 0): string

@@ -82,6 +82,16 @@ class Jetstream
 	/** @var \WebSocket\Client */
 	private $client;
 
+	/**
+	 * Initialize the Jetstream service.
+	 *
+	 * @param LoggerInterface $logger
+	 * @param IManageConfigValues $config
+	 * @param IManageKeyValuePairs $keyValue
+	 * @param ATProtocol $atprotocol
+	 * @param Actor $actor
+	 * @param Processor $processor
+	 */
 	public function __construct(LoggerInterface $logger, IManageConfigValues $config, IManageKeyValuePairs $keyValue, ATProtocol $atprotocol, Actor $actor, Processor $processor)
 	{
 		$this->logger     = $logger;
@@ -95,7 +105,7 @@ class Jetstream
 	}
 
 	/**
-	 * Listen to incoming webstream messages from Jetstream
+	 * Listen to incoming Jetstream WebSocket messages
 	 *
 	 * @return void
 	 */
@@ -204,7 +214,7 @@ class Jetstream
 	}
 
 	/**
-	 * Set options like the followed DIDs
+	 * Set stream options like the followed DIDs
 	 *
 	 * @return void
 	 */
@@ -257,7 +267,7 @@ class Jetstream
 		$update = [
 			'type'    => 'options_update',
 			'payload' => [
-				'wantedCollections'   => ['app.bsky.feed.post', 'app.bsky.feed.repost', 'app.bsky.feed.like', 'app.bsky.graph.block', 'app.bsky.actor.profile', 'app.bsky.graph.follow'],
+				'wantedCollections'   => ['app.bsky.feed.post', 'app.bsky.feed.repost', 'app.bsky.feed.like', 'app.bsky.graph.block', 'app.bsky.actor.profile', 'app.bsky.graph.follow', 'site.standard.publication', 'site.standard.document', 'site.standard.graph.subscription'],
 				'wantedDids'          => $dids,
 				'maxMessageSizeBytes' => 1000000,
 			],
@@ -309,6 +319,7 @@ class Jetstream
 		}
 
 		Item::incrementInbound(Protocol::ATPROTO);
+		$this->atprotocol->setApiForUser(0);
 
 		switch ($data->kind) {
 			case 'account':
@@ -426,7 +437,7 @@ class Jetstream
 
 			case 'create':
 				if ($drift < self::MAX_DRIFT_CREATE_POSTS) {
-					$this->processor->createPost($data, $this->uids[$data->did] ?? [0], ($drift > self::MAX_DRIFT_THREAD_COMPLETION));
+					$this->processor->createPost($data, $this->uids[$data->did] ?? [0], true);
 				}
 				break;
 

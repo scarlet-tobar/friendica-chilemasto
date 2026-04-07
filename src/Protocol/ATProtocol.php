@@ -11,6 +11,7 @@ use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Database\Database;
+use Friendica\Model\Conversation;
 use Friendica\Model\Item;
 use Friendica\Model\User;
 use Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests;
@@ -53,6 +54,15 @@ final class ATProtocol
 	private string $api;
 	private int $uid = 0;
 
+	/**
+	 * Initialize the AT Protocol service.
+	 *
+	 * @param LoggerInterface $logger
+	 * @param Database $database
+	 * @param IManageConfigValues $config
+	 * @param IManagePersonalConfigValues $pConfig
+	 * @param ICanSendHttpRequests $httpClient
+	 */
 	public function __construct(LoggerInterface $logger, Database $database, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, ICanSendHttpRequests $httpClient)
 	{
 		$this->logger     = $logger;
@@ -77,7 +87,7 @@ final class ATProtocol
 	}
 
 	/**
-	 * Returns an array of user ids who want to import the AT Protocol timeline
+	 * Get user IDs that import the AT Protocol timeline
 	 *
 	 * @return array user ids
 	 */
@@ -108,21 +118,21 @@ final class ATProtocol
 	}
 
 	/**
-	 * Fetches XRPC data
+	 * Fetch XRPC data
 	 * @see https://atproto.com/specs/xrpc#lexicon-http-endpoints
 	 *
 	 * @param string  $url        for example "app.bsky.feed.getTimeline"
 	 * @param array   $parameters Array with parameters
-	 * @param integer $uid        User ID
+	 * @param integer $uid        User ID. When set to null, the value from "setApiForUser" will be used
 	 * @return stdClass|null Fetched data
 	 */
-	public function XRPCGet(string $url, array $parameters = [], int $uid = 0): ?stdClass
+	public function XRPCGet(string $url, array $parameters = [], ?int $uid = null): ?stdClass
 	{
 		if (!empty($parameters)) {
 			$url .= '?' . http_build_query($parameters);
 		}
 
-		if ($uid === 0 && $this->uid !== 0) {
+		if (is_null($uid)) {
 			$uid = $this->uid;
 		}
 
@@ -407,7 +417,7 @@ final class ATProtocol
 	}
 
 	/**
-	 * Fetches the DID of a given handle via a DND request.
+	 * Fetches the DID of a given handle via a DNS request.
 	 * This is one of the ways, custom handles can be authorized.
 	 *
 	 * @param string $handle The user handle
@@ -433,7 +443,7 @@ final class ATProtocol
 	}
 
 	/**
-	 * Fetch the PDS of a given DID
+	 * Fetch the PDS URL for a given DID
 	 *
 	 * @param string $did DID (did:plc:...)
 	 * @return string|null URL of the PDS, e.g. https://enoki.us-east.host.bsky.network
@@ -455,7 +465,7 @@ final class ATProtocol
 	}
 
 	/**
-	 * Set the AppView API for this class for a given uid
+	 * Set the AppView API for this class for a given user ID
 	 *
 	 * @param integer $uid
 	 * @return void
@@ -463,13 +473,48 @@ final class ATProtocol
 	public function setApiForUser(int $uid)
 	{
 		$this->api = $this->config->get('atprotocol', 'appview_api');
-		if ($uid !== 0 && $this->getUserPds($uid)) {
-			$this->uid = $uid;
+		$this->uid = 0;
+		if ($uid !== 0) {
+			$userPds = $this->getUserPds($uid);
+			if ($userPds) {
+				$this->api = $userPds;
+				$this->uid = $uid;
+			}
 		}
 	}
 
 	/**
-	 * Get the DID PLC Directory
+	 * Get the user ID for which the API URL is set
+	 *
+	 * @return integer
+	 */
+	public function getUser(): int
+	{
+		return $this->uid;
+	}
+
+	/**
+	 * Get the user ID for the selected protocol
+	 *
+	 * @param integer $protocol
+	 * @return integer|null
+	 */
+	public function getUserForProtocol(int $protocol): ?int
+	{
+		switch ($protocol) {
+			case Conversation::PARCEL_JETSTREAM:
+				return 0;
+
+			case Conversation::PARCEL_CONNECTOR:
+				return $this->uid;
+
+			default:
+				return null;
+		}
+	}
+
+	/**
+	 * Get the DID PLC directory
 	 *
 	 * @return string
 	 */
@@ -489,7 +534,7 @@ final class ATProtocol
 	}
 
 	/**
-	 * Get the web address for a given uid
+	 * Get the web address for a given user ID
 	 *
 	 * @param integer $uid
 	 * @return string
