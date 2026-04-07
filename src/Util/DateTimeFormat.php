@@ -17,11 +17,11 @@ use Friendica\DI;
  */
 class DateTimeFormat
 {
-	const ATOM  = 'Y-m-d\TH:i:s\Z';
-	const MYSQL = 'Y-m-d H:i:s';
-	const HTTP  = 'D, d M Y H:i:s \G\M\T';
-	const JSON  = 'Y-m-d\TH:i:s.v\Z';
-	const API   = 'D M d H:i:s +0000 Y';
+	public const ATOM  = 'Y-m-d\TH:i:s\Z';
+	public const MYSQL = 'Y-m-d H:i:s';
+	public const HTTP  = 'D, d M Y H:i:s \G\M\T';
+	public const JSON  = 'Y-m-d\TH:i:s.v\Z';
+	public const API   = 'D M d H:i:s +0000 Y';
 
 	public static $localTimezone = 'UTC';
 
@@ -181,6 +181,9 @@ class DateTimeFormat
 		$pregPatterns = [
 			['#(\w+), (\d+ \w+ \d+) (\d+:\d+:\d+) (.+)#', '$2 $3 $4'],
 			['#(\d+:\d+) (\w+), (\w+) (\d+), (\d+)#', '$1 $2 $3 $4 $5'],
+			['#(GMT[+-]\d{4}) \([^)]*\)#', '$1'], // Tue Apr 07 2026 11:40:30 GMT+0530 (India Standard Time)
+			['#\s+\((?:[A-Za-z]+(?: [A-Za-z]+){0,5})\)$#', ''], // Tue Apr 07 2026 11:40:30 (India Standard Time)
+			['#^(\w+), ((?:1[3-9]|2\d|3[0-1]))/(0?[1-9]|1[0-2])/(\d{4}), (\d{1,2}:\d{2}(?::\d{2})?)$#', '$4-$3-$2 $5'],
 			['#\[[^\]]*\]#', ''], // 2025-03-07T08:54:14.341+01:00[Europe/Berlin]
 		];
 
