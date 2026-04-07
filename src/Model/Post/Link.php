@@ -117,7 +117,7 @@ class Link
 			return [];
 		}
 
-		$fields = ['mimetype' => $mimeType[0] . '/' . $mimeType[1]];
+		$fields = ['mimetype' => implode('/', $mimeType)];
 
 		if (Images::isSupportedMimeType($fields['mimetype'])) {
 			try {
