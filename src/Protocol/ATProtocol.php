@@ -195,14 +195,16 @@ final class ATProtocol
 		}
 
 		$data = json_decode($curlResult->getBodyString());
+		if (!$data || !is_object($data)) {
+			$this->logger->notice('Invalid data returned', ['url' => $url, 'code' => $curlResult->getReturnCode()]);
+			return null;
+		}
+
 		if (!$curlResult->isSuccess()) {
-			$this->logger->notice('API Error', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data ?: $curlResult->getBodyString()]);
-			if (!$data || !is_object($data)) {
-				return null;
-			}
+			$this->logger->notice('API Error', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data]);
 			$data->code = $curlResult->getReturnCode();
 		} elseif (($curlResult->getReturnCode() < 200) || ($curlResult->getReturnCode() >= 400)) {
-			$this->logger->notice('Unexpected return code', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data ?: $curlResult->getBodyString()]);
+			$this->logger->notice('Unexpected return code', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data]);
 			$data->code = $curlResult->getReturnCode();
 		}
 

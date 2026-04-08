@@ -217,7 +217,7 @@ class Processor
 					}
 				}
 				$item['source'] = json_encode($post);
-				$item           = $this->addMedia($post->thread->post->embed, $item, 0);
+				$item           = $this->addMedia($post->thread->post->embed, $item, Conversation::PARCEL_JETSTREAM, 0);
 			}
 
 			$id = Item::insert($item);
@@ -406,7 +406,7 @@ class Processor
 		}
 
 		if (!empty($post->embed)) {
-			$item = $this->addMedia($post->embed, $item, $level);
+			$item = $this->addMedia($post->embed, $item, $protocol, $level);
 		}
 
 		$item['restrictions'] = $this->getRestrictionsForUser($post, $item, $post_reason);
@@ -677,10 +677,11 @@ class Processor
 	 *
 	 * @param stdClass $embed
 	 * @param array $item
+	 * @param int $protocol
 	 * @param int $level
 	 * @return array
 	 */
-	private function addMedia(stdClass $embed, array $item, int $level): array
+	private function addMedia(stdClass $embed, array $item, int $protocol, int $level): array
 	{
 		$type = '$type';
 		switch ($embed->$type) {
@@ -736,7 +737,7 @@ class Processor
 				}
 				$fetched_uri = $this->getPostUri($uri, $item['uid']);
 				if (!$fetched_uri) {
-					$uri = $this->fetchMissingPost($uri, 0, Item::PR_FETCHED, $item['contact-id'], $level, $uri);
+					$uri = $this->fetchMissingPost($uri, 0, Item::PR_FETCHED, $item['contact-id'], $level, $uri, false, $protocol);
 				} else {
 					$uri = $fetched_uri;
 				}
@@ -752,9 +753,9 @@ class Processor
 				break;
 
 			case 'app.bsky.embed.recordWithMedia#view':
-				$this->addMedia($embed->media, $item, $level);
+				$this->addMedia($embed->media, $item, $protocol, $level);
 				$original_uri = $uri = $this->getUri($embed->record->record);
-				$uri          = $this->fetchMissingPost($uri, 0, Item::PR_FETCHED, $item['contact-id'], $level, $uri);
+				$uri          = $this->fetchMissingPost($uri, 0, Item::PR_FETCHED, $item['contact-id'], $level, $uri, false, $protocol);
 				if ($uri) {
 					$shared = Post::selectFirst(['uri-id'], ['uri' => $uri, 'uid' => [$item['uid'], 0]]);
 					$uri_id = $shared['uri-id'] ?? 0;
