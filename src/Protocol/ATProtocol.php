@@ -51,8 +51,7 @@ final class ATProtocol
 	/** @var ICanSendHttpRequests */
 	private $httpClient;
 
-	private string $api;
-	private int $uid = 0;
+	private int $uid;
 
 	/**
 	 * Initialize the AT Protocol service.
@@ -79,11 +78,14 @@ final class ATProtocol
 	 */
 	public function getApi(): string
 	{
-		if (!isset($this->api)) {
-			$this->logger->notice('Public API not set.');
-			$this->setApiForUser(0);
+		$uid = $this->getUser();
+		$api = $this->getUserPds($uid);
+		if ($api) {
+			return $api;
 		}
-		return $this->api;
+
+		$this->logger->warning('PDS for user could not be fetched', ['uid' => $uid]);
+		return $this->getUserPds(0);
 	}
 
 	/**
@@ -133,16 +135,16 @@ final class ATProtocol
 		}
 
 		if (is_null($uid)) {
-			$uid = $this->uid;
-		}
-
-		if ($uid === 0) {
-			return $this->get($this->getApi() . '/xrpc/' . $url);
+			$uid = $this->getUser();
 		}
 
 		$pds = $this->getUserPds($uid);
 		if (empty($pds)) {
 			return null;
+		}
+
+		if ($uid === 0) {
+			return $this->get($pds . '/xrpc/' . $url);
 		}
 
 		$headers = ['Authorization' => ['Bearer ' . $this->getUserToken($uid)]];
@@ -292,7 +294,7 @@ final class ATProtocol
 	private function getUserPds(int $uid): ?string
 	{
 		if ($uid == 0) {
-			return $this->getApi();
+			return $this->config->get('atprotocol', 'appview_api');
 		}
 
 		$pds = $this->pConfig->get($uid, 'bluesky', 'pds');
@@ -472,14 +474,10 @@ final class ATProtocol
 	 */
 	public function setApiForUser(int $uid)
 	{
-		$this->api = $this->config->get('atprotocol', 'appview_api');
-		$this->uid = 0;
-		if ($uid !== 0) {
-			$userPds = $this->getUserPds($uid);
-			if ($userPds) {
-				$this->api = $userPds;
-				$this->uid = $uid;
-			}
+		$this->uid = $uid;
+
+		if (!$this->getUserPds($uid)) {
+			$this->uid = 0;
 		}
 	}
 
@@ -490,6 +488,11 @@ final class ATProtocol
 	 */
 	public function getUser(): int
 	{
+		if (is_null($this->uid)) {
+			$this->logger->notice('API user not set.');
+			$this->uid = 0;
+		}
+
 		return $this->uid;
 	}
 
@@ -506,7 +509,7 @@ final class ATProtocol
 				return 0;
 
 			case Conversation::PARCEL_CONNECTOR:
-				return $this->uid;
+				return $this->getUser();
 
 			default:
 				return null;
