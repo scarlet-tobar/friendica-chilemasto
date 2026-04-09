@@ -51,7 +51,7 @@ final class ATProtocol
 	/** @var ICanSendHttpRequests */
 	private $httpClient;
 
-	private int $uid;
+	private ?int $uid = null;
 
 	/**
 	 * Initialize the AT Protocol service.
