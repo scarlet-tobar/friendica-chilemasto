@@ -141,6 +141,22 @@ class DateTimeFormatTest extends MockedTestCase
 				'expectedDate' => '2025-03-07T08:54:14+01:00',
 				'dateString'   => '2025-03-07T08:54:14.341+01:00[Europe/Berlin]',
 			],
+			'April 9, 2026 at 10:00am' => [
+				'expectedDate' => '2026-04-09T10:00:00+00:00',
+				'dateString'   => 'April 9, 2026 at 10:00am',
+			],
+			'Apr 09, 2026 @ 4:52 PM PDT' => [
+				'expectedDate' => '2026-04-09T16:52:00+00:00',
+				'dateString'   => 'Apr 09, 2026 @ 4:52 PM PDT',
+			],
+			'Fr., 10 Apr. 2026 14:46:27 +0200' => [
+				'expectedDate' => '2026-04-10T14:46:27+02:00',
+				'dateString'   => 'Fr., 10 Apr. 2026 14:46:27 +0200',
+			],
+			'April, 10 2026 11:52:50 +0000' => [
+				'expectedDate' => '2026-04-10T11:52:50+00:00',
+				'dateString'   => 'April, 10 2026 11:52:50 +0000',
+			],
 		];
 	}
 
