@@ -626,7 +626,7 @@ class Network
 	 */
 	public static function isValidAtUrl(string $url): bool
 	{
-		return str_starts_with($url, 'at://');
+		return is_object(DI::atProtocol()->getUriObject($url));
 	}
 
 	/**

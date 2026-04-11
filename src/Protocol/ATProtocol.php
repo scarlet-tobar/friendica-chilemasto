@@ -640,26 +640,120 @@ final class ATProtocol
 	}
 
 	/**
-	 * Get the profile link for a given DID and user id
+	 * Get the profile link for a given uri and user id
 	 *
-	 * @param string  $did The contact DID
+	 * @param string  $did The post uri
 	 * @param integer $uid User id to get the web for (0 for global)
 	 * @return string Profile link
 	 */
-	public function getPostLink(string $did, int $uid = 0): string
+	public function getPostLink(string $uri, int $uid = 0): string
 	{
 		$web       = $this->getWebForUser($uid);
 		$frontends = $this->config->get('atprotocol', 'frontends');
 		if ($web && is_array($frontends) && isset($frontends[$web])) {
-			$parts = explode('/', $did);
-			if (count($parts) === 5) {
-				$did        = $parts[2];
-				$collection = $parts[3];
-				$rkeyparts  = explode(':', $parts[4]);
-				$rkey       = $rkeyparts[0];
-				return str_replace(['{did}', '{collection}', '{rkey}'], [$did, $collection, $rkey], $frontends[$web][2]);
+			$parts = $this->getUriObject($uri);
+			if (is_object($parts)) {
+				return str_replace(['{did}', '{collection}', '{rkey}'], [$parts->repo, $parts->collection, $parts->rkey], $frontends[$web][2]);
 			}
 		}
 		return '';
+	}
+
+	/**
+	 * Fetch a record from the AT Protocol repository
+	 *
+	 * @param string $uri AT URI in the format at://did/collection/rkey
+	 * @return stdClass|null The fetched record or null on failure
+	 */
+	public function getRecord(string $uri): ?stdClass
+	{
+		$parts = $this->getUriObject($uri);
+		if (!is_object($parts)) {
+			return null;
+		}
+
+		$url = $this->getPdsOfDid($parts->repo);
+		if (!$url) {
+			return null;
+		}
+
+		$url .= '/xrpc/com.atproto.repo.getRecord?' . http_build_query(['repo' => $parts->repo, 'collection' => $parts->collection, 'rkey' => $parts->rkey]);
+		return $this->get($url);
+	}
+
+	/**
+	 * Create a new record in the AT Protocol repository
+	 *
+	 * @param integer        $uid        User ID
+	 * @param string         $collection Collection name, e.g. "app.bsky.feed.post"
+	 * @param array|stdClass $record     The record data to create
+	 * @return stdClass|null The created record response or null on failure
+	 */
+	public function createRecord(int $uid, string $collection, $record): ?stdClass
+	{
+		$post = [
+			'collection' => $collection,
+			'repo'       => $this->getUserDid($uid),
+			'record'     => $record,
+		];
+
+		return $this->XRPCPost($uid, 'com.atproto.repo.createRecord', $post);
+	}
+
+	/**
+	 * Delete a record from the AT Protocol repository
+	 *
+	 * @param integer $uid User ID
+	 * @param string  $uri AT URI in the format at://did/collection/rkey
+	 * @return stdClass|null The deletion response or null on failure
+	 */
+	public function deleteRecord(int $uid, string $uri): ?stdClass
+	{
+		$parts = $this->getUriObject($uri);
+		if (!is_object($parts)) {
+			return null;
+		}
+
+		return $this->XRPCPost($uid, 'com.atproto.repo.deleteRecord', ['repo' => $parts->repo, 'collection' => $parts->collection, 'rkey' => $parts->rkey]);
+	}
+
+	/**
+	 * Update an existing record in the AT Protocol repository
+	 *
+	 * @param integer        $uid    User ID
+	 * @param string         $uri    AT URI in the format at://did/collection/rkey
+	 * @param array|stdClass $record The updated record data
+	 * @return stdClass|null The update response or null on failure
+	 */
+	public function putRecord(int $uid, string $uri, $record): ?stdClass
+	{
+		$parts = $this->getUriObject($uri);
+		if (!is_object($parts)) {
+			return null;
+		}
+
+		return $this->XRPCPost($uid, 'com.atproto.repo.putRecord', ['repo' => $parts->repo, 'collection' => $parts->collection, 'rkey' => $parts->rkey, 'record' => $record]);
+	}
+
+	/**
+	 * Parse an AT URI into repository, collection and record key.
+	 *
+	 * @param string $uri
+	 * @return stdClass|null
+	 */
+	public function getUriObject(string $uri): ?stdClass
+	{
+		$parts = explode('/', $uri);
+		if (!$parts || count($parts) !== 5 || $parts[0] !== 'at:' || $parts[1] !== '') {
+			return null;
+		}
+
+		$class = new stdClass();
+
+		$class->repo       = $parts[2];
+		$class->collection = $parts[3];
+		$class->rkey       = explode(':', $parts[4])[0];
+
+		return $class;
 	}
 }

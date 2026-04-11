@@ -1016,15 +1016,7 @@ class Processor
 			return null;
 		}
 
-		$parts = explode('/', substr($class->uri, 5));
-
-		$class = new stdClass();
-
-		$class->repo       = $parts[0];
-		$class->collection = $parts[1];
-		$class->rkey       = $parts[2];
-
-		return $class;
+		return $this->atprotocol->getUriObject($class->uri);
 	}
 
 	/**
