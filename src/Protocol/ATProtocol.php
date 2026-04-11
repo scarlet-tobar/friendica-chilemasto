@@ -11,6 +11,7 @@ use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Database\Database;
+use Friendica\Model\Conversation;
 use Friendica\Model\Item;
 use Friendica\Model\User;
 use Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests;
@@ -50,9 +51,17 @@ final class ATProtocol
 	/** @var ICanSendHttpRequests */
 	private $httpClient;
 
-	private string $api;
-	private int $uid = 0;
+	private ?int $uid = null;
 
+	/**
+	 * Initialize the AT Protocol service.
+	 *
+	 * @param LoggerInterface $logger
+	 * @param Database $database
+	 * @param IManageConfigValues $config
+	 * @param IManagePersonalConfigValues $pConfig
+	 * @param ICanSendHttpRequests $httpClient
+	 */
 	public function __construct(LoggerInterface $logger, Database $database, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, ICanSendHttpRequests $httpClient)
 	{
 		$this->logger     = $logger;
@@ -69,15 +78,18 @@ final class ATProtocol
 	 */
 	public function getApi(): string
 	{
-		if (!isset($this->api)) {
-			$this->logger->notice('Public API not set.');
-			$this->setApiForUser(0);
+		$uid = $this->getUser();
+		$api = $this->getUserPds($uid);
+		if ($api) {
+			return $api;
 		}
-		return $this->api;
+
+		$this->logger->warning('PDS for user could not be fetched', ['uid' => $uid]);
+		return $this->getUserPds(0);
 	}
 
 	/**
-	 * Returns an array of user ids who want to import the AT Protocol timeline
+	 * Get user IDs that import the AT Protocol timeline
 	 *
 	 * @return array user ids
 	 */
@@ -108,31 +120,31 @@ final class ATProtocol
 	}
 
 	/**
-	 * Fetches XRPC data
+	 * Fetch XRPC data
 	 * @see https://atproto.com/specs/xrpc#lexicon-http-endpoints
 	 *
 	 * @param string  $url        for example "app.bsky.feed.getTimeline"
 	 * @param array   $parameters Array with parameters
-	 * @param integer $uid        User ID
+	 * @param integer $uid        User ID. When set to null, the value from "setApiForUser" will be used
 	 * @return stdClass|null Fetched data
 	 */
-	public function XRPCGet(string $url, array $parameters = [], int $uid = 0): ?stdClass
+	public function XRPCGet(string $url, array $parameters = [], ?int $uid = null): ?stdClass
 	{
 		if (!empty($parameters)) {
 			$url .= '?' . http_build_query($parameters);
 		}
 
-		if ($uid === 0 && $this->uid !== 0) {
-			$uid = $this->uid;
-		}
-
-		if ($uid === 0) {
-			return $this->get($this->getApi() . '/xrpc/' . $url);
+		if (is_null($uid)) {
+			$uid = $this->getUser();
 		}
 
 		$pds = $this->getUserPds($uid);
 		if (empty($pds)) {
 			return null;
+		}
+
+		if ($uid === 0) {
+			return $this->get($pds . '/xrpc/' . $url);
 		}
 
 		$headers = ['Authorization' => ['Bearer ' . $this->getUserToken($uid)]];
@@ -183,14 +195,16 @@ final class ATProtocol
 		}
 
 		$data = json_decode($curlResult->getBodyString());
+		if (!$data || !is_object($data)) {
+			$this->logger->notice('Invalid data returned', ['url' => $url, 'code' => $curlResult->getReturnCode()]);
+			return null;
+		}
+
 		if (!$curlResult->isSuccess()) {
-			$this->logger->notice('API Error', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data ?: $curlResult->getBodyString()]);
-			if (!$data || !is_object($data)) {
-				return null;
-			}
+			$this->logger->notice('API Error', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data]);
 			$data->code = $curlResult->getReturnCode();
 		} elseif (($curlResult->getReturnCode() < 200) || ($curlResult->getReturnCode() >= 400)) {
-			$this->logger->notice('Unexpected return code', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data ?: $curlResult->getBodyString()]);
+			$this->logger->notice('Unexpected return code', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data]);
 			$data->code = $curlResult->getReturnCode();
 		}
 
@@ -282,7 +296,7 @@ final class ATProtocol
 	private function getUserPds(int $uid): ?string
 	{
 		if ($uid == 0) {
-			return $this->getApi();
+			return $this->config->get('atprotocol', 'appview_api');
 		}
 
 		$pds = $this->pConfig->get($uid, 'bluesky', 'pds');
@@ -407,7 +421,7 @@ final class ATProtocol
 	}
 
 	/**
-	 * Fetches the DID of a given handle via a DND request.
+	 * Fetches the DID of a given handle via a DNS request.
 	 * This is one of the ways, custom handles can be authorized.
 	 *
 	 * @param string $handle The user handle
@@ -433,7 +447,7 @@ final class ATProtocol
 	}
 
 	/**
-	 * Fetch the PDS of a given DID
+	 * Fetch the PDS URL for a given DID
 	 *
 	 * @param string $did DID (did:plc:...)
 	 * @return string|null URL of the PDS, e.g. https://enoki.us-east.host.bsky.network
@@ -455,21 +469,57 @@ final class ATProtocol
 	}
 
 	/**
-	 * Set the AppView API for this class for a given uid
+	 * Set the AppView API for this class for a given user ID
 	 *
 	 * @param integer $uid
 	 * @return void
 	 */
 	public function setApiForUser(int $uid)
 	{
-		$this->api = $this->config->get('atprotocol', 'appview_api');
-		if ($uid !== 0 && $this->getUserPds($uid)) {
-			$this->uid = $uid;
+		$this->uid = $uid;
+
+		if (!$this->getUserPds($uid)) {
+			$this->uid = 0;
 		}
 	}
 
 	/**
-	 * Get the DID PLC Directory
+	 * Get the user ID for which the API URL is set
+	 *
+	 * @return integer
+	 */
+	public function getUser(): int
+	{
+		if (is_null($this->uid)) {
+			$this->logger->notice('API user not set.');
+			$this->uid = 0;
+		}
+
+		return $this->uid;
+	}
+
+	/**
+	 * Get the user ID for the selected protocol
+	 *
+	 * @param integer $protocol
+	 * @return integer|null
+	 */
+	public function getUserForProtocol(int $protocol): ?int
+	{
+		switch ($protocol) {
+			case Conversation::PARCEL_JETSTREAM:
+				return 0;
+
+			case Conversation::PARCEL_CONNECTOR:
+				return $this->getUser();
+
+			default:
+				return null;
+		}
+	}
+
+	/**
+	 * Get the DID PLC directory
 	 *
 	 * @return string
 	 */
@@ -489,7 +539,7 @@ final class ATProtocol
 	}
 
 	/**
-	 * Get the web address for a given uid
+	 * Get the web address for a given user ID
 	 *
 	 * @param integer $uid
 	 * @return string
@@ -590,26 +640,120 @@ final class ATProtocol
 	}
 
 	/**
-	 * Get the profile link for a given DID and user id
+	 * Get the profile link for a given uri and user id
 	 *
-	 * @param string  $did The contact DID
+	 * @param string  $uri The post uri
 	 * @param integer $uid User id to get the web for (0 for global)
 	 * @return string Profile link
 	 */
-	public function getPostLink(string $did, int $uid = 0): string
+	public function getPostLink(string $uri, int $uid = 0): string
 	{
 		$web       = $this->getWebForUser($uid);
 		$frontends = $this->config->get('atprotocol', 'frontends');
 		if ($web && is_array($frontends) && isset($frontends[$web])) {
-			$parts = explode('/', $did);
-			if (count($parts) === 5) {
-				$did        = $parts[2];
-				$collection = $parts[3];
-				$rkeyparts  = explode(':', $parts[4]);
-				$rkey       = $rkeyparts[0];
-				return str_replace(['{did}', '{collection}', '{rkey}'], [$did, $collection, $rkey], $frontends[$web][2]);
+			$parts = $this->getUriObject($uri);
+			if (is_object($parts)) {
+				return str_replace(['{did}', '{collection}', '{rkey}'], [$parts->repo, $parts->collection, $parts->rkey], $frontends[$web][2]);
 			}
 		}
 		return '';
+	}
+
+	/**
+	 * Fetch a record from the AT Protocol repository
+	 *
+	 * @param string $uri AT URI in the format at://did/collection/rkey
+	 * @return stdClass|null The fetched record or null on failure
+	 */
+	public function getRecord(string $uri): ?stdClass
+	{
+		$parts = $this->getUriObject($uri);
+		if (!is_object($parts)) {
+			return null;
+		}
+
+		$url = $this->getPdsOfDid($parts->repo);
+		if (!$url) {
+			return null;
+		}
+
+		$url .= '/xrpc/com.atproto.repo.getRecord?' . http_build_query(['repo' => $parts->repo, 'collection' => $parts->collection, 'rkey' => $parts->rkey]);
+		return $this->get($url);
+	}
+
+	/**
+	 * Create a new record in the AT Protocol repository
+	 *
+	 * @param integer        $uid        User ID
+	 * @param string         $collection Collection name, e.g. "app.bsky.feed.post"
+	 * @param array|stdClass $record     The record data to create
+	 * @return stdClass|null The created record response or null on failure
+	 */
+	public function createRecord(int $uid, string $collection, $record): ?stdClass
+	{
+		$post = [
+			'collection' => $collection,
+			'repo'       => $this->getUserDid($uid),
+			'record'     => $record,
+		];
+
+		return $this->XRPCPost($uid, 'com.atproto.repo.createRecord', $post);
+	}
+
+	/**
+	 * Delete a record from the AT Protocol repository
+	 *
+	 * @param integer $uid User ID
+	 * @param string  $uri AT URI in the format at://did/collection/rkey
+	 * @return stdClass|null The deletion response or null on failure
+	 */
+	public function deleteRecord(int $uid, string $uri): ?stdClass
+	{
+		$parts = $this->getUriObject($uri);
+		if (!is_object($parts)) {
+			return null;
+		}
+
+		return $this->XRPCPost($uid, 'com.atproto.repo.deleteRecord', ['repo' => $parts->repo, 'collection' => $parts->collection, 'rkey' => $parts->rkey]);
+	}
+
+	/**
+	 * Update an existing record in the AT Protocol repository
+	 *
+	 * @param integer        $uid    User ID
+	 * @param string         $uri    AT URI in the format at://did/collection/rkey
+	 * @param array|stdClass $record The updated record data
+	 * @return stdClass|null The update response or null on failure
+	 */
+	public function putRecord(int $uid, string $uri, $record): ?stdClass
+	{
+		$parts = $this->getUriObject($uri);
+		if (!is_object($parts)) {
+			return null;
+		}
+
+		return $this->XRPCPost($uid, 'com.atproto.repo.putRecord', ['repo' => $parts->repo, 'collection' => $parts->collection, 'rkey' => $parts->rkey, 'record' => $record]);
+	}
+
+	/**
+	 * Parse an AT URI into repository, collection and record key.
+	 *
+	 * @param string $uri
+	 * @return stdClass|null
+	 */
+	public function getUriObject(string $uri): ?stdClass
+	{
+		$parts = explode('/', $uri);
+		if (!$parts || count($parts) !== 5 || $parts[0] !== 'at:' || $parts[1] !== '') {
+			return null;
+		}
+
+		$class = new stdClass();
+
+		$class->repo       = $parts[2];
+		$class->collection = $parts[3];
+		$class->rkey       = explode(':', $parts[4])[0];
+
+		return $class;
 	}
 }
