@@ -642,7 +642,7 @@ final class ATProtocol
 	/**
 	 * Get the profile link for a given uri and user id
 	 *
-	 * @param string  $did The post uri
+	 * @param string  $uri The post uri
 	 * @param integer $uid User id to get the web for (0 for global)
 	 * @return string Profile link
 	 */
