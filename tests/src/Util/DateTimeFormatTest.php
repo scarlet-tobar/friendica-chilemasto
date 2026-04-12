@@ -157,6 +157,18 @@ class DateTimeFormatTest extends MockedTestCase
 				'expectedDate' => '2026-04-10T11:52:50+00:00',
 				'dateString'   => 'April, 10 2026 11:52:50 +0000',
 			],
+			'2026:04:08 17:36:01 :' => [
+				'expectedDate' => '2026-04-08T17:36:01+00:00',
+				'dateString'   => '2026:04:08 17:36:01 :',
+			],
+			'Mo, 02/09/2026, 13:03' => [
+				'expectedDate' => '2026-02-09T13:03:00+00:00',
+				'dateString'   => 'Mo, 02/09/2026, 13:03',
+			],
+			'Publicado: 25 Mar 2024, 08:42-03:00' => [
+				'expectedDate' => '2024-03-25T08:42:00-03:00',
+				'dateString'   => 'Publicado: 25 Mar 2024, 08:42-03:00',
+			],
 		];
 	}
 
