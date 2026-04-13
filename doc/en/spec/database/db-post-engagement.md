@@ -22,12 +22,15 @@ Engagement data per post
 
 ## Indexes
 
-| Name       | Fields               |
-| ---------- | -------------------- |
-| PRIMARY    | uri-id               |
-| owner-id   | owner-id             |
-| created    | created              |
-| searchtext | FULLTEXT, searchtext |
+| Name                        | Fields                        |
+| --------------------------- | ----------------------------- |
+| PRIMARY                     | uri-id                        |
+| owner-id                    | owner-id                      |
+| created                     | created                       |
+| searchtext                  | FULLTEXT, searchtext          |
+| network_language_comments   | network, language, comments   |
+| network_language_activities | network, language, activities |
+| network_language_views      | network, language, views      |
 
 ## Foreign keys
 

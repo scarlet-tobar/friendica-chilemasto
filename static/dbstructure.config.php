@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1592);
+	define('DB_UPDATE_VERSION', 1593);
 }
 
 return [
@@ -1382,10 +1382,13 @@ return [
 			"views"        => ["type" => "mediumint unsigned", "comment" => "Number of views"],
 		],
 		"indexes" => [
-			"PRIMARY"    => ["uri-id"],
-			"owner-id"   => ["owner-id"],
-			"created"    => ["created"],
-			"searchtext" => ["FULLTEXT", "searchtext"],
+			"PRIMARY"                     => ["uri-id"],
+			"owner-id"                    => ["owner-id"],
+			"created"                     => ["created"],
+			"searchtext"                  => ["FULLTEXT", "searchtext"],
+			"network_language_comments"   => ["network", "language", "comments"],
+			"network_language_activities" => ["network", "language", "activities"],
+			"network_language_views"      => ["network", "language", "views"],
 		],
 	],
 	"channel-post" => [
