@@ -79,12 +79,15 @@ final class ATProtocol
 	public function getApi(): string
 	{
 		$uid = $this->getUser();
-		$api = $this->getUserPds($uid);
-		if ($api) {
-			return $api;
+		if ($uid !== 0) {
+			$api = $this->pConfig->get($uid, 'bluesky', 'pds');
+			if ($api) {
+				return $api;
+			}
+
+			$this->logger->warning('PDS for user could not be fetched', ['uid' => $uid]);
 		}
 
-		$this->logger->warning('PDS for user could not be fetched', ['uid' => $uid]);
 		return $this->getUserPds(0);
 	}
 
