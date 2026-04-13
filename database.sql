@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2026.04-dev (Blutwurz)
--- DB_UPDATE_VERSION 1592
+-- DB_UPDATE_VERSION 1593
 -- ------------------------------------------
 
 
@@ -1379,6 +1379,9 @@ CREATE TABLE IF NOT EXISTS `post-engagement` (
 	 INDEX `owner-id` (`owner-id`),
 	 INDEX `created` (`created`),
 	 FULLTEXT INDEX `searchtext` (`searchtext`),
+	 INDEX `network_language_comments` (`network`,`language`,`comments`),
+	 INDEX `network_language_activities` (`network`,`language`,`activities`),
+	 INDEX `network_language_views` (`network`,`language`,`views`),
 	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
 	FOREIGN KEY (`owner-id`) REFERENCES `contact` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Engagement data per post';
