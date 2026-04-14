@@ -47,8 +47,8 @@ final class Report extends \Friendica\BaseEntity
 		self::CATEGORY_VIOLATION,
 	];
 
-	const STATUS_CLOSED = 0;
-	const STATUS_OPEN = 1;
+	const STATUS_CLOSED = 1;
+	const STATUS_OPEN = 0;
 
 	const RESOLUTION_ACCEPTED = 0;
 	const RESOLUTION_REJECTED = 1;

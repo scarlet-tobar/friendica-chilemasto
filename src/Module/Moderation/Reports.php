@@ -21,6 +21,7 @@ use Friendica\Database\DBA;
 use Friendica\Module\BaseModeration;
 use Friendica\Module\Moderation\Utils\ReportUtil;
 use Friendica\Module\Response;
+use Friendica\Moderation\Repository\Report as ReportRepository;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
@@ -32,18 +33,40 @@ class Reports extends BaseModeration
 	private $database;
 	/** @var ReportUtil */
 	protected $reportUtil;
+	/** @var ReportRepository */
+	private $reportRepository;
 
-	public function __construct(Database $database, Page $page, ReportUtil $reportUtil, AppHelper $appHelper, SystemMessages $systemMessages, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(Database $database, Page $page, ReportUtil $reportUtil, ReportRepository $reportRepository, AppHelper $appHelper, SystemMessages $systemMessages, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($page, $appHelper, $systemMessages, $session, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->database   = $database;
-		$this->reportUtil = $reportUtil;
+		$this->database            = $database;
+		$this->reportUtil          = $reportUtil;
+		$this->reportRepository    = $reportRepository;
 	}
 
 	protected function post(array $request = [])
 	{
-		// @todo check if POST is really used here
+		// Handle bulk close reports
+		if (!empty($request['close_reports']) && !empty($request['report_ids'])) {
+			$reportIds = $request['report_ids'];
+			if (is_string($reportIds)) {
+				$reportIds = [$reportIds];
+			}
+
+			$closedCount = 0;
+			foreach ($reportIds as $reportId) {
+				try {
+					$this->reportRepository->setStatus((int) $reportId, \Friendica\Moderation\Entity\Report::STATUS_CLOSED);
+					$closedCount++;
+				} catch (\Exception $e) {
+					$this->logger->notice('Error closing report', ['report_id' => $reportId, 'exception' => $e]);
+				}
+			}
+
+			$this->systemMessages->addInfo($this->tt('Report closed.', '%d reports closed.', $closedCount));
+		}
+
 		$this->content($request);
 	}
 
@@ -51,7 +74,7 @@ class Reports extends BaseModeration
 	{
 		parent::content();
 
-		$total = $this->database->count('report');
+		$total = $this->database->count('report', ['status' => \Friendica\Moderation\Entity\Report::STATUS_OPEN]);
 
 		$pager = new Pager($this->l10n, $this->args->getQueryString(), 10);
 
@@ -68,8 +91,10 @@ class Reports extends BaseModeration
 	`contact`.`micro`, `contact`.`name`, `contact`.`nick`, `contact`.`url`, `contact`.`addr`
 FROM report
 INNER JOIN `contact` ON `contact`.`id` = `report`.`cid`
+WHERE `report`.`status` = ?
 ORDER BY `report`.`created` DESC
 LIMIT ?, ?",
+			\Friendica\Moderation\Entity\Report::STATUS_OPEN,
 			$pager->getStart(),
 			$pager->getItemsPerPage(),
 		);
@@ -106,8 +131,10 @@ LIMIT ?, ?",
 			'$description' => $this->t('This page display reports created by our or remote users.'),
 			'$no_data'     => $this->t('No report exists at this node.'),
 
-			'$h_reports'  => $this->t('Reports'),
-			'$th_reports' => [$this->t('Created'), $this->t('Photo'), $this->t('Name'), $this->t('Comment'), $this->t('Category')],
+			'$h_reports'    => $this->t('Reports'),
+			'$th_reports'   => [$this->t('Created'), $this->t('Photo'), $this->t('Name'), $this->t('Comment'), $this->t('Category')],
+			'$select_all'   => $this->t('Select all'),
+			'$close_reports' => $this->t('Close selected reports'),
 
 			// values //
 			'$reports'       => $reports,
