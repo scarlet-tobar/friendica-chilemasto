@@ -40,9 +40,9 @@ class Reports extends BaseModeration
 	{
 		parent::__construct($page, $appHelper, $systemMessages, $session, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->database            = $database;
-		$this->reportUtil          = $reportUtil;
-		$this->reportRepository    = $reportRepository;
+		$this->database         = $database;
+		$this->reportUtil       = $reportUtil;
+		$this->reportRepository = $reportRepository;
 	}
 
 	protected function post(array $request = [])
@@ -131,9 +131,9 @@ LIMIT ?, ?",
 			'$description' => $this->t('This page display reports created by our or remote users.'),
 			'$no_data'     => $this->t('No report exists at this node.'),
 
-			'$h_reports'    => $this->t('Reports'),
-			'$th_reports'   => [$this->t('Created'), $this->t('Photo'), $this->t('Name'), $this->t('Comment'), $this->t('Category')],
-			'$select_all'   => $this->t('Select all'),
+			'$h_reports'     => $this->t('Reports'),
+			'$th_reports'    => [$this->t('Created'), $this->t('Photo'), $this->t('Name'), $this->t('Comment'), $this->t('Category')],
+			'$select_all'    => $this->t('Select all'),
 			'$close_reports' => $this->t('Close selected reports'),
 
 			// values //
