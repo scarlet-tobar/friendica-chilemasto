@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-14 21:57+0000\n"
+"POT-Creation-Date: 2026-04-16 20:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2052,7 +2052,7 @@ msgstr ""
 #: src/Module/Moderation/Blocklist/Server/Index.php:84
 #: src/Module/Moderation/Item/Delete.php:47
 #: src/Module/Moderation/Item/Source.php:71
-#: src/Module/Moderation/Reports.php:129 src/Module/Moderation/Summary.php:64
+#: src/Module/Moderation/Reports.php:125 src/Module/Moderation/Summary.php:64
 #: src/Module/Moderation/Users/Active.php:89
 #: src/Module/Moderation/Users/Blocked.php:89
 #: src/Module/Moderation/Users/Create.php:47
@@ -4075,7 +4075,7 @@ msgstr ""
 msgid "Job Parameters"
 msgstr ""
 
-#: src/Module/Admin/Queue.php:70 src/Module/Moderation/Reports.php:135
+#: src/Module/Admin/Queue.php:70 src/Module/Moderation/Reports.php:131
 #: src/Module/Settings/OAuth.php:63
 msgid "Created"
 msgstr ""
@@ -5546,7 +5546,7 @@ msgstr ""
 msgid "Submanaged account can't access the moderation pages. Please log back in as the main account."
 msgstr ""
 
-#: src/Module/BaseModeration.php:99 src/Module/Moderation/Reports.php:134
+#: src/Module/BaseModeration.php:99 src/Module/Moderation/Reports.php:130
 msgid "Reports"
 msgstr ""
 
@@ -6079,7 +6079,7 @@ msgstr ""
 
 #: src/Module/Contact/Advanced.php:120
 #: src/Module/Moderation/Blocklist/Contact.php:113
-#: src/Module/Moderation/Reports.php:135
+#: src/Module/Moderation/Reports.php:131
 #: src/Module/Moderation/Users/Active.php:82
 #: src/Module/Moderation/Users/Blocked.php:82
 #: src/Module/Moderation/Users/Deleted.php:69
@@ -6198,7 +6198,7 @@ msgstr ""
 #: src/Module/Contact/Follow.php:155 src/Module/Contact/Profile.php:454
 #: src/Module/Contact/Unfollow.php:115
 #: src/Module/Moderation/Blocklist/Contact.php:122
-#: src/Module/Moderation/Reports.php:144
+#: src/Module/Moderation/Reports.php:140
 #: src/Module/Notifications/Introductions.php:125
 #: src/Module/Notifications/Introductions.php:198
 msgid "Profile URL"
@@ -7450,7 +7450,7 @@ msgid "Block New Remote Contact"
 msgstr ""
 
 #: src/Module/Moderation/Blocklist/Contact.php:113
-#: src/Module/Moderation/Reports.php:135
+#: src/Module/Moderation/Reports.php:131
 msgid "Photo"
 msgstr ""
 
@@ -8025,50 +8025,43 @@ msgstr ""
 msgid "3. Pick posts"
 msgstr ""
 
-#: src/Module/Moderation/Reports.php:67
-#, php-format
-msgid "Report closed."
-msgid_plural "%d reports closed."
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/Module/Moderation/Reports.php:130
+#: src/Module/Moderation/Reports.php:126
 msgid "List of reports"
 msgstr ""
 
-#: src/Module/Moderation/Reports.php:131
+#: src/Module/Moderation/Reports.php:127
 msgid "This page display reports created by our or remote users."
 msgstr ""
 
-#: src/Module/Moderation/Reports.php:132
+#: src/Module/Moderation/Reports.php:128
 msgid "No report exists at this node."
 msgstr ""
 
-#: src/Module/Moderation/Reports.php:135 src/Object/Post.php:614
+#: src/Module/Moderation/Reports.php:131 src/Object/Post.php:614
 #: src/Object/Post.php:1165
 msgid "Comment"
 msgstr ""
 
-#: src/Module/Moderation/Reports.php:135
+#: src/Module/Moderation/Reports.php:131
 msgid "Category"
 msgstr ""
 
-#: src/Module/Moderation/Reports.php:136
+#: src/Module/Moderation/Reports.php:132
 msgid "Select all"
 msgstr ""
 
-#: src/Module/Moderation/Reports.php:137
+#: src/Module/Moderation/Reports.php:133
 msgid "Close selected reports"
 msgstr ""
 
-#: src/Module/Moderation/Reports.php:141
+#: src/Module/Moderation/Reports.php:137
 #, php-format
 msgid "%s total report"
 msgid_plural "%s total reports"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Module/Moderation/Reports.php:144
+#: src/Module/Moderation/Reports.php:140
 msgid "URL of the reported contact."
 msgstr ""
 
