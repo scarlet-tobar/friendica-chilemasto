@@ -54,17 +54,13 @@ class Reports extends BaseModeration
 				$reportIds = [$reportIds];
 			}
 
-			$closedCount = 0;
 			foreach ($reportIds as $reportId) {
 				try {
 					$this->reportRepository->setStatus((int) $reportId, \Friendica\Moderation\Entity\Report::STATUS_CLOSED);
-					$closedCount++;
 				} catch (\Exception $e) {
 					$this->logger->notice('Error closing report', ['report_id' => $reportId, 'exception' => $e]);
 				}
 			}
-
-			$this->systemMessages->addInfo($this->tt('Report closed.', '%d reports closed.', $closedCount));
 		}
 
 		$this->content($request);
