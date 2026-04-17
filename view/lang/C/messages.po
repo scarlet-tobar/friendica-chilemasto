@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-16 20:28+0000\n"
+"POT-Creation-Date: 2026-04-17 18:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5782,8 +5782,7 @@ msgstr ""
 #: src/Module/Moderation/Report/Create.php:200
 #: src/Module/Moderation/Report/Create.php:260
 #: src/Module/Settings/Server/Action.php:65 src/Module/User/Delegation.php:181
-#: src/Object/Post.php:1166 view/theme/duepuntozero/config.php:73
-#: view/theme/quattro/config.php:75 view/theme/vier/config.php:123
+#: src/Object/Post.php:1166 view/theme/vier/config.php:123
 msgid "Submit"
 msgstr ""
 
@@ -10007,8 +10006,7 @@ msgstr ""
 msgid "Content Settings"
 msgstr ""
 
-#: src/Module/Settings/Display.php:428 view/theme/duepuntozero/config.php:74
-#: view/theme/frio/config.php:159 view/theme/quattro/config.php:76
+#: src/Module/Settings/Display.php:428 view/theme/frio/config.php:159
 #: view/theme/vier/config.php:124
 msgid "Theme settings"
 msgstr ""
@@ -11992,10 +11990,6 @@ msgstr ""
 msgid "Empty Post"
 msgstr ""
 
-#: view/theme/duepuntozero/config.php:75
-msgid "Variations"
-msgstr ""
-
 #: view/theme/frio/config.php:153
 msgid "Note"
 msgstr ""
@@ -12126,30 +12120,6 @@ msgstr ""
 
 #: view/theme/frio/theme.php:223
 msgid "Your postings with media"
-msgstr ""
-
-#: view/theme/quattro/config.php:77
-msgid "Alignment"
-msgstr ""
-
-#: view/theme/quattro/config.php:77
-msgid "Left"
-msgstr ""
-
-#: view/theme/quattro/config.php:77
-msgid "Center"
-msgstr ""
-
-#: view/theme/quattro/config.php:78
-msgid "Color scheme"
-msgstr ""
-
-#: view/theme/quattro/config.php:79
-msgid "Posts font size"
-msgstr ""
-
-#: view/theme/quattro/config.php:80
-msgid "Textareas font size"
 msgstr ""
 
 #: view/theme/vier/config.php:79
