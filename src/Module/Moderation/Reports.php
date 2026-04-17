@@ -48,7 +48,7 @@ class Reports extends BaseModeration
 	protected function post(array $request = [])
 	{
 		// Handle bulk close reports
-		if (!empty($request['close_reports']) && !empty($request['report_ids'])) {
+		if (isset($request['close_reports']) && isset($request['report_ids'])) {
 			$reportIds = $request['report_ids'];
 			if (is_string($reportIds)) {
 				$reportIds = [$reportIds];
