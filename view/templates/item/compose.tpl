@@ -29,7 +29,7 @@
                 </div>
             {{/if}}
 
-            <div class="comment-edit-bb-{{$id}} btn-toolbar clearfix" role="toolbar" style="margin-bottom: 12px;">
+            <div class="comment-edit-bb-{{$id}} btn-toolbar clearfix" role="toolbar">
                 <div class="btn-group">
                     <button type="button" class="btn btn-default bb-img" aria-label="{{$l10n.edimg}}" title="{{$l10n.edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}" tabindex="6">
                         <i class="fa fa-picture-o"></i>
@@ -102,7 +102,7 @@
                     <button type="button" class="btn btn-default" onclick="preview_comment_toggle({{$id}}, '{{$l10n.preview}}');" id="comment-edit-preview-link-{{$id}}" tabindex="8">
                         <i class="fa fa-eye"></i> <span id="preview-btn-text-{{$id}}">{{$l10n.preview}}</span>
                     </button>
-                    <button type="submit" class="btn btn-primary" id="comment-edit-submit-{{$id}}" name="submit" tabindex="9"><i class="fa fa-envelope"></i> {{$l10n.submit}}</button>
+                    <button type="submit" class="btn btn-primary" id="comment-edit-submit-{{$id}}" name="submit" tabindex="9"><i class="fa fa-paper-plane"></i> {{$l10n.submit}}</button>
                 </div>
             </div>
 

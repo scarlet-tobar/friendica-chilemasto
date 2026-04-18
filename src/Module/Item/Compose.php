@@ -188,7 +188,7 @@ class Compose extends BaseModule
 				'summary'              => $this->l10n->t('Summary'),
 				'visibility_title'     => $this->l10n->t('Visibility'),
 				'mytitle'              => $this->l10n->t('This is you'),
-				'submit'               => $this->l10n->t('Submit'),
+				'submit'               => $this->l10n->t('Post'),
 				'edbold'               => $this->l10n->t('Bold'),
 				'editalic'             => $this->l10n->t('Italic'),
 				'eduline'              => $this->l10n->t('Underline'),

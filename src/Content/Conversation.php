@@ -366,7 +366,7 @@ class Conversation
 			'$new_post'            => $this->l10n->t('New Post'),
 			'$return_path'         => $this->args->getQueryString(),
 			'$action'              => 'item',
-			'$share'               => ($x['button'] ?? '') ?: $this->l10n->t('Share'),
+			'$share'               => ($x['button'] ?? '') ?: $this->l10n->t('Post'),
 			'$loading'             => $this->l10n->t('Loading...'),
 			'$upload'              => $this->l10n->t('Upload photo'),
 			'$shortupload'         => $this->l10n->t('upload photo'),
