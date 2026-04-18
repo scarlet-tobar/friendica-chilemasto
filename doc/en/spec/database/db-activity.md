@@ -10,6 +10,7 @@
 | network             | Network from where the activity comes from | char(4)            | NO   | PRI | NULL    |       |
 | cid                 | the user's public contact                  | int unsigned       | NO   |     | 0       |       |
 | expires             | datetime of activity statistics expiration | datetime           | YES  |     | NULL    |       |
+| languages           | JSON with the selected user languages      | varbinary(383)     | YES  |     | NULL    |       |
 | median-comments     |                                            | int unsigned       | YES  |     | NULL    |       |
 | median-activities   |                                            | int unsigned       | YES  |     | NULL    |       |
 | median-views        |                                            | int unsigned       | YES  |     | NULL    |       |

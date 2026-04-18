@@ -16,6 +16,7 @@ use Friendica\Core\Protocol;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
+use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
 use Psr\Log\LoggerInterface;
 
@@ -62,6 +63,7 @@ final class Activity
 		$activity = new ActivityEntity(
 			$uid,
 			$network,
+			User::getWantedLanguages($uid),
 			$cid,
 			DateTimeFormat::utc('now + 1 hours'),
 			$this->getMedianComments($uid, 4, $network),

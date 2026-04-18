@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2026.04-dev (Blutwurz)
--- DB_UPDATE_VERSION 1593
+-- DB_UPDATE_VERSION 1594
 -- ------------------------------------------
 
 
@@ -364,6 +364,7 @@ CREATE TABLE IF NOT EXISTS `activity` (
 	`network` char(4) NOT NULL COMMENT 'Network from where the activity comes from',
 	`cid` int unsigned NOT NULL DEFAULT 0 COMMENT 'the user\'s public contact',
 	`expires` datetime COMMENT 'datetime of activity statistics expiration',
+	`languages` varbinary(383) COMMENT 'JSON with the selected user languages',
 	`median-comments` int unsigned COMMENT '',
 	`median-activities` int unsigned COMMENT '',
 	`median-views` int unsigned COMMENT '',
@@ -568,6 +569,8 @@ CREATE TABLE IF NOT EXISTS `contact-relation` (
 	`post-score` smallint unsigned COMMENT 'score for the amount of posts from cid that can be seen by relation-cid',
 	 PRIMARY KEY(`cid`,`relation-cid`),
 	 INDEX `relation-cid-network` (`relation-cid`,`network`),
+	 INDEX `cid_follows_relation-cid` (`cid`,`follows`,`relation-cid`),
+	 INDEX `cid_relation-cid` (`cid`,`relation-cid`),
 	FOREIGN KEY (`cid`) REFERENCES `contact` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
 	FOREIGN KEY (`relation-cid`) REFERENCES `contact` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Contact relations';

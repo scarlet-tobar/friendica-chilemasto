@@ -277,6 +277,21 @@ class DBA
 	}
 
 	/**
+	 * Insert multiple rows into a table.
+	 *
+	 * @param string $table          Table name in format [schema.]table
+	 * @param array  $rows           Array of parameter arrays
+	 * @param int    $duplicate_mode What to do on a duplicated entry
+	 *
+	 * @return boolean was the insert successful?
+	 * @throws \Exception
+	 */
+	public static function batchInsert(string $table, array $rows, int $duplicate_mode = Database::INSERT_DEFAULT): bool
+	{
+		return DI::dba()->batchInsert($table, $rows, $duplicate_mode);
+	}
+
+	/**
 	 * Inserts a row with the provided data in the provided table.
 	 * If the data corresponds to an existing row through a UNIQUE or PRIMARY index constraints, it updates the row instead.
 	 *
