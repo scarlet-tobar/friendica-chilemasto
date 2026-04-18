@@ -1163,7 +1163,7 @@ class Post
 				'$mytitle'     => DI::l10n()->t('This is you'),
 				'$myphoto'     => DI::baseUrl()->remove($owner['thumb'] ?? ''),
 				'$comment'     => DI::l10n()->t('Comment'),
-				'$submit'      => DI::l10n()->t('Submit'),
+				'$submit'      => DI::l10n()->t('Post comment'),
 				'$loading'     => DI::l10n()->t('Loading...'),
 				'$edbold'      => DI::l10n()->t('Bold'),
 				'$editalic'    => DI::l10n()->t('Italic'),
