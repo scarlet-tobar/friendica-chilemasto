@@ -2321,6 +2321,7 @@ button[disabled] {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
+	margin-bottom: 0;
 }
 
 /* acpopup  + textcompletion*/
@@ -2925,9 +2926,6 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 }
 #prvmail-end {
 	clear: both;
-}
-#modal #prvmail-text-edit-bb .bb-img {
-	display: none;
 }
 
 /* photos */
