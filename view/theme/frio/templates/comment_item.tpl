@@ -18,35 +18,38 @@
 		<input type="hidden" name="post_id_random" value="{{$rand_num}}" />
 
 		<p class="comment-edit-bb-{{$id}} comment-icon-list">
-			<span>
-				<button type="button" class="btn btn-sm template-icon bb-img" style="cursor: pointer;" aria-label="{{$edimg}}" title="{{$edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}">
+			<span class="btn-group">
+				<button type="button" class="btn bb-img" style="cursor: pointer;" aria-label="{{$edimg}}" title="{{$edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}">
 					<i class="fa fa-picture-o"></i>
 				</button>
-				<button type="button" class="btn btn-sm template-icon bb-attach" style="cursor: pointer;" aria-label="{{$edattach}}" title="{{$edattach}}" ondragenter="return commentLinkDrop(event, {{$id}});" ondragover="return commentLinkDrop(event, {{$id}});" ondrop="commentLinkDropper(event);" onclick="commentGetLink({{$id}}, '{{$prompttext}}');">
+				<button type="button" class="btn bb-attach" style="cursor: pointer;" aria-label="{{$edattach}}" title="{{$edattach}}" ondragenter="return commentLinkDrop(event, {{$id}});" ondragover="return commentLinkDrop(event, {{$id}});" ondrop="commentLinkDropper(event);" onclick="commentGetLink({{$id}}, '{{$prompttext}}');">
 					<i class="fa fa-paperclip"></i>
 				</button>
 			</span>
-			<span>
-				<button type="button" class="btn btn-sm template-icon bb-url" style="cursor: pointer;" aria-label="{{$edurl}}" title="{{$edurl}}" onclick="insertFormatting('url',{{$id}});">
+			<span class="btn-group">
+				<button type="button" class="btn bb-url" style="cursor: pointer;" aria-label="{{$edurl}}" title="{{$edurl}}" onclick="insertFormatting('url',{{$id}});">
 					<i class="fa fa-link"></i>
 				</button>
-				<button type="button" class="btn btn-sm template-icon underline" style="cursor: pointer;" aria-label="{{$eduline}}" title="{{$eduline}}" onclick="insertFormatting('u',{{$id}});">
+				<button type="button" class="btn underline" style="cursor: pointer;" aria-label="{{$eduline}}" title="{{$eduline}}" onclick="insertFormatting('u',{{$id}});">
 					<i class="fa fa-underline"></i>
 				</button>
-				<button type="button" class="btn btn-sm template-icon italic" style="cursor: pointer;" aria-label="{{$editalic}}" title="{{$editalic}}" onclick="insertFormatting('i',{{$id}});">
+				<button type="button" class="btn italic" style="cursor: pointer;" aria-label="{{$editalic}}" title="{{$editalic}}" onclick="insertFormatting('i',{{$id}});">
 					<i class="fa fa-italic"></i>
 				</button>
-				<button type="button" class="btn btn-sm template-icon bold" style="cursor: pointer;" aria-label="{{$edbold}}" title="{{$edbold}}" onclick="insertFormatting('b',{{$id}});">
+				<button type="button" class="btn bold" style="cursor: pointer;" aria-label="{{$edbold}}" title="{{$edbold}}" onclick="insertFormatting('b',{{$id}});">
 					<i class="fa fa-bold"></i>
 				</button>
-				<button type="button" class="btn btn-sm template-icon quote" style="cursor: pointer;" aria-label="{{$edquote}}" title="{{$edquote}}" onclick="insertFormatting('quote',{{$id}});">
+				<button type="button" class="btn quote" style="cursor: pointer;" aria-label="{{$edquote}}" title="{{$edquote}}" onclick="insertFormatting('quote',{{$id}});">
 					<i class="fa fa-quote-left"></i>
 				</button>
-				<button type="button" class="btn btn-sm template-icon emojis" style="cursor: pointer;" aria-label="{{$edemojis}}" title="{{$edemojis}}">
+				<button type="button" class="btn emojis" style="cursor: pointer;" aria-label="{{$edemojis}}" title="{{$edemojis}}">
 					<i class="fa fa-smile-o"></i>
 				</button>
-				<button type="button" class="btn btn-sm template-icon bold" style="cursor: pointer;" aria-label="{{$contentwarn}}" title="{{$contentwarn}}" onclick="insertFormatting('abstract',{{$id}});">
+				<button type="button" class="btn eye" style="cursor: pointer;" aria-label="{{$contentwarn}}" title="{{$contentwarn}}" onclick="insertFormatting('abstract',{{$id}});">
 					<i class="fa fa-eye"></i>
+				</button>
+				<button type="button" class="btn code" style="cursor: pointer;" aria-label="{{$edcode}}" title="{{$edcode}}" onclick="insertFormatting('code',{{$id}});">
+					<i class="fa fa-code"></i>
 				</button>
 			</span>
 			</p>
@@ -79,12 +82,12 @@
 
 <script>
 	$('[id=comment-fake-text-{{$id}}]').on('focus', function() {
-		dzFactory.setupDropzone('#dropzone-{{$id}}', 'comment-edit-text-{{$id}}'); 
+		dzFactory.setupDropzone('#dropzone-{{$id}}', 'comment-edit-text-{{$id}}');
 		$('[id=comment-fake-text-{{$id}}]').prop('focus', null).off('focus');
 		$('[id=comment-{{$id}}]').prop('click', null).off('click');
 	});
 	$('[id=comment-{{$id}}]').on('click', function() {
-		dzFactory.setupDropzone('#dropzone-{{$id}}', 'comment-edit-text-{{$id}}'); 
+		dzFactory.setupDropzone('#dropzone-{{$id}}', 'comment-edit-text-{{$id}}');
 		$('[id=comment-fake-text-{{$id}}]').prop('focus', null).off('focus');
 		$('[id=comment-{{$id}}]').prop('click', null).off('click');
 	});
