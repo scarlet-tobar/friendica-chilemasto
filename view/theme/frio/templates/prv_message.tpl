@@ -28,7 +28,7 @@
 		<textarea class="prvmail-text form-control text-autosize" id="comment-edit-text-input" name="body" tabindex="12" dir="auto" onkeydown="sendOnCtrlEnter(event, 'prvmail-submit')">{{$text}}</textarea>
 	</div>
 
-	<ul id="prvmail-text-edit-bb" class="comment-edit-bb comment-icon-list nav nav-pills hidden-xs pull-left">
+	<ul id="prvmail-text-edit-bb" class="comment-edit-bb comment-icon-list nav nav-pills pull-left">
 				<li>
 					<button type="button" class="btn-link icon bb-img" style="cursor: pointer;" title="{{$edimg}}" data-role="insert-formatting" data-comment=" " data-bbcode="imgprv" data-id="input">
 						<i class="fa fa-picture-o" aria-hidden="true"></i>
@@ -63,6 +63,11 @@
 				<li>
 					<button type="button" class="btn-link icon quote" style="cursor: pointer;" title="{{$edquote}}" data-role="insert-formatting" data-comment=" " data-bbcode="quote" data-id="input">
 						<i class="fa fa-quote-left" aria-hidden="true"></i>
+					</button>
+				</li>
+				<li>
+					<button type="button" class="btn-link icon code" style="cursor: pointer;" title="{{$edquote}}" data-role="insert-formatting" data-comment=" " data-bbcode="code" data-id="input">
+						<i class="fa fa-code" aria-hidden="true"></i>
 					</button>
 				</li>
 			</ul>
