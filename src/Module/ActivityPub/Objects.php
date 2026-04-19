@@ -105,7 +105,7 @@ class Objects extends BaseModule
 		} elseif (empty($this->parameters['activity']) || in_array(
 			$this->parameters['activity'],
 			['Create', 'Announce', 'Update', 'Like', 'Dislike', 'Accept', 'Reject',
-				'TentativeAccept', 'Follow', 'Add', 'Delete']
+				'TentativeAccept', 'Follow', 'Add', 'Delete'],
 		)) {
 			$data = ActivityPub\Transmitter::createCachedActivityFromItem($item['id']);
 			if (empty($data)) {
@@ -122,6 +122,10 @@ class Objects extends BaseModule
 		// Relaxed CORS header for public items
 		header('Access-Control-Allow-Origin: *');
 
-		$this->jsonExit($data, 'application/activity+json');
+		if ($item['deleted']) {
+			$this->jsonError(410, $data, 'application/activity+json');
+		} else {
+			$this->jsonExit($data, 'application/activity+json');
+		}
 	}
 }
