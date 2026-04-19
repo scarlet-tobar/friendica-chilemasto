@@ -794,7 +794,7 @@ return [
 	],
 	'atprotocol' => [
 		// appview_api (URL)
-		// Path to the public Bluesky AppView API.
+		// Path to a public AppView server.
 		'appview_api' => 'https://public.api.bsky.app',
 		// frontends (Array)
 		// Array of various web frontends for the AT Protocol
@@ -808,15 +808,17 @@ return [
 			'https://klearsky.pages.dev' => ['Klearsky', 'https://klearsky.pages.dev/?ref=blueskydirectory#/profile/feeds?account={did}', 'https://klearsky.pages.dev/#/post?uri=at://{did}/{collection}/{rkey}'],
 		],
 		// jetstream (URL)
-		// Path to the jetstream service. Available servers are:
+		// Path to the jetstream service. Available servers from Bluesky are:
 		// jetstream1.us-east.bsky.network, jetstream2.us-east.bsky.network, jetstream1.us-west.bsky.network, jetstream2.us-west.bsky.network
+		// independant servers are: jetstream2.fr.hose.cam and jetstream.fire.hose.cam
+		// See also the servers at https://firehose.stream/
 		'jetstream' => 'jetstream1.us-west.bsky.network',
 		// directory (URL)
 		// Path to the directory server service to fetch the PDS of a given DID
 		'plc_directory' => 'https://plc.directory',
 		// web (URL)
 		// Path to the web interface with the user profile and posts.
-		// Other options are https://reddwarf.app or https://blacksky.community
+		// See 'frontends' for the available options.
 		'web' => 'https://bsky.app',
 	],
 ];
