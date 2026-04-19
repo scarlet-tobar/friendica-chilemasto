@@ -192,7 +192,9 @@ class Contact
 		if (empty($contact)) {
 			return false;
 		}
-		$contact['uid'] = 0;
+		$contact['uid']     = 0;
+		$contact['blocked'] = false;
+		$contact['pending'] = false;
 		return (bool) self::insert($contact);
 	}
 
