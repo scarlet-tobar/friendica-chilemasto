@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1593);
+	define('DB_UPDATE_VERSION', 1594);
 }
 
 return [
@@ -410,6 +410,7 @@ return [
 			"network"             => ["type" => "char(4)", "not null" => "1", "primary" => "1", "comment" => "Network from where the activity comes from"],
 			"cid"                 => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id"], "comment" => "the user's public contact"],
 			"expires"             => ["type" => "datetime", "comment" => "datetime of activity statistics expiration"],
+			"languages"           => ["type" => "varbinary(383)", "comment" => "JSON with the selected user languages"],
 			"median-comments"     => ["type" => "int unsigned", "comment" => ""],
 			"median-activities"   => ["type" => "int unsigned", "comment" => ""],
 			"median-views"        => ["type" => "int unsigned", "comment" => ""],
@@ -613,8 +614,10 @@ return [
 			"post-score"            => ["type" => "smallint unsigned", "comment" => "score for the amount of posts from cid that can be seen by relation-cid"],
 		],
 		"indexes" => [
-			"PRIMARY"              => ["cid", "relation-cid"],
-			"relation-cid-network" => ["relation-cid", "network"],
+			"PRIMARY"                  => ["cid", "relation-cid"],
+			"relation-cid-network"     => ["relation-cid", "network"],
+			"cid_follows_relation-cid" => ["cid" , "follows", "relation-cid"],
+			"cid_relation-cid"         => ["cid", "relation-cid"],
 		],
 	],
 	"conv" => [

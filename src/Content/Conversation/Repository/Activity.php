@@ -54,6 +54,9 @@ final class Activity
 	 */
 	public function save(ActivityEntity $activity): bool
 	{
-		return $this->dba->insert('activity', $activity->toArray(), Database::INSERT_UPDATE);
+		$data              = $activity->toArray();
+		$data['languages'] = json_encode($activity->languages);
+
+		return $this->dba->insert('activity', $data, Database::INSERT_UPDATE);
 	}
 }

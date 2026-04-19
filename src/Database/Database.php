@@ -1047,6 +1047,70 @@ class Database
 	}
 
 	/**
+	 * Insert multiple rows into a table.
+	 *
+	 * @param string $table          Table name in format [schema.]table
+	 * @param array  $rows           Array of parameter arrays
+	 * @param int    $duplicate_mode What to do on a duplicated entry
+	 *
+	 * @return boolean was the insert successful?
+	 * @throws \Exception
+	 */
+	public function batchInsert(string $table, array $rows, int $duplicate_mode = self::INSERT_DEFAULT): bool
+	{
+		if (empty($table) || empty($rows)) {
+			$this->logger->info('Table and rows have to be set');
+			return false;
+		}
+
+		$first_row = reset($rows);
+		$fields    = array_keys($first_row);
+
+		if (empty($fields)) {
+			$this->logger->info('Fields have to be set');
+			return false;
+		}
+
+		$fields_string = implode(', ', array_map([DBA::class, 'quoteIdentifier'], $fields));
+		$table_string  = DBA::buildTableString([$table]);
+
+		$values_list = [];
+		$all_values  = [];
+
+		foreach ($rows as $row) {
+			$row = $this->castFields($table, $row);
+
+			$placeholders  = array_fill(0, count($fields), '?');
+			$values_list[] = '(' . implode(', ', $placeholders) . ')';
+
+			foreach ($fields as $field) {
+				$all_values[] = $row[$field] ?? null;
+			}
+		}
+
+		$values_string = implode(', ', $values_list);
+
+		$sql = "INSERT ";
+
+		if ($duplicate_mode == self::INSERT_IGNORE) {
+			$sql .= "IGNORE ";
+		}
+
+		$sql .= "INTO " . $table_string . " (" . $fields_string . ") VALUES " . $values_string;
+
+		$result = $this->e($sql, $all_values);
+		if (!$result || ($duplicate_mode != self::INSERT_IGNORE)) {
+			return $result;
+		}
+
+		if ($this->affectedRows() === 0) {
+			$this->logger->info('affectedRows is 0.', ['table' => $table, 'rows' => count($rows), 'sql' => $this->replaceParameters($sql, $all_values)]);
+		}
+
+		return $this->affectedRows() != 0;
+	}
+
+	/**
 	 * Inserts a row with the provided data in the provided table.
 	 * If the data corresponds to an existing row through a UNIQUE or PRIMARY index constraints, it updates the row instead.
 	 *

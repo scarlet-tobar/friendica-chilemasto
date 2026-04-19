@@ -20,10 +20,12 @@ Contact relations
 
 ## Indexes
 
-| Name                 | Fields                |
-| -------------------- | --------------------- |
-| PRIMARY              | cid, relation-cid     |
-| relation-cid-network | relation-cid, network |
+| Name                     | Fields                     |
+| ------------------------ | -------------------------- |
+| PRIMARY                  | cid, relation-cid          |
+| relation-cid-network     | relation-cid, network      |
+| cid_follows_relation-cid | cid, follows, relation-cid |
+| cid_relation-cid         | cid, relation-cid          |
 
 ## Foreign keys
 

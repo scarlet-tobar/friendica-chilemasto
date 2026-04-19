@@ -16,6 +16,7 @@ final class Activity
 {
 	public int $uid;
 	public string $network;
+	public array $languages;
 	public int $cid;
 	public string $expires;
 	public int $medianComments;
@@ -29,6 +30,7 @@ final class Activity
 	 *
 	 * @param int $uid
 	 * @param string $network
+	 * @param array $languages
 	 * @param int $cid
 	 * @param string $expires
 	 * @param int $medianComments
@@ -40,6 +42,7 @@ final class Activity
 	public function __construct(
 		int $uid,
 		string $network,
+		array $languages,
 		int $cid,
 		string $expires,
 		int $medianComments,
@@ -50,6 +53,7 @@ final class Activity
 	) {
 		$this->uid               = $uid;
 		$this->network           = $network;
+		$this->languages         = $languages;
 		$this->cid               = $cid;
 		$this->expires           = $expires;
 		$this->medianComments    = $medianComments;
@@ -67,9 +71,18 @@ final class Activity
 	 */
 	public static function fromArray(array $data): self
 	{
+		$languages = [];
+		if (isset($data['languages'])) {
+			$decoded = json_decode($data['languages'], true);
+			if (is_array($decoded)) {
+				$languages = $decoded;
+			}
+		}
+
 		return new self(
 			$data['uid'],
 			$data['network'],
+			$languages,
 			$data['cid'],
 			$data['expires'],
 			$data['median-comments'],
@@ -90,6 +103,7 @@ final class Activity
 		return [
 			'uid'                 => $this->uid,
 			'network'             => $this->network,
+			'languages'           => $this->languages,
 			'cid'                 => $this->cid,
 			'expires'             => $this->expires,
 			'median-comments'     => $this->medianComments,
