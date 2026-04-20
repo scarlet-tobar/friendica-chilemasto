@@ -2255,24 +2255,6 @@ button[disabled] {
 /*
 * Comments
 */
-wall-item-comment-wrapper.well {
-	border: none;
-	box-shadow: none;
-	background-color: rgba(237, 237, 237, $contentbg_transp);
-	background-image: none;
-	margin-bottom: 1px;
-	background-color: red;
-}
-wall-item-comment-wrapper.well-small {
-	padding: 10px;
-	border-radius: 3px;
-}
-wall-item-comment-wrapper.well hr {
-	border-top: 1px solid #d9d9d9;
-}
-.wall-entry wall-item-comment-wrapper.well {
-	margin-bottom: 0;
-}
 .comment-container {
 	margin-bottom: 0px;
 	border-top-left-radius: 3px;
@@ -2308,7 +2290,7 @@ wall-item-comment-wrapper.well hr {
 .wall-item-comment-wrapper {
 	padding: 10px;
 	border-top: 1px solid rgba(255, 255, 255, 0.8);
-	background-color: rgba(0, 0, 0, 0.03);
+	background-color: var(--content-bg);
 	border-radius: 0 0 4px 4px;
 	margin-bottom: 0;
 }
@@ -2337,7 +2319,9 @@ wall-item-comment-wrapper.well hr {
 
 .comment-icon-list {
 	display: flex;
+	flex-wrap: wrap;
 	justify-content: space-between;
+	margin-bottom: 0;
 }
 
 /* acpopup  + textcompletion*/
@@ -2942,9 +2926,6 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 }
 #prvmail-end {
 	clear: both;
-}
-#modal #prvmail-text-edit-bb .bb-img {
-	display: none;
 }
 
 /* photos */

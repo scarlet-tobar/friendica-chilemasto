@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-17 18:05+0200\n"
+"POT-Creation-Date: 2026-04-21 00:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1052,8 +1052,8 @@ msgstr ""
 msgid "New Post"
 msgstr ""
 
-#: src/Content/Conversation.php:369
-msgid "Share"
+#: src/Content/Conversation.php:369 src/Module/Item/Compose.php:191
+msgid "Post"
 msgstr ""
 
 #: src/Content/Conversation.php:370 src/Content/Nav.php:113
@@ -1182,7 +1182,7 @@ msgid "Preview"
 msgstr ""
 
 #: src/Content/Conversation.php:429 src/Content/Item.php:442
-#: src/Content/Widget/VCard.php:120 src/Model/Contact.php:1306
+#: src/Content/Widget/VCard.php:120 src/Model/Contact.php:1308
 #: src/Model/Profile.php:472 src/Module/Admin/Logs/View.php:79
 #: src/Module/Post/Edit.php:181
 msgid "Message"
@@ -1693,27 +1693,27 @@ msgstr ""
 msgid "Complete Thread"
 msgstr ""
 
-#: src/Content/Item.php:437 src/Model/Contact.php:1301
+#: src/Content/Item.php:437 src/Model/Contact.php:1303
 msgid "View Status"
 msgstr ""
 
-#: src/Content/Item.php:438 src/Content/Item.php:461 src/Model/Contact.php:1236
-#: src/Model/Contact.php:1292 src/Model/Contact.php:1302
+#: src/Content/Item.php:438 src/Content/Item.php:461 src/Model/Contact.php:1238
+#: src/Model/Contact.php:1294 src/Model/Contact.php:1304
 #: src/Module/Directory.php:143 src/Module/Settings/Profile/Index.php:279
 msgid "View Profile"
 msgstr ""
 
-#: src/Content/Item.php:439 src/Model/Contact.php:1303
+#: src/Content/Item.php:439 src/Model/Contact.php:1305
 msgid "View Photos"
 msgstr ""
 
-#: src/Content/Item.php:440 src/Model/Contact.php:1270
+#: src/Content/Item.php:440 src/Model/Contact.php:1272
 #: src/Model/Profile.php:444
 msgid "Network Posts"
 msgstr ""
 
-#: src/Content/Item.php:441 src/Model/Contact.php:1294
-#: src/Model/Contact.php:1305
+#: src/Content/Item.php:441 src/Model/Contact.php:1296
+#: src/Model/Contact.php:1307
 msgid "View Contact"
 msgstr ""
 
@@ -1751,7 +1751,7 @@ msgid "Raw content"
 msgstr ""
 
 #: src/Content/Item.php:458 src/Content/Widget.php:71
-#: src/Model/Contact.php:1295 src/Model/Contact.php:1307
+#: src/Model/Contact.php:1297 src/Model/Contact.php:1309
 #: src/Module/Contact/Follow.php:152 view/theme/vier/theme.php:182
 msgid "Connect/Follow"
 msgstr ""
@@ -2249,7 +2249,7 @@ msgstr ""
 msgid "Organisations"
 msgstr ""
 
-#: src/Content/Widget.php:563 src/Model/Contact.php:1797
+#: src/Content/Widget.php:563 src/Model/Contact.php:1799
 msgid "News"
 msgstr ""
 
@@ -2311,12 +2311,12 @@ msgstr ""
 msgid "Show Less"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:94 src/Model/Contact.php:1264
+#: src/Content/Widget/VCard.php:94 src/Model/Contact.php:1266
 #: src/Model/Profile.php:438
 msgid "Post to group"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:99 src/Model/Contact.php:1268
+#: src/Content/Widget/VCard.php:99 src/Model/Contact.php:1270
 #: src/Model/Profile.php:442 src/Module/Moderation/Item/Source.php:81
 msgid "Mention"
 msgstr ""
@@ -2349,13 +2349,13 @@ msgstr ""
 msgid "Follow"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:118 src/Model/Contact.php:1296
-#: src/Model/Contact.php:1308 src/Model/Profile.php:468
+#: src/Content/Widget/VCard.php:118 src/Model/Contact.php:1298
+#: src/Model/Contact.php:1310 src/Model/Profile.php:468
 #: src/Module/Contact/Profile.php:521
 msgid "Unfollow"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:124 src/Model/Contact.php:1266
+#: src/Content/Widget/VCard.php:124 src/Model/Contact.php:1268
 #: src/Model/Profile.php:440
 msgid "View group"
 msgstr ""
@@ -2900,83 +2900,83 @@ msgstr ""
 msgid "Edit circles"
 msgstr ""
 
-#: src/Model/Contact.php:1315 src/Module/Moderation/Users/Pending.php:88
+#: src/Model/Contact.php:1317 src/Module/Moderation/Users/Pending.php:88
 #: src/Module/Notifications/Introductions.php:128
 msgid "Approve"
 msgstr ""
 
-#: src/Model/Contact.php:1653 src/Model/Contact.php:1718
+#: src/Model/Contact.php:1655 src/Model/Contact.php:1720
 #: src/Module/Contact/Profile.php:399
 #, php-format
 msgid "%s has blocked you"
 msgstr ""
 
-#: src/Model/Contact.php:1793
+#: src/Model/Contact.php:1795
 msgid "Organisation"
 msgstr ""
 
-#: src/Model/Contact.php:1801
+#: src/Model/Contact.php:1803
 msgid "Group"
 msgstr ""
 
-#: src/Model/Contact.php:1805 src/Module/Moderation/BaseUsers.php:150
+#: src/Model/Contact.php:1807 src/Module/Moderation/BaseUsers.php:150
 msgid "Relay"
 msgstr ""
 
-#: src/Model/Contact.php:3131
+#: src/Model/Contact.php:3133
 msgid "Disallowed profile URL."
 msgstr ""
 
-#: src/Model/Contact.php:3136 src/Module/Friendica.php:106
+#: src/Model/Contact.php:3138 src/Module/Friendica.php:106
 msgid "Blocked domain"
 msgstr ""
 
-#: src/Model/Contact.php:3141
+#: src/Model/Contact.php:3143
 msgid "Connect URL missing."
 msgstr ""
 
-#: src/Model/Contact.php:3154
+#: src/Model/Contact.php:3156
 msgid "The contact could not be added. Please check the relevant network credentials in your Settings -> Social Networks page."
 msgstr ""
 
-#: src/Model/Contact.php:3172
+#: src/Model/Contact.php:3174
 #, php-format
 msgid "Expected network %s does not match actual network %s"
 msgstr ""
 
-#: src/Model/Contact.php:3189
+#: src/Model/Contact.php:3191
 msgid "This seems to be a relay account. They can't be followed by users."
 msgstr ""
 
-#: src/Model/Contact.php:3196
+#: src/Model/Contact.php:3198
 msgid "The profile address specified does not provide adequate information."
 msgstr ""
 
-#: src/Model/Contact.php:3198
+#: src/Model/Contact.php:3200
 msgid "No compatible communication protocols or feeds were discovered."
 msgstr ""
 
-#: src/Model/Contact.php:3201
+#: src/Model/Contact.php:3203
 msgid "An author or name was not found."
 msgstr ""
 
-#: src/Model/Contact.php:3204
+#: src/Model/Contact.php:3206
 msgid "No browser URL could be matched to this address."
 msgstr ""
 
-#: src/Model/Contact.php:3207
+#: src/Model/Contact.php:3209
 msgid "Unable to match @-style Identity Address with a known protocol or email contact."
 msgstr ""
 
-#: src/Model/Contact.php:3208
+#: src/Model/Contact.php:3210
 msgid "Use mailto: in front of address to force email check."
 msgstr ""
 
-#: src/Model/Contact.php:3214
+#: src/Model/Contact.php:3216
 msgid "Limited profile. This person will be unable to receive direct/personal notifications from you."
 msgstr ""
 
-#: src/Model/Contact.php:3273
+#: src/Model/Contact.php:3275
 msgid "Unable to retrieve contact information."
 msgstr ""
 
@@ -5775,14 +5775,13 @@ msgstr ""
 #: src/Module/Debug/Probe.php:40 src/Module/Debug/WebFinger.php:37
 #: src/Module/FriendSuggest.php:138 src/Module/Install.php:219
 #: src/Module/Install.php:259 src/Module/Install.php:296
-#: src/Module/Invite.php:162 src/Module/Item/Compose.php:191
-#: src/Module/Moderation/Item/Source.php:75
+#: src/Module/Invite.php:162 src/Module/Moderation/Item/Source.php:75
 #: src/Module/Moderation/Report/Create.php:157
 #: src/Module/Moderation/Report/Create.php:172
 #: src/Module/Moderation/Report/Create.php:200
 #: src/Module/Moderation/Report/Create.php:260
 #: src/Module/Settings/Server/Action.php:65 src/Module/User/Delegation.php:181
-#: src/Object/Post.php:1166 view/theme/vier/config.php:123
+#: view/theme/vier/config.php:123
 msgid "Submit"
 msgstr ""
 
@@ -11847,6 +11846,10 @@ msgstr ""
 #: src/Object/Post.php:773
 #, php-format
 msgid "Quote shared by: %s"
+msgstr ""
+
+#: src/Object/Post.php:1166
+msgid "Post comment"
 msgstr ""
 
 #: src/Protocol/ActivityPub/Receiver.php:577

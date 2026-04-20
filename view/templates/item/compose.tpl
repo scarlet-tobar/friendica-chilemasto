@@ -29,7 +29,7 @@
                 </div>
             {{/if}}
 
-            <div class="comment-edit-bb-{{$id}} btn-toolbar clearfix" role="toolbar" style="margin-bottom: 12px;">
+            <div class="comment-edit-bb-{{$id}} btn-toolbar clearfix" role="toolbar">
                 <div class="btn-group">
                     <button type="button" class="btn btn-default bb-img" aria-label="{{$l10n.edimg}}" title="{{$l10n.edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}" tabindex="6">
                         <i class="fa fa-picture-o"></i>
@@ -58,7 +58,7 @@
                         <button type="button" class="btn btn-default quote" aria-label="{{$l10n.edquote}}" title="{{$l10n.edquote}}" onclick="insertFormatting('quote',{{$id}});" tabindex="12">
                             <i class="fa fa-quote-left"></i>
                         </button>
-                        <button type="button" id="button_emojipicker"class="btn btn-default emojis" aria-label="{{$l10n.edemojis}}" title="{{$l10n.edemojis}}" tabindex="13">
+                        <button type="button" id="button_emojipicker" class="btn btn-default emojis" aria-label="{{$l10n.edemojis}}" title="{{$l10n.edemojis}}" tabindex="13">
                             <i class="fa fa-smile-o"></i>
                         </button>
                         <button type="button" class="btn btn-default bb-url" aria-label="{{$l10n.contentwarn}}" title="{{$l10n.contentwarn}}" onclick="insertFormatting('abstract',{{$id}});" tabindex="14">
@@ -102,7 +102,7 @@
                     <button type="button" class="btn btn-default" onclick="preview_comment_toggle({{$id}}, '{{$l10n.preview}}');" id="comment-edit-preview-link-{{$id}}" tabindex="8">
                         <i class="fa fa-eye"></i> <span id="preview-btn-text-{{$id}}">{{$l10n.preview}}</span>
                     </button>
-                    <button type="submit" class="btn btn-primary" id="comment-edit-submit-{{$id}}" name="submit" tabindex="9"><i class="fa fa-envelope"></i> {{$l10n.submit}}</button>
+                    <button type="submit" class="btn btn-primary" id="comment-edit-submit-{{$id}}" name="submit" tabindex="9"><i class="fa fa-paper-plane"></i> {{$l10n.submit}}</button>
                 </div>
             </div>
 
