@@ -24,25 +24,13 @@ when:
   branch: [ develop, '*-rc' ]
   event: push
 
-skip_clone: true
-
 steps:
-  clone:
-    image: alpine/git
-    commands:
-      - git config --global user.email "no-reply@friendi.ca"
-      - git config --global user.name "Friendica"
-      - git config --global --add safe.directory $CI_WORKSPACE
-      - git clone $CI_REPO_CLONE_URL .
-      - git checkout $CI_COMMIT_BRANCH
-      - git fetch origin $CI_COMMIT_REF
-      - git merge $CI_COMMIT_SHA
   restore_cache:
     image: meltwater/drone-cache:dev
     settings:
       backend: "filesystem"
       restore: true
-      cache_key: "{{ .Repo.Name }}_php7.4_{{ arch }}_{{ os }}"
+      cache_key: "{{ .Repo.Name }}_php{{PHP_MAJOR_VERSION}}_{{ arch }}_{{ os }}"
       archive_format: "gzip"
       mount:
         - '.composer'
