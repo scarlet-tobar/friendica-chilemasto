@@ -87,6 +87,17 @@ class Content
 	}
 
 	/**
+	 * Check if a post-content entry exists that quotes the given URI ID
+	 *
+	 * @param integer $uri_id
+	 * @return boolean exists?
+	 */
+	public static function existsQuote(int $uri_id): bool
+	{
+		return DBA::exists('post-content', ['quote-uri-id' => $uri_id]);
+	}
+
+	/**
 	 * Search posts for given content
 	 *
 	 * @param string $search
@@ -111,7 +122,7 @@ class Content
 
 		$params = [
 			'order' => ['uri-id' => true],
-			'limit' => [$start, $limit]
+			'limit' => [$start, $limit],
 		];
 
 		$tags = DBA::select(SearchIndex::getSearchTable(), ['uri-id'], $condition, $params);
