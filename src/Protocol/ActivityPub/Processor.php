@@ -45,13 +45,13 @@ use Friendica\Worker\FetchMissingActivity;
  */
 class Processor
 {
-	const CACHEKEY_FETCH_ACTIVITY = 'processor:fetchMissingActivity:';
-	const CACHEKEY_JUST_FETCHED   = 'processor:isJustFetched:';
+	public const CACHEKEY_FETCH_ACTIVITY = 'processor:fetchMissingActivity:';
+	public const CACHEKEY_JUST_FETCHED   = 'processor:isJustFetched:';
 
-	const FETCH_REPLIES_ALL         = 0;
-	const FETCH_REPLIES_NONE        = 1;
-	const FETCH_REPLIES_FOLLOWED    = 2;
-	const FETCH_REPLIES_INTERACTION = 3;
+	public const FETCH_REPLIES_ALL         = 0;
+	public const FETCH_REPLIES_NONE        = 1;
+	public const FETCH_REPLIES_FOLLOWED    = 2;
+	public const FETCH_REPLIES_INTERACTION = 3;
 
 	/**
 	 * Add an object id to the list of processed ids
@@ -128,8 +128,8 @@ class Processor
 				array_column($emojis, 'name'),
 				array_map(function ($emoji) {
 					return '[emoji=' . $emoji['href'] . ']' . $emoji['name'] . '[/emoji]';
-				}, $emojis)
-			)
+				}, $emojis),
+			),
 		);
 
 		// We store the emoji here to be able to avoid storing it in the media
@@ -1095,6 +1095,11 @@ class Processor
 	 */
 	private static function isSolicitedMessage(array $activity, array $item): bool
 	{
+		if (Post\Content::existsQuote($item['uri-id'])) {
+			DI::logger()->debug('Message is used in a quote - accepted', ['uri-id' => $item['uri-id'], 'guid' => $item['guid'], 'url' => $item['uri']]);
+			return true;
+		}
+
 		// The checks are split to improve the support when searching why a message was accepted.
 		if (count($activity['receiver']) != 1) {
 			// The message has more than one receiver, so it is wanted.
@@ -1253,7 +1258,7 @@ class Processor
 						&& in_array($activity['thread-children-type'] ?? '', Receiver::ACTIVITY_TYPES)) {
 						DI::logger()->info(
 							'Top level post from thread completion from a non sharer had been initiated via an activity, ignoring',
-							['type' => $activity['thread-children-type'], 'user' => $item['uid'], 'causer' => $item['causer-link'], 'author' => $activity['author'], 'url' => $item['uri']]
+							['type' => $activity['thread-children-type'], 'user' => $item['uid'], 'causer' => $item['causer-link'], 'author' => $activity['author'], 'url' => $item['uri']],
 						);
 						continue;
 					}
@@ -1375,7 +1380,7 @@ class Processor
 				$has_parents = true;
 			} elseif ($add_parent && Post::exists(['uri-id' => $item['parent-uri-id'], 'uid' => 0])) {
 				$stored      = Item::storeForUserByUriId($item['parent-uri-id'], $receiver, $fields);
-				$has_parents = (bool)$stored;
+				$has_parents = (bool) $stored;
 				if ($stored) {
 					DI::logger()->notice('Inserted missing parent post', ['stored' => $stored, 'uid' => $receiver, 'parent' => $item['parent-uri']]);
 				} else {
@@ -1394,7 +1399,7 @@ class Processor
 				$has_parents = true;
 			} elseif (($has_parents || $add_parent) && Post::exists(['uri-id' => $item['thr-parent-id'], 'uid' => 0])) {
 				$stored      = Item::storeForUserByUriId($item['thr-parent-id'], $receiver, $fields);
-				$has_parents = $has_parents || (bool)$stored;
+				$has_parents = $has_parents || (bool) $stored;
 				if ($stored) {
 					DI::logger()->notice('Inserted missing thread parent post', ['stored' => $stored, 'uid' => $receiver, 'thread-parent' => $item['thr-parent']]);
 				} else {
