@@ -399,8 +399,10 @@ class BaseApi extends BaseModule
 	{
 		try {
 			$token = self::getCurrentApplication();
+		} catch (HTTPException\UnauthorizedException $th) {
+			$this->logAndJsonUnauthorizedError($th->getCode(), $this->errorFactory->Unauthorized($th->getMessage()));
 		} catch (\Throwable $th) {
-			$this->logAndJsonError($th->getCode(), $this->errorFactory->Forbidden($th->getMessage()));
+			$this->logAndJsonError(403, $this->errorFactory->Forbidden($th->getMessage()));
 		}
 
 		if (empty($token)) {
@@ -515,5 +517,17 @@ class BaseApi extends BaseModule
 	{
 		$this->logger->info('API Error', ['no' => $errorno, 'error' => $error->toArray(), 'method' => $this->args->getMethod(), 'command' => $this->args->getQueryString(), 'user-agent' => $this->server['HTTP_USER_AGENT'] ?? '']);
 		$this->jsonError($errorno, $error->toArray());
+	}
+
+	/**
+	 * @param int   $errorno
+	 * @param Error $error
+	 * @return never
+	 * @throws HTTPException\InternalServerErrorException
+	 */
+	protected function logAndJsonUnauthorizedError(int $errorno, Error $error)
+	{
+		$this->logger->info('API Error', ['no' => $errorno, 'error' => $error->toArray(), 'method' => $this->args->getMethod(), 'command' => $this->args->getQueryString(), 'user-agent' => $this->server['HTTP_USER_AGENT'] ?? '']);
+		$this->jsonError(401, $error->toArray());
 	}
 }

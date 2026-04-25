@@ -41,14 +41,22 @@ class UploadTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	//public function testApiMediaUploadWithoutAuthenticatedUser()
-	//{
-	//	$this->expectException(UnauthorizedException::class);
-	//	AuthTestConfig::$authenticated = false;
-	//
-	//	(new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-	//		->run($this->httpExceptionMock);
-	//}
+	public function testApiMediaUploadWithoutAuthenticatedUser()
+	{
+		$this->expectException(UnauthorizedException::class);
+		AuthTestConfig::$authenticated = false;
+
+		(new class (DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []) extends Upload {
+			public function jsonError(int $httpCode, $content, string $content_type = 'application/json')
+			{
+				if ($httpCode === 401) {
+					throw new UnauthorizedException(json_encode($content));
+				}
+
+				parent::jsonError($httpCode, $content, $content_type);
+			}
+		})->run($this->httpExceptionMock);
+	}
 
 	/**
 	 * Test the \Friendica\Module\Api\Twitter\Media\Upload module with an invalid uploaded media.
