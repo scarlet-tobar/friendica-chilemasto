@@ -108,7 +108,7 @@ class ExpirePosts
 		DI::logger()->notice('Delete orphaned entries');
 
 		// "post-user" is the leading table. So we delete every entry that isn't found there
-		$tables = ['item', 'post', 'post-content', 'post-thread', 'post-thread-user'];
+		$tables = ['item', 'post', 'post-content', 'post-quote', 'post-thread', 'post-thread-user'];
 		foreach ($tables as $table) {
 			if (($table == 'item') && !DBStructure::existsTable('item')) {
 				continue;
@@ -217,6 +217,7 @@ class ExpirePosts
 			LEFT JOIN `post-user` pu5 ON i.id = pu5.`replies-id`
 			LEFT JOIN `post-thread` pt1 ON i.id = pt1.`context-id`
 			LEFT JOIN `post-thread` pt2 ON i.id = pt2.`conversation-id`
+			LEFT JOIN `post-quote` pq ON i.id = pq.`quote-uri-id`
 			LEFT JOIN `mail` m1 ON i.id = m1.`uri-id`
 			LEFT JOIN `event` e ON i.id = e.`uri-id`
 			LEFT JOIN `user-contact` uc ON i.id = uc.`uri-id`
@@ -237,6 +238,7 @@ class ExpirePosts
 			  pu5.`replies-id` IS NULL AND
 			  pt1.`context-id` IS NULL AND
 			  pt2.`conversation-id` IS NULL AND
+			  pq.`quote-uri-id` IS NULL AND
 			  m1.`uri-id` IS NULL AND
 			  e.`uri-id` IS NULL AND
 			  uc.`uri-id` IS NULL AND

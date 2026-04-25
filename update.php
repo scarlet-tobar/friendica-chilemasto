@@ -1532,3 +1532,15 @@ function update_1573()
 	DBA::close($media);
 	return Update::SUCCESS;
 }
+
+function update_1595()
+{
+	if (!DBA::e("INSERT IGNORE INTO `post-quote` (`uri-id`, `quote-uri-id`)
+		SELECT `uri-id`, `quote-uri-id`
+		FROM `post-content`
+		WHERE NOT `quote-uri-id` IS NULL")) {
+		return Update::FAILED;
+	}
+
+	return Update::SUCCESS;
+}

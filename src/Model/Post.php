@@ -685,6 +685,7 @@ class Post
 		}
 
 		$update_fields = DI::dbaDefinition()->truncateFieldsForTable('post-content', $fields);
+		unset($update_fields['quote-uri-id']);
 		if (!empty($update_fields)) {
 			$affected_count = 0;
 			$posts          = DBA::select('post-user-view', ['uri-id'], $condition, ['group_by' => ['uri-id']]);
