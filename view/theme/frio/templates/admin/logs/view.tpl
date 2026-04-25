@@ -32,7 +32,7 @@
 					<th>{{$l10n.Date}}</th>
 					<th class="dropdown">
 						<a class="dropdown-toggle text-nowrap" type="button" id="level" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							{{$l10n.Level}} {{if $filters.level}}({{$filters.level}}){{/if}}<span class="caret"></span>
+							{{$l10n.Level}}{{if $filters.level}}({{$filters.level}}){{/if}}<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu" aria-labelledby="level">
 							{{foreach $filtersvalues.level as $v }}
@@ -46,7 +46,7 @@
 					</th>
 					<th class="dropdown">
 						<a class="dropdown-toggle text-nowrap" type="button" id="context" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							{{$l10n.Context}} {{if $filters.context}}({{$filters.context}}){{/if}}<span class="caret"></span>
+							{{$l10n.Context}}{{if $filters.context}}({{$filters.context}}){{/if}}<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu" aria-labelledby="context">
 							{{foreach $filtersvalues.context as $v }}
@@ -58,7 +58,7 @@
 							{{/foreach}}
 						</ul>
 					</th>
-					<th>{{$l10n.Message}}</th>
+					<th class="log-message">{{$l10n.Message}}</th>
 				</tr>
 			</thead>
 			<tbody>

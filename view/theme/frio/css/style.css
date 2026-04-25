@@ -3593,19 +3593,10 @@ li.addon {
 	display: flex;
 	align-items: center;
 }
-#adminpage .table-logs thead tr {
-	display: grid;
-	grid-auto-flow: row;
-}
-#adminpage .table-logs tbody {
-	display: table;
-	width: 100%;
-	table-layout: fixed;
-}
 #adminpage .table-logs td {
 	word-break: break-word;
 }
-#adminpage .table-logs td.log-message {
+#adminpage .table-logs th.log-message, #adminpage .table-logs td.log-message {
 	width: 40%;
 }
 #logdetail td.log-message {
@@ -3616,11 +3607,8 @@ li.addon {
 	max-width: 296px;
 }
 @media (min-width: 600px) {
-	#adminpage .table-logs thead tr {
-		grid-auto-flow: column;
-	}
-	#adminpage .table-logs td.log-message {
-		width: 60%;
+	#adminpage .table-logs th.log-message, #adminpage .table-logs td.log-message {
+		width: 57%;
 	}
 }
 #adminpage td,
