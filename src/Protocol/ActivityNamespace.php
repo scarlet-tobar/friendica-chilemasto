@@ -190,4 +190,30 @@ final class ActivityNamespace
 	 * @var string
 	 */
 	const PEERTUBE        = 'https://joinpeertube.org';
+
+	/**
+	 * FEP-3b86: Activity Intents base namespace.
+	 * Activity Intents enable remote servers to link users back to their home server
+	 * to perform activities (Follow, Create, etc.) on remote content.
+	 *
+	 * @see https://w3id.org/fep/3b86
+	 * @var string
+	 */
+	const FEP3B86         = 'https://w3id.org/fep/3b86';
+
+	/**
+	 * FEP-3b86: Follow Intent – endpoint to follow a remote actor
+	 *
+	 * @see https://w3id.org/fep/3b86
+	 * @var string
+	 */
+	const FEP3B86_FOLLOW  = 'https://w3id.org/fep/3b86/Follow';
+
+	/**
+	 * FEP-3b86: Create Intent – endpoint to create a new post (share / compose)
+	 *
+	 * @see https://w3id.org/fep/3b86
+	 * @var string
+	 */
+	const FEP3B86_CREATE  = 'https://w3id.org/fep/3b86/Create';
 }

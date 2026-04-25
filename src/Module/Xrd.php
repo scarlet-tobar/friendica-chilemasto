@@ -165,6 +165,14 @@ class Xrd extends BaseModule
 					'rel'      => ActivityNamespace::OSTATUSSUB,
 					'template' => $baseURL . '/contact/follow?url={uri}',
 				],
+				[
+					'rel'      => ActivityNamespace::FEP3B86_FOLLOW,
+					'template' => $baseURL . '/contact/follow?url={object}',
+				],
+				[
+					'rel'      => ActivityNamespace::FEP3B86_CREATE,
+					'template' => $baseURL . '/compose?body={content}&title={name}&summary={summary}&attachment={attachment}',
+				],
 			]
 		];
 		header('Access-Control-Allow-Origin: *');
@@ -223,6 +231,14 @@ class Xrd extends BaseModule
 				[
 					'rel'      => ActivityNamespace::OSTATUSSUB,
 					'template' => $baseURL . '/contact/follow?url={uri}',
+				],
+				[
+					'rel'      => ActivityNamespace::FEP3B86_FOLLOW,
+					'template' => $baseURL . '/contact/follow?url={object}',
+				],
+				[
+					'rel'      => ActivityNamespace::FEP3B86_CREATE,
+					'template' => $baseURL . '/compose?body={content}&title={name}&summary={summary}&attachment={attachment}',
 				],
 				[
 					'rel'  => ActivityNamespace::OPENWEBAUTH,
@@ -309,6 +325,18 @@ class Xrd extends BaseModule
 					]
 				],
 				'10:link' => [
+					'@attributes' => [
+						'rel'      => ActivityNamespace::FEP3B86_FOLLOW,
+						'template' => $baseURL . '/contact/follow?url={object}'
+					]
+				],
+				'11:link' => [
+					'@attributes' => [
+						'rel'      => ActivityNamespace::FEP3B86_CREATE,
+						'template' => $baseURL . '/compose?body={content}&title={name}&summary={summary}&attachment={attachment}'
+					]
+				],
+				'12:link' => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::OPENWEBAUTH,
 						'type' => 'application/x-zot+json',
