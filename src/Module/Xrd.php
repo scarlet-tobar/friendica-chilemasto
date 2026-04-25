@@ -127,7 +127,7 @@ class Xrd extends BaseModule
 
 	private function printSystemJSON(array $owner)
 	{
-		$baseURL = (string)$this->baseUrl;
+		$baseURL = (string) $this->baseUrl;
 		$json    = [
 			'subject' => 'acct:' . $owner['addr'],
 			'aliases' => [$owner['url']],
@@ -173,7 +173,7 @@ class Xrd extends BaseModule
 					'rel'      => ActivityNamespace::FEP3B86_CREATE,
 					'template' => $baseURL . '/compose?body={content}&title={name}&summary={summary}&attachment={attachment}',
 				],
-			]
+			],
 		];
 		header('Access-Control-Allow-Origin: *');
 		$this->jsonExit($json, 'application/jrd+json; charset=utf-8');
@@ -181,7 +181,7 @@ class Xrd extends BaseModule
 
 	private function printJSON(string $alias, array $owner, array $avatar)
 	{
-		$baseURL = (string)$this->baseUrl;
+		$baseURL = (string) $this->baseUrl;
 
 		$json = [
 			'subject' => 'acct:' . $owner['addr'],
@@ -254,7 +254,7 @@ class Xrd extends BaseModule
 
 	private function printXML(string $alias, array $owner, array $avatar)
 	{
-		$baseURL = (string)$this->baseUrl;
+		$baseURL = (string) $this->baseUrl;
 
 		$xmlString = XML::fromArray([
 			'XRD' => [
@@ -267,81 +267,81 @@ class Xrd extends BaseModule
 				'1:link'  => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::DFRN,
-						'href' => $owner['url']
-					]
+						'href' => $owner['url'],
+					],
 				],
 				'2:link' => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::FEED,
 						'type' => 'application/atom+xml',
-						'href' => $owner['poll']
-					]
+						'href' => $owner['poll'],
+					],
 				],
 				'3:link' => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::WEBFINGERPROFILE,
 						'type' => 'text/html',
-						'href' => $owner['url']
-					]
+						'href' => $owner['url'],
+					],
 				],
 				'4:link' => [
 					'@attributes' => [
 						'rel'  => 'self',
 						'type' => 'application/activity+json',
-						'href' => $owner['url']
-					]
+						'href' => $owner['url'],
+					],
 				],
 				'5:link' => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::HCARD,
 						'type' => 'text/html',
-						'href' => $baseURL . '/hcard/' . $owner['nickname']
-					]
+						'href' => $baseURL . '/hcard/' . $owner['nickname'],
+					],
 				],
 				'6:link' => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::WEBFINGERAVATAR,
 						'type' => $avatar['type'],
-						'href' => User::getAvatarUrl($owner)
-					]
+						'href' => User::getAvatarUrl($owner),
+					],
 				],
 				'7:link' => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::DIASPORA_SEED,
 						'type' => 'text/html',
-						'href' => $baseURL
-					]
+						'href' => $baseURL,
+					],
 				],
 				'8:link' => [
 					'@attributes' => [
 						'rel'  => 'salmon',
-						'href' => $baseURL . '/receive/users/' . $owner['guid']
-					]
+						'href' => $baseURL . '/receive/users/' . $owner['guid'],
+					],
 				],
 				'9:link' => [
 					'@attributes' => [
 						'rel'      => ActivityNamespace::OSTATUSSUB,
-						'template' => $baseURL . '/contact/follow?url={uri}'
-					]
+						'template' => $baseURL . '/contact/follow?url={uri}',
+					],
 				],
 				'10:link' => [
 					'@attributes' => [
 						'rel'      => ActivityNamespace::FEP3B86_FOLLOW,
-						'template' => $baseURL . '/contact/follow?url={object}'
-					]
+						'template' => $baseURL . '/contact/follow?url={object}',
+					],
 				],
 				'11:link' => [
 					'@attributes' => [
 						'rel'      => ActivityNamespace::FEP3B86_CREATE,
-						'template' => $baseURL . '/compose?body={content}&title={name}&summary={summary}&attachment={attachment}'
-					]
+						'template' => $baseURL . '/compose?body={content}&title={name}&summary={summary}&attachment={attachment}',
+					],
 				],
 				'12:link' => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::OPENWEBAUTH,
 						'type' => 'application/x-zot+json',
-						'href' => $baseURL . '/owa'
-					]
+						'href' => $baseURL . '/owa',
+					],
 				],
 			],
 		]);
