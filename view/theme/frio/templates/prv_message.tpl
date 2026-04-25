@@ -14,15 +14,14 @@
 	<div id="prvmail-to-label" class="form-group">
 		<label for="recipient">{{$to}}</label><br>
 		{{$select nofilter}}
+		 <small>{{$to_desc}}</small>
 	</div>
 
 	{{* The subject input field *}}
 	<div id="prvmail-subject-label" class="form-group">
-		<label for="prvmail-subject">{{$subject}}</label>
-		<input type="text" id="prvmail-subject" class="form-control" name="subject" value="{{$subjtxt}}" {{$readonly}} tabindex="11" />
+	  <input type="text" id="prvmail-subject" class="form-control" placeholder="{{$subject}}" name="subject" value="{{$subjtxt}}" {{$readonly}} tabindex="11" />
 	</div>
 
-	<label for="comment-edit-text-input">{{$yourmessage}}</label>
 	<div id="prvmail-text-edit-bb" class="comment-edit-bb comment-icon-list">
 		<div class="btn-group">
 			<button type="button" class="btn btn-default icon bb-img" style="cursor: pointer;" title="{{$edimg}}" data-role="insert-formatting" data-comment=" " data-bbcode="imgprv" data-id="input">
@@ -58,7 +57,7 @@
 	</div>
 
 	{{* The message input field which contains the message text *}}
-	<textarea class="prvmail-text form-control text-autosize" id="comment-edit-text-input" name="body" tabindex="12" dir="auto" onkeydown="sendOnCtrlEnter(event, 'prvmail-submit')">{{$text}}</textarea>
+	<textarea class="prvmail-text form-control text-autosize" id="comment-edit-text-input" name="body" placeholder="{{$yourmessage}}" tabindex="12" dir="auto" onkeydown="sendOnCtrlEnter(event, 'prvmail-submit')">{{$text}}</textarea>
 
 	{{* The submit button *}}
 	<div id="prvmail-submit-wrapper">
