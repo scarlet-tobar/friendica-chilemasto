@@ -1101,14 +1101,7 @@ class Item
 	public function isTooOld(string $created, int $uid = 0): bool
 	{
 		// check for create date and expire time
-		$expire_interval = $this->config->get('system', 'dbclean-expire-days', 0);
-
-		if ($uid) {
-			$user = DBA::selectFirst('user', ['expire'], ['uid' => $uid]);
-			if (DBA::isResult($user) && ($user['expire'] > 0) && (($user['expire'] < $expire_interval) || ($expire_interval == 0))) {
-				$expire_interval = $user['expire'];
-			}
-		}
+		$expire_interval = $this->getExpirationDays($uid);
 
 		if (($expire_interval > 0) && !empty($created)) {
 			$expire_date  = time() - ($expire_interval * 86400);
@@ -1120,6 +1113,24 @@ class Item
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get the expiration days for a user
+	 *
+	 * @param integer $uid
+	 * @return integer expiration days
+	 */
+	public function getExpirationDays(int $uid = 0): int
+	{
+		$expiration = $this->config->get('system', 'dbclean-expire-days') ?? 0;
+		if ($this->pConfig->get($uid, 'expire', 'items', true)) {
+			$user = User::getById($uid, ['expire']);
+			if (isset($user['expire']) && ($user['expire'] > 0) && (($user['expire'] < $expiration) || ($expiration == 0))) {
+				$expiration = $user['expire'];
+			}
+		}
+		return $expiration;
 	}
 
 	/**
