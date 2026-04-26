@@ -1335,8 +1335,8 @@ return [
 	"post-quote" => [
 		"comment" => "Quotes",
 		"fields"  => [
-			"uri-id"          => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the item uri"],
-			"quote-uri-id"    => ["type" => "int unsigned", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table that contains the quoted uri"],
+			"uri-id"       => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the item uri"],
+			"quote-uri-id" => ["type" => "int unsigned", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table that contains the quoted uri"],
 		],
 		"indexes" => [
 			"PRIMARY"      => ["uri-id"],

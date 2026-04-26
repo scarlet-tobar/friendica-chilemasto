@@ -199,7 +199,7 @@ class ExpirePosts
 		$item = Post::selectFirstThread(
 			['uri-id'],
 			["`uid` = ? AND `received` < ?", 0, DateTimeFormat::utc('now - 1 day')],
-			['order' => ['received' => true]]
+			['order' => ['received' => true]],
 		);
 		if (empty($item['uri-id'])) {
 			DI::logger()->warning('No item with uri-id found - we better quit here');
@@ -252,7 +252,7 @@ class ExpirePosts
 			  m3.`thr-parent-id` IS NULL
 			LIMIT ?',
 			$item['uri-id'],
-			$limit
+			$limit,
 		];
 		$pass = 0;
 		do {
@@ -307,7 +307,7 @@ class ExpirePosts
 					WHERE (`origin` OR `event-id` != 0 OR `post-type` = ?) AND `parent-uri-id` = `post-thread`.`uri-id`)
 				AND NOT `uri-id` IN (SELECT `uri-id` FROM `post-content`
 					WHERE `resource-id` != 0 AND `uri-id` = `post-thread`.`uri-id`)",
-				DateTimeFormat::utc('now - ' . (int)$expire_days . ' days'), Item::PT_PERSONAL_NOTE
+				DateTimeFormat::utc('now - ' . (int) $expire_days . ' days'), Item::PT_PERSONAL_NOTE,
 			];
 			$pass = 0;
 			do {
@@ -335,7 +335,7 @@ class ExpirePosts
 					AND `i`.`parent-uri-id` = `post-user`.`uri-id`)
 				AND NOT `uri-id` IN (SELECT `parent-uri-id` FROM `post-user` AS `i` WHERE `i`.`uid` = ?
 					AND `i`.`parent-uri-id` = `post-user`.`uri-id` AND `i`.`received` > ?)",
-				Item::GRAVITY_PARENT, 0, DateTimeFormat::utc('now - ' . (int)$expire_days_unclaimed . ' days'), 0, 0, DateTimeFormat::utc('now - ' . (int)$expire_days_unclaimed . ' days')
+				Item::GRAVITY_PARENT, 0, DateTimeFormat::utc('now - ' . (int) $expire_days_unclaimed . ' days'), 0, 0, DateTimeFormat::utc('now - ' . (int) $expire_days_unclaimed . ' days'),
 			];
 			$pass = 0;
 			do {
