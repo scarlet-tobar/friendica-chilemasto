@@ -1095,7 +1095,7 @@ class Processor
 	 */
 	private static function isSolicitedMessage(array $activity, array $item): bool
 	{
-		if (Post\Content::existsQuote($item['uri-id'])) {
+		if (Post\Quote::existsQuote($item['uri-id'])) {
 			DI::logger()->debug('Message is used in a quote - accepted', ['uri-id' => $item['uri-id'], 'guid' => $item['guid'], 'url' => $item['uri']]);
 			return true;
 		}

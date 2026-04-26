@@ -934,6 +934,10 @@ class Item
 			}
 		}
 
+		if (isset($item['quote-uri-id'])) {
+			Post\Quote::insert($item['uri-id'], $item);
+		}
+
 		// The content of activities normally doesn't matter - except for emoji activities
 		if (in_array($item['gravity'], [self::GRAVITY_PARENT, self::GRAVITY_COMMENT]) || in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE, Activity::EMOJIREACT]) && !empty($item['body']) && (mb_strlen($item['body']) == 1)) {
 			if (!Post\Content::exists($item['uri-id']) && !Post\Content::insert($item['uri-id'], $item)) {

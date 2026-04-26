@@ -51,6 +51,7 @@ class OptimizeTables
 			DBA::optimizeTable('photo');
 			DBA::optimizeTable('post');
 			DBA::optimizeTable('post-content');
+			DBA::optimizeTable('post-quote');
 			DBA::optimizeTable('post-delivery-data');
 			DBA::optimizeTable('post-link');
 			DBA::optimizeTable('post-thread');

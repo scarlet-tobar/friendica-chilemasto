@@ -1128,7 +1128,7 @@ class Conversation
 		$condition = DBA::mergeConditions(['quote-uri-id' => $uriids], ["NOT `quote-uri-id` IS NULL"]);
 		$separator = chr(255) . chr(255) . chr(255);
 
-		$sql = "SELECT `quote-uri-id`, COUNT(*) AS `total`, GROUP_CONCAT(REPLACE(`name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title` FROM `post-content` INNER JOIN `post` ON `post`.`uri-id` = `post-content`.`uri-id` INNER JOIN `contact` ON `post`.`author-id` = `contact`.`id` WHERE " . array_shift($condition) . " GROUP BY `quote-uri-id`";
+		$sql = "SELECT `quote-uri-id`, COUNT(*) AS `total`, GROUP_CONCAT(REPLACE(`name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title` FROM `post-quote` INNER JOIN `post` ON `post`.`uri-id` = `post-quote`.`uri-id` INNER JOIN `contact` ON `post`.`author-id` = `contact`.`id` WHERE " . array_shift($condition) . " GROUP BY `quote-uri-id`";
 
 		$quotes = [];
 

@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1594);
+	define('DB_UPDATE_VERSION', 1595);
 }
 
 return [
@@ -1310,7 +1310,7 @@ return [
 			"content-warning" => ["type" => "varchar(500)", "not null" => "1", "default" => "", "comment" => ""],
 			"body"            => ["type" => "mediumtext", "comment" => "item body content"],
 			"raw-body"        => ["type" => "mediumtext", "comment" => "Body without embedded media links"],
-			"quote-uri-id"    => ["type" => "int unsigned", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table that contains the quoted uri"],
+			"quote-uri-id"    => ["type" => "int unsigned", "comment" => "Deprecated. It is replaced by the field quote-uri-id in the table post-quote"],
 			"location"        => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "text location where this item originated"],
 			"coord"           => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "longitude/latitude pair representing location where this item originated"],
 			"language"        => ["type" => "text", "comment" => "Language information about this post"],
@@ -1329,6 +1329,17 @@ return [
 			"PRIMARY"      => ["uri-id"],
 			"plink"        => ["plink(191)"],
 			"resource-id"  => ["resource-id"],
+			"quote-uri-id" => ["quote-uri-id"],
+		],
+	],
+	"post-quote" => [
+		"comment" => "Quotes",
+		"fields"  => [
+			"uri-id"       => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the item uri"],
+			"quote-uri-id" => ["type" => "int unsigned", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table that contains the quoted uri"],
+		],
+		"indexes" => [
+			"PRIMARY"      => ["uri-id"],
 			"quote-uri-id" => ["quote-uri-id"],
 		],
 	],

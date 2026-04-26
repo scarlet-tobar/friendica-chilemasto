@@ -108,7 +108,7 @@ class ExpirePosts
 		DI::logger()->notice('Delete orphaned entries');
 
 		// "post-user" is the leading table. So we delete every entry that isn't found there
-		$tables = ['item', 'post', 'post-content', 'post-thread', 'post-thread-user'];
+		$tables = ['item', 'post', 'post-content', 'post-quote', 'post-thread', 'post-thread-user'];
 		foreach ($tables as $table) {
 			if (($table == 'item') && !DBStructure::existsTable('item')) {
 				continue;
@@ -199,7 +199,7 @@ class ExpirePosts
 		$item = Post::selectFirstThread(
 			['uri-id'],
 			["`uid` = ? AND `received` < ?", 0, DateTimeFormat::utc('now - 1 day')],
-			['order' => ['received' => true]]
+			['order' => ['received' => true]],
 		);
 		if (empty($item['uri-id'])) {
 			DI::logger()->warning('No item with uri-id found - we better quit here');
@@ -217,6 +217,7 @@ class ExpirePosts
 			LEFT JOIN `post-user` pu5 ON i.id = pu5.`replies-id`
 			LEFT JOIN `post-thread` pt1 ON i.id = pt1.`context-id`
 			LEFT JOIN `post-thread` pt2 ON i.id = pt2.`conversation-id`
+			LEFT JOIN `post-quote` pq ON i.id = pq.`quote-uri-id`
 			LEFT JOIN `mail` m1 ON i.id = m1.`uri-id`
 			LEFT JOIN `event` e ON i.id = e.`uri-id`
 			LEFT JOIN `user-contact` uc ON i.id = uc.`uri-id`
@@ -237,6 +238,7 @@ class ExpirePosts
 			  pu5.`replies-id` IS NULL AND
 			  pt1.`context-id` IS NULL AND
 			  pt2.`conversation-id` IS NULL AND
+			  pq.`quote-uri-id` IS NULL AND
 			  m1.`uri-id` IS NULL AND
 			  e.`uri-id` IS NULL AND
 			  uc.`uri-id` IS NULL AND
@@ -250,7 +252,7 @@ class ExpirePosts
 			  m3.`thr-parent-id` IS NULL
 			LIMIT ?',
 			$item['uri-id'],
-			$limit
+			$limit,
 		];
 		$pass = 0;
 		do {
@@ -305,7 +307,7 @@ class ExpirePosts
 					WHERE (`origin` OR `event-id` != 0 OR `post-type` = ?) AND `parent-uri-id` = `post-thread`.`uri-id`)
 				AND NOT `uri-id` IN (SELECT `uri-id` FROM `post-content`
 					WHERE `resource-id` != 0 AND `uri-id` = `post-thread`.`uri-id`)",
-				DateTimeFormat::utc('now - ' . (int)$expire_days . ' days'), Item::PT_PERSONAL_NOTE
+				DateTimeFormat::utc('now - ' . (int) $expire_days . ' days'), Item::PT_PERSONAL_NOTE,
 			];
 			$pass = 0;
 			do {
@@ -333,7 +335,7 @@ class ExpirePosts
 					AND `i`.`parent-uri-id` = `post-user`.`uri-id`)
 				AND NOT `uri-id` IN (SELECT `parent-uri-id` FROM `post-user` AS `i` WHERE `i`.`uid` = ?
 					AND `i`.`parent-uri-id` = `post-user`.`uri-id` AND `i`.`received` > ?)",
-				Item::GRAVITY_PARENT, 0, DateTimeFormat::utc('now - ' . (int)$expire_days_unclaimed . ' days'), 0, 0, DateTimeFormat::utc('now - ' . (int)$expire_days_unclaimed . ' days')
+				Item::GRAVITY_PARENT, 0, DateTimeFormat::utc('now - ' . (int) $expire_days_unclaimed . ' days'), 0, 0, DateTimeFormat::utc('now - ' . (int) $expire_days_unclaimed . ' days'),
 			];
 			$pass = 0;
 			do {

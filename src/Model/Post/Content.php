@@ -28,6 +28,7 @@ class Content
 		}
 
 		$fields = DI::dbaDefinition()->truncateFieldsForTable('post-content', $data);
+		unset($fields['quote-uri-id']);
 
 		// Additionally assign the key fields
 		$fields['uri-id'] = $uri_id;
@@ -51,6 +52,7 @@ class Content
 		}
 
 		$fields = DI::dbaDefinition()->truncateFieldsForTable('post-content', $data);
+		unset($fields['quote-uri-id']);
 
 		// Remove the key fields
 		unset($fields['uri-id']);
@@ -84,17 +86,6 @@ class Content
 	public static function exists(int $uri_id): bool
 	{
 		return DBA::exists('post-content', ['uri-id' => $uri_id]);
-	}
-
-	/**
-	 * Check if a post-content entry exists that quotes the given URI ID
-	 *
-	 * @param integer $uri_id
-	 * @return boolean exists?
-	 */
-	public static function existsQuote(int $uri_id): bool
-	{
-		return DBA::exists('post-content', ['quote-uri-id' => $uri_id]);
 	}
 
 	/**

@@ -363,7 +363,7 @@ return [
 			"context"               => ["context-item-uri", "uri"],
 			"context-id"            => ["post-thread-user", "context-id"],
 			"quote-uri"             => ["quote-item-uri", "uri"],
-			"quote-uri-id"          => ["post-content", "quote-uri-id"],
+			"quote-uri-id"          => ["post-quote", "quote-uri-id"],
 			"guid"                  => ["item-uri", "guid"],
 			"wall"                  => ["post-origin", "wall"],
 			"gravity"               => ["post-origin", "gravity"],
@@ -533,7 +533,8 @@ return [
 			LEFT JOIN `event` ON `event`.`id` = `post-user`.`event-id`
 			LEFT JOIN `diaspora-interaction` ON `diaspora-interaction`.`uri-id` = `post-origin`.`uri-id`
 			LEFT JOIN `post-content` ON `post-content`.`uri-id` = `post-origin`.`uri-id`
-			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-content`.`quote-uri-id`
+			LEFT JOIN `post-quote` ON `post-quote`.`uri-id` = `post-origin`.`uri-id`
+			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-quote`.`quote-uri-id`
 			LEFT JOIN `post-delivery-data` ON `post-delivery-data`.`uri-id` = `post-origin`.`uri-id`
 			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post-origin`.`uri-id`
 			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-user`.`psid`
@@ -556,7 +557,7 @@ return [
 			"context"               => ["context-item-uri", "uri"],
 			"context-id"            => ["post-thread-user", "context-id"],
 			"quote-uri"             => ["quote-item-uri", "uri"],
-			"quote-uri-id"          => ["post-content", "quote-uri-id"],
+			"quote-uri-id"          => ["post-quote", "quote-uri-id"],
 			"guid"                  => ["item-uri", "guid"],
 			"wall"                  => ["post-origin", "wall"],
 			"gravity"               => ["post-origin", "gravity"],
@@ -726,7 +727,8 @@ return [
 			LEFT JOIN `event` ON `event`.`id` = `post-user`.`event-id`
 			LEFT JOIN `diaspora-interaction` ON `diaspora-interaction`.`uri-id` = `post-origin`.`uri-id`
 			LEFT JOIN `post-content` ON `post-content`.`uri-id` = `post-origin`.`uri-id`
-			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-content`.`quote-uri-id`
+			LEFT JOIN `post-quote` ON `post-quote`.`uri-id` = `post-origin`.`uri-id`
+			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-quote`.`quote-uri-id`
 			LEFT JOIN `post-delivery-data` ON `post-delivery-data`.`uri-id` = `post-origin`.`uri-id`
 			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post-origin`.`uri-id`
 			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-thread-user`.`psid`",
@@ -748,7 +750,7 @@ return [
 			"context"               => ["context-item-uri", "uri"],
 			"context-id"            => ["post-thread", "context-id"],
 			"quote-uri"             => ["quote-item-uri", "uri"],
-			"quote-uri-id"          => ["post-content", "quote-uri-id"],
+			"quote-uri-id"          => ["post-quote", "quote-uri-id"],
 			"guid"                  => ["item-uri", "guid"],
 			"wall"                  => ["post-user", "wall"],
 			"gravity"               => ["post-user", "gravity"],
@@ -918,7 +920,8 @@ return [
 			LEFT JOIN `event` ON `event`.`id` = `post-user`.`event-id`
 			LEFT JOIN `diaspora-interaction` ON `diaspora-interaction`.`uri-id` = `post-user`.`uri-id`
 			LEFT JOIN `post-content` ON `post-content`.`uri-id` = `post-user`.`uri-id`
-			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-content`.`quote-uri-id`
+			LEFT JOIN `post-quote` ON `post-quote`.`uri-id` = `post-user`.`uri-id`
+			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-quote`.`quote-uri-id`
 			LEFT JOIN `post-delivery-data` ON `post-delivery-data`.`uri-id` = `post-user`.`uri-id` AND `post-user`.`origin`
 			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post-user`.`uri-id`
 			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-user`.`psid`
@@ -941,7 +944,7 @@ return [
 			"context"               => ["context-item-uri", "uri"],
 			"context-id"            => ["post-thread-user", "context-id"],
 			"quote-uri"             => ["quote-item-uri", "uri"],
-			"quote-uri-id"          => ["post-content", "quote-uri-id"],
+			"quote-uri-id"          => ["post-quote", "quote-uri-id"],
 			"guid"                  => ["item-uri", "guid"],
 			"wall"                  => ["post-thread-user", "wall"],
 			"gravity"               => ["post-user", "gravity"],
@@ -1110,7 +1113,8 @@ return [
 			LEFT JOIN `event` ON `event`.`id` = `post-user`.`event-id`
 			LEFT JOIN `diaspora-interaction` ON `diaspora-interaction`.`uri-id` = `post-thread-user`.`uri-id`
 			LEFT JOIN `post-content` ON `post-content`.`uri-id` = `post-thread-user`.`uri-id`
-			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-content`.`quote-uri-id`
+			LEFT JOIN `post-quote` ON `post-quote`.`uri-id` = `post-thread-user`.`uri-id`
+			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-quote`.`quote-uri-id`
 			LEFT JOIN `post-delivery-data` ON `post-delivery-data`.`uri-id` = `post-thread-user`.`uri-id` AND `post-thread-user`.`origin`
 			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post-thread-user`.`uri-id`
 			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-thread-user`.`psid`",
@@ -1128,7 +1132,7 @@ return [
 			"context"               => ["context-item-uri", "uri"],
 			"context-id"            => ["post-thread", "context-id"],
 			"quote-uri"             => ["quote-item-uri", "uri"],
-			"quote-uri-id"          => ["post-content", "quote-uri-id"],
+			"quote-uri-id"          => ["post-quote", "quote-uri-id"],
 			"guid"                  => ["item-uri", "guid"],
 			"gravity"               => ["post", "gravity"],
 			"extid"                 => ["external-item-uri", "uri"],
@@ -1264,7 +1268,8 @@ return [
 			LEFT JOIN `verb` ON `verb`.`id` = `post`.`vid`
 			LEFT JOIN `diaspora-interaction` ON `diaspora-interaction`.`uri-id` = `post`.`uri-id`
 			LEFT JOIN `post-content` ON `post-content`.`uri-id` = `post`.`uri-id`
-			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-content`.`quote-uri-id`
+			LEFT JOIN `post-quote` ON `post-quote`.`uri-id` = `post`.`uri-id`
+			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-quote`.`quote-uri-id`
 			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post`.`uri-id`
 			LEFT JOIN `contact` AS `parent-post-author` ON `parent-post-author`.`id` = `post-thread`.`author-id`",
 	],
@@ -1281,7 +1286,7 @@ return [
 			"context"               => ["context-item-uri", "uri"],
 			"context-id"            => ["post-thread", "context-id"],
 			"quote-uri"             => ["quote-item-uri", "uri"],
-			"quote-uri-id"          => ["post-content", "quote-uri-id"],
+			"quote-uri-id"          => ["post-quote", "quote-uri-id"],
 			"guid"                  => ["item-uri", "guid"],
 			"gravity"               => ["post", "gravity"],
 			"extid"                 => ["external-item-uri", "uri"],
@@ -1419,7 +1424,8 @@ return [
 			LEFT JOIN `verb` ON `verb`.`id` = `post`.`vid`
 			LEFT JOIN `diaspora-interaction` ON `diaspora-interaction`.`uri-id` = `post-thread`.`uri-id`
 			LEFT JOIN `post-content` ON `post-content`.`uri-id` = `post-thread`.`uri-id`
-			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-content`.`quote-uri-id`
+			LEFT JOIN `post-quote` ON `post-quote`.`uri-id` = `post-thread`.`uri-id`
+			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-quote`.`quote-uri-id`
 			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post-thread`.`uri-id`",
 	],
 	"category-view" => [
