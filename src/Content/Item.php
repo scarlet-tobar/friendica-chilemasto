@@ -1121,7 +1121,7 @@ class Item
 	 * @param integer $uid
 	 * @return integer expiration days
 	 */
-	public function getExpirationDays(int $uid = 0): int
+	private function getExpirationDays(int $uid = 0): int
 	{
 		$expiration = $this->config->get('system', 'dbclean-expire-days') ?? 0;
 		if ($this->pConfig->get($uid, 'expire', 'items', true)) {
