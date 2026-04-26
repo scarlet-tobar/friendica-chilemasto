@@ -31,11 +31,11 @@ use Psr\Log\LoggerInterface;
  */
 class Form extends BaseModule
 {
-	const MODE_NEW  = 'new';
-	const MODE_EDIT = 'edit';
-	const MODE_COPY = 'copy';
+	public const MODE_NEW  = 'new';
+	public const MODE_EDIT = 'edit';
+	public const MODE_COPY = 'copy';
 
-	const ALLOWED_MODES = [
+	public const ALLOWED_MODES = [
 		self::MODE_NEW,
 		self::MODE_EDIT,
 		self::MODE_COPY,
@@ -111,14 +111,14 @@ class Form extends BaseModule
 		if (empty($orig_event)) {
 			$orig_event = User::getById(
 				$this->session->getLocalUserId(),
-				['allow_cid', 'allow_gid', 'deny_cid', 'deny_gid']
+				['allow_cid', 'allow_gid', 'deny_cid', 'deny_gid'],
 			);
 		} elseif ($orig_event['allow_cid'] !== '<' . $this->session->getLocalUserId() . '>'
 				   || $orig_event['allow_gid']
 				   || $orig_event['deny_cid']
 				   || $orig_event['deny_gid']) {
 			$share_checked = ' checked="checked" ';
-			$submit = $this->t("Edit event");
+			$submit        = $this->t("Edit event");
 		}
 
 		// In case of an error the browser is redirected back here, with these parameters filled in with the previous values
@@ -186,7 +186,7 @@ class Form extends BaseModule
 
 		$this->page['aside'] .= CalendarExport::getHTML($this->session->getLocalUserId());
 
-		$tpl = Renderer::getMarkupTemplate('calendar/event_form.tpl');
+		$tpl   = Renderer::getMarkupTemplate('calendar/event_form.tpl');
 		$no_bb = $this->t("Can't use BBCode here");
 
 		return Renderer::replaceMacros($tpl, [
@@ -208,7 +208,7 @@ class Form extends BaseModule
 				true,
 				'',
 				'',
-				true
+				true,
 			),
 
 			'$n_text'    => $this->t('End date/time is unknown or irrelevant'),
@@ -222,7 +222,7 @@ class Form extends BaseModule
 				'finish_text',
 				true,
 				true,
-				'start_text'
+				'start_text',
 			),
 
 			'$no_bb'       => $no_bb,
