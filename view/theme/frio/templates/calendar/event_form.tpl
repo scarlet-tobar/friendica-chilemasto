@@ -75,48 +75,43 @@
 			{{* The textarea for the event description *}}
 			<div class="form-group">
 				<div id="event-desc-text"><b>{{$d_text}}</b></div>
-				<textarea id="comment-edit-text-desc" class="form-control text-autosize" name="desc" rows="8" dir="auto">{{$d_orig}}</textarea>
-				<ul id="event-desc-text-edit-bb" class="comment-edit-bb comment-icon-list nav nav-pills hidden-xs pull-left">
-					{{* commented out because it isn't implemented yet
-					<li>
-						<button type="button" class="btn-link icon bb-img" style="cursor: pointer;" title="{{$edimg}}" data-role="insert-formatting" data-comment=" " data-bbcode="img" data-id="desc">
-							<i class="fa fa-picture-o"></i>
-						</button>
-					</li>
-					*}}
-					<li>
-						<button type="button" class="btn-link icon bb-url" style="cursor: pointer;" title="{{$edurl}}" data-role="insert-formatting" data-comment=" " data-bbcode="url" data-id="desc">
+				<div id="event-desc-text-edit-bb" class="comment-edit-bb comment-icon-list">
+					<div class="btn-group">
+					  {{* commented out because it isn't implemented yet
+					  <button type="button" class="btn btn-secondary icon bb-img" style="cursor: pointer;" title="{{$edimg}}" data-role="insert-formatting" data-comment=" " data-bbcode="img" data-id="desc">
+					  	<i class="fa fa-picture-o"></i>
+					  </button>
+					  *}}
+	        <button type="button" class="btn btn-default emojis" style="cursor: pointer;" aria-label="{{$edemojis}}" title="{{$edemojis}}">
+				    <i class="fa fa-smile-o"></i>
+			    </button>
+					</div>
+
+					<div class="btn-group">
+						<button type="button" class="btn btn-secondary icon bb-url" style="cursor: pointer;" title="{{$edurl}}" data-role="insert-formatting" data-comment=" " data-bbcode="url" data-id="desc">
 							<i class="fa fa-link"></i>
 						</button>
-					</li>
-					<li>
-						<button type="button" class="btn-link icon bb-video" style="cursor: pointer;" title="{{$edvideo}}" data-role="insert-formatting" data-comment=" " data-bbcode="video" data-id="desc">
-							<i class="fa fa-video-camera"></i>
+						<button type="button" class="btn btn-secondary icon bb-embed" style="cursor: pointer;" title="{{$edembed}}" data-role="insert-formatting" data-comment=" " data-bbcode="embed" data-id="desc">
+							<i class="fa fa-play"></i>
 						</button>
-					</li>
-
-					<li>
-						<button type="button" class="btn-link icon underline" style="cursor: pointer;" title="{{$eduline}}" data-role="insert-formatting" data-comment=" " data-bbcode="u" data-id="desc">
+						<button type="button" class="btn btn-secondary icon underline" style="cursor: pointer;" title="{{$eduline}}" data-role="insert-formatting" data-comment=" " data-bbcode="u" data-id="desc">
 							<i class="fa fa-underline"></i>
 						</button>
-					</li>
-					<li>
-						<button type="button" class="btn-link icon italic" style="cursor: pointer;" title="{{$editalic}}" data-role="insert-formatting" data-comment=" " data-bbcode="i" data-id="desc">
+						<button type="button" class="btn btn-secondary icon italic" style="cursor: pointer;" title="{{$editalic}}" data-role="insert-formatting" data-comment=" " data-bbcode="i" data-id="desc">
 							<i class="fa fa-italic"></i>
 						</button>
-					</li>
-					<li>
-						<button type="button" class="btn-link icon bold" style="cursor: pointer;"  title="{{$edbold}}" data-role="insert-formatting" data-comment=" " data-bbcode="b" data-id="desc">
+						<button type="button" class="btn btn-secondary icon bold" style="cursor: pointer;"  title="{{$edbold}}" data-role="insert-formatting" data-comment=" " data-bbcode="b" data-id="desc">
 							<i class="fa fa-bold"></i>
 						</button>
-					</li>
-					<li>
-						<button type="button" class="btn-link icon quote" style="cursor: pointer;" title="{{$edquote}}" data-role="insert-formatting" data-comment=" " data-bbcode="quote" data-id="desc">
+						<button type="button" class="btn btn-secondary icon quote" style="cursor: pointer;" title="{{$edquote}}" data-role="insert-formatting" data-comment=" " data-bbcode="quote" data-id="desc">
 							<i class="fa fa-quote-left"></i>
 						</button>
-					</li>
-				</ul>
-				<div class="clear"></div>
+						<button type="button" class="btn btn-secondary icon code" style="cursor: pointer;" title="{{$edcode}}" data-role="insert-formatting" data-comment=" " data-bbcode="code" data-id="desc">
+							<i class="fa fa-code"></i>
+						</button>
+					</div>
+				</div>
+				<textarea id="comment-edit-text-desc" class="form-control text-autosize emojis-target" name="desc" rows="8" dir="auto">{{$d_orig}}</textarea>
 			</div>
 
 			{{* The textarea for the event location *}}

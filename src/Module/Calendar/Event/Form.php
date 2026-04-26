@@ -224,7 +224,7 @@ class Form extends BaseModule
 
 			'$t_text'      => $this->t('Title (BBCode not allowed)') . ' <span class="required" title="' . $this->t('Required') . '">*</span>',
 			'$t_orig'      => $t_orig,
-			'$d_text'      => $this->t('Description (BBCode allowed)'),
+			'$d_text'      => $this->t('Description'),
 			'$d_orig'      => $d_orig,
 			'$l_text'      => $this->t('Location (BBCode not allowed)'),
 			'$l_orig'      => $l_orig,
