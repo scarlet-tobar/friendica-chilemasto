@@ -116,8 +116,9 @@
 
 			{{* The textarea for the event location *}}
 			<div class="form-group">
-				<div id="event-location-text"><b>{{$l_text}}</b></div>
+				<label for="comment-edit-text-loc">{{$l_text}}</label>
 				<textarea id="comment-edit-text-loc" class="form-control text-autosize" name="location" dir="auto">{{$l_orig}}</textarea>
+				<p>{{$no_bb}}</p>
 			</div>
 		</div>
 

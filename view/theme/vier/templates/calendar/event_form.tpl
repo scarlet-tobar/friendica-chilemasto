@@ -43,6 +43,7 @@
 
 <div id="event-location-text">{{$l_text}}</div>
 <textarea id="comment-edit-text-location" rows="4" cols="64" name="location" dir="auto">{{$l_orig}}</textarea>
+<p>{{$no_bb}}</p>
 
 <div id="event-location-break"></div>
 
