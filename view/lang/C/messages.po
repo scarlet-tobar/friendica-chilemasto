@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-21 00:30+0200\n"
+"POT-Creation-Date: 2026-04-26 10:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -123,7 +123,7 @@ msgstr ""
 msgid "Conversation was not removed."
 msgstr ""
 
-#: mod/message.php:170 mod/message.php:277
+#: mod/message.php:170 mod/message.php:278
 msgid "Please enter a link URL:"
 msgstr ""
 
@@ -131,84 +131,96 @@ msgstr ""
 msgid "Send Private Message"
 msgstr ""
 
-#: mod/message.php:180 mod/message.php:337
+#: mod/message.php:180 mod/message.php:338
 #: src/Module/Privacy/PermissionTooltip.php:149
 msgid "To:"
 msgstr ""
 
-#: mod/message.php:181 mod/message.php:338
-msgid "Subject:"
+#: mod/message.php:181
+msgid "Start typing the name of a contact and select from the list"
 msgstr ""
 
-#: mod/message.php:185 mod/message.php:341 src/Module/Invite.php:155
-msgid "Your message:"
+#: mod/message.php:182
+msgid "Subject"
 msgstr ""
 
-#: mod/message.php:188 mod/message.php:345 mod/photos.php:76 mod/photos.php:624
+#: mod/message.php:186
+msgid "Your message"
+msgstr ""
+
+#: mod/message.php:189 mod/message.php:346 mod/photos.php:76 mod/photos.php:624
 #: src/Content/Conversation.php:371 src/Module/Post/Edit.php:129
 #: src/Module/Profile/Photos.php:355 src/Module/Profile/Photos.php:375
 #: src/Module/Profile/Photos.php:378
 msgid "Upload photo"
 msgstr ""
 
-#: mod/message.php:189 mod/message.php:346 src/Module/Post/Edit.php:133
+#: mod/message.php:190 mod/message.php:347 src/Module/Post/Edit.php:133
 msgid "Insert web link"
 msgstr ""
 
-#: mod/message.php:190 mod/message.php:348 src/Content/Conversation.php:405
+#: mod/message.php:191 mod/message.php:349 src/Content/Conversation.php:405
 #: src/Content/Conversation.php:1614 src/Module/Item/Compose.php:208
 #: src/Module/Post/Edit.php:143 src/Object/Post.php:620
 msgid "Please wait"
 msgstr ""
 
-#: mod/message.php:191 mod/message.php:347
+#: mod/message.php:192 mod/message.php:348
 msgid "Send Message"
 msgstr ""
 
-#: mod/message.php:212
+#: mod/message.php:213
 msgid "You have no messages."
 msgstr ""
 
-#: mod/message.php:270
+#: mod/message.php:271
 msgid "Message not available."
 msgstr ""
 
-#: mod/message.php:314
+#: mod/message.php:315
 msgid "Delete message"
 msgstr ""
 
-#: mod/message.php:316 mod/message.php:439
+#: mod/message.php:317 mod/message.php:440
 msgid "D, d M Y - g:i A"
 msgstr ""
 
-#: mod/message.php:331 mod/message.php:436
+#: mod/message.php:332 mod/message.php:437
 msgid "Delete conversation"
 msgstr ""
 
-#: mod/message.php:333
+#: mod/message.php:334
 msgid "No secure communications available. You <strong>may</strong> be able to respond from the sender's profile page."
 msgstr ""
 
-#: mod/message.php:336
+#: mod/message.php:337
 msgid "Send Reply"
 msgstr ""
 
-#: mod/message.php:410
+#: mod/message.php:339
+msgid "Subject:"
+msgstr ""
+
+#: mod/message.php:342 src/Module/Invite.php:155
+msgid "Your message:"
+msgstr ""
+
+#: mod/message.php:411
 #, php-format
 msgid "Unknown sender - %s"
 msgstr ""
 
-#: mod/message.php:412
+#: mod/message.php:413
 #, php-format
 msgid "You and %s"
 msgstr ""
 
-#: mod/message.php:414
+#: mod/message.php:415
 #, php-format
 msgid "%s and You"
 msgstr ""
 
-#: mod/message.php:442
+#: mod/message.php:443
 #, php-format
 msgid "%d message"
 msgid_plural "%d messages"
@@ -303,7 +315,7 @@ msgid "If you want to add this photo to an album, begin typing its name, and exi
 msgstr ""
 
 #: mod/photos.php:487 mod/photos.php:806 src/Content/Conversation.php:407
-#: src/Module/Calendar/Event/Form.php:241 src/Module/Post/Edit.php:183
+#: src/Module/Calendar/Event/Form.php:245 src/Module/Post/Edit.php:183
 msgid "Permissions"
 msgstr ""
 
@@ -1124,7 +1136,7 @@ msgid "Link or Media"
 msgstr ""
 
 #: src/Content/Conversation.php:385
-msgid "Video"
+msgid "Embed"
 msgstr ""
 
 #: src/Content/Conversation.php:386 src/Module/Item/Compose.php:204
@@ -1175,7 +1187,7 @@ msgstr ""
 msgid "Public post"
 msgstr ""
 
-#: src/Content/Conversation.php:419 src/Module/Calendar/Event/Form.php:236
+#: src/Content/Conversation.php:419 src/Module/Calendar/Event/Form.php:240
 #: src/Module/Item/Compose.php:203 src/Module/Post/Edit.php:165
 #: src/Object/Post.php:1179
 msgid "Preview"
@@ -3179,7 +3191,7 @@ msgstr ""
 msgid "l, F j"
 msgstr ""
 
-#: src/Model/Event.php:652
+#: src/Model/Event.php:652 src/Module/Calendar/Event/Form.php:121
 msgid "Edit event"
 msgstr ""
 
@@ -4009,7 +4021,7 @@ msgstr ""
 msgid "Click to view details"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:83 src/Module/Calendar/Event/Form.php:195
+#: src/Module/Admin/Logs/View.php:83 src/Module/Calendar/Event/Form.php:198
 msgid "Event details"
 msgstr ""
 
@@ -4207,7 +4219,7 @@ msgstr ""
 msgid "Policies"
 msgstr ""
 
-#: src/Module/Admin/Site.php:465 src/Module/Calendar/Event/Form.php:240
+#: src/Module/Admin/Site.php:465 src/Module/Calendar/Event/Form.php:244
 #: src/Module/Contact.php:532 src/Module/Profile/Profile.php:285
 msgid "Advanced"
 msgstr ""
@@ -5707,17 +5719,25 @@ msgstr ""
 msgid "Event title and start time are required."
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:196
+#: src/Module/Calendar/Event/Form.php:110
+msgid "Create event"
+msgstr ""
+
+#: src/Module/Calendar/Event/Form.php:190
+msgid "Can't use BBCode here"
+msgstr ""
+
+#: src/Module/Calendar/Event/Form.php:199
 msgid "Starting date and Title are required."
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:197
-#: src/Module/Calendar/Event/Form.php:202
-msgid "Event Starts:"
+#: src/Module/Calendar/Event/Form.php:200
+#: src/Module/Calendar/Event/Form.php:205
+msgid "Event starts"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:197
-#: src/Module/Calendar/Event/Form.php:225 src/Module/Debug/Probe.php:45
+#: src/Module/Calendar/Event/Form.php:200
+#: src/Module/Calendar/Event/Form.php:229 src/Module/Debug/Probe.php:45
 #: src/Module/Install.php:186 src/Module/Install.php:212
 #: src/Module/Install.php:217 src/Module/Install.php:231
 #: src/Module/Install.php:240 src/Module/Install.php:245
@@ -5740,52 +5760,38 @@ msgstr ""
 msgid "Required"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:211
-#: src/Module/Calendar/Event/Form.php:235
+#: src/Module/Calendar/Event/Form.php:214
+#: src/Module/Calendar/Event/Form.php:239
 msgid "End date/time is unknown or irrelevant"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:213
-#: src/Module/Calendar/Event/Form.php:218
-msgid "Event ends:"
-msgstr ""
-
-#: src/Module/Calendar/Event/Form.php:225
-#: src/Module/Calendar/Event/Form.php:231
-msgid "Title (BBCode not allowed)"
-msgstr ""
-
-#: src/Module/Calendar/Event/Form.php:227
-msgid "Description (BBCode allowed)"
+#: src/Module/Calendar/Event/Form.php:216
+#: src/Module/Calendar/Event/Form.php:221
+msgid "Event ends"
 msgstr ""
 
 #: src/Module/Calendar/Event/Form.php:229
-msgid "Location (BBCode not allowed)"
+#: src/Module/Calendar/Event/Form.php:235
+msgid "Title"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:232
+#: src/Module/Calendar/Event/Form.php:231 src/Module/Settings/Channels.php:185
+#: src/Module/Settings/Channels.php:211 src/Module/Settings/Display.php:471
+#: src/Module/Settings/TwoFactor/AppSpecific.php:123
+msgid "Description"
+msgstr ""
+
 #: src/Module/Calendar/Event/Form.php:233
+#: src/Module/Settings/Profile/Index.php:282
+msgid "Location"
+msgstr ""
+
+#: src/Module/Calendar/Event/Form.php:236
+#: src/Module/Calendar/Event/Form.php:237
 msgid "Share this event"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:238 src/Module/Contact/Advanced.php:118
-#: src/Module/Contact/Profile.php:415
-#: src/Module/Debug/ActivityPubConversion.php:128
-#: src/Module/Debug/Babel.php:280 src/Module/Debug/Localtime.php:50
-#: src/Module/Debug/Probe.php:40 src/Module/Debug/WebFinger.php:37
-#: src/Module/FriendSuggest.php:138 src/Module/Install.php:219
-#: src/Module/Install.php:259 src/Module/Install.php:296
-#: src/Module/Invite.php:162 src/Module/Moderation/Item/Source.php:75
-#: src/Module/Moderation/Report/Create.php:157
-#: src/Module/Moderation/Report/Create.php:172
-#: src/Module/Moderation/Report/Create.php:200
-#: src/Module/Moderation/Report/Create.php:260
-#: src/Module/Settings/Server/Action.php:65 src/Module/User/Delegation.php:181
-#: view/theme/vier/config.php:123
-msgid "Submit"
-msgstr ""
-
-#: src/Module/Calendar/Event/Form.php:239 src/Module/Profile/Profile.php:284
+#: src/Module/Calendar/Event/Form.php:243 src/Module/Profile/Profile.php:284
 msgid "Basic"
 msgstr ""
 
@@ -6073,6 +6079,22 @@ msgstr ""
 
 #: src/Module/Contact/Advanced.php:116
 msgid "Return to contact editor"
+msgstr ""
+
+#: src/Module/Contact/Advanced.php:118 src/Module/Contact/Profile.php:415
+#: src/Module/Debug/ActivityPubConversion.php:128
+#: src/Module/Debug/Babel.php:280 src/Module/Debug/Localtime.php:50
+#: src/Module/Debug/Probe.php:40 src/Module/Debug/WebFinger.php:37
+#: src/Module/FriendSuggest.php:138 src/Module/Install.php:219
+#: src/Module/Install.php:259 src/Module/Install.php:296
+#: src/Module/Invite.php:162 src/Module/Moderation/Item/Source.php:75
+#: src/Module/Moderation/Report/Create.php:157
+#: src/Module/Moderation/Report/Create.php:172
+#: src/Module/Moderation/Report/Create.php:200
+#: src/Module/Moderation/Report/Create.php:260
+#: src/Module/Settings/Server/Action.php:65 src/Module/User/Delegation.php:181
+#: view/theme/vier/config.php:123
+msgid "Submit"
 msgstr ""
 
 #: src/Module/Contact/Advanced.php:120
@@ -9564,12 +9586,6 @@ msgstr ""
 msgid "Label"
 msgstr ""
 
-#: src/Module/Settings/Channels.php:185 src/Module/Settings/Channels.php:211
-#: src/Module/Settings/Display.php:471
-#: src/Module/Settings/TwoFactor/AppSpecific.php:123
-msgid "Description"
-msgstr ""
-
 #: src/Module/Settings/Channels.php:186 src/Module/Settings/Channels.php:212
 msgid "Access Key"
 msgstr ""
@@ -10304,10 +10320,6 @@ msgstr ""
 
 #: src/Module/Settings/Profile/Index.php:281
 msgid "Profile picture"
-msgstr ""
-
-#: src/Module/Settings/Profile/Index.php:282
-msgid "Location"
 msgstr ""
 
 #: src/Module/Settings/Profile/Index.php:283 src/Util/Temporal.php:83

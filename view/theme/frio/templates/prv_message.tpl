@@ -14,27 +14,29 @@
 	<div id="prvmail-to-label" class="form-group">
 		<label for="recipient">{{$to}}</label><br>
 		{{$select nofilter}}
+		 <small>{{$to_desc}}</small>
 	</div>
 
 	{{* The subject input field *}}
 	<div id="prvmail-subject-label" class="form-group">
-		<label for="prvmail-subject">{{$subject}}</label>
-		<input type="text" id="prvmail-subject" class="form-control" name="subject" value="{{$subjtxt}}" {{$readonly}} tabindex="11" />
+	  <input type="text" id="prvmail-subject" class="form-control" placeholder="{{$subject}}" name="subject" value="{{$subjtxt}}" {{$readonly}} tabindex="11" />
 	</div>
 
-	<label for="comment-edit-text-input">{{$yourmessage}}</label>
 	<div id="prvmail-text-edit-bb" class="comment-edit-bb comment-icon-list">
 		<div class="btn-group">
 			<button type="button" class="btn btn-default icon bb-img" style="cursor: pointer;" title="{{$edimg}}" data-role="insert-formatting" data-comment=" " data-bbcode="imgprv" data-id="input">
 					<i class="fa fa-picture-o" aria-hidden="true"></i>
+			</button>
+			<button type="button" class="btn btn-default emojis" style="cursor: pointer;" aria-label="{{$edemojis}}" title="{{$edemojis}}">
+				<i class="fa fa-smile-o"></i>
 			</button>
 		</div>
 	 <div class="btn-group">
 			<button type="button" class="btn btn-default icon bb-url" style="cursor: pointer;" title="{{$edurl}}" data-role="insert-formatting" data-comment=" " data-bbcode="url" data-id="input">
 					<i class="fa fa-link" aria-hidden="true"></i>
 			</button>
-			<button type="button" class="btn btn-default icon bb-video" style="cursor: pointer;" title="{{$edvideo}}" data-role="insert-formatting" data-comment=" " data-bbcode="video" data-id="input">
-				<i class="fa fa-video-camera" aria-hidden="true"></i>
+			<button type="button" class="btn btn-default icon bb-embed" style="cursor: pointer;" title="{{$edembed}}" data-role="insert-formatting" data-comment=" " data-bbcode="embed" data-id="input">
+				<i class="fa fa-play" aria-hidden="true"></i>
 			</button>
 			<button type="button" class="btn btn-default icon underline" style="cursor: pointer;" title="{{$eduline}}" data-role="insert-formatting" data-comment=" " data-bbcode="u" data-id="input">
 				<i class="fa fa-underline" aria-hidden="true"></i>
@@ -48,9 +50,6 @@
 			<button type="button" class="btn btn-default icon quote" style="cursor: pointer;" title="{{$edquote}}" data-role="insert-formatting" data-comment=" " data-bbcode="quote" data-id="input">
 				<i class="fa fa-quote-left" aria-hidden="true"></i>
 			</button>
-			<button type="button" class="btn btn-default emojis" style="cursor: pointer;" aria-label="{{$edemojis}}" title="{{$edemojis}}">
-				<i class="fa fa-smile-o"></i>
-			</button>
 			<button type="button" class="btn btn-default icon code" style="cursor: pointer;" title="{{$edquote}}" data-role="insert-formatting" data-comment=" " data-bbcode="code" data-id="input">
 				<i class="fa fa-code" aria-hidden="true"></i>
 			</button>
@@ -58,7 +57,7 @@
 	</div>
 
 	{{* The message input field which contains the message text *}}
-	<textarea class="prvmail-text form-control text-autosize" id="comment-edit-text-input" name="body" tabindex="12" dir="auto" onkeydown="sendOnCtrlEnter(event, 'prvmail-submit')">{{$text}}</textarea>
+	<textarea class="prvmail-text form-control text-autosize" id="comment-edit-text-input" name="body" placeholder="{{$yourmessage}}" tabindex="12" dir="auto" onkeydown="sendOnCtrlEnter(event, 'prvmail-submit')">{{$text}}</textarea>
 
 	{{* The submit button *}}
 	<div id="prvmail-submit-wrapper">

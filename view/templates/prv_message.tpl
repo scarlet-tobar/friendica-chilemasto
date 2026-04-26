@@ -13,14 +13,16 @@
 
 {{$parent nofilter}}
 
-<div id="prvmail-to-label">{{$to}}</div>
-{{$select nofilter}}
+<div id="prvmail-to-label">
+{{$to}}<br/>
+{{$select nofilter}}<br/>
+<small>{{$to_desc}}</small>
+</div>
 
-<div id="prvmail-subject-label">{{$subject}}</div>
-<input type="text" maxlength="255" id="prvmail-subject" name="subject" value="{{$subjtxt}}" {{$readonly}} tabindex="11" />
+<input type="text" maxlength="255" id="prvmail-subject" name="subject" placeholder="{{$subject}}" value="{{$subjtxt}}" {{$readonly}} tabindex="11" />
 
 <div id="prvmail-message-label">{{$yourmessage}}</div>
-<textarea rows="8" cols="72" class="prvmail-text" id="prvmail-text" name="body" tabindex="12">{{$text}}</textarea>
+<textarea rows="8" cols="72" class="prvmail-text" id="prvmail-text" name="body" placeholder="{{$yourmessage}}" tabindex="12">{{$text}}</textarea>
 
 
 <div id="prvmail-submit-wrapper">

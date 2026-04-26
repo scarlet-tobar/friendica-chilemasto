@@ -20,29 +20,35 @@
             </div>
 			{{if $l10n.placeholdersummary}}
 			<div id="jot-summary-wrap">
-				<input type="text" name="summary" id="jot-summary" class="jothidden jotforms form-control" placeholder="{{$l10n.placeholdersummary}}" title="{{$l10n.placeholdersummary}}" value="{{$summary}}" tabindex="1" dir="auto" />
+				<input type="text" name="summary" id="jot-summary" class="jothidden jotforms form-control" placeholder="{{$l10n.placeholdersummary}}" title="{{$l10n.placeholdersummary}}" value="{{$summary}}" tabindex="2" dir="auto" />
 			</div>
 			{{/if}}
             {{if $l10n.placeholdercategory}}
                 <div id="jot-category-wrap">
-                    <input name="category" id="jot-category" class="jothidden jotforms form-control" type="text" placeholder="{{$l10n.placeholdercategory}}" title="{{$l10n.placeholdercategory}}" value="{{$category}}" tabindex="2" dir="auto" />
+                    <input name="category" id="jot-category" class="jothidden jotforms form-control" type="text" placeholder="{{$l10n.placeholdercategory}}" title="{{$l10n.placeholdercategory}}" value="{{$category}}" tabindex="3" dir="auto" />
                 </div>
             {{/if}}
 
             <div class="comment-edit-bb-{{$id}} btn-toolbar clearfix" role="toolbar">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-default bb-img" aria-label="{{$l10n.edimg}}" title="{{$l10n.edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}" tabindex="6">
+                    <button type="button" class="btn btn-default bb-img" aria-label="{{$l10n.edimg}}" title="{{$l10n.edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}" tabindex="4">
                         <i class="fa fa-picture-o"></i>
                     </button>
-                    <button type="button" class="btn btn-default bb-attach" aria-label="{{$l10n.edattach}}" title="{{$l10n.edattach}}" ondragenter="return commentLinkDrop(event, {{$id}});" ondragover="return commentLinkDrop(event, {{$id}});" ondrop="commentLinkDropper(event);" onclick="commentGetLink({{$id}}, '{{$l10n.prompttext}}');" tabindex="7">
+                    <button type="button" class="btn btn-default bb-attach" aria-label="{{$l10n.edattach}}" title="{{$l10n.edattach}}" ondragenter="return commentLinkDrop(event, {{$id}});" ondragover="return commentLinkDrop(event, {{$id}});" ondrop="commentLinkDropper(event);" onclick="commentGetLink({{$id}}, '{{$l10n.prompttext}}');" tabindex="5">
                         <i class="fa fa-paperclip"></i>
+                    </button>
+                    <button type="button" id="button_emojipicker" class="btn btn-default emojis" aria-label="{{$l10n.edemojis}}" title="{{$l10n.edemojis}}" tabindex="6">
+                      <i class="fa fa-smile-o"></i>
                     </button>
                 </div>
 
                 <div class="pull-right">
                     <div class="btn-group">
-                        <button type="button" class="btn btn-default bb-url" aria-label="{{$l10n.edurl}}" title="{{$l10n.edurl}}" onclick="insertFormatting('url',{{$id}});" tabindex="8">
+                        <button type="button" class="btn btn-default bb-url" aria-label="{{$l10n.edurl}}" title="{{$l10n.edurl}}" onclick="insertFormatting('url',{{$id}});" tabindex="7">
                             <i class="fa fa-link"></i>
+                        </button>
+                        <button type="button" class="btn btn-default bb-url" aria-label="{{$l10n.edembed}}" title="{{$l10n.edembed}}" onclick="insertFormatting('embed',{{$id}});" tabindex="8">
+                            <i class="fa fa-play"></i>
                         </button>
                         <button type="button" class="btn btn-default underline" aria-label="{{$l10n.eduline}}" title="{{$l10n.eduline}}" onclick="insertFormatting('u',{{$id}});" tabindex="9">
                             <i class="fa fa-underline"></i>
@@ -58,13 +64,10 @@
                         <button type="button" class="btn btn-default quote" aria-label="{{$l10n.edquote}}" title="{{$l10n.edquote}}" onclick="insertFormatting('quote',{{$id}});" tabindex="12">
                             <i class="fa fa-quote-left"></i>
                         </button>
-                        <button type="button" id="button_emojipicker" class="btn btn-default emojis" aria-label="{{$l10n.edemojis}}" title="{{$l10n.edemojis}}" tabindex="13">
-                            <i class="fa fa-smile-o"></i>
-                        </button>
-                        <button type="button" class="btn btn-default bb-url" aria-label="{{$l10n.contentwarn}}" title="{{$l10n.contentwarn}}" onclick="insertFormatting('abstract',{{$id}});" tabindex="14">
+                        <button type="button" class="btn btn-default bb-url" aria-label="{{$l10n.contentwarn}}" title="{{$l10n.contentwarn}}" onclick="insertFormatting('abstract',{{$id}});" tabindex="13">
                             <i class="fa fa-eye"></i>
                         </button>
-                        <button type="button" class="btn btn-default code" aria-label="{{$l10n.edcode}}" title="{{$l10n.edcode}}" onclick="insertFormatting('code',{{$id}});" tabindex="4">
+                        <button type="button" class="btn btn-default code" aria-label="{{$l10n.edcode}}" title="{{$l10n.edcode}}" onclick="insertFormatting('code',{{$id}});" tabindex="14">
                             <i class="fa fa-code"></i>
                         </button>
                     </div>

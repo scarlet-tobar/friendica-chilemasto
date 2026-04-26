@@ -36,7 +36,7 @@
 				<div class="comment-edit-bb">
 					<a title="{{$edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}"><i class="icon-picture"></i></a>
 					<a title="{{$edurl}}" data-role="insert-formatting" data-bbcode="url" data-id="{{$id}}"><i class="icon-link"></i></a>
-					<a title="{{$edvideo}}" data-role="insert-formatting" data-bbcode="video" data-id="{{$id}}"><i class="icon-film"></i></a>
+					<a title="{{$edembed}}" data-role="insert-formatting" data-bbcode="embed" data-id="{{$id}}"><i class="icon-play"></i></a>
 
 					<a title="{{$eduline}}" data-role="insert-formatting" data-bbcode="u" data-id="{{$id}}"><i class="icon-underline"></i></a>
 					<a title="{{$editalic}}" data-role="insert-formatting" data-bbcode="i" data-id="{{$id}}"><i class="icon-italic"></i></a>
