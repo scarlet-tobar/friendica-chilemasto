@@ -195,6 +195,16 @@ details summary {
 	line-height: 1.5;
 }
 
+@media (max-width: 768px) {
+	#back-to-top {
+		font-size: 1.8em;
+		padding: 0 8px 0 8px;
+		right: 10px;
+		bottom: 10px;
+		line-height: 1.4;
+	}
+}
+
 #item-delete-selected {
 	cursor: pointer;
 	color: white;
