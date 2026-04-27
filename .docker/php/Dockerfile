@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     mariadb-client \
+    gettext \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions with docker-php-extension-installer
