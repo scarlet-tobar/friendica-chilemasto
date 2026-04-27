@@ -154,7 +154,7 @@ class APContact
 		} elseif (isset($apcontact['url'])) {
 			$url = $apcontact['url'];
 		}
-		
+
 		if (!isset($apcontact['addr'])) {
 			$apcontact['addr'] = '';
 		}
@@ -182,7 +182,7 @@ class APContact
 			try {
 				$data        = Transmitter::getProfile($local_uid);
 				$local_owner = User::getOwnerDataById($local_uid);
-			} catch(HTTPException\NotFoundException $e) {
+			} catch (HTTPException\NotFoundException $e) {
 				$data = null;
 			}
 		}
@@ -192,8 +192,8 @@ class APContact
 
 			try {
 				$curlResult = HTTPSignature::fetchRaw($url);
-				$failed     = empty($curlResult->getBodyString()) ||
-					(!$curlResult->isSuccess() && ($curlResult->getReturnCode() != 410));
+				$failed     = empty($curlResult->getBodyString())
+					|| (!$curlResult->isSuccess() && ($curlResult->getReturnCode() != 410));
 
 				if (!$failed) {
 					$data   = json_decode($curlResult->getBodyString(), true);
@@ -334,9 +334,9 @@ class APContact
 			}
 		}
 
-		$apcontact['manually-approve']   = (int)JsonLD::fetchElement($compacted, 'as:manuallyApprovesFollowers');
-		$apcontact['posting-restricted'] = (int)JsonLD::fetchElement($compacted, 'lemmy:postingRestrictedToMods');
-		$apcontact['suspended']          = (int)JsonLD::fetchElement($compacted, 'toot:suspended');
+		$apcontact['manually-approve']   = (int) JsonLD::fetchElement($compacted, 'as:manuallyApprovesFollowers');
+		$apcontact['posting-restricted'] = (int) JsonLD::fetchElement($compacted, 'lemmy:postingRestrictedToMods');
+		$apcontact['suspended']          = (int) JsonLD::fetchElement($compacted, 'toot:suspended');
 
 		if (!empty($compacted['as:generator'])) {
 			$apcontact['baseurl']   = JsonLD::fetchElement($compacted['as:generator'], 'as:url', '@id');
@@ -410,11 +410,11 @@ class APContact
 		if (strlen($apcontact['photo'] ?? '') > 383) {
 			$parts = parse_url($apcontact['photo']);
 			unset($parts['fragment']);
-			$apcontact['photo'] = (string)Uri::fromParts((array)$parts);
+			$apcontact['photo'] = (string) Uri::fromParts((array) $parts);
 
 			if (strlen($apcontact['photo']) > 383) {
 				unset($parts['query']);
-				$apcontact['photo'] = (string)Uri::fromParts((array)$parts);
+				$apcontact['photo'] = (string) Uri::fromParts((array) $parts);
 			}
 
 			if (strlen($apcontact['photo']) > 383) {
