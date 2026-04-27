@@ -436,12 +436,19 @@ class Probe
 					return [];
 				}
 			}
-		} elseif (strstr($uri, '@')) {
+		} elseif (str_contains($uri, '@') && !str_contains($uri, '/')) {
 			// Remove "acct:" from the URI
-			$uri = str_replace('acct:', '', $uri);
+			if (str_starts_with($uri, 'acct:')) {
+				$uri = str_replace('acct:', '', $uri);
+			}
 
-			$host = substr($uri, strpos($uri, '@') + 1);
-			$nick = substr($uri, 0, strpos($uri, '@'));
+			$addr_parts = explode('@', $uri);
+			if (count($addr_parts) != 2) {
+				return [];
+			}
+
+			$host = $addr_parts[1];
+			$nick = $addr_parts[0];
 			$addr = $uri;
 
 			$webfinger = self::getWebfinger('https://' . $host . self::WEBFINGER, HttpClientAccept::JRD_JSON, $uri, $addr);
