@@ -1704,6 +1704,8 @@ class GServer
 			return 'eurosky';
 		} elseif ($host === 'blacksky.app') {
 			return 'blacksky';
+		} elseif ($host === 'northsky.social') {
+			return 'northsky';
 		}
 		return 'atprotocol';
 	}
