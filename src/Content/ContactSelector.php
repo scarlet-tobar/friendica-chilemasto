@@ -232,7 +232,7 @@ class ContactSelector
 			'greatape', 'guppe', 'hollo', 'hometown', 'honk', 'hubzilla', 'iceshrimp', 'juick', 'kazarma',
 			'kbin', 'kepi', 'kitsune', 'kmyblue', 'kookie', 'ktistec', 'lemmy', 'loops', 'mastodon',
 			'mbin', 'micro.blog', 'minds', 'misskey', 'mistpark', 'mitra', 'mobilizon', 'neodb',
-			'newsmast', 'nextcloud_social', 'nodebb', 'osada', 'owncast', 'peertube', 'piefed', 'pinetta',
+			'newsmast', 'nextcloud_social', 'nodebb', 'northsky', 'osada', 'owncast', 'peertube', 'piefed', 'pinetta',
 			'pixelfed', 'pleroma', 'plume', 'postmarks', 'prismo', 'pump-io', 'rebased', 'redmatrix',
 			'reel2bits', 'rss', 'ruffy', 'sakura', 'seppo', 'shadowfacts', 'sharky', 'shuttlecraft',
 			'smilodon', 'smithereen', 'snac', 'soapbox', 'socialhome', 'streams', 'sublinks', 'sutty',
@@ -245,7 +245,7 @@ class ContactSelector
 				'flipboard', 'flohmarkt', 'forgejo', 'friendica', 'funkwhale', 'ghost', 'gitlab',
 				'glitch-soc', 'gnusocial', 'gotosocial', 'guppe', 'hollo', 'hubzilla', 'iceshrimp', 'kbin',
 				'lemmy', 'loforo', 'loops', 'mastodon', 'mbin', 'microblog', 'minds', 'misskey', 'mobilizon',
-				'nextcloud', 'owncast', 'peertube', 'phanpy', 'pixelfed', 'pleroma', 'plume', 'rss', 'shark',
+				'nextcloud', 'northsky', 'owncast', 'peertube', 'phanpy', 'pixelfed', 'pleroma', 'plume', 'rss', 'shark',
 				'soapbox', 'socialhome', 'streams', 'takahē', 'threads', 'tumblr', 'wordpress', 'write.as',
 				'writefreely', 'xwiki', 'zap'];
 		}
@@ -277,7 +277,7 @@ class ContactSelector
 
 		$color = ['aardwolf', 'activitypods', 'activitypub', 'akkoma', 'atprotocol', 'bluesky', 'chuckya', 'decodon',
 			'discourse', 'eurosky', 'fedify', 'firefish', 'flipboard', 'friendica', 'gitlab', 'gnusocial', 'iceshrimp', 'kookie',
-			'loops', 'mastodon', 'mbin', 'misskey', 'neodb', 'newsmast', 'nodebb', 'peertube', 'pixelfed',
+			'loops', 'mastodon', 'mbin', 'misskey', 'neodb', 'newsmast', 'nodebb', 'northsky', 'peertube', 'pixelfed',
 			'pleroma', 'rss', 'sharky', 'tumblr', 'vervis', 'vocata', 'wordpress'];
 
 		if (in_array($platform_icon_style, [self::SVG_COLOR_BLACK, self::SVG_COLOR_WHITE]) && in_array($network_svg, $color)) {
