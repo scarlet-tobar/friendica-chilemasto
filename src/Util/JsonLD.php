@@ -109,6 +109,28 @@ class JsonLD
 	}
 
 	/**
+	 * Checks if the given data contains suspicious commands that could be used in a malicious way, like @graph, @included or @reverse.
+	 * If such commands are found, a warning is logged and false is returned.
+	 *
+	 * @param array $data
+	 * @return boolean
+	 */
+	private static function isValidObject(array $data): bool
+	{
+		$valid = true;
+
+		array_walk_recursive($data, function (&$value, $key) use ($data, &$valid) {
+			$suspicious = ['@graph', '@included', '@reverse'];
+			if (in_array((string) $key, $suspicious) || in_array((string) $value, $suspicious)) {
+				DI::logger()->warning('Document with suspicious commands.', ['key' => $key, 'value' => $value, 'document' => $data]);
+				$valid = false;
+			}
+		});
+
+		return $valid;
+	}
+
+	/**
 	 * Normalises a given JSON array
 	 *
 	 * @param array $json
@@ -118,6 +140,10 @@ class JsonLD
 	 */
 	public static function normalize($json)
 	{
+		if (!self::isValidObject($json)) {
+			return [];
+		}
+
 		jsonld_set_document_loader('Friendica\Util\JsonLD::documentLoader');
 
 		$jsonobj = json_decode(json_encode($json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
@@ -192,6 +218,9 @@ class JsonLD
 		}
 
 		$json = json_decode(json_encode($compacted, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), true);
+		if (!self::isValidObject($json)) {
+			return [];
+		}
 
 		if ($json === false) {
 			DI::logger()->notice('JSON encode->decode failed', ['orig_json' => $orig_json, 'compacted' => $compacted]);
