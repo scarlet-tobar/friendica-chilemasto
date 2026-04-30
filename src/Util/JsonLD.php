@@ -179,26 +179,26 @@ class JsonLD
 	{
 		jsonld_set_document_loader('Friendica\Util\JsonLD::documentLoader');
 
-		$context = (object)[
+		$context = (object) [
 			'as'        => 'https://www.w3.org/ns/activitystreams#',
 			'w3id'      => 'https://w3id.org/security#',
-			'ldp'       => (object)['@id' => 'http://www.w3.org/ns/ldp#', '@type' => '@id'],
-			'vcard'     => (object)['@id' => 'http://www.w3.org/2006/vcard/ns#', '@type' => '@id'],
-			'dfrn'      => (object)['@id' => 'http://purl.org/macgirvin/dfrn/1.0/', '@type' => '@id'],
-			'diaspora'  => (object)['@id' => 'https://diasporafoundation.org/ns/', '@type' => '@id'],
-			'ostatus'   => (object)['@id' => 'http://ostatus.org#', '@type' => '@id'],
-			'dc'        => (object)['@id' => 'http://purl.org/dc/terms/', '@type' => '@id'],
-			'toot'      => (object)['@id' => 'http://joinmastodon.org/ns#', '@type' => '@id'],
-			'litepub'   => (object)['@id' => 'http://litepub.social/ns#', '@type' => '@id'],
-			'sc'        => (object)['@id' => 'http://schema.org#', '@type' => '@id'],
-			'pt'        => (object)['@id' => 'https://joinpeertube.org/ns#', '@type' => '@id'],
-			'mobilizon' => (object)['@id' => 'https://joinmobilizon.org/ns#', '@type' => '@id'],
-			'fedibird'  => (object)['@id' => 'http://fedibird.com/ns#', '@type' => '@id'],
-			'misskey'   => (object)['@id' => 'https://misskey-hub.net/ns#', '@type' => '@id'],
-			'pixelfed'  => (object)['@id' => 'http://pixelfed.org/ns#', '@type' => '@id'],
-			'lemmy'     => (object)['@id' => 'https://join-lemmy.org/ns#', '@type' => '@id'],
-			'quote'     => (object)['@id' => 'https://w3id.org/fep/044f#', '@type' => '@id'],
-			'gts'       => (object)['@id' => 'https://gotosocial.org/ns#', '@type' => '@id'],
+			'ldp'       => (object) ['@id' => 'http://www.w3.org/ns/ldp#', '@type' => '@id'],
+			'vcard'     => (object) ['@id' => 'http://www.w3.org/2006/vcard/ns#', '@type' => '@id'],
+			'dfrn'      => (object) ['@id' => 'http://purl.org/macgirvin/dfrn/1.0/', '@type' => '@id'],
+			'diaspora'  => (object) ['@id' => 'https://diasporafoundation.org/ns/', '@type' => '@id'],
+			'ostatus'   => (object) ['@id' => 'http://ostatus.org#', '@type' => '@id'],
+			'dc'        => (object) ['@id' => 'http://purl.org/dc/terms/', '@type' => '@id'],
+			'toot'      => (object) ['@id' => 'http://joinmastodon.org/ns#', '@type' => '@id'],
+			'litepub'   => (object) ['@id' => 'http://litepub.social/ns#', '@type' => '@id'],
+			'sc'        => (object) ['@id' => 'http://schema.org#', '@type' => '@id'],
+			'pt'        => (object) ['@id' => 'https://joinpeertube.org/ns#', '@type' => '@id'],
+			'mobilizon' => (object) ['@id' => 'https://joinmobilizon.org/ns#', '@type' => '@id'],
+			'fedibird'  => (object) ['@id' => 'http://fedibird.com/ns#', '@type' => '@id'],
+			'misskey'   => (object) ['@id' => 'https://misskey-hub.net/ns#', '@type' => '@id'],
+			'pixelfed'  => (object) ['@id' => 'http://pixelfed.org/ns#', '@type' => '@id'],
+			'lemmy'     => (object) ['@id' => 'https://join-lemmy.org/ns#', '@type' => '@id'],
+			'quote'     => (object) ['@id' => 'https://w3id.org/fep/044f#', '@type' => '@id'],
+			'gts'       => (object) ['@id' => 'https://gotosocial.org/ns#', '@type' => '@id'],
 		];
 
 		$orig_json = $json;
