@@ -53,7 +53,7 @@ class Notifications extends BaseApi
 
 		$params = ['order' => ['id' => true]];
 
-		$condition = ["`uid` = ? AND (NOT `type` IN (?, ?))", $uid,
+		$condition = ["`uid` = ? AND (NOT `type` IN (?, ?)) AND NOT EXISTS(SELECT `cid` FROM `user-contact` WHERE `user-contact`.`cid` = `notification`.`actor-id` AND `user-contact`.`uid` = `notification`.`uid` AND (`is-blocked` OR `blocked`))", $uid,
 			Post\UserNotification::TYPE_ACTIVITY_PARTICIPATION,
 			Post\UserNotification::TYPE_COMMENT_PARTICIPATION];
 
