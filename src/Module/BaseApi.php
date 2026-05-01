@@ -400,7 +400,7 @@ class BaseApi extends BaseModule
 		try {
 			$token = self::getCurrentApplication();
 		} catch (HTTPException\UnauthorizedException $th) {
-			$this->logAndJsonError($th->getCode(), $this->errorFactory->Unauthorized($th->getMessage()));
+			$this->logAndJsonError(401, $this->errorFactory->Unauthorized($th->getMessage()));
 		} catch (\Throwable $th) {
 			$this->logAndJsonError(403, $this->errorFactory->Forbidden($th->getMessage()));
 		}
