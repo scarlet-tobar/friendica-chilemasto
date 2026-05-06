@@ -99,7 +99,10 @@ if ($minimal) {
 			<div class="container">
 				<div class="row">
 <?php
-					if ((empty($_REQUEST['pagename']) || $_REQUEST['pagename'] != "lostpass") && ($_SERVER['REQUEST_URI'] != $basepath)) {
+					$pagename_parts  = explode('/', (string)($_REQUEST['pagename'] ?? ''));
+					$is_lostpasspage = ($pagename_parts[0] ?? '') === 'lostpass';
+
+					if (!$is_lostpasspage && ($_SERVER['REQUEST_URI'] != $basepath)) {
 						echo '
 					<aside class="col-lg-3 col-md-3 offcanvas-sm offcanvas-xs">';
 
