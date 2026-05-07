@@ -334,14 +334,19 @@ class Statuses extends BaseApi
 		}
 
 		if (!empty($request['scheduled_at'])) {
-			$item['guid'] = $this->item->guid($item, true);
-			$item['uri']  = Item::newURI($item['guid']);
+			$scheduledAt = DateTimeFormat::utc($request['scheduled_at']);
+			if ($scheduledAt > DateTimeFormat::utcNow()) {
+				$item['guid'] = $this->item->guid($item, true);
+				$item['uri']  = Item::newURI($item['guid']);
 
-			$id = Post\Delayed::add($item['uri'], $item, Worker::PRIORITY_HIGH, Post\Delayed::PREPARED, DateTimeFormat::utc($request['scheduled_at']));
-			if (empty($id)) {
-				$this->logAndJsonError(500, $this->errorFactory->InternalError());
+				$id = Post\Delayed::add($item['uri'], $item, Worker::PRIORITY_HIGH, Post\Delayed::PREPARED, $scheduledAt);
+				if (empty($id)) {
+					$this->logAndJsonError(500, $this->errorFactory->InternalError());
+				}
+				$this->jsonExit(DI::mstdnScheduledStatus()->createFromDelayedPostId($id, $uid)->toArray());
 			}
-			$this->jsonExit(DI::mstdnScheduledStatus()->createFromDelayedPostId($id, $uid)->toArray());
+
+			$item['created'] = $scheduledAt;
 		}
 
 		$id = Item::insert($item, true);
