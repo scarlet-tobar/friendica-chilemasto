@@ -312,6 +312,10 @@ function item_process(array $post, array $request, bool $preview, string $return
 			Post\Delayed::add($post['uri'], $post, Worker::PRIORITY_HIGH, Post\Delayed::PREPARED_NO_HOOK, $scheduled_at);
 			item_post_return(DI::baseUrl(), $return_path);
 		}
+		$post['created'] = $scheduled_at;
+		unset($post['edited']);
+		unset($post['commented']);
+		unset($post['changed']);
 	}
 
 	if (!empty($post['cancel'])) {
