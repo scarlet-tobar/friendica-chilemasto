@@ -10,11 +10,9 @@ namespace Friendica\Module\Settings;
 use Friendica\App;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
-use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Core\Worker;
 use Friendica\Model\APContact;
 use Friendica\Model\Contact;
 use Friendica\Module\BaseSettings;
@@ -26,7 +24,6 @@ use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\ActivityPub;
-use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Worker\AddContact;
 use Psr\Log\LoggerInterface;
@@ -36,21 +33,15 @@ use Psr\Log\LoggerInterface;
  **/
 class ContactImport extends BaseSettings
 {
-	/** @var IManageConfigValues */
-	private $config;
-	/** @var IManagePersonalConfigValues */
-	private $pconfig;
-	/** @var SystemMessages */
-	protected $systemMessages;
-	/** @var ICanSendHttpRequests */
-	private $httpClient;
+	private IManageConfigValues $config;
+	protected SystemMessages $systemMessages;
+	private ICanSendHttpRequests $httpClient;
 
-	public function __construct(ICanSendHttpRequests $httpClient, SystemMessages $systemMessages, IManagePersonalConfigValues $pconfig, IManageConfigValues $config, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(ICanSendHttpRequests $httpClient, SystemMessages $systemMessages, IManageConfigValues $config, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->config         = $config;
-		$this->pconfig        = $pconfig;
 		$this->systemMessages = $systemMessages;
 		$this->httpClient     = $httpClient;
 	}
@@ -68,6 +59,7 @@ class ContactImport extends BaseSettings
 		if (!empty($request['importcontact-submit'])) {
 			if (isset($request['legacy_contact'])) {
 				$this->import($request['legacy_contact']);
+				$this->systemMessages->addInfo($this->l10n->t('Importing Contacts done'));
 			}
 
 			// Import Contacts from CSV file
@@ -80,19 +72,11 @@ class ContactImport extends BaseSettings
 					$csvArray = array_map('str_getcsv', file($_FILES['importcontact-filename']['tmp_name']));
 					$this->logger->notice('Import started', ['lines' => count($csvArray)]);
 					// import contacts
+					$urls = [];
 					foreach ($csvArray as $csvRow) {
-						// The 1st row may, or may not contain the headers of the table
-						// We expect the 1st field of the row to contain either the URL
-						// or the handle of the account, therefore we check for either
-						// "http" or "@" to be present in the string.
-						// All other fields from the row will be ignored
-						if ((strpos($csvRow[0], '@') !== false) || Network::isValidHttpUrl($csvRow[0])) {
-							AddContact::add(Worker::PRIORITY_MEDIUM, $this->session->getLocalUserId(), trim($csvRow[0], '@'));
-						} else {
-							$this->logger->notice('Invalid account', ['url' => $csvRow[0]]);
-						}
+						$urls[] = $csvRow[0];
 					}
-					$this->logger->notice('Import done');
+					AddContact::addByArray($urls, $this->session->getLocalUserId());
 
 					$this->systemMessages->addInfo($this->l10n->t('Importing Contacts done'));
 					// delete temp file
@@ -131,8 +115,7 @@ class ContactImport extends BaseSettings
 			return;
 		}
 
-		$uid = $this->session->getLocalUserId();
-
+		$urls = [];
 		if ($contact['network'] == Protocol::OSTATUS) {
 			$api = $contact['baseurl'] . '/api/';
 
@@ -149,34 +132,30 @@ class ContactImport extends BaseSettings
 				$this->logger->notice('Couldn\'t fetch following contacts.', ['url' => $url]);
 				return;
 			}
-			$friends = json_decode($friends);
+			foreach (json_decode($friends) as $friend) {
+				$urls[] = $friend->statusnet_profile_url;
+			}
 		} elseif ($apcontact = APContact::getByURL($contact['url'])) {
 			if (empty($apcontact['following'])) {
 				$this->logger->notice('Couldn\'t fetch remote profile.', ['url' => $url]);
 				return;
 			}
-			$followings = ActivityPub::fetchItems($apcontact['following']);
-			if (empty($followings)) {
+			$urls = ActivityPub::fetchItems($apcontact['following']);
+			if (empty($urls)) {
 				$this->logger->notice('Couldn\'t fetch following contacts.', ['url' => $url]);
 				return;
 			}
-			$friends = $followings;
 		} else {
 			$this->logger->notice('Unsupported network', ['url' => $url]);
 			return;
 		}
 
-		if (empty($friends)) {
-			$friends = [];
+		if (!$urls) {
+			$this->logger->notice('No contacts to import.', ['url' => $url]);
+			return;
 		}
 
-		foreach ($friends as $friend) {
-			$contact = $friend->statusnet_profile_url ?? $friend;
-			AddContact::add(Worker::PRIORITY_MEDIUM, $uid, $contact);
-			$this->logger->notice('Added contact', ['url' => $url, 'contact' => $contact]);
-		}
-
-		$this->logger->notice('Done', ['url' => $url]);
+		AddContact::addByArray($urls, $this->session->getLocalUserId());
 		return;
 	}
 }
