@@ -67,14 +67,14 @@ class BaseSearch extends BaseModule
 				DI::userSession()->getLocalUserId(),
 				'system',
 				'itemspage_mobile_network',
-				DI::config()->get('system', 'itemspage_network_mobile')
+				DI::config()->get('system', 'itemspage_network_mobile'),
 			);
 		} else {
 			$itemsPerPage = DI::pConfig()->get(
 				DI::userSession()->getLocalUserId(),
 				'system',
 				'itemspage_network',
-				DI::config()->get('system', 'itemspage_network')
+				DI::config()->get('system', 'itemspage_network'),
 			);
 		}
 
@@ -110,16 +110,8 @@ class BaseSearch extends BaseModule
 	 */
 	protected static function printResult(ResultList $results, Pager $pager, string $header = ''): string
 	{
-		if ($results->getTotal() == 0) {
-			$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
-				'$title' => DI::l10n()->t('No results.')
-			]);
-			return $o;
-		}
-
 		$filtered = 0;
-
-		$entries = [];
+		$entries  = [];
 		foreach ($results->getResults() as $result) {
 			// in case the result is a contact result, add a contact-specific entry
 			if ($result instanceof ContactResult) {
@@ -135,13 +127,20 @@ class BaseSearch extends BaseModule
 			}
 		}
 
+		if (!$entries && !$filtered) {
+			$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
+				'$title' => DI::l10n()->t('No results.'),
+			]);
+			return $o;
+		}
+
 		$tpl = Renderer::getMarkupTemplate('contact/list.tpl');
 		return Renderer::replaceMacros($tpl, [
 			'$title'    => $header,
 			'$filtered' => $filtered ? DI::l10n()->tt(
 				'%d result was filtered out because your node blocks the domain it is registered on. You can review the list of domains your node is currently blocking in the <a href="/friendica">About page</a>.',
 				'%d results were filtered out because your node blocks the domain they are registered on. You can review the list of domains your node is currently blocking in the <a href="/friendica">About page</a>.',
-				$filtered
+				$filtered,
 			) : '',
 			'$contacts' => $entries,
 			'$paginate' => $pager->renderFull($results->getTotal()),
