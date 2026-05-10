@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-09 07:29+0000\n"
+"POT-Creation-Date: 2026-05-10 03:45+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,8 +66,8 @@ msgstr ""
 #: src/Module/Search/Directory.php:23 src/Module/Settings/Account.php:34
 #: src/Module/Settings/Account.php:337 src/Module/Settings/Channels.php:54
 #: src/Module/Settings/Channels.php:135
-#: src/Module/Settings/ContactImport.php:61
-#: src/Module/Settings/ContactImport.php:109
+#: src/Module/Settings/ContactImport.php:52
+#: src/Module/Settings/ContactImport.php:93
 #: src/Module/Settings/Delegation.php:76 src/Module/Settings/Display.php:84
 #: src/Module/Settings/Display.php:218
 #: src/Module/Settings/Profile/Photo/Crop.php:148
@@ -149,8 +149,8 @@ msgstr ""
 
 #: mod/message.php:189 mod/message.php:346 mod/photos.php:76 mod/photos.php:624
 #: src/Content/Conversation.php:371 src/Module/Post/Edit.php:129
-#: src/Module/Profile/Photos.php:355 src/Module/Profile/Photos.php:375
-#: src/Module/Profile/Photos.php:378
+#: src/Module/Profile/Photos.php:362 src/Module/Profile/Photos.php:382
+#: src/Module/Profile/Photos.php:385
 msgid "Upload photo"
 msgstr ""
 
@@ -239,17 +239,17 @@ msgid "User not found."
 msgstr ""
 
 #: mod/photos.php:73 src/Module/BaseProfile.php:53
-#: src/Module/Profile/Photos.php:352
+#: src/Module/Profile/Photos.php:359
 msgid "Photo Albums"
 msgstr ""
 
-#: mod/photos.php:74 src/Module/Profile/Photos.php:353
-#: src/Module/Profile/Photos.php:373
+#: mod/photos.php:74 src/Module/Profile/Photos.php:360
+#: src/Module/Profile/Photos.php:380
 msgid "Recent Photos"
 msgstr ""
 
 #: mod/photos.php:88 src/Module/BaseSettings.php:60
-#: src/Module/Profile/Photos.php:336
+#: src/Module/Profile/Photos.php:343
 msgid "everybody"
 msgstr ""
 
@@ -274,7 +274,7 @@ msgid "Failed to delete the photo."
 msgstr ""
 
 #: mod/photos.php:332 src/Module/Conversation/Community.php:146
-#: src/Module/Directory.php:34 src/Module/Profile/Photos.php:270
+#: src/Module/Directory.php:34 src/Module/Profile/Photos.php:277
 #: src/Module/Search/Index.php:50
 msgid "Public access denied."
 msgstr ""
@@ -361,7 +361,7 @@ msgstr ""
 msgid "Show Oldest First"
 msgstr ""
 
-#: mod/photos.php:609 src/Module/Profile/Photos.php:323
+#: mod/photos.php:609 src/Module/Profile/Photos.php:330
 msgid "View Photo"
 msgstr ""
 
@@ -3752,7 +3752,7 @@ msgstr ""
 #: src/Module/Admin/Themes/Index.php:105 src/Module/Admin/Tos.php:72
 #: src/Module/Settings/Addons.php:64 src/Module/Settings/Connectors.php:143
 #: src/Module/Settings/Connectors.php:228
-#: src/Module/Settings/ContactImport.php:117
+#: src/Module/Settings/ContactImport.php:101
 #: src/Module/Settings/Delegation.php:179 src/Module/Settings/Display.php:426
 #: src/Module/Settings/Features.php:90
 #: src/Module/Settings/Profile/Index.php:272
@@ -5633,13 +5633,13 @@ msgstr ""
 msgid "Group Search - %s"
 msgstr ""
 
-#: src/Module/BaseSearch.php:115 src/Module/Conversation/Channel.php:121
+#: src/Module/BaseSearch.php:132 src/Module/Conversation/Channel.php:121
 #: src/Module/Conversation/Community.php:111 src/Module/Search/Index.php:140
 #: src/Module/Search/Index.php:192
 msgid "No results."
 msgstr ""
 
-#: src/Module/BaseSearch.php:142
+#: src/Module/BaseSearch.php:141
 #, php-format
 msgid "%d result was filtered out because your node blocks the domain it is registered on. You can review the list of domains your node is currently blocking in the <a href=\"/friendica\">About page</a>."
 msgid_plural "%d results were filtered out because your node blocks the domain they are registered on. You can review the list of domains your node is currently blocking in the <a href=\"/friendica\">About page</a>."
@@ -5677,7 +5677,7 @@ msgstr ""
 
 #: src/Module/BaseSettings.php:155
 #: src/Module/Moderation/Blocklist/Contact/Import.php:108
-#: src/Module/Settings/ContactImport.php:116
+#: src/Module/Settings/ContactImport.php:100
 msgid "Import Contacts"
 msgstr ""
 
@@ -8578,7 +8578,7 @@ msgstr ""
 msgid "Image file is empty."
 msgstr ""
 
-#: src/Module/Profile/Photos.php:329
+#: src/Module/Profile/Photos.php:336
 msgid "View Album"
 msgstr ""
 
@@ -9830,27 +9830,28 @@ msgstr ""
 msgid "Move to folder:"
 msgstr ""
 
-#: src/Module/Settings/ContactImport.php:78
-msgid "Contact CSV file upload error"
-msgstr ""
-
-#: src/Module/Settings/ContactImport.php:97
+#: src/Module/Settings/ContactImport.php:62
+#: src/Module/Settings/ContactImport.php:81
 msgid "Importing Contacts done"
 msgstr ""
 
-#: src/Module/Settings/ContactImport.php:119
+#: src/Module/Settings/ContactImport.php:70
+msgid "Contact CSV file upload error"
+msgstr ""
+
+#: src/Module/Settings/ContactImport.php:103
 msgid "Upload a CSV file that contains the handle of your followed accounts in the first column you exported from the old account. Your contacts will be added in the background. This can take some time."
 msgstr ""
 
-#: src/Module/Settings/ContactImport.php:120
+#: src/Module/Settings/ContactImport.php:104
 msgid "Upload File"
 msgstr ""
 
-#: src/Module/Settings/ContactImport.php:122
+#: src/Module/Settings/ContactImport.php:106
 msgid "Your legacy ActivityPub/GNU Social account"
 msgstr ""
 
-#: src/Module/Settings/ContactImport.php:122
+#: src/Module/Settings/ContactImport.php:106
 msgid "If you enter your old account name from an ActivityPub based system or your GNU Social/Statusnet account name here (in the format user@domain.tld), your contacts will be added in the background. This can take some time."
 msgstr ""
 
