@@ -1588,6 +1588,10 @@ class Conversation
 				$pinned = '';
 			}
 
+			if ($this->item->redundantSummary($item['body'], $item['content-warning'])) {
+				$item['content-warning'] = '';
+			}
+
 			$tmp_item = [
 				'template'             => 'search_item.tpl',
 				'id'                   => ($preview ? 'P0' : $item['id']),
