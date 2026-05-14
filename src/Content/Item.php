@@ -1428,7 +1428,7 @@ class Item
 			return false;
 		}
 
-		return (1 - ($distance / $max_len)) > 0.9;
+		return ($distance / $max_len) <= 0.1;
 	}
 
 }
