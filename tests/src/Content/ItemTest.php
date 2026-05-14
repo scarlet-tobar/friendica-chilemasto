@@ -35,12 +35,12 @@ class ItemTestDice
 
 	public function __construct($profiler, $eventDispatcher, $config, $l10n, $baseUrl, \Closure $mockFactory)
 	{
-		$this->profiler = $profiler;
+		$this->profiler        = $profiler;
 		$this->eventDispatcher = $eventDispatcher;
-		$this->config = $config;
-		$this->l10n = $l10n;
-		$this->baseUrl = $baseUrl;
-		$this->mockFactory = $mockFactory;
+		$this->config          = $config;
+		$this->l10n            = $l10n;
+		$this->baseUrl         = $baseUrl;
+		$this->mockFactory     = $mockFactory;
 	}
 
 	public function create($class)
@@ -123,7 +123,7 @@ class ItemTest extends MockedTestCase
 				['rendertime', 'callstack', null, false],
 			]);
 
-		$l10n = $this->createMock(L10n::class);
+		$l10n    = $this->createMock(L10n::class);
 		$baseUrl = $this->createMock(BaseURL::class);
 
 		$mockFactory = \Closure::bind(function ($class) {
@@ -145,33 +145,33 @@ class ItemTest extends MockedTestCase
 		return [
 			'empty-summary' => [
 				'expected' => false,
-				'body' => 'Some content here',
-				'summary' => '',
+				'body'     => 'Some content here',
+				'summary'  => '',
 			],
 			'identical-summary' => [
 				'expected' => true,
-				'body' => 'Some content here',
-				'summary' => 'Some content here',
+				'body'     => 'Some content here',
+				'summary'  => 'Some content here',
 			],
 			'same-start-different-case' => [
 				'expected' => true,
-				'body' => 'Some content here',
-				'summary' => 'some CONTENT here',
+				'body'     => 'Some content here',
+				'summary'  => 'some CONTENT here',
 			],
 			'prefix-match' => [
 				'expected' => true,
-				'body' => 'Some content here with extra text',
-				'summary' => 'Some content here',
+				'body'     => 'Some content here with extra text',
+				'summary'  => 'Some content here',
 			],
 			'different-summary' => [
 				'expected' => false,
-				'body' => 'Some content here',
-				'summary' => 'Completely different summary',
+				'body'     => 'Some content here',
+				'summary'  => 'Completely different summary',
 			],
 			'summary-longer-than-body' => [
 				'expected' => false,
-				'body' => 'Short',
-				'summary' => 'Short but longer summary',
+				'body'     => 'Short',
+				'summary'  => 'Short but longer summary',
 			],
 		];
 	}
@@ -206,7 +206,7 @@ class ItemTest extends MockedTestCase
 			$this->createMock(Emailer::class),
 			$this->createMock(EventDispatcherInterface::class),
 			$this->createMock(PostMediaRepository::class),
-			$this->createMock(PostMediaFactory::class)
+			$this->createMock(PostMediaFactory::class),
 		);
 	}
 }
