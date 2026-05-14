@@ -1404,15 +1404,15 @@ class Item
 	 */
 	public function redundantSummary(string $body, string $summary): bool
 	{
-		$normalize = function ($text) {
+		$normalize = function (string $text): string {
 			$text = mb_strtolower($text);
-			$text = str_replace(["\n", "\r"], ' ', $text);
+			$text = str_replace(["\n", "\r", "\t"], ' ', $text);
 			$text = preg_replace('/\s+/', ' ', $text);
 			return trim($text);
 		};
 
 		$summary_norm = $normalize($summary);
-		if (empty($summary_norm)) {
+		if ($summary_norm === '') {
 			return false;
 		}
 
