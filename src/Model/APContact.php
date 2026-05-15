@@ -422,6 +422,14 @@ class APContact
 			}
 		}
 
+		if (empty($apcontact['addr']) || empty($apcontact['baseurl'])) {
+			try {
+				$apcontact = array_merge($apcontact, self::fetchWebfingerData($apcontact['nick'] . '@' . (new Uri($apcontact['url']))->getAuthority()));
+			} catch (\Throwable $e) {
+				DI::logger()->warning('Unable to coerce APContact URL into a UriInterface object', ['url' => $apcontact['url'], 'error' => $e->getMessage()]);
+			}
+		}
+
 		if (empty($apcontact['baseurl'])) {
 			$apcontact['baseurl'] = null;
 		}
