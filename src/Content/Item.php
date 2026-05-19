@@ -1402,7 +1402,7 @@ class Item
 	 * @param string $summary
 	 * @return boolean summary is redundant
 	 */
-	public function redundantSummary(string $body, string $summary): bool
+	public function redundantSummary(?string $body = '', ?string $summary = ''): bool
 	{
 		$normalize = function (string $text): string {
 			$text = mb_strtolower($text);
