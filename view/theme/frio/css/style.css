@@ -195,6 +195,16 @@ details summary {
 	line-height: 1.5;
 }
 
+@media (max-width: 768px) {
+	#back-to-top {
+		font-size: 1.8em;
+		padding: 0 8px 0 8px;
+		right: 10px;
+		bottom: 10px;
+		line-height: 1.4;
+	}
+}
+
 #item-delete-selected {
 	cursor: pointer;
 	color: white;
@@ -645,6 +655,16 @@ nav.navbar .nav > li > button:hover,
 nav.navbar .nav > li > button:focus {
 	background-color: $nav_icon_hover_color;
 }
+/* Current section highlighting */
+#topbar-first .nav > li > a.selected i,
+#nav-notification.dropdown.open {
+  border-bottom: 3px solid $nav_icon_color;
+	padding-bottom: 7px;
+}
+/* Offset the overflow caused by the current section highlighting padding above by a lowered height */
+#topbar-first .nav > li > a.selected:hover {
+	height: 50px;
+}
 #topbar-first .nav > .account {
 	height: 50px;
 	margin-left: 20px;
@@ -923,7 +943,7 @@ nav.navbar .nav > li > button:focus {
 	font-size: 1.6em;
 }
 
-#nav-search-input-field {
+#search-box #nav-search-input-field {
 	width: 296px;
 }
 
@@ -1282,7 +1302,7 @@ aside .vcard .fn {
 }
 aside .vcard .p-addr {
 	font-style: italic;
-	padding-bottom: 2px;
+	padding-bottom: 7px;
 	text-align: center;
 	word-wrap: break-word;
 }
@@ -1295,6 +1315,9 @@ aside .vcard .detail {
 }
 aside .xmpp, aside .matrix {
 	display: table;
+}
+aside .member-since {
+	padding-top: 5px;
 }
 aside .vcard .icon {
 	display: table-cell;
@@ -1521,8 +1544,9 @@ section #jotOpen {
 	margin-right: 20px;
 }
 #jot-title-wrap,
+#jot-summary-wrap,
 #jot-category-wrap {
-	margin-bottom: 5px;
+	margin-bottom: 10px;
 }
 #jot-text-wrap {
 	margin-top: 20px;
@@ -1551,6 +1575,14 @@ textarea.comment-edit-text:focus + .comment-edit-form .preview {
 	border: 2px solid #6fdbe8;
 	border-top: none;
 }
+#compose-additional-settings-location {
+	align-items: center;
+	display: flex;
+	flex-grow: 1;
+	gap: 5px;
+	padding-bottom: 15px;
+}
+
 .preview hr.previewseparator {
 	margin-top: 0px;
 	border-color: #d2d2d2;
@@ -1686,6 +1718,9 @@ textarea.comment-edit-text:focus + .comment-edit-form .preview {
 }
 .fbrowser.photo .photo-album-image-wrapper .jg-caption {
 	pointer-events: none;
+}
+.fbswitcher {
+	margin-top: -3px;
 }
 
 /* Photo album hover effect using jg-caption */
@@ -2230,24 +2265,6 @@ button[disabled] {
 /*
 * Comments
 */
-wall-item-comment-wrapper.well {
-	border: none;
-	box-shadow: none;
-	background-color: rgba(237, 237, 237, $contentbg_transp);
-	background-image: none;
-	margin-bottom: 1px;
-	background-color: red;
-}
-wall-item-comment-wrapper.well-small {
-	padding: 10px;
-	border-radius: 3px;
-}
-wall-item-comment-wrapper.well hr {
-	border-top: 1px solid #d9d9d9;
-}
-.wall-entry wall-item-comment-wrapper.well {
-	margin-bottom: 0;
-}
 .comment-container {
 	margin-bottom: 0px;
 	border-top-left-radius: 3px;
@@ -2283,7 +2300,7 @@ wall-item-comment-wrapper.well hr {
 .wall-item-comment-wrapper {
 	padding: 10px;
 	border-top: 1px solid rgba(255, 255, 255, 0.8);
-	background-color: rgba(0, 0, 0, 0.03);
+	background-color: var(--content-bg);
 	border-radius: 0 0 4px 4px;
 	margin-bottom: 0;
 }
@@ -2304,13 +2321,17 @@ wall-item-comment-wrapper.well hr {
 }
 
 .comment-edit-submit-wrapper {
-	text-align: right;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
 	margin-bottom: 0;
 }
 
 .comment-icon-list {
 	display: flex;
+	flex-wrap: wrap;
 	justify-content: space-between;
+	margin-bottom: 0;
 }
 
 /* acpopup  + textcompletion*/
@@ -2782,6 +2803,11 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 	padding-top: 10px;
 }
 
+#num-results {
+	padding-top: 20px;
+	margin-bottom: 0;
+}
+
 /* circle edit page */
 .circle-actions {
 	margin-top: 4px;
@@ -2911,9 +2937,6 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 #prvmail-end {
 	clear: both;
 }
-#modal #prvmail-text-edit-bb .bb-img {
-	display: none;
-}
 
 /* photos */
 #photo-album-edit-name-label {
@@ -2966,6 +2989,10 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 
 .profile-edit-submit-button {
 	margin-top: 15px;
+}
+
+#photos-usage-message {
+	padding-bottom: 15px;
 }
 
 /* Events page */
@@ -3516,6 +3543,14 @@ section.help-content-wrapper li {
 #admin-summary-wrapper {
 	padding-top: 10px;
 }
+#admin-summary-wrapper h2 {
+	font-size: 21px;
+	padding-top: 13px;
+	padding-bottom: 8px;
+}
+#admin-summary-addons tr td:first-child {
+	width: clamp(30px, 20vw, 200px);
+}
 #adminpage ul#addonslist,
 li.addon {
 	list-style: none;
@@ -3564,31 +3599,38 @@ li.addon {
 #adminpage h2 {
 	word-break: break-all;
 }
-#adminpage .table-logs thead tr {
-	display: grid;
-	grid-auto-flow: row;
-}
-#adminpage .table-logs tbody {
-	display: table;
-	width: 100%;
-	table-layout: fixed;
+#adminpage .form-group-search {
+	display: flex;
+	align-items: center;
 }
 #adminpage .table-logs td {
 	word-break: break-word;
 }
-#adminpage .table-logs td.log-message {
+#adminpage .table-logs th.log-message, #adminpage .table-logs td.log-message {
 	width: 40%;
 }
 #logdetail td.log-message {
 	width: 80%;
 }
+#adminpage #nav-search-input-field {
+	display: inline;
+	max-width: 296px;
+}
 @media (min-width: 600px) {
-	#adminpage .table-logs thead tr {
-		grid-auto-flow: column;
+	#adminpage .table-logs th.log-message, #adminpage .table-logs td.log-message {
+		width: 57%;
 	}
-	#adminpage .table-logs td.log-message {
-		width: 60%;
-	}
+}
+#adminpage td,
+.adminpage td,
+#adminpage .table td,
+.adminpage .table td,
+#adminpage.table > tbody > tr > td,
+.adminpage.table > tbody > tr > td,
+.table#adminpage > tbody > tr > td {
+	word-break: break-all !important;
+	white-space: normal !important;
+	vertical-align: top !important;
 }
 #admin-users #users tr.blocked {
 	background-color: #f8efc0;
@@ -4041,6 +4083,9 @@ div.login-form, .login-content-wrapper,
 	margin-left: 30px;
 	width: 60px;
 }
+.event-wrapper.fancybox-content {
+	width: clamp(200px, 80vw, 900px);
+}
 
 /**
  * The event-card
@@ -4075,7 +4120,7 @@ div.login-form, .login-content-wrapper,
 
 	.mod-home.is-not-singleuser .login-form,
 	.mod-login #content .login-form {
-		background-color: #fff;
+		background-color: $background_color;
 		padding: 1.5em;
 		position: relative;
 	}
@@ -4273,7 +4318,7 @@ div.login-form, .login-content-wrapper,
 	}
 
 }/* Even smaller mobile displays */
-@media (width < 315px) {
+@media (width < 358px) {
 	/* Less topnav padding */
 	.navbar-left {
 		float: none!important;

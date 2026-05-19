@@ -473,7 +473,7 @@ class Image
 			return;
 		}
 
-		$ort = isset($exif['IFD0']['Orientation']) ? $exif['IFD0']['Orientation'] : 1;
+		$ort = $exif['IFD0']['Orientation'] ?? 1;
 
 		switch ($ort) {
 			case 1: // nothing
@@ -840,7 +840,7 @@ class Image
 
 		for ($y = 0; $y < $scaled['height']; ++$y) {
 			for ($x = 0; $x < $scaled['width']; ++$x) {
-				list($r, $g, $b) = $pixels[$y][$x];
+				[$r, $g, $b] = $pixels[$y][$x];
 				if ($draw !== null) {
 					$draw->setFillColor("rgb($r, $g, $b)");
 					$draw->point($x, $y);

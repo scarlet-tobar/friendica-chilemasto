@@ -183,7 +183,7 @@ class Statuses extends BaseApi
 
 		Item::updateDisplayCache($post['uri-id']);
 
-		$this->jsonExit(DI::mstdnStatus()->createFromUriId($post['uri-id'], $uid, self::appSupportsQuotes()));
+		$this->jsonExit(DI::mstdnStatus()->createFromUriId($post['uri-id'], $uid));
 	}
 
 	protected function post(array $request = [])
@@ -217,7 +217,6 @@ class Statuses extends BaseApi
 		$item['body']       = $this->formatStatus($request['status'], $uid);
 		$item['app']        = $this->getApp();
 		$item['sensitive']  = $request['sensitive'];
-		$item['visibility'] = $request['visibility'];
 
 		switch ($request['visibility']) {
 			case 'public':
@@ -238,11 +237,15 @@ class Statuses extends BaseApi
 				if ($request['in_reply_to_id']) {
 					$parent_item = Post::selectFirst(Item::ITEM_FIELDLIST, ['uri-id' => $request['in_reply_to_id'], 'uid' => $uid, 'private' => Item::PRIVATE]);
 					if (!empty($parent_item)) {
-						$item['allow_cid'] = $parent_item['allow_cid'];
-						$item['allow_gid'] = $parent_item['allow_gid'];
-						$item['deny_cid']  = $parent_item['deny_cid'];
-						$item['deny_gid']  = $parent_item['deny_gid'];
-						$item['private']   = $parent_item['private'];
+						// When 'visibility' is set to 'private' we want the permissions be copied from the parent post in the "insert" function.
+						// But this must only happen when the parent post was private as well.
+						// In all other cases we want to keep the permissions we defined here. The copying is controlled via the 'visibility' field.
+						$item['visibility'] = $request['visibility'];
+						$item['allow_cid']  = $parent_item['allow_cid'];
+						$item['allow_gid']  = $parent_item['allow_gid'];
+						$item['deny_cid']   = $parent_item['deny_cid'];
+						$item['deny_gid']   = $parent_item['deny_gid'];
+						$item['private']    = $parent_item['private'];
 						break;
 					}
 				}
@@ -331,21 +334,26 @@ class Statuses extends BaseApi
 		}
 
 		if (!empty($request['scheduled_at'])) {
-			$item['guid'] = $this->item->guid($item, true);
-			$item['uri']  = Item::newURI($item['guid']);
+			$scheduledAt = DateTimeFormat::utc($request['scheduled_at']);
+			if ($scheduledAt > DateTimeFormat::utcNow()) {
+				$item['guid'] = $this->item->guid($item, true);
+				$item['uri']  = Item::newURI($item['guid']);
 
-			$id = Post\Delayed::add($item['uri'], $item, Worker::PRIORITY_HIGH, Post\Delayed::PREPARED, DateTimeFormat::utc($request['scheduled_at']));
-			if (empty($id)) {
-				$this->logAndJsonError(500, $this->errorFactory->InternalError());
+				$id = Post\Delayed::add($item['uri'], $item, Worker::PRIORITY_HIGH, Post\Delayed::PREPARED, $scheduledAt);
+				if (empty($id)) {
+					$this->logAndJsonError(500, $this->errorFactory->InternalError());
+				}
+				$this->jsonExit(DI::mstdnScheduledStatus()->createFromDelayedPostId($id, $uid)->toArray());
 			}
-			$this->jsonExit(DI::mstdnScheduledStatus()->createFromDelayedPostId($id, $uid)->toArray());
+
+			$item['created'] = $scheduledAt;
 		}
 
 		$id = Item::insert($item, true);
 		if (!empty($id)) {
 			$item = Post::selectFirst(['uri-id'], ['id' => $id]);
 			if (!empty($item['uri-id'])) {
-				$this->jsonExit(DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, self::appSupportsQuotes()));
+				$this->jsonExit(DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid));
 			}
 		}
 
@@ -394,9 +402,10 @@ class Statuses extends BaseApi
 			if (Post::exists(['uri-id' => $this->parameters['id'], 'uid' => $uid, 'unseen' => true])) {
 				Post::update(['unseen' => false], ['uri-id' => $this->parameters['id'], 'uid' => $uid, 'unseen' => true]);
 			}
+			$this->item->setViewed($this->parameters['id'], $uid);
 		}
 
-		$this->jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, self::appSupportsQuotes(), false));
+		$this->jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, false));
 	}
 
 	private function getApp(): string
@@ -429,7 +438,7 @@ class Statuses extends BaseApi
 					'mimetype' => $attach['filetype'],
 					'url'      => DI::baseUrl() . '/attach/' . substr($id, 7),
 					'size'     => $attach['filetype'],
-					'name'     => $attach['filename']
+					'name'     => $attach['filename'],
 				];
 				$item['attachments'][] = $attachment;
 				Attach::setPermissionForId(substr($id, 7), $item['uid'], $item['allow_cid'], $item['allow_gid'], $item['deny_cid'], $item['deny_gid']);
@@ -456,7 +465,7 @@ class Statuses extends BaseApi
 				'name'        => $media[0]['filename'] ?: $media[0]['resource-id'],
 				'description' => $media[0]['desc'] ?? '',
 				'width'       => $media[0]['width'],
-				'height'      => $media[0]['height']
+				'height'      => $media[0]['height'],
 			];
 
 			if (count($media) > 1) {

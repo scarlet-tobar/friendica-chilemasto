@@ -85,7 +85,7 @@
 						{{/if}}
 
 						{{if $nav.messages}}
-							<li class="nav-segment hidden-xs">
+							<li class="nav-segment">
 								<a accesskey="m" id="nav-messages-link" href="{{$nav.messages.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
 									aria-label="{{$nav.messages.1}}" title="{{$nav.messages.1}}"
 									class="nav-menu {{$sel.messages}}"><i class="fa fa-envelope fa-lg fa-fw"
@@ -97,7 +97,7 @@
 						{{if $nav.calendar}}
 							<li class="nav-segment hidden-xs">
 								<a accesskey="e" id="nav-calendar-link" href="{{$nav.calendar.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
-									aria-label="{{$nav.calendar.1}}" title="{{$nav.calendar.1}}" class="nav-menu"><i
+									aria-label="{{$nav.calendar.1}}" title="{{$nav.calendar.1}}" class="nav-menu {{$sel.calendar}}"><i
 										class="fa fa-lg fa-calendar fa-fw"></i></a>
 							</li>
 						{{/if}}
@@ -197,24 +197,16 @@
 									{{/if}}
 									{{foreach $nav.usermenu as $usermenu}}
 										<li>
-											<a role="menuitem" class="{{$usermenu.2}}" href="{{$usermenu.0}}"
+											<a role="menuitem" class="{{$usermenu.2}}{{if $usermenu.0|str_ends_with:"calendar/"}}visible-xs{{/if}}" href="{{$usermenu.0}}"
 												title="{{$usermenu.3}}">
 												<i class="fa {{$usermenu.4}}"></i>
 												{{$usermenu.1}}
 											</a>
 										</li>
 									{{/foreach}}
-									<li class="divider"><hr></li>
-									{{if $nav.notifications}}
-										<li>
-											<a role="menuitem" href="{{$nav.notifications.all.0}}" title="{{$nav.notifications.1}}">
-												<i class="fa fa-bell fa-fw" aria-hidden="true"></i>
-												{{$nav.notifications.1}}
-											</a>
-										</li>
-									{{/if}}
+									<li class="divider visible-xs"><hr></li>
 									{{if $nav.messages}}
-										<li>
+										<li class="visible-xs">
 											<a role="menuitem"
 												class="nav-commlink {{$nav.messages.2}} {{$sel.messages}}"
 												href="{{$nav.messages.0}}" title="{{$nav.messages.3}}">
@@ -224,9 +216,8 @@
 											</a>
 										</li>
 									{{/if}}
-									<li class="divider"><hr></li>
 									{{if $nav.contacts}}
-										<li>
+										<li class="visible-xs">
 											<a role="menuitem" id="nav-menu-contacts-link"
 												class="nav-link {{$nav.contacts.2}}" href="{{$nav.contacts.0}}"
 												title="{{$nav.contacts.3}}">
@@ -362,16 +353,8 @@
 									</a>
 								</li>
 							{{/foreach}}
-							{{if $nav.notifications || $nav.contacts || $nav.messages || $nav.delegation}}
+							{{if $nav.contacts || $nav.messages || $nav.delegation}}
 								<li class="divider"><hr></li>
-							{{/if}}
-							{{if $nav.notifications}}
-								<li class="list-group-item">
-									<a role="menuitem"
-										href="{{$nav.notifications.all.0}}" title="{{$nav.notifications.1}}"><i
-											class="fa fa-bell fa-fw" aria-hidden="true"></i> {{$nav.notifications.1}}
-									</a>
-								</li>
 							{{/if}}
 							{{if $nav.contacts}}
 								<li class="list-group-item">

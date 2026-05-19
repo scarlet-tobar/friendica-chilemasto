@@ -46,7 +46,7 @@ function message_init()
 
 	$head_tpl = Renderer::getMarkupTemplate('message-head.tpl');
 	DI::page()['htmlhead'] .= Renderer::replaceMacros($head_tpl, [
-		'$base' => (string)DI::baseUrl()
+		'$base' => (string) DI::baseUrl(),
 	]);
 }
 
@@ -147,7 +147,7 @@ function message_content()
 				DI::baseUrl()->redirect('message');
 			}
 
-			DI::baseUrl()->redirect('message/' . $conversation['id'] );
+			DI::baseUrl()->redirect('message/' . $conversation['id']);
 		} else {
 			$parentmail = DBA::selectFirst('mail', ['parent-uri'], ['id' => DI::args()->getArgv()[2], 'uid' => DI::userSession()->getLocalUserId()]);
 			if (DBA::isResult($parentmail)) {
@@ -167,7 +167,7 @@ function message_content()
 		$tpl = Renderer::getMarkupTemplate('msg-header.tpl');
 		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
 			'$nickname' => DI::userSession()->getLocalUserNickname(),
-			'$linkurl'  => DI::l10n()->t('Please enter a link URL:')
+			'$linkurl'  => DI::l10n()->t('Please enter a link URL:'),
 		]);
 
 		$recipientId = DI::args()->getArgv()[2] ?? null;
@@ -178,17 +178,18 @@ function message_content()
 		$o .= Renderer::replaceMacros($tpl, [
 			'$header'      => DI::l10n()->t('Send Private Message'),
 			'$to'          => DI::l10n()->t('To:'),
-			'$subject'     => DI::l10n()->t('Subject:'),
+			'$to_desc'     => DI::l10n()->t('Start typing the name of a contact and select from the list'),
+			'$subject'     => DI::l10n()->t('Subject'),
 			'$subjtxt'     => $_REQUEST['subject'] ?? '',
 			'$text'        => $_REQUEST['body']    ?? '',
 			'$readonly'    => '',
-			'$yourmessage' => DI::l10n()->t('Your message:'),
+			'$yourmessage' => DI::l10n()->t('Your message'),
 			'$select'      => $select,
 			'$parent'      => '',
 			'$upload'      => DI::l10n()->t('Upload photo'),
 			'$insert'      => DI::l10n()->t('Insert web link'),
 			'$wait'        => DI::l10n()->t('Please wait'),
-			'$submit'      => DI::l10n()->t('Send Message')
+			'$submit'      => DI::l10n()->t('Send Message'),
 		]);
 		return $o;
 	}
@@ -232,14 +233,14 @@ function message_content()
 			WHERE `mail`.`uid` = ? AND `mail`.`id` = ?
 			LIMIT 1",
 			DI::userSession()->getLocalUserId(),
-			DI::args()->getArgv()[1]
+			DI::args()->getArgv()[1],
 		);
 		if (DBA::isResult($message)) {
 			$contact_id = $message['contact-id'];
 
 			$params = [
 				DI::userSession()->getLocalUserId(),
-				$message['parent-uri']
+				$message['parent-uri'],
 			];
 
 			if ($message['convid']) {
@@ -256,7 +257,7 @@ function message_content()
 				WHERE `mail`.`uid` = ?
 				$sql_extra
 				ORDER BY `mail`.`created` ASC",
-				...$params
+				...$params,
 			);
 
 			$messages = DBA::toArray($messages_stmt);
@@ -274,7 +275,7 @@ function message_content()
 		$tpl = Renderer::getMarkupTemplate('msg-header.tpl');
 		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
 			'$nickname' => DI::userSession()->getLocalUserNickname(),
-			'$linkurl'  => DI::l10n()->t('Please enter a link URL:')
+			'$linkurl'  => DI::l10n()->t('Please enter a link URL:'),
 		]);
 
 		$mails   = [];
@@ -345,7 +346,7 @@ function message_content()
 			'$upload'      => DI::l10n()->t('Upload photo'),
 			'$insert'      => DI::l10n()->t('Insert web link'),
 			'$submit'      => DI::l10n()->t('Send Message'),
-			'$wait'        => DI::l10n()->t('Please wait')
+			'$wait'        => DI::l10n()->t('Please wait'),
 		]);
 
 		return $o;

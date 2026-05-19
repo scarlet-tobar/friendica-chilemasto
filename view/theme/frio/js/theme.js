@@ -16,14 +16,14 @@ $(document).ready(function () {
 	$(window).scroll(function () {
 		let currentScroll = $(this).scrollTop();
 
-		// Top of the page or going down = hide the button
-		if (!scrollStart || !currentScroll || currentScroll > scrollStart) {
+		// Top of the page or going up = hide the button
+		if (!scrollStart || !currentScroll || currentScroll < scrollStart) {
 			$("#back-to-top").fadeOut();
 			scrollStart = currentScroll;
 		}
 
-		// Going up enough = show the button
-		if (scrollStart - currentScroll > 100) {
+		// Going down enough = show the button
+		if (currentScroll - scrollStart > 100) {
 			$("#back-to-top").fadeIn();
 			scrollStart = currentScroll;
 		}
@@ -298,6 +298,10 @@ $(document).ready(function () {
 	 */
 	$(document).on("mousedown", function (event) {
 		if (event.target.type === "button") {
+			return true;
+		}
+
+		if ($(event.target).closest(".fg-emoji-container").length) {
 			return true;
 		}
 

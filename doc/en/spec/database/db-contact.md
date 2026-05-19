@@ -114,6 +114,7 @@ contact table
 | next-update                 | next-update                          |
 | local-data-next-update      | local-data, next-update              |
 | uid_lastitem                | uid, last-item                       |
+| uid_created                 | uid, created                         |
 | baseurl                     | baseurl(64)                          |
 | uid_contact-type            | uid, contact-type                    |
 | uid_self_contact-type       | uid, self, contact-type              |

@@ -159,8 +159,8 @@ class Follow extends BaseModule
 
 			'$action'   => $requestUrl,
 			'$name'     => $contact['name'],
-			'$url'      => $contact['alias'] ?: $contact['url'],
-			'$zrl'      => OpenWebAuth::getZrlUrl($contact['alias'] ?: $contact['url']),
+			'$url'      => Contact::getProfileLink($contact),
+			'$zrl'      => OpenWebAuth::getZrlUrl(Contact::getProfileLink($contact)),
 			'$myaddr'   => $myaddr,
 			'$keywords' => $contact['keywords'],
 
@@ -175,11 +175,11 @@ class Follow extends BaseModule
 
 			$output .= Renderer::replaceMacros(
 				Renderer::getMarkupTemplate('section_title.tpl'),
-				['$title' => $this->t('Posts and Replies')]
+				['$title' => $this->t('Posts and Replies')],
 			);
 
 			// Show last public posts
-			$output .= Contact::getPostsFromUrl($contact['url'], $this->session->getLocalUserId());
+			$output .= Contact::getPostsFromUrl($contact['url'], $this->session->getLocalUserId(), false, $request);
 		}
 
 		return $output;

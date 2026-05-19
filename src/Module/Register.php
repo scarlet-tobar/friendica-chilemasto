@@ -84,8 +84,13 @@ class Register extends BaseModule
 		}
 
 		if (!DI::userSession()->getLocalUserId() && self::getPolicy() === self::CLOSED) {
-			DI::sysmsg()->addNotice(DI::l10n()->t('Permission denied.'));
-			return '';
+			$tpl = Renderer::getMarkupTemplate('register_closed.tpl');
+			return Renderer::replaceMacros($tpl, [
+				'$title'       => DI::l10n()->t('Registration Closed'),
+				'$message'     => DI::l10n()->t('Registration is currently closed on this node.'),
+				'$explanation' => DI::l10n()->t('The administrators have decided to limit new registrations. This could be temporary or permanent.'),
+				'$find_server' => BBCode::convertForUriId(User::getSystemUriId(), DI::l10n()->t('You can find other open Friendica servers at %s where you can register.', '[url=https://dir.friendica.social/servers]dir.friendica.social/servers[/url]')),
+			]);
 		}
 
 		$max_dailies = intval(DI::config()->get('system', 'max_daily_registrations'));

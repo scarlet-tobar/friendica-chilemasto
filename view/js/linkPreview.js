@@ -128,12 +128,6 @@
 				isExtern = true;
 			}
 
-			// Don't process the textarea input if we have already
-			// an attachment preview.
-			if (!isExtern && isActive) {
-				return;
-			}
-
 			if (trim(text) !== "" && block === false && urlRegex.test(text)) {
 				binurl = bin2hex(text);
 				block = true;
@@ -160,15 +154,16 @@
 		var processContentData = function(result) {
 			if (result.contentType === 'image') {
 				insertImage(result.data);
-			}
-			if (result.contentType === 'audio') {
+			} else if (result.contentType === 'audio') {
 				insertAudio(result.data);
-			}
-			if (result.contentType === 'video') {
+			} else if (result.contentType === 'video') {
 				insertVideo(result.data);
-			}
-			if (result.contentType === 'attachment') {
+			} else if ((result.contentType === 'attachment' || result.contentType === 'embed') && !isActive) {
 				insertAttachment(result.data);
+			} else if (result.contentType === 'embed') {
+				insertEmbed(result.data);
+			} else {
+				insertUrl(result.data);
 			}
 			$('#profile-rotator').hide();
 		};
@@ -180,14 +175,14 @@
 		 * @param {type} callback
 		 * @returns {void}
 		 */
-		var getContentData = function(binurl, callback) {
+		var getContentData = function(binurl, callback, attach) {
 			$.get('parseurl?binurl='+ binurl + '&format=json', function (answer) {
 				obj = sanitizeInputData(answer);
 
 				// Put the data into a cache
 				cache[binurl] = obj;
 
-				callback(obj);
+				callback(obj, attach);
 
 				isCrawling = false;
 			});
@@ -203,7 +198,7 @@
 			if (!isExtern) {
 				return;
 			}
-			var bbcode = '\n[img=' + data.url + '][/img]\n';
+			var bbcode = '[img=' + data.url + '][/img]';
 			addeditortext(bbcode);
 		};
 
@@ -217,7 +212,7 @@
 			if (!isExtern) {
 				return;
 			}
-			var bbcode = '\n[audio]' + data.url + '[/audio]\n';
+			var bbcode = '[audio]' + data.url + '[/audio]';
 			addeditortext(bbcode);
 		};
 
@@ -231,7 +226,35 @@
 			if (!isExtern) {
 				return;
 			}
-			var bbcode = '\n[video]' + data.url + '[/video]\n';
+			var bbcode = '[video]' + data.url + '[/video]';
+			addeditortext(bbcode);
+		};
+
+		/*
+		 * Add a [embed] bbtag with the embed url to the jot editor.
+		 *
+		 * @param {type} data
+		 * @returns {void}
+		 */
+		var insertEmbed = function(data) {
+			if (!isExtern) {
+				return;
+			}
+			var bbcode = '[embed]' + data.url + '[/embed]';
+			addeditortext(bbcode);
+		};
+
+		/*
+		 * Add a [url] bbtag with the url to the jot editor.
+		 *
+		 * @param {type} data
+		 * @returns {void}
+		 */
+		var insertUrl = function(data) {
+			if (!isExtern) {
+				return;
+			}
+			var bbcode = '[url=' + data.url + ']' + data.title + '[/url]';
 			addeditortext(bbcode);
 		};
 

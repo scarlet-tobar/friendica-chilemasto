@@ -70,11 +70,18 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 			$row['embed-width'],
 			$row['embed-height'],
 			$row['page-type'],
-			$row['schematypes'] ? json_decode($row['schematypes'], true) : null
+			$row['schematypes'] ? json_decode($row['schematypes'], true) : null,
 		);
 	}
 
-	public function createFromBlueskyImageEmbed(int $uriId, stdClass $image): PostMediaEntity
+	/**
+	 * Create a PostMedia entity from an image element
+	 *
+	 * @param integer $uriId
+	 * @param stdClass $image
+	 * @return PostMediaEntity
+	 */
+	public function createFromATProtocolImageEmbed(int $uriId, stdClass $image): PostMediaEntity
 	{
 		return new PostMediaEntity(
 			$uriId,
@@ -92,8 +99,14 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 		);
 	}
 
-
-	public function createFromBlueskyExternalEmbed(int $uriId, stdClass $external): PostMediaEntity
+	/**
+	 * Create a PostMedia entity from an external embed element
+	 *
+	 * @param integer $uriId
+	 * @param stdClass $external
+	 * @return PostMediaEntity
+	 */
+	public function createFromATProtocolExternalEmbed(int $uriId, stdClass $external): PostMediaEntity
 	{
 		return new PostMediaEntity(
 			$uriId,
@@ -108,10 +121,18 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 			null,
 			null,
 			$external->description,
-			$external->title
+			$external->title,
 		);
 	}
 
+	/**
+	 * Create a PostMedia entity from an attachment array
+	 *
+	 * @param array $attachment
+	 * @param integer $uriId
+	 * @param integer $id
+	 * @return PostMediaEntity
+	 */
 	public function createFromAttachment(array $attachment, int $uriId = 0, int $id = 0)
 	{
 		$row = [
@@ -163,6 +184,14 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 		return $this->createFromTableRow($row);
 	}
 
+	/**
+	 * Create a PostMedia entity from parsed URL data
+	 *
+	 * @param array $data
+	 * @param integer $uriId
+	 * @param integer $id
+	 * @return PostMediaEntity
+	 */
 	public function createFromParseUrl(array $data, int $uriId = 0, int $id = 0)
 	{
 		$row = [

@@ -150,7 +150,7 @@ function frio_form($arr)
 	$scheme_info = get_scheme_info($arr['scheme']);
 	$disable     = $scheme_info['overwrites'];
 
-	$background_image_help = '<strong>' . DI::l10n()->t('Note') . ': </strong>' . DI::l10n()->t('Check image permissions if all users are allowed to see the image');
+	$background_image_help = '<strong>' . DI::l10n()->t('Note') . ': </strong>' . DI::l10n()->t('Ensure that the image has the correct permissions, allowing all users to view it.');
 
 	$t   = Renderer::getMarkupTemplate('theme_settings.tpl');
 	$ctx = [
@@ -159,7 +159,7 @@ function frio_form($arr)
 		'$title'                  => DI::l10n()->t('Theme settings'),
 		'$scheme'                 => ['frio_scheme', DI::l10n()->t('Appearance'), $arr['scheme'], frio_scheme_get_list()],
 		'$scheme_accent'          => !$scheme_info['accented'] ? '' : ['frio_scheme_accent', DI::l10n()->t('Accent color'), $arr['scheme_accent']],
-		'$share_string'           => $arr['scheme'] != FRIO_CUSTOM_SCHEME ? '' : ['frio_share_string', DI::l10n()->t('Copy or paste schemestring'), $arr['share_string'], DI::l10n()->t('You can copy this string to share your theme with others. Pasting here applies the schemestring'), false, false],
+		'$share_string'           => $arr['scheme'] != FRIO_CUSTOM_SCHEME ? '' : ['frio_share_string', DI::l10n()->t('Copy or paste theme settings'), $arr['share_string'], DI::l10n()->t('You can copy this text to share your theme settings with others. Pasting here updates the theme settings below. Afterwards, if you want, click the save button below to use the new settings.'), false, false],
 		'$nav_bg'                 => array_key_exists('nav_bg', $disable) ? '' : ['frio_nav_bg', DI::l10n()->t('Navigation bar background color'), $arr['nav_bg'], '', false],
 		'$nav_icon_color'         => array_key_exists('nav_icon_color', $disable) ? '' : ['frio_nav_icon_color', DI::l10n()->t('Navigation bar icon color '), $arr['nav_icon_color'], '', false],
 		'$link_color'             => array_key_exists('link_color', $disable) ? '' : ['frio_link_color', DI::l10n()->t('Link color'), $arr['link_color'], '', false],
@@ -169,7 +169,7 @@ function frio_form($arr)
 		'$bg_image_options_title' => DI::l10n()->t('Background image style'),
 		'$bg_image_options'       => Image::get_options($arr),
 
-		'$always_open_compose' => ['frio_always_open_compose', DI::l10n()->t('Always open Compose page'), $arr['always_open_compose'], DI::l10n()->t('The New Post button always open the <a href="/compose">Compose page</a> instead of the modal form. When this is disabled, the Compose page can be accessed with a middle click on the link or from the modal.')],
+		'$always_open_compose' => ['frio_always_open_compose', DI::l10n()->t('Always open Compose page'), $arr['always_open_compose'], DI::l10n()->t('If enabled, the button to make a new post always opens a dedicated page (the <a href="/compose">Compose page</a>) instead of a small window on top of the current page. When disabled, the "Compose page" can be accessed with a middle click on the button to make a new post, or via a button in the small window.')],
 	];
 
 	if (array_key_exists('login_bg_image', $arr) && !array_key_exists('login_bg_image', $disable)) {
@@ -177,7 +177,7 @@ function frio_form($arr)
 	}
 
 	if (array_key_exists('login_bg_color', $arr) && !array_key_exists('login_bg_color', $disable)) {
-		$ctx['$login_bg_color'] = ['frio_login_bg_color', DI::l10n()->t('Login page background color'), $arr['login_bg_color'], DI::l10n()->t('Leave background image and color empty for theme defaults'), false];
+		$ctx['$login_bg_color'] = ['frio_login_bg_color', DI::l10n()->t('Login page background color'), $arr['login_bg_color'], DI::l10n()->t('Leave background image and color empty to use theme defaults.'), false];
 	}
 
 	return Renderer::replaceMacros($t, $ctx);

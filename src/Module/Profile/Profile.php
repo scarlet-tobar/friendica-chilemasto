@@ -35,7 +35,6 @@ use Friendica\Network\HTTPException;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Profile\ProfileField\Repository\ProfileField;
 use Friendica\Protocol\ActivityPub;
-use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
@@ -146,7 +145,7 @@ class Profile extends BaseProfile
 				$view_as_contact_alert = $this->t(
 					'You\'re currently viewing your profile as <b>%s</b> <a href="%s" class="btn btn-sm pull-right">Cancel</a>',
 					htmlentities($view_as_contacts[$key]['name'], ENT_COMPAT, 'UTF-8'),
-					'profile/' . $this->parameters['nickname'] . '/profile'
+					'profile/' . $this->parameters['nickname'] . '/profile',
 				);
 			}
 		}
@@ -183,20 +182,16 @@ class Profile extends BaseProfile
 		if (Feature::isEnabled($profile['uid'], Feature::MEMBER_SINCE)) {
 			$basic_fields += self::buildField(
 				'membersince',
-				$this->t('Member since:'),
-				DateTimeFormat::local($profile['register_date'])
+				$this->t('Joined:'),
+				$this->l10n->mediumDate($profile['register_date']),
 			);
 		}
 
 		if (!empty($profile['dob']) && $profile['dob'] > DBA::NULL_DATE) {
-			$year_bd_format  = $this->t('j F, Y');
-			$short_bd_format = $this->t('j F');
-
-			$dob = $this->l10n->getDay(
-				intval($profile['dob']) ?
-					DateTimeFormat::utc($profile['dob'] . ' 00:00 +00:00', $year_bd_format)
-					: DateTimeFormat::utc('2001-' . substr($profile['dob'], 5) . ' 00:00 +00:00', $short_bd_format)
-			);
+			$short_bd_format = $this->t('d MMMM');
+			$dob             = intval($profile['dob'])
+					? $this->l10n->longDate($profile['dob'] . ' 00:00 +00:00')
+					: $this->l10n->formatDateTimeByPattern('2001-' . substr($profile['dob'], 5) . ' 00:00 +00:00', $short_bd_format);
 
 			$basic_fields += self::buildField('dob', $this->t('Birthday:'), $dob);
 
@@ -221,7 +216,7 @@ class Profile extends BaseProfile
 			$basic_fields += self::buildField(
 				'homepage',
 				$this->t('Homepage:'),
-				$this->tryRelMe($profile['homepage']) ?: $this->cleanInput($profile['uri-id'], $profile['homepage'])
+				$this->tryRelMe($profile['homepage']) ?: $this->cleanInput($profile['uri-id'], $profile['homepage']),
 			);
 		}
 
@@ -264,7 +259,7 @@ class Profile extends BaseProfile
 				'custom_' . $profile_field->order,
 				$profile_field->label,
 				$this->tryRelMe($profile_field->value) ?: BBCode::convertForUriId($profile['uri-id'], $profile_field->value),
-				'aprofile custom'
+				'aprofile custom',
 			);
 		}
 
@@ -273,7 +268,7 @@ class Profile extends BaseProfile
 			$custom_fields += self::buildField(
 				'group_list',
 				$this->t('Groups:'),
-				GroupManager::profileAdvanced($profile['uid'])
+				GroupManager::profileAdvanced($profile['uid']),
 			);
 		}
 
@@ -294,13 +289,9 @@ class Profile extends BaseProfile
 			'$custom_fields'         => $custom_fields,
 			'$profile'               => $profile,
 			'$homepage_verified'     => $this->l10n->t('This website has been verified to belong to the same person.'),
-			'$edit_link'             => [
-				'url'   => 'settings/profile', $this->t('Edit profile'),
-				'label' => $this->t('Edit profile')
-			],
-			'$viewas_link' => [
+			'$viewas_link'           => [
 				'url'   => $this->args->getQueryString() . '#viewas',
-				'label' => $this->t('View as')
+				'label' => $this->t('View as'),
 			],
 		]);
 
@@ -389,7 +380,7 @@ class Profile extends BaseProfile
 		$input = trim($input);
 		if (Network::isValidHttpUrl($input)) {
 			try {
-				$input = (string)Uri::fromParts(parse_url($input));
+				$input = (string) Uri::fromParts(parse_url($input));
 				return '<a href="' . $input . '" target="_blank" rel="noopener noreferrer me">' . $input . '</a>';
 			} catch (\Throwable $th) {
 				return '';

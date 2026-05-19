@@ -78,7 +78,7 @@ class Notifier
 					$inbox,
 					$uid,
 					$receivers,
-					$post_uriid
+					$post_uriid,
 				);
 			}
 		} elseif ($cmd == Delivery::SUGGESTION) {
@@ -189,7 +189,7 @@ class Notifier
 					DI::logger()->debug('Post has got no Diaspora signature, so there will be no Diaspora delivery', ['guid' => $target_item['guid'], 'uri-id' => $target_item['uri-id']]);
 					$diaspora_delivery = false;
 				}
-				DI::logger()->info('Threaded comment', ['diaspora_delivery' => (int)$diaspora_delivery]);
+				DI::logger()->info('Threaded comment', ['diaspora_delivery' => (int) $diaspora_delivery]);
 			}
 
 			$unlisted = $target_item['private'] == Item::UNLISTED;
@@ -332,6 +332,11 @@ class Notifier
 		$ap_contacts = $apdelivery['contacts'];
 		$delivery_queue_count += $apdelivery['count'];
 
+		if (isset($target_item['verb']) && $target_item['verb'] === Activity::VIEW) {
+			DI::logger()->info('Not delivering view activities', ['guid' => $target_item['guid'], 'uri-id' => $target_item['uri-id']]);
+			return;
+		}
+
 		if (!$only_ap_delivery) {
 			if (empty($delivery_contacts_stmt)) {
 				$condition = ['id' => $recipients, 'self' => false, 'uid' => [0, $uid],
@@ -355,7 +360,7 @@ class Notifier
 						'contact',
 						['batch', 'network', 'protocol', 'baseurl', 'gsid', 'id', 'url', 'name'],
 						["`network` = ? AND `batch` != '' AND `uid` = ? AND `rel` != ? AND NOT `blocked` AND NOT `pending` AND NOT `archive`", Protocol::DIASPORA, $owner['uid'], Contact::SHARING],
-						['group_by' => ['batch', 'network', 'protocol']]
+						['group_by' => ['batch', 'network', 'protocol']],
 					);
 
 					// Fetch the participation list
@@ -370,7 +375,7 @@ class Notifier
 					'blocked' => false,
 					'pending' => false,
 					'archive' => false,
-					'rel'     => [Contact::FOLLOWER, Contact::FRIEND]
+					'rel'     => [Contact::FOLLOWER, Contact::FRIEND],
 				];
 
 				$contacts = DBA::selectToArray('contact', ['id', 'uri-id', 'url', 'addr', 'name', 'network', 'protocol', 'baseurl', 'gsid'], $condition);
@@ -384,7 +389,7 @@ class Notifier
 			$delivery_queue_count += self::delivery($cmd, $post_uriid, $sender_uid, $target_item, $parent, $thr_parent, $owner, $batch_delivery, false, $contacts, $ap_contacts, $conversants);
 		}
 
-		if (!empty($target_item)) {
+		if ($target_item) {
 			DI::logger()->info('Calling hooks for ' . $cmd . ' ' . $target_id);
 
 			Hook::fork($appHelper->getQueueValue('priority'), 'notifier_normal', $target_item);
@@ -543,7 +548,7 @@ class Notifier
 				DI::deliveryQueueItemRepo()->save($deliveryQueueItem);
 				Worker::add(['priority' => Worker::PRIORITY_HIGH, 'dont_fork' => true], 'BulkDelivery', $contact['gsid']);
 			} else {
-				if (Worker::add($deliver_options, 'Delivery', $cmd, $post_uriid, (int)$contact['id'], $sender_uid)) {
+				if (Worker::add($deliver_options, 'Delivery', $cmd, $post_uriid, (int) $contact['id'], $sender_uid)) {
 					$delivery_queue_count++;
 				}
 			}
@@ -637,7 +642,7 @@ class Notifier
 				0,
 				$inbox,
 				$self_user_id,
-				$receivers
+				$receivers,
 			);
 			Worker::coolDown();
 		}
@@ -682,6 +687,12 @@ class Notifier
 		// Posts from Diaspora contacts are transmitted via Diaspora
 		if ($target_item['network'] == Protocol::DIASPORA) {
 			DI::logger()->info('Post network is Diaspora, so no AP delivery');
+			return ['count' => 0, 'contacts' => []];
+		}
+
+		// "View" is not delivered
+		if ($target_item['verb'] === Activity::VIEW) {
+			DI::logger()->info('Not delivering view activities', ['guid' => $target_item['guid'], 'uri-id' => $target_item['uri-id']]);
 			return ['count' => 0, 'contacts' => []];
 		}
 
@@ -791,7 +802,7 @@ class Notifier
 					$inbox,
 					$uid,
 					$receivers,
-					$target_item['uri-id']
+					$target_item['uri-id'],
 				)) {
 					$delivery_queue_count++;
 				}

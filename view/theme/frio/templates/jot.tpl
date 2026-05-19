@@ -105,23 +105,28 @@
 					<input type="hidden" name="contact_allow[]" value="<{{$notes_cid}}>" />
 					{{/if}}
 					<div id="jot-title-wrap"><input name="title" id="jot-title" class="jothidden jotforms form-control" type="text" placeholder="{{$placeholdertitle}}" title="{{$placeholdertitle}}" value="{{$title}}" style="display:block;" dir="auto" /></div>
+					{{if $placeholdersummary}}
+					<div id="jot-summary-wrap"><input name="summary" id="jot-summary" class="jothidden jotforms form-control" type="text" placeholder="{{$placeholdersummary}}" title="{{$placeholdersummary}}" value="{{$summary}}" style="display:block;" dir="auto" /></div>
+					{{/if}}
 					{{if $placeholdercategory}}
 					<div id="jot-category-wrap"><input name="category" id="jot-category" class="jothidden jotforms form-control" type="text" placeholder="{{$placeholdercategory}}" title="{{$placeholdercategory}}" value="{{$category}}" dir="auto" /></div>
 					{{/if}}
 
 					{{* The jot text field in which the post text is inserted *}}
 					<div id="jot-text-wrap" class="dropzone">
-						<textarea rows="8" cols="64" class="profile-jot-text form-control text-autosize" id="profile-jot-text" name="body" placeholder="{{$share}}" onFocus="jotTextOpenUI(this);" onBlur="jotTextCloseUI(this);" style="min-width:100%; max-width:100%;" dir="auto" onkeydown="sendOnCtrlEnter(event, 'profile-jot-submit')">{{if $content}}{{$content nofilter}}{{/if}}</textarea>
+						<textarea rows="8" cols="64" class="profile-jot-text form-control text-autosize emojis-target" id="profile-jot-text" name="body" placeholder="{{$share}}" onFocus="jotTextOpenUI(this);" onBlur="jotTextCloseUI(this);" style="min-width:100%; max-width:100%;" dir="auto" onkeydown="sendOnCtrlEnter(event, 'profile-jot-submit')">{{if $content}}{{$content nofilter}}{{/if}}</textarea>
 					</div>
 
 					<ul id="profile-jot-submit-wrapper" class="jothidden nav nav-pills">
+						<li><button type="button" class="btn-link" id="profile-attach"  ondragenter="return linkDropper(event);" ondragover="return linkDropper(event);" ondrop="linkDrop(event);" onclick="jotGetLink();" title="{{$edattach}}"><i class="fa fa-paperclip"></i></button></li>
+						<li><button type="button" class="hidden-xs btn-link icon emojis" style="cursor: pointer;" aria-label="{{$edemojis}}" title="{{$edemojis}}"><i class="fa fa-smile-o"></i></button></li>
+
+						<li><button type="button" class="btn-link icon" style="cursor: pointer;" aria-label="{{$edurl}}" title="{{$edurl}}" onclick="insertFormattingToPost('url');"><i class="fa fa-link"></i></button></li>
+						<li><button type="button" class="hidden-xs btn-link" style="cursor: pointer;" aria-label="{{$edembed}}" title="{{$edembed}}" onclick="insertFormattingToPost('embed');"><i class="fa fa-play"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link icon underline" style="cursor: pointer;" aria-label="{{$eduline}}" title="{{$eduline}}" onclick="insertFormattingToPost('u');"><i class="fa fa-underline"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link icon italic" style="cursor: pointer;" aria-label="{{$editalic}}" title="{{$editalic}}" onclick="insertFormattingToPost('i');"><i class="fa fa-italic"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link icon bold" style="cursor: pointer;" aria-label="{{$edbold}}" title="{{$edbold}}" onclick="insertFormattingToPost('b');"><i class="fa fa-bold"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link icon quote" style="cursor: pointer;" aria-label="{{$edquote}}" title="{{$edquote}}" onclick="insertFormattingToPost('quote');"><i class="fa fa-quote-left"></i></button></li>
-						<li><button type="button" class="hidden-xs btn-link icon emojis" style="cursor: pointer;" aria-label="{{$edemojis}}" title="{{$edemojis}}"><i class="fa fa-smile-o"></i></button></li>
-						<li><button type="button" class="btn-link icon" style="cursor: pointer;" aria-label="{{$edurl}}" title="{{$edurl}}" onclick="insertFormattingToPost('url');"><i class="fa fa-link"></i></button></li>
-						<li><button type="button" class="btn-link" id="profile-attach"  ondragenter="return linkDropper(event);" ondragover="return linkDropper(event);" ondrop="linkDrop(event);" onclick="jotGetLink();" title="{{$edattach}}"><i class="fa fa-paperclip"></i></button></li>
 						<li><button type="button" class="btn-link" id="profile-location" onclick="jotGetLocation();" title="{{$setloc}}"><i class="fa fa-map-marker" aria-hidden="true"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link icon underline" style="cursor: pointer;" aria-label="{{$contentwarn}}" title="{{$contentwarn}}" onclick="insertFormattingToPost('abstract');"><i class="fa fa-eye"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link" style="cursor: pointer;" aria-label="{{$edcode}}" title="{{$edcode}}" onclick="insertFormattingToPost('code');"><i class="fa fa-code"></i></button></li>
@@ -147,6 +152,7 @@
 
 				<div id="profile-jot-acl-wrapper" class="minimize" aria-labelledby="jot-perms-lnk" role="tabpanel" aria-hidden="true">
 					{{$acl nofilter}}
+					{{include file="field_checkbox.tpl" field=$sensitive}}
 					{{if $scheduled_at}}{{$scheduled_at nofilter}}{{/if}}
 					{{if $created_at}}{{$created_at nofilter}}{{/if}}
 				</div>

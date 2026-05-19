@@ -8,6 +8,7 @@ Contact relations
 | --------------------- | ----------------------------------------------------------------------- | ----------------- | ---- | --- | ------------------- | ----- |
 | cid                   | contact the related contact had interacted with                         | int unsigned      | NO   | PRI | 0                   |       |
 | relation-cid          | related contact who had interacted with the contact                     | int unsigned      | NO   | PRI | 0                   |       |
+| network               | The network that is used between these contacts                         | char(4)           | YES  |     | NULL                |       |
 | last-interaction      | Date of the last interaction by relation-cid on cid                     | datetime          | NO   |     | 0001-01-01 00:00:00 |       |
 | follow-updated        | Date of the last update of the contact relationship                     | datetime          | NO   |     | 0001-01-01 00:00:00 |       |
 | follows               | if true, relation-cid follows cid                                       | boolean           | NO   |     | 0                   |       |
@@ -19,10 +20,12 @@ Contact relations
 
 ## Indexes
 
-| Name         | Fields            |
-| ------------ | ----------------- |
-| PRIMARY      | cid, relation-cid |
-| relation-cid | relation-cid      |
+| Name                     | Fields                     |
+| ------------------------ | -------------------------- |
+| PRIMARY                  | cid, relation-cid          |
+| relation-cid-network     | relation-cid, network      |
+| cid_follows_relation-cid | cid, follows, relation-cid |
+| cid_relation-cid         | cid, relation-cid          |
 
 ## Foreign keys
 

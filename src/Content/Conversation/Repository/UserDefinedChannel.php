@@ -12,7 +12,6 @@ use Friendica\Content\Conversation\Collection\UserDefinedChannels;
 use Friendica\Content\Conversation\Entity\UserDefinedChannel as UserDefinedChannelEntity;
 use Friendica\Content\Conversation\Factory\UserDefinedChannel as UserDefinedChannelFactory;
 use Friendica\Core\Cache\Capability\ICanCache;
-use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Database\Database;
@@ -300,7 +299,7 @@ class UserDefinedChannel extends BaseRepository
 				$this->logger->debug('Matching channel found.', ['uid' => $channel->uid, 'label' => $channel->label, 'language' => $language, 'tags' => $tags, 'media_type' => $media_type, 'searchtext' => $searchtext]);
 
 				return true;
-			}
+			},
 		);
 
 		return $filteredChannels->column('uid');
@@ -316,9 +315,10 @@ class UserDefinedChannel extends BaseRepository
 	 * @param int    $owner_id Owner contact id.
 	 * @param int    $reshare_id Reshare contact id.
 	 * @param array  $uids User IDs to filter channels.
+	 * @param array  $circles circle IDs to filter channels.
 	 * @return UserDefinedChannels|null Collection of matching channels or null.
 	 */
-	public function getMatchingChannels(string $searchtext, string $language, array $tags, int $media_type, int $owner_id, int $reshare_id, array $uids): ?UserDefinedChannels
+	public function getMatchingChannels(string $searchtext, string $language, array $tags, int $media_type, int $owner_id, int $reshare_id, array $uids, array $circles): ?UserDefinedChannels
 	{
 		if (!in_array($language, User::getLanguages())) {
 			$this->logger->debug('Unwanted language found. No matched channel found.', ['language' => $language, 'searchtext' => $searchtext]);
@@ -327,7 +327,12 @@ class UserDefinedChannel extends BaseRepository
 
 		$disposableFullTextSearch = new DisposableFullTextSearch($this->db, $searchtext);
 
-		$filteredChannels = $this->select(['uid' => $uids, 'valid' => true])->filter(
+		$condition = ['uid' => $uids, 'valid' => true];
+		if ($circles) {
+			$condition = DBA::mergeConditions($condition, ['circle' => $circles]);
+		}
+
+		$filteredChannels = $this->select($condition)->filter(
 			function (UserDefinedChannelEntity $channel) use ($owner_id, $reshare_id, $language, $tags, $media_type, $disposableFullTextSearch, $searchtext) {
 				if (
 					($channel->circle > 0)
@@ -360,7 +365,7 @@ class UserDefinedChannel extends BaseRepository
 				$this->logger->debug('Matching channel found.', ['id' => $channel->code, 'label' => $channel->label, 'language' => $language, 'tags' => $tags, 'media_type' => $media_type, 'searchtext' => $searchtext]);
 
 				return true;
-			}
+			},
 		);
 
 		/** @var UserDefinedChannels $filteredChannels */
@@ -478,9 +483,9 @@ class UserDefinedChannel extends BaseRepository
 		$condition = [];
 
 		if (!empty($channel->circle)) {
-			if ($channel->circle == -1) {
+			if ($channel->circle == UserDefinedChannelEntity::CIRCLE_FOLLOWING) {
 				$condition = ["`owner-id` IN (SELECT `pid` FROM `account-user-view` WHERE `uid` = ? AND `rel` IN (?, ?))", $uid, Contact::SHARING, Contact::FRIEND];
-			} elseif ($channel->circle == -2) {
+			} elseif ($channel->circle == UserDefinedChannelEntity::CIRCLE_FOLLOWERS) {
 				$condition = ["`owner-id` IN (SELECT `pid` FROM `account-user-view` WHERE `uid` = ? AND `rel` = ?)", $uid, Contact::FOLLOWER];
 			} elseif ($channel->circle > 0) {
 				$condition = DBA::mergeConditions($condition, ["`owner-id` IN (SELECT `pid` FROM `group_member` INNER JOIN `account-user-view` ON `group_member`.`contact-id` = `account-user-view`.`id` WHERE `gid` = ? AND `account-user-view`.`uid` = ?)", $channel->circle, $uid]);
@@ -542,7 +547,7 @@ class UserDefinedChannel extends BaseRepository
 			$condition = DBA::mergeConditions($condition, ["`size` <= ?", $channel->maxSize]);
 		}
 
-		if (in_array($channel->circle, [-3, -4, -5])) {
+		if (in_array($channel->circle, [UserDefinedChannelEntity::CIRCLE_CREATION, UserDefinedChannelEntity::CIRCLE_POSTS, UserDefinedChannelEntity::CIRCLE_ACTIVITY])) {
 			$condition = DBA::mergeConditions($condition, ['uid' => $uid]);
 		}
 
@@ -638,137 +643,5 @@ class UserDefinedChannel extends BaseRepository
 			$condition[0] .= " AND (" . implode(' OR ', $conditions) . ")";
 		}
 		return $condition;
-	}
-
-	/**
-	 * Compute a median-like post score for a contact id.
-	 *
-	 * Uses caching to avoid repeated heavy queries.
-	 *
-	 * @param int $cid Contact id.
-	 * @param int $divider Divider to compute the median index.
-	 * @return int Median post score.
-	 */
-	public function getMedianPostScore(int $cid, int $divider): int
-	{
-		$cache_key = 'Channel:getPostScore:' . $cid . ':' . $divider;
-		$score     = $this->cache->get($cache_key);
-		if (!empty($score)) {
-			return $score;
-		}
-
-		$condition = ["`relation-cid` = ? AND `post-score` > ?", $cid, 0];
-
-		$limit    = $this->db->count('contact-relation', $condition) / $divider;
-		$relation = $this->db->selectToArray('contact-relation', ['post-score'], $condition, ['order' => ['post-score' => true], 'limit' => [$limit, 1]]);
-		$score    = $relation[0]['post-score'] ?? 0;
-		if ($score === 0) {
-			return 0;
-		}
-
-		$this->cache->set($cache_key, $score, Duration::HALF_HOUR);
-		$this->logger->debug('Calculated median score', ['cid' => $cid, 'divider' => $divider, 'median' => $score]);
-		return $score;
-	}
-
-	/**
-	 * Compute median comments for a user's wanted languages.
-	 *
-	 * @param int $uid User id.
-	 * @param int $divider Divider used to determine median index.
-	 * @param string $network Optional network filter.
-	 * @return int Median comments value.
-	 */
-	public function getMedianComments(int $uid, int $divider, string $network = ''): int
-	{
-		$languages = User::getWantedLanguages($uid);
-		$cache_key = 'Channel:getMedianComments:' . $divider . ':' . implode(':', $languages) . $network;
-		$comments  = $this->cache->get($cache_key);
-		if (!empty($comments)) {
-			return $comments;
-		}
-
-		$condition = ["`contact-type` != ? AND `comments` > ? AND NOT `restricted`", Contact::TYPE_COMMUNITY, 0];
-		$condition = $this->addLanguageCondition($uid, $condition);
-
-		if ($network) {
-			$condition = DBA::mergeConditions($condition, ["`network` = ?", $network]);
-		}
-
-		$limit    = $this->db->count('post-engagement', $condition) / $divider;
-		$post     = $this->db->selectToArray('post-engagement', ['comments'], $condition, ['order' => ['comments' => true], 'limit' => [$limit, 1]]);
-		$comments = $post[0]['comments'] ?? 0;
-		if (empty($comments)) {
-			return 0;
-		}
-
-		$this->cache->set($cache_key, $comments, Duration::HALF_HOUR);
-		$this->logger->debug('Calculated median comments', ['divider' => $divider, 'languages' => $languages, 'network' => $network, 'median' => $comments]);
-		return $comments;
-	}
-
-	/**
-	 * Compute median activities for a user's wanted languages.
-	 *
-	 * @param int $uid User id.
-	 * @param int $divider Divider used to determine median index.
-	 * @param string $network Optional network filter.
-	 * @return int Median activities value.
-	 */
-	public function getMedianActivities(int $uid, int $divider, string $network = ''): int
-	{
-		$languages  = User::getWantedLanguages($uid);
-		$cache_key  = 'Channel:getMedianActivities:' . $divider . ':' . implode(':', $languages) . $network;
-		$activities = $this->cache->get($cache_key);
-		if (!empty($activities)) {
-			return $activities;
-		}
-
-		$condition = ["`contact-type` != ? AND `activities` > ? AND NOT `restricted`", Contact::TYPE_COMMUNITY, 0];
-		$condition = $this->addLanguageCondition($uid, $condition);
-
-		if ($network) {
-			$condition = DBA::mergeConditions($condition, ["`network` = ?", $network]);
-		}
-
-		$limit      = $this->db->count('post-engagement', $condition) / $divider;
-		$post       = $this->db->selectToArray('post-engagement', ['activities'], $condition, ['order' => ['activities' => true], 'limit' => [$limit, 1]]);
-		$activities = $post[0]['activities'] ?? 0;
-		if (empty($activities)) {
-			return 0;
-		}
-
-		$this->cache->set($cache_key, $activities, Duration::HALF_HOUR);
-		$this->logger->debug('Calculated median activities', ['divider' => $divider, 'languages' => $languages, 'network' => $network, 'median' => $activities]);
-		return $activities;
-	}
-
-	/**
-	 * Compute median relation thread score for a contact id.
-	 *
-	 * @param int $cid Contact id.
-	 * @param int $divider Divider to compute the median index.
-	 * @return int Median relation thread score.
-	 */
-	public function getMedianRelationThreadScore(int $cid, int $divider): int
-	{
-		$cache_key = 'Channel:getThreadScore:' . $cid . ':' . $divider;
-		$score     = $this->cache->get($cache_key);
-		if (!empty($score)) {
-			return $score;
-		}
-
-		$condition = ["`relation-cid` = ? AND `relation-thread-score` > ?", $cid, 0];
-
-		$limit    = $this->db->count('contact-relation', $condition) / $divider;
-		$relation = $this->db->selectToArray('contact-relation', ['relation-thread-score'], $condition, ['order' => ['relation-thread-score' => true], 'limit' => [$limit, 1]]);
-		$score    = $relation[0]['relation-thread-score'] ?? 0;
-		if ($score === 0) {
-			return 0;
-		}
-
-		$this->cache->set($cache_key, $score, Duration::HALF_HOUR);
-		$this->logger->debug('Calculated median score', ['cid' => $cid, 'divider' => $divider, 'median' => $score]);
-		return $score;
 	}
 }

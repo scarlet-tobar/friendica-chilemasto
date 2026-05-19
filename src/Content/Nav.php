@@ -224,10 +224,9 @@ class Nav
 
 		if ($this->session->isAuthenticated()) {
 			// user menu
-			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname(), $this->l10n->t('Conversations'), '', $this->l10n->t('Conversations you started'), 'fa-commenting'];
 			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/profile', $this->l10n->t('Profile'), '', $this->l10n->t('Your profile page'), 'fa-user'];
+			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname(), $this->l10n->t('Conversations'), '', $this->l10n->t('Conversations you started'), 'fa-commenting'];
 			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/photos', $this->l10n->t('Photos'), '', $this->l10n->t('Your photos'), 'fa-picture-o'];
-			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/media', $this->l10n->t('Media'), '', $this->l10n->t('Your postings with media'), 'fa-edit'];
 			$nav['usermenu'][] = ['calendar/', $this->l10n->t('Calendar'), '', $this->l10n->t('Your calendar'), 'fa-calendar'];
 			$nav['usermenu'][] = ['notes/', $this->l10n->t('Personal notes'), '', $this->l10n->t('Your personal notes'), 'fa-book'];
 
@@ -318,8 +317,12 @@ class Nav
 			$nav['messages']['outbox'] = ['message/sent', $this->l10n->t('Outbox'), '', $this->l10n->t('Outbox')];
 			$nav['messages']['new']    = ['message/new', $this->l10n->t('New Message'), '', $this->l10n->t('New Message')];
 
+			$nav_accounts_name        = $this->l10n->t('Accounts');
+			$nav_accounts_description = $this->l10n->t('Manage other accounts, including groups and pages');
 			if (User::hasIdentities($this->session->getSubManagedUserId() ?: $this->session->getLocalUserId())) {
-				$nav['delegation'] = ['delegation', $this->l10n->t('Accounts'), '', $this->l10n->t('Manage other accounts, including groups and pages')];
+				$nav['delegation'] = ['delegation', $nav_accounts_name, '', $nav_accounts_description];
+			} else {
+				$nav['delegation'] = ['settings/delegation', $nav_accounts_name, '', $nav_accounts_description];
 			}
 
 			$nav['settings'] = ['settings', $this->l10n->t('Settings'), '', $this->l10n->t('Account settings')];

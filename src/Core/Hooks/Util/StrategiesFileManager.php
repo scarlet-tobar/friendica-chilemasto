@@ -24,9 +24,9 @@ class StrategiesFileManager
 	 * The default hook-file-key of strategies
 	 * -> it's an empty string to cover empty/missing config values
 	 */
-	const STRATEGY_DEFAULT_KEY = '';
-	const STATIC_DIR           = 'static';
-	const CONFIG_NAME          = 'strategies';
+	public const STRATEGY_DEFAULT_KEY = '';
+	public const STATIC_DIR           = 'static';
+	public const CONFIG_NAME          = 'strategies';
 
 	private IManageConfigValues $configuration;
 	protected array $config = [];
@@ -84,7 +84,7 @@ class StrategiesFileManager
 		}
 
 		/**
-		 * @deprecated 2025.07 Providing strategies via addons is deprecated and will be removed in 5 months.
+		 * @deprecated 2026.01 Providing strategies via addons is deprecated and will be removed in 5 months.
 		 */
 		$this->config = array_merge_recursive($config, $this->getActiveAddonConfig());
 	}
@@ -113,14 +113,14 @@ class StrategiesFileManager
 			foreach ($config as $classname => $rule) {
 				if ($classname === LoggerInterface::class) {
 					@trigger_error(sprintf(
-						'Providing a strategy for `%s` is deprecated since 2025.07 and will stop working in 5 months, please provide an implementation for `%s` via `dependency.config.php` and remove the `strategies.config.php` file in the `%s` addon.',
+						'Providing a strategy for `%s` is deprecated since 2026.01 and will stop working in 5 months, please provide an implementation for `%s` via `dependency.config.php` and remove the `strategies.config.php` file in the `%s` addon.',
 						$classname,
 						LoggerFactory::class,
 						$addonName,
 					), \E_USER_DEPRECATED);
 				} else {
 					@trigger_error(sprintf(
-						'Providing strategies for `%s` via addons is deprecated since 2025.07 and will stop working in 5 months, please stop using this and remove the `strategies.config.php` file in the `%s` addon.',
+						'Providing strategies for `%s` via addons is deprecated since 2026.01 and will stop working in 5 months, please stop using this and remove the `strategies.config.php` file in the `%s` addon.',
 						$classname,
 						$addonName,
 					), \E_USER_DEPRECATED);

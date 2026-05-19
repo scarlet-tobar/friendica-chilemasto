@@ -744,7 +744,7 @@ as the value of $top_child_total (this is done at the end of this file)
 			<textarea id="comment-fake-text-{{$item.id}}" class="comment-fake-text-empty form-control" placeholder="{{$item.reply_label}}" onFocus="commentOpenUI(this, {{$item.id}});"  rows="1"></textarea>
 		</div>
 		{{/if}}
-		<div class="wall-item-comment-wrapper well well-small" id="item-comments-{{$item.id}}" data-display="block" style="display: none">{{$item.comment_html nofilter}}</div>
+		<div class="wall-item-comment-wrapper" id="item-comments-{{$item.id}}" data-display="block" style="display: none">{{$item.comment_html nofilter}}</div>
 	{{/if}}
 </div><!-- ./panel-body or ./wall-item-container -->
 

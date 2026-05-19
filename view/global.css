@@ -41,11 +41,6 @@ a.btn, a.btn:hover {
   text-decoration: overline;
 }
 
-.template-icon {
-	width: 24px;
-	height: 24px;
-}
-
 /* List of social Networks */
 img.connector, img.connector-disabled {
   height: 40px;
@@ -898,4 +893,8 @@ a:has(img.has-alt-description)::after {
 
 #profile-page .profile-entry a {
 	word-break: break-all;
+}
+
+.edit-profile-link-wrapper {
+	text-align: center;
 }

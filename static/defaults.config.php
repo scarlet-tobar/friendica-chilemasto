@@ -361,7 +361,7 @@ return [
 
 		// logger_config (String)
 		// Sets the logging adapter of Friendica globally (syslog, stream)
-		// @deprecated 2025.07 The value `monolog` is deprecated, please use `stream` or `syslog` instead.
+		// @deprecated 2026.01 The value `monolog` is deprecated, please use `stream` or `syslog` instead.
 		'logger_config' => 'stream',
 
 		// syslog_flags (Integer)
@@ -675,7 +675,7 @@ return [
 			Friendica\Core\Worker::PRIORITY_HIGH       => 10,
 			Friendica\Core\Worker::PRIORITY_MEDIUM     => 60,
 			Friendica\Core\Worker::PRIORITY_LOW        => 180,
-			Friendica\Core\Worker::PRIORITY_NEGLIGIBLE => 720
+			Friendica\Core\Worker::PRIORITY_NEGLIGIBLE => 720,
 		],
 
 		// worker_max_idletime (Integer)
@@ -791,5 +791,34 @@ return [
 		// Maximum number of DIDs that are filtered in Jetstream. The maximum number is 10,000,
 		// The higher the number, the more likely the system won't be able to process the posts on time.
 		'did_limit' => 1000,
+	],
+	'atprotocol' => [
+		// appview_api (URL)
+		// Path to a public AppView server.
+		'appview_api' => 'https://public.api.bsky.app',
+		// frontends (Array)
+		// Array of various web frontends for the AT Protocol
+		'frontends' => [
+			'https://akari.blue'         => ['akari', 'https://akari.blue/profile/{did}', 'https://akari.blue/profile/{did}/post/{rkey}'],
+			'https://atsky.app'          => ['Atsky', 'https://atsky.app/profile/{did}', 'https://atsky.app/profile/{did}/post/{rkey}'],
+			'https://bsky.app'           => ['Bluesky', 'https://bsky.app/profile/{did}', 'https://bsky.app/profile/{did}/post/{rkey}'],
+			'https://blacksky.community' => ['Blacksky', 'https://blacksky.community/profile/{did}', 'https://blacksky.community/profile/{did}/post/{rkey}'],
+			'https://deer.social'        => ['Deer', 'https://deer.social/profile/{did}', 'https://deer.social/profile/{did}/post/{rkey}'],
+			'https://reddwarf.app'       => ['Red Dwarf', 'https://reddwarf.app/profile/{did}', 'https://reddwarf.app/profile/{did}/post/{rkey}'],
+			'https://klearsky.pages.dev' => ['Klearsky', 'https://klearsky.pages.dev/?ref=blueskydirectory#/profile/feeds?account={did}', 'https://klearsky.pages.dev/#/post?uri=at://{did}/{collection}/{rkey}'],
+		],
+		// jetstream (URL)
+		// Path to the jetstream service. Available servers from Bluesky are:
+		// jetstream1.us-east.bsky.network, jetstream2.us-east.bsky.network, jetstream1.us-west.bsky.network, jetstream2.us-west.bsky.network
+		// independant servers are: jetstream2.fr.hose.cam and jetstream.fire.hose.cam
+		// See also the servers at https://firehose.stream/
+		'jetstream' => 'jetstream1.us-west.bsky.network',
+		// directory (URL)
+		// Path to the directory server service to fetch the PDS of a given DID
+		'plc_directory' => 'https://plc.directory',
+		// web (URL)
+		// Path to the web interface with the user profile and posts.
+		// See 'frontends' for the available options.
+		'web' => 'https://bsky.app',
 	],
 ];

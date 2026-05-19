@@ -88,19 +88,23 @@ class Conversations extends BaseModule
 			$this->baseUrl->redirect('profile/' . $contact['nick']);
 		}
 
-		// Load necessary libraries for the status editor
-		$this->page->registerFooterScript(Theme::getPathForFile('asset/typeahead.js/dist/typeahead.bundle.js'));
-		$this->page->registerFooterScript(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.js'));
-		$this->page->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.css'));
-		$this->page->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput-typeahead.css'));
+		$raw = isset($request['mode']) && ($request['mode'] == 'raw');
 
-		$this->page['aside'] .= VCard::getHTML($contact, true);
+		if (!$raw) {
+			// Load necessary libraries for the status editor
+			$this->page->registerFooterScript(Theme::getPathForFile('asset/typeahead.js/dist/typeahead.bundle.js'));
+			$this->page->registerFooterScript(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.js'));
+			$this->page->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.css'));
+			$this->page->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput-typeahead.css'));
 
-		Nav::setSelected('contact');
+			$this->page['aside'] .= VCard::getHTML($contact, true);
+		}
+
+		Nav::setSelected('contacts');
 
 		$output = '';
 
-		if (!$contact['ap-posting-restricted']) {
+		if (!$contact['ap-posting-restricted'] && !$raw) {
 			$options = [
 				'lockstate' => ACL::getLockstateForUserId($this->userSession->getLocalUserId()) ? 'lock' : 'unlock',
 				'acl'       => ACL::getFullSelectorHTML($this->page, $this->userSession->getLocalUserId(), true, []),
@@ -111,8 +115,10 @@ class Conversations extends BaseModule
 		}
 
 		Contact::setPageTitle($contact);
-		$output .= Contact::getTabsHTML($contact, Contact::TAB_CONVERSATIONS);
-		$output .= ModelContact::getThreadsFromId($contact['id'], $this->userSession->getLocalUserId(), 0, 0, $request['last_created'] ?? '');
+		if (!$raw) {
+			$output .= Contact::getTabsHTML($contact, Contact::TAB_CONVERSATIONS);
+		}
+		$output .= ModelContact::getThreadsFromId($contact['id'], $this->userSession->getLocalUserId(), 0, 0, $request);
 
 		return $output;
 	}

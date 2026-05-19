@@ -115,7 +115,7 @@ class Index extends BaseSettings
 			}
 
 			if ($ignore_year) {
-				$dob = '0000-' . DateTimeFormat::utc('1900-' . $dob, 'm-d');
+				$dob = '0000-' . DateTimeFormat::utc('1904-' . $dob, 'm-d');
 			} else {
 				$dob = DateTimeFormat::utc($dob, 'Y-m-d');
 			}
@@ -148,8 +148,8 @@ class Index extends BaseSettings
 
 		$profileFieldsNew = $this->getProfileFieldsFromInput(
 			$this->session->getLocalUserId(),
-			(array)$request['profile_field'],
-			(array)$request['profile_field_order']
+			(array) $request['profile_field'],
+			(array) $request['profile_field_order'],
 		);
 
 		$this->profileFieldRepo->saveCollectionForUser($this->session->getLocalUserId(), $profileFieldsNew);
@@ -171,7 +171,7 @@ class Index extends BaseSettings
 				'pub_keywords' => $pub_keywords,
 				'prv_keywords' => $prv_keywords,
 			],
-			$this->session->getLocalUserId()
+			$this->session->getLocalUserId(),
 		);
 
 		Worker::add(Worker::PRIORITY_MEDIUM, 'CheckRelMeProfileLink', $this->session->getLocalUserId());
@@ -210,7 +210,7 @@ class Index extends BaseSettings
 		$profileFields = $this->profileFieldRepo->selectByUserId($this->session->getLocalUserId());
 		foreach ($profileFields as $profileField) {
 			$defaultPermissions = $profileField->permissionSet->withAllowedContacts(
-				Contact::pruneUnavailable($profileField->permissionSet->allow_cid)
+				Contact::pruneUnavailable($profileField->permissionSet->allow_cid),
 			);
 
 			$custom_fields[] = [
@@ -225,7 +225,7 @@ class Index extends BaseSettings
 						false,
 						$defaultPermissions->toArray(),
 						['network' => Protocol::DFRN],
-						'profile_field[' . $profileField->id . ']'
+						'profile_field[' . $profileField->id . ']',
 					),
 				],
 
@@ -246,7 +246,7 @@ class Index extends BaseSettings
 					false,
 					['allow_cid' => []],
 					['network'   => Protocol::DFRN],
-					'profile_field[new]'
+					'profile_field[new]',
 				),
 			],
 
@@ -288,7 +288,7 @@ class Index extends BaseSettings
 				<p>Reorder by dragging the field title.</p>
 				<p>Empty the label field to remove a custom field.</p>
 				<p>Non-public fields can only be seen by the selected Friendica contacts or the Friendica contacts in the selected circles.</p>',
-					'profile/' . $owner['nickname'] . '/profile'
+					'profile/' . $owner['nickname'] . '/profile',
 				),
 			],
 
@@ -313,8 +313,8 @@ class Index extends BaseSettings
 			'$xmpp'          => ['xmpp', $this->t('XMPP (Jabber) address:'), $owner['xmpp'], $this->t('The XMPP address will be published so that people can follow you there.')],
 			'$matrix'        => ['matrix', $this->t('Matrix (Element) address:'), $owner['matrix'], $this->t('The Matrix address will be published so that people can follow you there.')],
 			'$homepage'      => ['homepage', $this->t('Homepage URL:'), $owner['homepage'], $homepage_help_text],
-			'$pub_keywords'  => ['pub_keywords', $this->t('Public Keywords:'), $owner['pub_keywords'], $this->t('(Used for suggesting potential friends, can be seen by others)')],
-			'$prv_keywords'  => ['prv_keywords', $this->t('Private Keywords:'), $owner['prv_keywords'], $this->t('(Used for searching profiles, never shown to others)')],
+			'$pub_keywords'  => ['pub_keywords', $this->t('Public Keywords:'), $owner['pub_keywords'], $this->t('Used for suggesting potential friends, can be seen by others.')],
+			'$prv_keywords'  => ['prv_keywords', $this->t('Private Keywords:'), $owner['prv_keywords'], $this->t('Used for searching profiles, never shown to others.')],
 			'$custom_fields' => $custom_fields,
 		]);
 
@@ -346,7 +346,7 @@ class Index extends BaseSettings
 				$this->aclFormatter->toString($profileFieldInputs['new']['contact_allow'] ?? ''),
 				$this->aclFormatter->toString($profileFieldInputs['new']['circle_allow'] ?? ''),
 				$this->aclFormatter->toString($profileFieldInputs['new']['contact_deny'] ?? ''),
-				$this->aclFormatter->toString($profileFieldInputs['new']['circle_deny'] ?? '')
+				$this->aclFormatter->toString($profileFieldInputs['new']['circle_deny'] ?? ''),
 			));
 
 			$profileFields->append($this->profileFieldFactory->createFromValues(
@@ -354,7 +354,7 @@ class Index extends BaseSettings
 				$profileFieldOrder['new'],
 				$profileFieldInputs['new']['label'],
 				$profileFieldInputs['new']['value'],
-				$permissionSet
+				$permissionSet,
 			));
 		}
 
@@ -372,7 +372,7 @@ class Index extends BaseSettings
 				$this->aclFormatter->toString($profileFieldInput['contact_allow'] ?? ''),
 				$this->aclFormatter->toString($profileFieldInput['circle_allow'] ?? ''),
 				$this->aclFormatter->toString($profileFieldInput['contact_deny'] ?? ''),
-				$this->aclFormatter->toString($profileFieldInput['circle_deny'] ?? '')
+				$this->aclFormatter->toString($profileFieldInput['circle_deny'] ?? ''),
 			));
 
 			$profileFields->append($this->profileFieldFactory->createFromValues(
@@ -380,7 +380,7 @@ class Index extends BaseSettings
 				$profileFieldOrder[$id],
 				$profileFieldInput['label'],
 				$profileFieldInput['value'],
-				$permissionSet
+				$permissionSet,
 			));
 		}
 

@@ -18,15 +18,19 @@ Engagement data per post
 | restricted   | If true, this post is either unlisted or not from a federated network | boolean            | NO   |     | 0       |       |
 | comments     | Number of comments                                                    | mediumint unsigned | YES  |     | NULL    |       |
 | activities   | Number of activities (like, dislike, ...)                             | mediumint unsigned | YES  |     | NULL    |       |
+| views        | Number of views                                                       | mediumint unsigned | YES  |     | NULL    |       |
 
 ## Indexes
 
-| Name       | Fields               |
-| ---------- | -------------------- |
-| PRIMARY    | uri-id               |
-| owner-id   | owner-id             |
-| created    | created              |
-| searchtext | FULLTEXT, searchtext |
+| Name                        | Fields                        |
+| --------------------------- | ----------------------------- |
+| PRIMARY                     | uri-id                        |
+| owner-id                    | owner-id                      |
+| created                     | created                       |
+| searchtext                  | FULLTEXT, searchtext          |
+| network_language_comments   | network, language, comments   |
+| network_language_activities | network, language, activities |
+| network_language_views      | network, language, views      |
 
 ## Foreign keys
 

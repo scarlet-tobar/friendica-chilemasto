@@ -32,10 +32,10 @@ use Psr\Log\LoggerInterface;
 
 class Create extends BaseModule
 {
-	const CONTACT_ACTION_NONE     = 0;
-	const CONTACT_ACTION_COLLAPSE = 1;
-	const CONTACT_ACTION_IGNORE   = 2;
-	const CONTACT_ACTION_BLOCK    = 3;
+	public const CONTACT_ACTION_NONE     = 0;
+	public const CONTACT_ACTION_COLLAPSE = 1;
+	public const CONTACT_ACTION_IGNORE   = 2;
+	public const CONTACT_ACTION_BLOCK    = 3;
 
 	/** @var SystemMessages */
 	private $systemMessages;
@@ -99,7 +99,7 @@ class Create extends BaseModule
 				!empty($request['rule-ids']) ? explode(',', $request['rule-ids']) : [],
 				$this->session->get('report_comment') ?? '',
 				!empty($request['uri-ids']) ? explode(',', $request['uri-ids']) : [],
-				(bool)($request['forward'] ?? false),
+				(bool) ($request['forward'] ?? false),
 			);
 			$this->repository->save($report);
 
@@ -228,14 +228,14 @@ class Create extends BaseModule
 					DI::userSession()->getLocalUserId(),
 					'system',
 					'itemspage_mobile_network',
-					DI::config()->get('system', 'itemspage_network_mobile')
+					DI::config()->get('system', 'itemspage_network_mobile'),
 				);
 			} else {
 				$itemsPerPage = DI::pConfig()->get(
 					DI::userSession()->getLocalUserId(),
 					'system',
 					'itemspage_network',
-					DI::config()->get('system', 'itemspage_network')
+					DI::config()->get('system', 'itemspage_network'),
 				);
 			}
 
@@ -273,7 +273,7 @@ class Create extends BaseModule
 		$tpl = Renderer::getMarkupTemplate('moderation/report/create/summary.tpl');
 
 		$forward_translation = $this->t('Would you like to forward this report to the remote server?');
-		// @deprecated 2025.07 this translation is scheduled for removal as a new translation has been added without the typo
+		// @deprecated 2026.01 this translation is scheduled for removal as a new translation has been added without the typo
 		$forward_translation = $this->t('Would you ike to forward this report to the remote server?');
 
 		return Renderer::replaceMacros($tpl, [

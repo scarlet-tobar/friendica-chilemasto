@@ -32,18 +32,18 @@ use Friendica\Model\Post;
  */
 class ParseUrl
 {
-	const DEFAULT_EXPIRATION_FAILURE = 'now + 1 day';
-	const DEFAULT_EXPIRATION_SUCCESS = 'now + 3 months';
+	public const DEFAULT_EXPIRATION_FAILURE = 'now + 1 day';
+	public const DEFAULT_EXPIRATION_SUCCESS = 'now + 3 months';
 
 	/**
 	 * Maximum number of characters for the description
 	 */
-	const MAX_DESC_COUNT = 250;
+	public const MAX_DESC_COUNT = 250;
 
 	/**
 	 * Minimum number of characters for the description
 	 */
-	const MIN_DESC_COUNT = 100;
+	public const MIN_DESC_COUNT = 100;
 
 	/**
 	 * Fetch the content type of the given url
@@ -147,7 +147,7 @@ class ParseUrl
 				'created'  => DateTimeFormat::utcNow(),
 				'expires'  => $expires,
 			],
-			Database::INSERT_UPDATE
+			Database::INSERT_UPDATE,
 		);
 
 		return $data;
@@ -268,7 +268,7 @@ class ParseUrl
 
 		if ($cacheControlHeader = $curlResult->getHeader('Cache-Control')[0] ?? '') {
 			if (preg_match('/max-age=([0-9]+)/i', $cacheControlHeader, $matches)) {
-				$maxAge = max(86400, (int)array_pop($matches));
+				$maxAge = max(86400, (int) array_pop($matches));
 
 				$siteinfo['expires'] = DateTimeFormat::utc("now + $maxAge seconds");
 			}
@@ -285,7 +285,7 @@ class ParseUrl
 			if (isset($mediaType->parameters['charset'])) {
 				$charset = $mediaType->parameters['charset'];
 			}
-		} catch(\InvalidArgumentException $e) {
+		} catch (\InvalidArgumentException $e) {
 		}
 
 		$siteinfo['charset'] = $charset;
@@ -504,6 +504,8 @@ class ParseUrl
 			}
 		}
 
+		$siteinfo = self::checkATProtocol($siteinfo, $xpath);
+
 		$siteinfo['schematypes'] = [];
 
 		$list = $xpath->query("//script[@type='application/ld+json']");
@@ -546,7 +548,7 @@ class ParseUrl
 		}
 
 		if (!empty($siteinfo['image'])) {
-			$siteinfo['images'] = $siteinfo['images'] ?? [];
+			$siteinfo['images'] ??= [];
 			array_unshift($siteinfo['images'], ['url' => $siteinfo['image']]);
 			unset($siteinfo['image']);
 		}
@@ -571,6 +573,90 @@ class ParseUrl
 		Hook::callAll('getsiteinfo', $siteinfo);
 
 		ksort($siteinfo);
+
+		return $siteinfo;
+	}
+
+	/**
+	 * Check if the page is a AT protocol profile page or post page
+	 *
+	 * @param array $siteinfo
+	 * @param DOMXPath $xpath
+	 * @return array
+	 */
+	private static function checkATProtocol(array $siteinfo, DOMXPath $xpath): array
+	{
+		$handle = '';
+		$list   = $xpath->query('//meta[@property]');
+		foreach ($list as $node) {
+			$meta_tag = [];
+			if ($node->attributes->length) {
+				foreach ($node->attributes as $attribute) {
+					$meta_tag[$attribute->name] = $attribute->value;
+				}
+			}
+			if ($meta_tag['property'] !== 'profile:username' || !isset($meta_tag['content'])) {
+				continue;
+			}
+			$handle = $meta_tag['content'];
+		}
+		if ($handle === '') {
+			return $siteinfo;
+		}
+
+		$siteinfo['atprotocol']['handle'] = $handle;
+
+		// Publically visible posts have got a link element that points to the at address
+		$list = $xpath->query('//link[@rel]');
+		foreach ($list as $node) {
+			$meta_tag = [];
+			if ($node->attributes->length) {
+				foreach ($node->attributes as $attribute) {
+					$meta_tag[$attribute->name] = $attribute->value;
+				}
+			}
+			if ($meta_tag['rel'] !== 'alternate' || !isset($meta_tag['href'])) {
+				continue;
+			}
+
+			if (isset($meta_tag['type']) && $meta_tag['type'] === 'application/rss+xml') {
+				$siteinfo['atprotocol']['feed'] = $meta_tag['href'];
+			}
+
+			if (!str_starts_with($meta_tag['href'], 'at://')) {
+				continue;
+			}
+			if (str_ends_with($meta_tag['href'], '/app.bsky.actor.profile/self')) {
+				$siteinfo['atprotocol']['did'] = str_replace(['at://', '/app.bsky.actor.profile/self'], '', $meta_tag['href']);
+				DI::logger()->debug('Found AT Protocol post via alternate link', ['url' => $siteinfo['url'], 'uri' => $meta_tag['href']]);
+				continue;
+			}
+			$siteinfo['atprotocol']['uri'] = $meta_tag['href'];
+			$parts                         = explode('/', $siteinfo['atprotocol']['uri']);
+			if (count($parts) === 5) {
+				$siteinfo['atprotocol']['did'] = $parts[2];
+			}
+		}
+
+		if (!isset($siteinfo['atprotocol']['did'])) {
+			$did = DI::atProtocol()->getDid($handle);
+			if ($did === '') {
+				unset($siteinfo['atprotocol']);
+				return $siteinfo;
+			}
+			$siteinfo['atprotocol']['did'] = $did;
+		}
+
+		if (!DI::atProtocol()->isValidDid($siteinfo['atprotocol']['did'], $siteinfo['atprotocol']['handle'])) {
+			unset($siteinfo['atprotocol']);
+			return $siteinfo;
+		}
+
+		// When the post is not publically visible, we have to do some guess work. At first we check if that page is an AT Protocol page
+		if (!isset($siteinfo['atprotocol']['uri']) && preg_match('#^https://.+/profile/(.+)/post/(.+)#', $siteinfo['url'], $matches)) {
+			$siteinfo['atprotocol']['uri'] = 'at://' . $siteinfo['atprotocol']['did'] . '/app.bsky.feed.post/' . $matches[2];
+			DI::logger()->debug('Found AT Protocol post via url structure', ['uri' => $siteinfo['url'], 'did' => $siteinfo['atprotocol']['did'], 'cid' => $matches[2]]);
+		}
 
 		return $siteinfo;
 	}
@@ -836,6 +922,10 @@ class ParseUrl
 			return $siteinfo;
 		}
 
+		if (isset($siteinfo['atprotocol']) && $type === 'ProfilePage') {
+			$siteinfo = self::parseJsonLdProfilePage($siteinfo, $jsonld);
+		}
+
 		switch ($type) {
 			case 'Article':
 			case 'AdvertiserContentArticle':
@@ -905,6 +995,41 @@ class ParseUrl
 				DI::logger()->info('Unknown type', ['type' => $type, 'url' => $siteinfo['url']]);
 				return $siteinfo;
 		}
+	}
+
+	/**
+	 * Fetch AT Protocol related profile page data
+	 *
+	 * @param array $siteinfo
+	 * @param array $jsonld
+	 *
+	 * @return array siteinfo
+	 */
+	private static function parseJsonLdProfilePage(array $siteinfo, array $jsonld): array
+	{
+		if (isset($jsonld['dateCreated'])) {
+			$siteinfo['atprotocol']['created'] = DateTimeFormat::utc($jsonld['dateCreated']);
+		}
+		if (!isset($jsonld['mainEntity']) || !is_array($jsonld['mainEntity'])) {
+			return $siteinfo;
+		}
+		$main = $jsonld['mainEntity'];
+		if (!isset($main['@type']) || $main['@type'] !== 'Person') {
+			return $siteinfo;
+		}
+		if (isset($main['name'])) {
+			$siteinfo['atprotocol']['name'] = $main['name'];
+		}
+		if (isset($main['identifier'])) {
+			$siteinfo['atprotocol']['did'] = $main['identifier'];
+		}
+		if (isset($main['description'])) {
+			$siteinfo['atprotocol']['description'] = $main['description'];
+		}
+		if (isset($main['image'])) {
+			$siteinfo['atprotocol']['image'] = $main['image'];
+		}
+		return $siteinfo;
 	}
 
 	/**
@@ -1282,22 +1407,22 @@ class ParseUrl
 		}
 
 		$content = JsonLD::fetchElement($jsonld, 'height');
-		if (!empty($content) && is_string($content)) {
+		if (!empty($content) && is_string($content) && is_numeric($content)) {
 			$media['height'] = trim($content);
 		}
 
 		$content = JsonLD::fetchElement($jsonld, 'width');
-		if (!empty($content) && is_string($content)) {
+		if (!empty($content) && is_string($content) && is_numeric($content)) {
 			$media['width'] = trim($content);
 		}
 
 		$content = JsonLD::fetchElement($jsonld, 'duration');
-		if (!empty($content) && is_string($content)) {
+		if (!empty($content) && is_string($content) && is_numeric($content)) {
 			$media['duration'] = trim($content);
 		}
 
 		$content = JsonLD::fetchElement($jsonld, 'contentSize');
-		if (!empty($content) && is_string($content)) {
+		if (!empty($content) && is_string($content) && is_numeric($content)) {
 			$media['size'] = trim($content);
 		}
 
@@ -1394,7 +1519,7 @@ class ParseUrl
 			DI::logger()->debug('Found oEmbed JSON from Embera', ['url' => $url]);
 		}
 
-		if  (!isset($data['type']) || !isset($data['provider_url'])) {
+		if (!isset($data['type']) || !isset($data['provider_url'])) {
 			return [];
 		}
 
@@ -1748,6 +1873,10 @@ class ParseUrl
 			$siteinfo['player']['width']  = is_numeric($data['width'] ?? '') ? $data['width']  : null;
 			$siteinfo['player']['height'] = is_numeric($data['height'] ?? '') ? $data['height'] : null;
 			DI::logger()->debug('Found oEmbed iframe_url parameter', ['embed' => $siteinfo['player']['embed'], 'width' => $siteinfo['player']['width'], 'height' => $siteinfo['player']['height']]);
+			return $siteinfo;
+		}
+
+		if ($data['html'] == '') {
 			return $siteinfo;
 		}
 

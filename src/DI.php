@@ -259,11 +259,11 @@ abstract class DI
 	}
 
 	/**
-	 * @deprecated 2025.07 Use `DI::loggerManager()` and `DI::logger()` instead
+	 * @deprecated 2026.01 Use `DI::loggerManager()` and `DI::logger()` instead
 	 */
 	public static function workerLogger(): Core\Logger\Type\WorkerLogger
 	{
-		@trigger_error('`' . __METHOD__ . '()` is deprecated since 2025.07 and will be removed after 5 months, use `DI::logger()` instead.', E_USER_DEPRECATED);
+		@trigger_error('`' . __METHOD__ . '()` is deprecated since 2026.01 and will be removed after 5 months, use `DI::logger()` instead.', E_USER_DEPRECATED);
 
 		return self::$dice->create(Core\Logger\Type\WorkerLogger::class);
 	}
@@ -413,6 +413,11 @@ abstract class DI
 		return self::$dice->create(Network\HTTPClient\Capability\ICanSendHttpRequests::class);
 	}
 
+	public static function robotsTxt(): Network\RobotsTxt
+	{
+		return self::$dice->create(Network\RobotsTxt::class);
+	}
+
 	//
 	// "Repository" namespace
 	//
@@ -460,6 +465,11 @@ abstract class DI
 	public static function NetworkFactory(): Content\Conversation\Factory\Network
 	{
 		return self::$dice->create(Content\Conversation\Factory\Network::class);
+	}
+
+	public static function ActivityFactory(): Content\Conversation\Factory\Activity
+	{
+		return self::$dice->create(Content\Conversation\Factory\Activity::class);
 	}
 
 	public static function intro(): Contact\Introduction\Repository\Introduction
@@ -627,7 +637,7 @@ abstract class DI
 
 	/**
 	 * @internal The EventDispatcher should never called outside of the core, like in addons or themes
-	 * @deprecated 2025.07 Use constructor injection instead
+	 * @deprecated 2026.01 Use constructor injection instead
 	 */
 	public static function eventDispatcher(): \Psr\EventDispatcher\EventDispatcherInterface
 	{

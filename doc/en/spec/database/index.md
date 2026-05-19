@@ -7,6 +7,7 @@
 | [2fa_trusted_browser](help/spec/database/db-2fa_trusted_browser) | Two-factor authentication trusted browsers |
 | [account-suggestion](help/spec/database/db-account-suggestion) | Account suggestion |
 | [account-user](help/spec/database/db-account-user) | Remote and local accounts |
+| [activity](help/spec/database/db-activity) |  |
 | [apcontact](help/spec/database/db-apcontact) | ActivityPub compatible contacts - used in the ActivityPub implementation |
 | [application](help/spec/database/db-application) | OAuth application |
 | [application-marker](help/spec/database/db-application-marker) | Timeline marker |
@@ -65,9 +66,11 @@
 | [post-history](help/spec/database/db-post-history) | Post history |
 | [post-link](help/spec/database/db-post-link) | Post related external links |
 | [post-media](help/spec/database/db-post-media) | Attached media |
+| [post-media-exif](help/spec/database/db-post-media-exif) | Exif data for attached media, see https://exiv2.org/tags.html |
 | [post-origin](help/spec/database/db-post-origin) | Posts from local users |
 | [post-question](help/spec/database/db-post-question) | Question |
 | [post-question-option](help/spec/database/db-post-question-option) | Question option |
+| [post-quote](help/spec/database/db-post-quote) | Quotes |
 | [post-searchindex](help/spec/database/db-post-searchindex) | Content for all posts |
 | [post-tag](help/spec/database/db-post-tag) | post relation to tags |
 | [post-thread](help/spec/database/db-post-thread) | Thread related data |

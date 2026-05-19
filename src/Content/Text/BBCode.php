@@ -12,6 +12,7 @@ use DOMXPath;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Item;
 use Friendica\Content\PageInfo;
+use Friendica\Content\Post\Entity\PostMedia;
 use Friendica\Content\Smilies;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
@@ -36,29 +37,29 @@ use GuzzleHttp\Psr7\Uri;
 class BBCode
 {
 	// Update this value to the current date whenever changes are made to BBCode::convert
-	const VERSION = '2024-04-07';
+	public const VERSION = '2024-04-07';
 
-	const INTERNAL     = 0;
-	const EXTERNAL     = 1;
-	const MASTODON_API = 2;
-	const DIASPORA     = 3;
-	const CONNECTORS   = 4;
-	const TWITTER_API  = 5;
-	const NPF          = 6;
-	const TWITTER      = 8;
-	const BACKLINK     = 8;
-	const ACTIVITYPUB  = 9;
-	const BLUESKY      = 10;
+	public const INTERNAL     = 0;
+	public const EXTERNAL     = 1;
+	public const MASTODON_API = 2;
+	public const DIASPORA     = 3;
+	public const CONNECTORS   = 4;
+	public const TWITTER_API  = 5;
+	public const NPF          = 6;
+	public const TWITTER      = 8;
+	public const BACKLINK     = 8;
+	public const ACTIVITYPUB  = 9;
+	public const ATPROTOCOL   = 10;
 
-	const SHARED_ANCHOR = '<hr class="shared-anchor">';
-	const TOP_ANCHOR    = '<br class="top-anchor">';
-	const BOTTOM_ANCHOR = '<br class="button-anchor">';
+	public const SHARED_ANCHOR = '<hr class="shared-anchor">';
+	public const TOP_ANCHOR    = '<br class="top-anchor">';
+	public const BOTTOM_ANCHOR = '<br class="button-anchor">';
 
-	const PREVIEW_NONE     = 0;
-	const PREVIEW_NO_IMAGE = 1;
-	const PREVIEW_LARGE    = 2;
-	const PREVIEW_SMALL    = 3;
-	const PREVIEW_AUTO     = 4;
+	public const PREVIEW_NONE     = 0;
+	public const PREVIEW_NO_IMAGE = 1;
+	public const PREVIEW_LARGE    = 2;
+	public const PREVIEW_SMALL    = 3;
+	public const PREVIEW_AUTO     = 4;
 
 	/**
 	 * Fetches attachment data that were generated with the "attachment" element
@@ -183,7 +184,7 @@ class BBCode
 				$attach_data = self::getAttachmentData($match[0]);
 				if (empty($attach_data['url'])) {
 					return $match[0];
-				} elseif (strpos(str_replace($match[0], '', $body), $attach_data['url']) !== false) {
+				} elseif (strpos(str_replace($match[0], '', $body), (string) $attach_data['url']) !== false) {
 					return '';
 				} elseif (empty($attach_data['title']) || $no_link_desc) {
 					return " \n[url]" . $attach_data['url'] . "[/url]\n";
@@ -191,7 +192,7 @@ class BBCode
 					return " \n[url=" . $attach_data['url'] . ']' . $attach_data['title'] . "[/url]\n";
 				}
 			},
-			$body
+			$body,
 		);
 	}
 
@@ -245,12 +246,12 @@ class BBCode
 		// Add text from attached media
 		if (!empty($uri_id)) {
 			foreach (Post\Media::getByURIId($uri_id) as $media) {
-				if (!empty($media['description']) && (stripos($text, $media['description']) === false)) {
+				if (!empty($media['description']) && (stripos($text, (string) $media['description']) === false)) {
 					$text .= ' ' . $media['description'];
 				}
 				if (in_array($media['type'], [Post\Media::HTML, Post\Media::ACTIVITY])) {
 					foreach (['name', 'author-name', 'publisher-name'] as $key) {
-						if (!empty($media[$key] && stripos($text, $media[$key]) === false)) {
+						if (!empty($media[$key] && stripos($text, (string) $media[$key]) === false)) {
 							$text .= ' ' . $media[$key];
 						}
 					}
@@ -401,15 +402,16 @@ class BBCode
 	}
 
 	/**
-	 * Processes [attachment] tags
+	 * Processes [attachment] tags and renders them to HTML.
 	 *
-	 * Note: Can produce a [bookmark] tag in the returned string
+	 * Note: Can produce a [bookmark] tag in the returned string.
 	 *
-	 * @param string  $text
-	 * @param integer $simplehtml
-	 * @param bool    $embed
-	 * @param array   $data
-	 * @param int     $uriid
+	 * @param string $text         Original BBCode text that may contain an attachment block.
+	 * @param int    $simplehtml   Target rendering mode (internal/external/API/connector).
+	 * @param array  $data         Optional pre-parsed attachment data; extracted from $text when empty.
+	 * @param int    $uriid        Item URI-ID used for media/link lookup and proxy handling.
+	 * @param int    $preview_mode Attachment preview strategy (see PREVIEW_* constants).
+	 * @param bool   $embed        Whether embeddable media (player/embed HTML) should be rendered inline.
 	 * @return string
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
@@ -424,78 +426,81 @@ class BBCode
 
 		$data['url'] = Network::sanitizeUrl($data['url']);
 
-		if (isset($data['title'])) {
-			$data['title'] = strip_tags($data['title']);
-			$data['title'] = str_replace(['http://', 'https://'], '', $data['title']);
-		} else {
-			$data['title'] = '';
-		}
-
 		if (((strpos($data['text'], '[img=') !== false) || (strpos($data['text'], '[img]') !== false) || DI::config()->get('system', 'always_show_preview')) && !empty($data['image'])) {
 			$data['preview'] = $data['image'];
 			$data['image']   = '';
 		}
 
-		$return = '';
+		$media = DI::postMediaFactory()->createFromAttachment($data, $uriid);
 
-		$data['title'] = ($data['title'] ?? '') ?: $data['url'];
+		$return = self::convertAttachmentFromPostMedia($media, $simplehtml, $uriid, $preview_mode, $embed, false);
+
+		return trim(($data['text'] ?? '') . ' ' . $return . ' ' . ($data['after'] ?? ''));
+	}
+
+	/**
+	 * Processes PostMedia entity and renders it to HTML.
+	 *
+	 * @param PostMedia $media        Optional media entity used to build inline player/embed output.
+	 * @param int       $simplehtml   Target rendering mode (internal/external/API/connector).
+	 * @param int       $uriid        Item URI-ID used for media/link lookup and proxy handling.
+	 * @param int       $preview_mode Attachment preview strategy (see PREVIEW_* constants).
+	 * @param bool      $embed        Whether embeddable media (player/embed HTML) should be rendered inline.
+	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public static function convertAttachmentFromPostMedia(PostMedia $media, int $simplehtml = self::INTERNAL, int $uriid = 0, int $preview_mode = self::PREVIEW_AUTO, bool $embed = false, bool $hide_description): string
+	{
+		DI::profiler()->startRecording('rendering');
+
+		$media = DI::postMediaRepository()->sanitizeData($media);
 
 		if ($simplehtml != self::CONNECTORS) {
-			$return = sprintf('<div class="type-%s">', $data['type']);
+			$return = '<div class="type-link">';
+		} else {
+			$return = '';
 		}
 
+		$embed_media = null;
 		if ($embed) {
-			$media = DI::postMediaFactory()->createFromAttachment($data, $uriid);
 			if ($media->hasPlayerUrl() && $media->hasPlayerHeight()) {
 				$embed_media = DI::postMediaRepository()->getPlayerIframe($media);
 			} elseif ($media->hasEmbedHtml() && !$media->isPhoto()) {
 				$embed_media = DI::postMediaRepository()->getEmbedIframe($media);
-			} else {
-				$embed_media = null;
 			}
 
 			if ($embed_media) {
 				$return .= $embed_media;
-
-				$preview_mode = self::PREVIEW_NO_IMAGE;
-				unset($data['title']);
-				unset($data['url']);
-				unset($data['description']);
-				unset($data['provider_url']);
-				unset($data['provider_name']);
 			}
 		}
 
-		if ($preview_mode == self::PREVIEW_NO_IMAGE) {
-			unset($data['image']);
-			unset($data['preview']);
-		}
-
-		if (!empty($data['title']) && !empty($data['url'])) {
+		if (!isset($embed_media) && isset($media->name) && isset($media->url)) {
 			$preview_class = in_array($preview_mode, [self::PREVIEW_AUTO, self::PREVIEW_LARGE]) ? 'attachment-image' : 'attachment-preview';
-			if (!empty($data['image']) && empty($data['text']) && ($data['type'] == 'photo')) {
-				$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="' . $preview_class . '" /></a>', $data['url'], self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title']);
-			} else {
-				if (!empty($data['image'])) {
-					$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="' . $preview_class . '" /></a><br>', $data['url'], self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title']);
-				} elseif (!empty($data['preview'])) {
-					$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br>', $data['url'], self::proxyUrl($data['preview'], $simplehtml, $uriid), $data['title']);
+
+			$link_attributes = 'target="_blank" rel="noopener noreferrer"';
+
+			if ($preview_mode !== self::PREVIEW_NO_IMAGE && isset($media->preview)) {
+				if ($media->previewWidth >= 500) {
+					$return .= sprintf('<a href="%s" %s><img src="%s" alt="" title="%s" class="%s" /></a><br>', $media->url, $link_attributes, self::proxyUrl($media->preview, $simplehtml, $uriid), $media->name, $preview_class);
+				} else {
+					$return .= sprintf('<a href="%s" %s><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br>', $media->url, $link_attributes, self::proxyUrl($media->preview, $simplehtml, $uriid), $media->name);
 				}
-				$return .= sprintf('<h4><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></h4>', $data['url'], $data['title']);
 			}
+
+			$return .= sprintf('<h4><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></h4>', $media->url, $media->name);
 		}
 
-		if (!empty($data['description']) && $data['description'] != $data['title']) {
+		if (!isset($embed_media) && !$hide_description && !empty($media->description) && $media->description != $media->name) {
 			// Sanitize the HTML
-			$return .= sprintf('<blockquote>%s</blockquote>', trim(HTML::purify($data['description'])));
+			$return .= sprintf('<blockquote>%s</blockquote>', trim(HTML::purify($media->description)));
 		}
 
-		if (!empty($data['provider_url']) && !empty($data['provider_name'])) {
-			$data['provider_url'] = Network::sanitizeUrl($data['provider_url']);
-			if (!empty($data['author_name'])) {
-				$return .= sprintf('<sup><a href="%s" target="_blank" rel="noopener noreferrer">%s (%s)</a></sup>', $data['provider_url'], $data['author_name'], $data['provider_name']);
+		if (!isset($embed_media) && !empty($media->publisherUrl) && !empty($media->publisherName)) {
+			$provider_url = Network::sanitizeUrl((string) ($media->publisherUrl));
+			if (!empty($media->authorName)) {
+				$return .= sprintf('<sup><a href="%s" target="_blank" rel="noopener noreferrer">%s (%s)</a></sup>', $provider_url, $media->authorName, $media->publisherName);
 			} else {
-				$return .= sprintf('<sup><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></sup>', $data['provider_url'], $data['provider_name']);
+				$return .= sprintf('<sup><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></sup>', $provider_url, $media->publisherName);
 			}
 		}
 
@@ -504,7 +509,7 @@ class BBCode
 		}
 
 		DI::profiler()->stopRecording();
-		return trim(($data['text'] ?? '') . ' ' . $return . ' ' . ($data['after'] ?? ''));
+		return $return;
 	}
 
 	public static function removeShareInformation(string $text, bool $plaintext = false, bool $nolink = false): string
@@ -535,7 +540,7 @@ class BBCode
 		}
 
 		// If the link already is included in the post, don't add it again
-		if (!empty($data['url']) && strpos($data['text'], $data['url'])) {
+		if (!empty($data['url']) && strpos($data['text'], (string) $data['url'])) {
 			DI::profiler()->stopRecording();
 			return $data['text'] . $data['after'];
 		}
@@ -600,11 +605,11 @@ class BBCode
 		$res = [
 			'start' => [
 				'open'  => $start_open,
-				'close' => $start_close
+				'close' => $start_close,
 			],
 			'end' => [
 				'open'  => $end_open,
-				'close' => $end_open + strlen('[/' . $name . ']')
+				'close' => $end_open + strlen('[/' . $name . ']'),
 			],
 		];
 
@@ -701,7 +706,7 @@ class BBCode
 			$newbody = str_replace(
 				'[$#saved_image' . $cnt . '#$]',
 				'<img src="' . self::proxyUrl($image, self::INTERNAL, $uriid) . '" alt="" class="empty-description"/>',
-				$newbody
+				$newbody,
 			);
 			$cnt++;
 		}
@@ -811,9 +816,9 @@ class BBCode
 			function ($match) use ($callback, $uriid) {
 				$attributes = self::extractShareAttributes($match[2]);
 
-				$author_contact         = Contact::getByURL($attributes['profile'], false, ['id', 'url', 'addr', 'name', 'micro']);
-				$author_contact['url']  = ($author_contact['url'] ?? $attributes['profile']);
-				$author_contact['addr'] = ($author_contact['addr'] ?? '');
+				$author_contact = Contact::getByURL($attributes['profile'], false, ['id', 'url', 'addr', 'name', 'micro']);
+				$author_contact['url'] ??= $attributes['profile'];
+				$author_contact['addr'] ??= '';
 
 				$attributes['author']  = ($author_contact['name'] ?? '') ?: $attributes['author'];
 				$attributes['avatar']  = ($author_contact['micro'] ?? '') ?: $attributes['avatar'];
@@ -829,7 +834,7 @@ class BBCode
 
 				return $match[1] . $callback($attributes, $author_contact, $content ?? '', trim($match[1]) != '');
 			},
-			$text
+			$text,
 		);
 
 		DI::profiler()->stopRecording();
@@ -861,7 +866,7 @@ class BBCode
 				$img_str .= ' ' . empty($attributes['alt']) ? 'class="empty-description"' : 'class="has-alt-description"';
 				return $img_str . '>';
 			},
-			$text
+			$text,
 		);
 
 		DI::profiler()->stopRecording();
@@ -890,9 +895,9 @@ class BBCode
 		switch ($simplehtml) {
 			case self::MASTODON_API:
 			case self::TWITTER_API:
-				$text = ($is_quote_share ? '<br>' : '') .
-					'<b><a href="' . $attributes['link'] . '">' . html_entity_decode('&#x2672;', ENT_QUOTES, 'UTF-8') . ' ' . $author_contact['addr'] . "</a>:</b><br>\n" .
-					'<blockquote class="shared_content" dir="auto">' . $content . '</blockquote>';
+				$text = ($is_quote_share ? '<br>' : '')
+					. '<b><a href="' . $attributes['link'] . '">' . html_entity_decode('&#x2672;', ENT_QUOTES, 'UTF-8') . ' ' . $author_contact['addr'] . "</a>:</b><br>\n"
+					. '<blockquote class="shared_content" dir="auto">' . $content . '</blockquote>';
 				break;
 			case self::DIASPORA:
 				if (stripos(Strings::normaliseLink($attributes['link']), 'http://twitter.com/') === 0) {
@@ -1027,7 +1032,7 @@ class BBCode
 	 */
 	private static function expandLinksCallback(array $match): string
 	{
-		if (($match[3] == '') || ($match[2] == $match[3]) || stristr($match[2], $match[3])) {
+		if (($match[3] == '') || ($match[2] == $match[3]) || stristr($match[2], (string) $match[3])) {
 			return ($match[1] . '[url]' . $match[2] . '[/url]');
 		} else {
 			return ($match[1] . $match[3] . ' [url]' . $match[2] . '[/url]');
@@ -1153,7 +1158,7 @@ class BBCode
 	public static function setMentionsToNicknames(string $body): string
 	{
 		DI::profiler()->startRecording('rendering');
-		$regexp = "/([@!])\[url\=([^\[\]]*)\].*?\[\/url\]/ism";
+		$regexp = "/([@!])\[url\=([^\[\]]*)\](.*?)\[\/url\]/ism";
 		$body   = preg_replace_callback($regexp, [self::class, 'mentionCallback'], $body);
 		DI::profiler()->stopRecording();
 		return $body;
@@ -1172,12 +1177,21 @@ class BBCode
 			return '';
 		}
 
-		$data = Contact::getByURL($match[2], false, ['url', 'nick']);
+		$data = Contact::getByURL($match[2], false, ['url', 'alias', 'nick', 'network']);
+		if (empty($data['nick']) && str_starts_with($match[2], 'did:plc:')) {
+			$data = [
+				'url'     => $match[2],
+				'alias'   => $match[2],
+				'nick'    => $match[3],
+				'network' => Protocol::ATPROTO,
+			];
+		}
+
 		if (empty($data['nick'])) {
 			return $match[0];
 		}
 
-		return $match[1] . '[url=' . $data['url'] . ']' . $data['nick'] . '[/url]';
+		return $match[1] . '[url=' . Contact::getProfileLink($data) . ']' . $data['nick'] . '[/url]';
 	}
 
 	/**
@@ -1414,7 +1428,7 @@ class BBCode
 
 				return $return;
 			},
-			$text
+			$text,
 		);
 
 		if (strpos($text, '<p>') !== false || strpos($text, '</p>') !== false) {
@@ -1485,11 +1499,11 @@ class BBCode
 		if (DI::config()->get('system', 'remove_multiplicated_lines')) {
 			$search = [
 				"\n\n\n", "[/quote]\n\n", "\n[/quote]", "\n[ul]", "[/ul]\n", "\n[ol]", "[/ol]\n", "\n\n[share ", "[/attachment]\n",
-				"\n[h1]", "[/h1]\n", "\n[h2]", "[/h2]\n", "\n[h3]", "[/h3]\n", "\n[h4]", "[/h4]\n", "\n[h5]", "[/h5]\n", "\n[h6]", "[/h6]\n"
+				"\n[h1]", "[/h1]\n", "\n[h2]", "[/h2]\n", "\n[h3]", "[/h3]\n", "\n[h4]", "[/h4]\n", "\n[h5]", "[/h5]\n", "\n[h6]", "[/h6]\n",
 			];
 			$replace = [
 				"\n\n", "[/quote]\n", "[/quote]", "[ul]", "[/ul]", "[ol]", "[/ol]", "\n[share ", "[/attachment]",
-				"[h1]", "[/h1]", "[h2]", "[/h2]", "[h3]", "[/h3]", "[h4]", "[/h4]", "[h5]", "[/h5]", "[h6]", "[/h6]"
+				"[h1]", "[/h1]", "[h2]", "[/h2]", "[h3]", "[/h3]", "[h4]", "[/h4]", "[h5]", "[/h5]", "[h6]", "[/h6]",
 			];
 			do {
 				$oldtext = $text;
@@ -1552,7 +1566,7 @@ class BBCode
 				function ($match) use ($simple_html) {
 					return str_replace($match[0], '<p class="map">' . Map::byLocation($match[1], $simple_html) . '</p>', $match[0]);
 				},
-				$text
+				$text,
 			);
 		}
 
@@ -1562,7 +1576,7 @@ class BBCode
 				function ($match) use ($simple_html) {
 					return str_replace($match[0], '<p class="map">' . Map::byCoordinates(str_replace('/', ' ', $match[1]), $simple_html) . '</p>', $match[0]);
 				},
-				$text
+				$text,
 			);
 		}
 
@@ -1631,7 +1645,7 @@ class BBCode
 
 			$elements = [
 				'del'  => 's', 'ins' => 'em', 'kbd' => 'code', 'mark' => 'strong',
-				'samp' => 'code', 'u' => 'em', 'var' => 'em'
+				'samp' => 'code', 'u' => 'em', 'var' => 'em',
 			];
 			foreach ($elements as $bbcode => $html) {
 				$text = preg_replace("(\[" . $bbcode . "\](.*?)\[\/" . $bbcode . "\])ism", '<' . $html . '>$1</' . $html . '>', $text);
@@ -1642,7 +1656,7 @@ class BBCode
 		// @todo add the new elements to the documentation by the end of 2024 so that most systems will support them.
 		$elements = [
 			'b', 'del', 'em', 'i', 'ins', 'kbd', 'mark',
-			's', 'samp', 'small', 'strong', 'sub', 'sup', 'u', 'var'
+			's', 'samp', 'small', 'strong', 'sub', 'sup', 'u', 'var',
 		];
 		foreach ($elements as $element) {
 			$text = preg_replace("(\[" . $element . "\](.*?)\[\/" . $element . "\])ism", '<' . $element . '>$1</' . $element . '>', $text);
@@ -1693,10 +1707,10 @@ class BBCode
 		$text = preg_replace("/\[th\](.*?)\[\/th\]/sm", '<th>$1</th>', $text);
 		$text = preg_replace("/\[td\](.*?)\[\/td\]/sm", '<td>$1</td>', $text);
 		$text = preg_replace("/\[tr\](.*?)\[\/tr\]/sm", '<tr>$1</tr>', $text);
-		$text = preg_replace("/\[table\](.*?)\[\/table\]/sm", '</p><table>$1</table><p>', $text);
+		$text = preg_replace("/\[table\](.*?)\[\/table\]/sm", '</p><table class="table">$1</table><p>', $text);
 
-		$text = preg_replace("/\[table border=1\](.*?)\[\/table\]/sm", '</p><table border="1" >$1</table><p>', $text);
-		$text = preg_replace("/\[table border=0\](.*?)\[\/table\]/sm", '</p><table border="0" >$1</table><p>', $text);
+		$text = preg_replace("/\[table border=1\](.*?)\[\/table\]/sm", '</p><table class="table" border="1">$1</table><p>', $text);
+		$text = preg_replace("/\[table border=0\](.*?)\[\/table\]/sm", '</p><table class="table" border="0">$1</table><p>', $text);
 
 		return $text;
 	}
@@ -1706,10 +1720,10 @@ class BBCode
 		// handle nested lists
 		$endlessloop = 0;
 
-		while ((((strpos($text, "[/list]") !== false) && (strpos($text, "[list") !== false)) ||
-			((strpos($text, "[/ol]") !== false) && (strpos($text, "[ol]") !== false)) ||
-			((strpos($text, "[/ul]") !== false) && (strpos($text, "[ul]") !== false)) ||
-			((strpos($text, "[/li]") !== false) && (strpos($text, "[li]") !== false))) && (++$endlessloop < 20)) {
+		while ((((strpos($text, "[/list]") !== false) && (strpos($text, "[list") !== false))
+			|| ((strpos($text, "[/ol]") !== false) && (strpos($text, "[ol]") !== false))
+			|| ((strpos($text, "[/ul]") !== false) && (strpos($text, "[ul]") !== false))
+			|| ((strpos($text, "[/li]") !== false) && (strpos($text, "[li]") !== false))) && (++$endlessloop < 20)) {
 			$text = preg_replace("/\[list\](.*?)\[\/list\]/ism", '</p><ul class="listbullet" style="list-style-type: circle;">$1</ul><p>', $text);
 			$text = preg_replace("/\[list=\](.*?)\[\/list\]/ism", '</p><ul class="listnone" style="list-style-type: none;">$1</ul><p>', $text);
 			$text = preg_replace("/\[list=1\](.*?)\[\/list\]/ism", '</p><ul class="listdecimal" style="list-style-type: decimal;">$1</ul><p>', $text);
@@ -1749,7 +1763,7 @@ class BBCode
 			$text = preg_replace(
 				"/\[spoiler=[\"\']*(.*?)[\"\']*\](.*?)\[\/spoiler\]/ism",
 				'<details class="spoiler"><summary>$1</summary>$2</details>',
-				$text
+				$text,
 			);
 		}
 
@@ -1795,7 +1809,7 @@ class BBCode
 			$text = preg_replace(
 				"/\[quote=[\"\']*(.*?)[\"\']*\](.*?)\[\/quote\]/ism",
 				"<p><strong class=" . '"author"' . ">" . $t_wrote . "</strong></p><blockquote>$2</blockquote>",
-				$text
+				$text,
 			);
 		}
 
@@ -1815,7 +1829,7 @@ class BBCode
 				$matches[3] = self::proxyUrl($matches[3], $simple_html, $uriid);
 				return "[img=" . $matches[1] . "x" . $matches[2] . "]" . $matches[3] . "[/img]";
 			},
-			$text
+			$text,
 		);
 
 		$text = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '<img src="$3" style="width: $1px;" alt="" class="empty-description">', $text);
@@ -1833,7 +1847,7 @@ class BBCode
 					return '<img src="' . $matches[1] . '" alt="' . $alt . '">';
 				}
 			},
-			$text
+			$text,
 		);
 
 		// Images
@@ -1848,7 +1862,7 @@ class BBCode
 				$matches[1] = self::proxyUrl($matches[1], $simple_html, $uriid);
 				return "[img]" . $matches[1] . "[/img]";
 			},
-			$text
+			$text,
 		);
 
 		$text = preg_replace("/\[img\](.*?)\[\/img\]/ism", '<img src="$1" alt="" class="empty-description"/>', $text);
@@ -1878,12 +1892,12 @@ class BBCode
 			$text = preg_replace(
 				"/\[video\](.*?)\[\/video\]/ism",
 				'</p><video src="$1" controls width="100%" height="auto">$1</video><p>',
-				$text
+				$text,
 			);
 			$text = preg_replace(
 				"/\[audio\](.*?)\[\/audio\]/ism",
 				'</p><audio src="$1" controls>$1">$1</audio><p>',
-				$text
+				$text,
 			);
 		} else {
 			$text = preg_replace("/\[video\](.*?)\[\/video\]/ism", '[embed]$1[/embed]', $text);
@@ -1916,7 +1930,7 @@ class BBCode
 			function ($match) use ($max_length) {
 				return '<a class="embed" href="' . self::escapeUrl(Network::sanitizeUrl($match[1])) . '">' . Strings::getStyledURL(Network::sanitizeUrl($match[1]), $max_length) . "</a>";
 			},
-			$text
+			$text,
 		);
 
 		return $text;
@@ -1933,24 +1947,24 @@ class BBCode
 			$text = preg_replace(
 				"/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
 				'@<a href="$2">$3</a>',
-				$text
+				$text,
 			);
 		} elseif (in_array($simple_html, [self::ACTIVITYPUB])) {
 			$text = preg_replace(
 				"/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
 				'<span class="h-card"><a href="$2" class="u-url mention">$1<span>$3</span></a></span>',
-				$text
+				$text,
 			);
 			$text = preg_replace(
 				"/([#])\[url\=(.*?)\](.*?)\[\/url\]/ism",
 				'<a href="$2" class="mention hashtag" rel="tag">$1<span>$3</span></a>',
-				$text
+				$text,
 			);
 		} elseif (in_array($simple_html, [self::EXTERNAL, self::TWITTER_API])) {
 			$text = preg_replace(
 				"/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
 				'<bdi>$1<a href="$2" class="userinfo mention" title="$3">$3</a></bdi>',
-				$text
+				$text,
 			);
 		} elseif ($simple_html == self::INTERNAL) {
 			if (preg_match_all("/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism", $text, $matches, PREG_SET_ORDER)) {
@@ -1968,13 +1982,13 @@ class BBCode
 		} elseif ($simple_html == self::MASTODON_API) {
 			$text = preg_replace(
 				"/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
-				'<a class="u-url mention status-link" href="$2" rel="nofollow noopener noreferrer" target="_blank" title="$3">$1<span>$3</span></a>',
-				$text
+				'<span class="h-card"><a href="$2" class="u-url mention">$1<span>$3</span></a></span>',
+				$text,
 			);
 			$text = preg_replace(
 				"/([#])\[url\=(.*?)\](.*?)\[\/url\]/ism",
-				'<a class="mention hashtag status-link" href="$2" rel="tag">$1<span>$3</span></a>',
-				$text
+				'<a href="$2" class="mention hashtag" rel="nofollow noopener" target="_blank">$1<span>$3</span></a>',
+				$text,
 			);
 		} else {
 			$text = preg_replace("/([#@!])\[url\=(.*?)\](.*?)\[\/url\]/ism", '$1$3', $text);
@@ -1991,10 +2005,10 @@ class BBCode
 		$text = preg_replace(
 			"/#\[url\=.*?\]\^\[\/url\]\[url\=(.*?)\](.*?)\[\/url\]/i",
 			"[bookmark=$1]$2[/bookmark]",
-			$text
+			$text,
 		);
 
-		if (in_array($simple_html, [self::TWITTER, self::BLUESKY])) {
+		if (in_array($simple_html, [self::TWITTER, self::ATPROTOCOL])) {
 			$text = preg_replace_callback("/([^#@!])\[url\=([^\]]*)\](.*?)\[\/url\]/ism", [self::class, 'expandLinksCallback'], $text);
 			//$text = preg_replace("/[^#@!]\[url\=([^\]]*)\](.*?)\[\/url\]/ism", ' $2 [url]$1[/url]', $text);
 			$text = preg_replace("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism", ' $2 [url]$1[/url]', $text);
@@ -2008,7 +2022,7 @@ class BBCode
 			function ($match) {
 				return "[url=" . DI::baseUrl() . "/display/" . $match[1] . "]" . $match[2] . "[/url]";
 			},
-			$text
+			$text,
 		);
 
 		$text = preg_replace_callback(
@@ -2016,7 +2030,7 @@ class BBCode
 			function ($match) {
 				return "[url=" . DI::baseUrl() . "/search?search=%40" . $match[1] . "]" . $match[2] . "[/url]";
 			},
-			$text
+			$text,
 		);
 
 		// Server independent link to posts and comments
@@ -2083,7 +2097,7 @@ class BBCode
 
 		$parts['host'] = idn_to_ascii(urldecode($parts['host']));
 		try {
-			return (string)Uri::fromParts($parts);
+			return (string) Uri::fromParts($parts);
 		} catch (\Throwable $th) {
 			DI::logger()->notice('Exception on unparsing url', ['url' => $url, 'parts' => $parts, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
 			return $url;
@@ -2097,7 +2111,7 @@ class BBCode
 			function ($match) {
 				return "[url=" . self::escapeUrl($match[1]) . "]" . $match[1] . "[/url]";
 			},
-			$text
+			$text,
 		);
 	}
 
@@ -2114,7 +2128,7 @@ class BBCode
 			function ($match) use ($max_length) {
 				return "[url=" . self::escapeUrl($match[1]) . "]" . Strings::getStyledURL($match[1], $max_length) . "[/url]";
 			},
-			$text
+			$text,
 		);
 		$text = preg_replace_callback(
 			"/\[url\=(.*?)\](.*?)\[\/url\]/ism",
@@ -2125,7 +2139,7 @@ class BBCode
 					return "[url=" . self::escapeUrl($match[1]) . "]" . $match[2] . "[/url]";
 				}
 			},
-			$text
+			$text,
 		);
 		return $text;
 	}
@@ -2151,7 +2165,7 @@ class BBCode
 			function (array $attributes, array $author_contact, $content, $is_quote_share) use ($simple_html) {
 				return self::convertShareCallback($attributes, $author_contact, $content, $is_quote_share, $simple_html);
 			},
-			$uriid
+			$uriid,
 		);
 
 		return $text;
@@ -2179,7 +2193,7 @@ class BBCode
 		$text = preg_replace(
 			'#<([^>]*?)(src)="(?!' . implode('|', $allowed_src_protocols) . ')(.*?)"(.*?)>#ism',
 			'<$1$2=""$4 data-original-src="$3" class="invalid-src" title="' . DI::l10n()->t('Invalid source protocol') . '">',
-			$text
+			$text,
 		);
 
 		// sanitize href attributes (only allowlisted protocols URLs)
@@ -2302,7 +2316,7 @@ class BBCode
 			function ($matches) {
 				return '#' . str_replace(' ', '_', $matches[2]);
 			},
-			$text
+			$text,
 		);
 
 		// Converting images with size parameters to simple images. Markdown doesn't know it.
@@ -2348,7 +2362,7 @@ class BBCode
 			$text              = preg_replace_callback(
 				"/([@!])\[(.*?)\]\(([$url_search_string]*?)\)/ism",
 				[self::class, 'bbCodeMention2DiasporaCallback'],
-				$text
+				$text,
 			);
 		}
 
@@ -2463,7 +2477,7 @@ class BBCode
 						return $match[1] . '[url=' . DI::baseUrl() . '/search?tag=' . urlencode($match[2]) . ']' . $match[2] . '[/url]';
 				}
 			},
-			$body
+			$body,
 		);
 	}
 
@@ -2544,11 +2558,11 @@ class BBCode
 	public static function getShareOpeningTag(string $author, string $profile, string $avatar, string $link, string $posted, string $guid = null, string $uri = null): string
 	{
 		DI::profiler()->startRecording('rendering');
-		$header = "[share author='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $author) .
-			"' profile='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $profile) .
-			"' avatar='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $avatar) .
-			"' link='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $link) .
-			"' posted='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $posted);
+		$header = "[share author='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $author)
+			. "' profile='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $profile)
+			. "' avatar='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $avatar)
+			. "' link='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $link)
+			. "' posted='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $posted);
 
 		if ($guid) {
 			$header .= "' guid='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $guid);
@@ -2599,7 +2613,7 @@ class BBCode
 				}
 			}
 
-			$result = sprintf('[bookmark=%s]%s[/bookmark]%s', $url, ($title) ? $title : $url, $description) . $str_tags;
+			$result = sprintf('[bookmark=%s]%s[/bookmark]%s', $url, $title ?: $url, $description) . $str_tags;
 
 			DI::logger()->info('(unparsed): returns: ' . $result);
 

@@ -495,7 +495,7 @@ class Feed
 			if (!$dryRun) {
 				$condition = [
 					"`uid` = ? AND `uri` = ? AND `network` IN (?, ?)",
-					$importer['uid'], $item['uri'], Protocol::FEED, Protocol::DFRN
+					$importer['uid'], $item['uri'], Protocol::FEED, Protocol::DFRN,
 				];
 				$previous = Post::selectFirst(['id', 'created'], $condition);
 				if (DBA::isResult($previous)) {
@@ -544,7 +544,7 @@ class Feed
 						if (in_array($attribute->name, ['url', 'href'])) {
 							$href = $attribute->textContent;
 						} elseif ($attribute->name == 'length') {
-							$length = (int)$attribute->textContent;
+							$length = (int) $attribute->textContent;
 						} elseif ($attribute->name == 'type') {
 							$type = $attribute->textContent;
 						}
@@ -665,7 +665,7 @@ class Feed
 					$item['plink'],
 					false,
 					$fetch_further_information == LocalRelationship::FFI_BOTH,
-					$contact['ffi_keyword_denylist'] ?? ''
+					$contact['ffi_keyword_denylist'] ?? '',
 				);
 
 				if (!empty($data)) {
@@ -712,7 +712,7 @@ class Feed
 			DI::logger()->info('Stored feed', ['item' => $item]);
 
 			$notify       = Item::isRemoteSelf($contact, $item);
-			$item['wall'] = (bool)$notify;
+			$item['wall'] = (bool) $notify;
 
 			// Distributed items should have a well-formatted URI.
 			// Additionally, we have to avoid conflicts with identical URI between imported feeds and these items.
@@ -734,7 +734,7 @@ class Feed
 				} else {
 					$postings[] = [
 						'item'    => $item, 'notify' => $notify,
-						'taglist' => $taglist, 'attachments' => $attachments
+						'taglist' => $taglist, 'attachments' => $attachments,
 					];
 				}
 			} else {
@@ -1027,7 +1027,7 @@ class Feed
 			$owner['uid'], $check_date, Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT,
 			Item::GRAVITY_ACTIVITY, Activity::ANNOUNCE,
 			Item::PRIVATE, Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA,
-			$authorid
+			$authorid,
 		];
 
 		if ($filter === 'comments') {
@@ -1208,8 +1208,8 @@ class Feed
 			'',
 			[
 				'rel'  => 'alternate', 'type' => 'text/html',
-				'href' => DI::baseUrl() . '/display/' . $item['guid']
-			]
+				'href' => DI::baseUrl() . '/display/' . $item['guid'],
+			],
 		);
 
 		XML::addElement($doc, $entry, 'published', DateTimeFormat::utc($item['created'] . '+00:00', DateTimeFormat::ATOM));
@@ -1250,13 +1250,13 @@ class Feed
 			if (isset($parent_plink)) {
 				$attributes = [
 					'ref'  => $item['thr-parent'],
-					'href' => $parent_plink
+					'href' => $parent_plink,
 				];
 				XML::addElement($doc, $entry, 'thr:in-reply-to', '', $attributes);
 
 				$attributes = [
 					'rel'  => 'related',
-					'href' => $parent_plink
+					'href' => $parent_plink,
 				];
 				XML::addElement($doc, $entry, 'link', '', $attributes);
 			}
@@ -1410,9 +1410,9 @@ class Feed
 			if ($owner['contact-type'] == Contact::TYPE_COMMUNITY) {
 				$entry->setAttribute('xmlns:activity', ActivityNamespace::ACTIVITY);
 
-				$contact             = Contact::getByURL($item['author-link']) ?: $owner;
-				$contact['nickname'] = $contact['nickname'] ?? $contact['nick'];
-				$author              = self::addAuthor($doc, $contact);
+				$contact = Contact::getByURL($item['author-link']) ?: $owner;
+				$contact['nickname'] ??= $contact['nick'];
+				$author = self::addAuthor($doc, $contact);
 				$entry->appendChild($author);
 			}
 		} else {

@@ -13,6 +13,8 @@ use Friendica\App\Page;
 use Friendica\AppHelper;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Conversation\Collection\Timelines;
+use Friendica\Content\Conversation\Entity\Channel;
+use Friendica\Content\Conversation\Entity\UserDefinedChannel;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Conversation\Factory\Channel as ChannelFactory;
 use Friendica\Content\Conversation\Factory\Community as CommunityFactory;
@@ -26,6 +28,7 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
+use Friendica\Model\Post\Engagement;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
 use Friendica\Module\Response;
@@ -87,30 +90,32 @@ class Display extends BaseSettings
 
 		$theme                   = trim($request['theme']);
 		$mobile_theme            = trim($request['mobile_theme'] ?? '');
-		$enable_smile            = (bool)$request['enable_smile'];
-		$enable                  = (array)$request['enable'];
-		$bookmark                = (array)$request['bookmark'];
-		$channel_languages       = (array)$request['channel_languages'];
-		$first_day_of_week       = (int)$request['first_day_of_week'];
+		$enable_smile            = (bool) $request['enable_smile'];
+		$enable                  = (array) $request['enable'];
+		$bookmark                = (array) $request['bookmark'];
+		$channel_languages       = (array) $request['channel_languages'];
+		$timeline_channels       = isset($request['timeline_channels']) ? (array) $request['timeline_channels'] : null;
+		$filter_channels         = isset($request['filter_channels']) ? (array) $request['filter_channels'] : null;
+		$first_day_of_week       = (int) $request['first_day_of_week'];
 		$calendar_default_view   = trim($request['calendar_default_view']);
-		$infinite_scroll         = (bool)$request['infinite_scroll'];
-		$enable_smart_threading  = (bool)$request['enable_smart_threading'];
-		$enable_dislike          = (bool)$request['enable_dislike'];
-		$display_resharer        = (bool)$request['display_resharer'];
-		$stay_local              = (bool)$request['stay_local'];
-		$hide_empty_descriptions = (bool)$request['hide_empty_descriptions'];
-		$hide_custom_emojis      = (bool)$request['hide_custom_emojis'];
-		$platform_icon_style     = (int)$request['platform_icon_style'];
-		$show_page_drop          = (bool)$request['show_page_drop'];
-		$display_eventlist       = (bool)$request['display_eventlist'];
-		$preview_mode            = (int)$request['preview_mode'];
-		$update_content          = (int)$request['update_content'];
-		$embed_remote_media      = (bool)$request['embed_remote_media'];
-		$embed_media             = (bool)$request['embed_media'];
+		$infinite_scroll         = (bool) $request['infinite_scroll'];
+		$enable_smart_threading  = (bool) $request['enable_smart_threading'];
+		$enable_dislike          = (bool) $request['enable_dislike'];
+		$display_resharer        = (bool) $request['display_resharer'];
+		$stay_local              = (bool) $request['stay_local'];
+		$hide_empty_descriptions = (bool) $request['hide_empty_descriptions'];
+		$hide_custom_emojis      = (bool) $request['hide_custom_emojis'];
+		$platform_icon_style     = (int) $request['platform_icon_style'];
+		$show_page_drop          = (bool) $request['show_page_drop'];
+		$display_eventlist       = (bool) $request['display_eventlist'];
+		$preview_mode            = (int) $request['preview_mode'];
+		$update_content          = (int) $request['update_content'];
+		$embed_remote_media      = (bool) $request['embed_remote_media'];
+		$embed_media             = (bool) $request['embed_media'];
 		$widget_timelineorder    = trim($request['widget_timelineorder']);
 		$menu_timelineorder      = trim($request['menu_timelineorder']);
-		$widget_timeline_reset   = (bool)$request['widget_timeline_reset'];
-		$menu_timeline_reset     = (bool)$request['menu_timeline_reset'];
+		$widget_timeline_reset   = (bool) $request['widget_timeline_reset'];
+		$menu_timeline_reset     = (bool) $request['menu_timeline_reset'];
 
 		$enabled_timelines = [];
 		foreach ($enable as $code => $enabled) {
@@ -126,15 +131,15 @@ class Display extends BaseSettings
 			}
 		}
 
-		$itemspage_network = !empty($request['itemspage_network']) ?
-			intval($request['itemspage_network']) :
-			$this->config->get('system', 'itemspage_network');
+		$itemspage_network = !empty($request['itemspage_network'])
+			? intval($request['itemspage_network'])
+			: $this->config->get('system', 'itemspage_network');
 		if ($itemspage_network > 100) {
 			$itemspage_network = 100;
 		}
-		$itemspage_mobile_network = !empty($request['itemspage_mobile_network']) ?
-			intval($request['itemspage_mobile_network']) :
-			$this->config->get('system', 'itemspage_network_mobile');
+		$itemspage_mobile_network = !empty($request['itemspage_mobile_network'])
+			? intval($request['itemspage_mobile_network'])
+			: $this->config->get('system', 'itemspage_network_mobile');
 		if ($itemspage_mobile_network > 100) {
 			$itemspage_mobile_network = 100;
 		}
@@ -170,6 +175,13 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'network_timelines', $network_timelines);
 		$this->pConfig->set($uid, 'system', 'enabled_timelines', $enabled_timelines);
 		$this->pConfig->set($uid, 'channel', 'languages', $channel_languages);
+
+		if (!is_null($timeline_channels)) {
+			$this->pConfig->set($uid, 'channel', 'timeline_channels', $timeline_channels);
+		}
+		if (!is_null($filter_channels)) {
+			$this->pConfig->set($uid, 'channel', 'filter_channels', $filter_channels);
+		}
 
 		$this->pConfig->set($uid, 'accessibility', 'hide_empty_descriptions', $hide_empty_descriptions);
 		$this->pConfig->set($uid, 'accessibility', 'hide_custom_emojis', $hide_custom_emojis);
@@ -286,6 +298,27 @@ class Display extends BaseSettings
 		$enabled_timelines    = $this->pConfig->get($uid, 'system', 'enabled_timelines', $this->getAvailableTimelines($uid, false)->column('code'));
 		$channel_languages    = User::getWantedLanguages($uid);
 		$languages            = $this->l10n->getLanguageCodes(true, true);
+		$timeline_channels    = $this->pConfig->get($uid, 'channel', 'timeline_channels') ?? [];
+		$filter_channels      = $this->pConfig->get($uid, 'channel', 'filter_channels')   ?? [];
+
+		$channels = [];
+		if ($this->config->get('system', 'system_channel_cache')) {
+			foreach ($this->channel->getTimelines($uid) as $channel) {
+				if (!in_array($channel->code, [Channel::FORYOU, Channel::QUIETSHARERS])) {
+					$channels[$channel->code] = $channel->label;
+				}
+			}
+		}
+
+		$filter = [];
+		if ($this->config->get('system', 'channel_cache')) {
+			foreach ($this->userDefinedChannel->selectByUid($uid) as $channel) {
+				$filter[$channel->code] = $channel->label;
+				if (in_array($channel->circle, [UserDefinedChannel::CIRCLE_GLOBAL, UserDefinedChannel::CIRCLE_FOLLOWERS])) {
+					$channels[$channel->code] = $channel->label;
+				}
+			}
+		}
 
 		$timelines = [];
 		foreach ($this->getAvailableTimelines($uid) as $timeline) {
@@ -370,7 +403,7 @@ class Display extends BaseSettings
 			3 => $this->t('Wednesday'),
 			4 => $this->t('Thursday'),
 			5 => $this->t('Friday'),
-			6 => $this->t('Saturday')
+			6 => $this->t('Saturday'),
 		];
 
 		$calendar_default_view = $this->pConfig->get($uid, 'calendar', 'default_view', 'month');
@@ -378,7 +411,7 @@ class Display extends BaseSettings
 			'month'      => $this->t('month'),
 			'agendaWeek' => $this->t('week'),
 			'agendaDay'  => $this->t('day'),
-			'listMonth'  => $this->t('list')
+			'listMonth'  => $this->t('list'),
 		];
 
 		$theme_config = '';
@@ -399,27 +432,27 @@ class Display extends BaseSettings
 			'$timeline_title'      => $this->t('Timelines'),
 			'$channel_title'       => $this->t('Channels'),
 			'$calendar_title'      => $this->t('Calendar'),
-			'$sortable'            => $this->t('Drag to reorder or tab to item with keyboard and move up/down with arrow keys'),
+			'$sortable'            => $this->t('Drag to reorder, use arrow buttons on each item, or tab to item with keyboard and move up/down with arrow keys'),
 			'$reset_widget'        => [
 				'0' => 'widget_timeline_reset',
-				'1' => $this->t('Reset order')
+				'1' => $this->t('Reset order'),
 			],
 			'$reset_menu' => [
 				'0' => 'menu_timeline_reset',
-				'1' => $this->t('Reset order')
+				'1' => $this->t('Reset order'),
 			],
 
 			'$form_security_token' => self::getFormSecurityToken('settings_display'),
 			'$uid'                 => $uid,
 
-			'$theme'        => ['theme', $this->t('Display theme'), $theme_selected, '', $themes, true],
+			'$theme'        => ['theme', $this->t('Theme'), $theme_selected, '', $themes, true],
 			'$mobile_theme' => ['mobile_theme', $this->t('Mobile theme'), $mobile_theme_selected, '', $mobile_themes, false],
 			'$theme_config' => $theme_config,
 
 			'$itemspage_network'        => ['itemspage_network', $this->t('Number of items to display per page:'), $itemspage_network, $this->t('Maximum of 100 items')],
 			'$itemspage_mobile_network' => ['itemspage_mobile_network', $this->t('Number of items to display per page when viewed from mobile device:'), $itemspage_mobile_network, $this->t('Maximum of 100 items')],
 			'$update_content'           => ['update_content', $this->t('Regularly update the page content'), $update_content, $this->t('When enabled, new content on network, community and channels are added on top.')],
-			'$enable_smile'             => ['enable_smile', $this->t('Display emoticons'), $enable_smile, $this->t('When enabled, emoticons are replaced with matching symbols.')],
+			'$enable_smile'             => ['enable_smile', $this->t('Display emojis'), $enable_smile, $this->t('When enabled, emoticons are replaced with matching emojis.')],
 			'$infinite_scroll'          => ['infinite_scroll', $this->t('Infinite scroll'), $infinite_scroll, $this->t('Automatic fetch new items when reaching the page end.')],
 			'$enable_smart_threading'   => ['enable_smart_threading', $this->t('Enable Smart Threading'), $enable_smart_threading, $this->t('Enable the automatic suppression of extraneous thread indentation.')],
 			'$enable_dislike'           => ['enable_dislike', $this->t('Display the Dislike feature'), $enable_dislike, $this->t('Display the Dislike button and dislike reactions on posts and comments.')],
@@ -441,7 +474,11 @@ class Display extends BaseSettings
 			'$timelines'            => $timelines,
 			'$timeline_explanation' => $this->t('Enable timelines that you want to see in the channels widget. Bookmark timelines that you want to see in the top menu.'),
 
-			'$channel_languages' => ['channel_languages[]', $this->t('Channel languages:'), $channel_languages, $this->t('Select all the languages you want to see in your channels. "Unspecified" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language). If you want to see all languages, you will need to select all items in the list.'), $languages, 'multiple'],
+			'$channel_languages'     => ['channel_languages[]', $this->t('Channel languages:'), $channel_languages, $this->t('Select all the languages you want to see in your channels. "Unspecified" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language). If you want to see all languages, you will need to select all items in the list.'), $languages, 'multiple'],
+			'$timeline_channels'     => ['timeline_channels[]', $this->t('Timeline channels:'), $timeline_channels, $this->t('Select all the channels that you want to see in your network timeline.'), $channels, 'multiple'],
+			'$has_timeline_channels' => !empty($channels),
+			'$filter_channels'       => ['filter_channels[]', $this->t('Filter channels:'), $filter_channels, $this->t('Select all the channels that you want to use as a filter for your network timeline. All posts from these channels will be hidden. For technical reasons postings that are older than %s will not be filtered.', $this->l10n->dateTime(Engagement::getCreationDateLimit(false)), 'r'), $filter, 'multiple'],
+			'$has_filter_channels'   => !empty($filter),
 
 			'$first_day_of_week'     => ['first_day_of_week', $this->t('Beginning of week:'), $first_day_of_week, '', $weekdays, false],
 			'$calendar_default_view' => ['calendar_default_view', $this->t('Default calendar view:'), $calendar_default_view, '', $calendarViews, false],

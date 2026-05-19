@@ -12,6 +12,9 @@ use Friendica\App\BaseURL;
 use Friendica\App\Mode;
 use Friendica\App\Page;
 use Friendica\BaseModule;
+use Friendica\Content\Conversation\Factory\Channel;
+use Friendica\Content\Conversation\Repository\UserDefinedChannel;
+use Friendica\Content\Conversation\Entity\Channel as ChannelEntity;
 use Friendica\Core\ACL;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
@@ -47,16 +50,16 @@ use Psr\Log\LoggerInterface;
 
 class Conversation
 {
-	const MODE_CHANNEL       = 'channel';
-	const MODE_COMMUNITY     = 'community';
-	const MODE_CONTACTS      = 'contacts';
-	const MODE_CONTACT_POSTS = 'contact-posts';
-	const MODE_DISPLAY       = 'display';
-	const MODE_FILED         = 'filed';
-	const MODE_NETWORK       = 'network';
-	const MODE_NOTES         = 'notes';
-	const MODE_SEARCH        = 'search';
-	const MODE_PROFILE       = 'profile';
+	public const MODE_CHANNEL       = 'channel';
+	public const MODE_COMMUNITY     = 'community';
+	public const MODE_CONTACTS      = 'contacts';
+	public const MODE_CONTACT_POSTS = 'contact-posts';
+	public const MODE_DISPLAY       = 'display';
+	public const MODE_FILED         = 'filed';
+	public const MODE_NETWORK       = 'network';
+	public const MODE_NOTES         = 'notes';
+	public const MODE_SEARCH        = 'search';
+	public const MODE_PROFILE       = 'profile';
 
 	/** @var Activity */
 	private $activity;
@@ -85,23 +88,27 @@ class Conversation
 	/** @var UserGServerRepository */
 	private $userGServer;
 	private EventDispatcherInterface $eventDispatcher;
+	private Channel $channel;
+	private UserDefinedChannel $userDefinedChannel;
 
-	public function __construct(UserGServerRepository $userGServer, LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, Item $item, Arguments $args, BaseURL $baseURL, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Page $page, Mode $mode, EventDispatcherInterface $eventDispatcher, IHandleUserSessions $session)
+	public function __construct(UserGServerRepository $userGServer, Channel $channel, UserDefinedChannel $userDefinedChannel, LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, Item $item, Arguments $args, BaseURL $baseURL, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Page $page, Mode $mode, EventDispatcherInterface $eventDispatcher, IHandleUserSessions $session)
 	{
-		$this->activity        = $activity;
-		$this->item            = $item;
-		$this->config          = $config;
-		$this->mode            = $mode;
-		$this->baseURL         = $baseURL;
-		$this->profiler        = $profiler;
-		$this->logger          = $logger;
-		$this->l10n            = $l10n;
-		$this->args            = $args;
-		$this->pConfig         = $pConfig;
-		$this->page            = $page;
-		$this->eventDispatcher = $eventDispatcher;
-		$this->session         = $session;
-		$this->userGServer     = $userGServer;
+		$this->activity           = $activity;
+		$this->item               = $item;
+		$this->config             = $config;
+		$this->mode               = $mode;
+		$this->baseURL            = $baseURL;
+		$this->profiler           = $profiler;
+		$this->logger             = $logger;
+		$this->l10n               = $l10n;
+		$this->args               = $args;
+		$this->pConfig            = $pConfig;
+		$this->page               = $page;
+		$this->eventDispatcher    = $eventDispatcher;
+		$this->session            = $session;
+		$this->userGServer        = $userGServer;
+		$this->channel            = $channel;
+		$this->userDefinedChannel = $userDefinedChannel;
 	}
 
 	/**
@@ -266,7 +273,7 @@ class Conversation
 					break;
 				case 'dislike':
 					$dislike_translation_plural = '<button type="button" %2$s>%1$d people</button> don\'t like this';
-					// @deprecated 2025.07 this translation is scheduled for removal as a new translation has been added without the typo
+					// @deprecated 2026.01 this translation is scheduled for removal as a new translation has been added without the typo
 					$dislike_translation_plural = '<button type="button" %2$s>%1$d peiple</button> don\'t like this';
 					$phrase                     = $this->l10n->tt('<button type="button" %2$s>%1$d person</button> doesn\'t like this', $dislike_translation_plural, $total, $spanatts);
 					break;
@@ -290,7 +297,7 @@ class Conversation
 		$output = Renderer::replaceMacros(Renderer::getMarkupTemplate('voting_fakelink.tpl'), [
 			'$phrase' => $phrase,
 			'$type'   => $verb,
-			'$id'     => $id
+			'$id'     => $id,
 		]);
 		$output .= $expanded;
 
@@ -308,15 +315,15 @@ class Conversation
 		$this->profiler->startRecording('rendering');
 		$o = '';
 
-		$x['allow_location']   = $x['allow_location']   ?? $user['allow_location'];
-		$x['default_location'] = $x['default_location'] ?? $user['default-location'];
-		$x['nickname']         = $x['nickname']         ?? $user['nickname'];
-		$x['lockstate']        = $x['lockstate']        ?? ACL::getLockstateForUserId($user['uid']) ? 'lock' : 'unlock';
-		$x['acl']              = $x['acl']              ?? ACL::getFullSelectorHTML($this->page, $user['uid'], true);
-		$x['bang']             = $x['bang']             ?? '';
-		$x['visitor']          = $x['visitor']          ?? 'block';
-		$x['is_owner']         = $x['is_owner']         ?? true;
-		$x['profile_uid']      = $x['profile_uid']      ?? $this->session->getLocalUserId();
+		$x['allow_location'] ??= $user['allow_location'];
+		$x['default_location'] ??= $user['default-location'];
+		$x['nickname'] ??= $user['nickname'];
+		$x['lockstate'] = $x['lockstate'] ?? ACL::getLockstateForUserId($user['uid']) ? 'lock' : 'unlock';
+		$x['acl'] ??= ACL::getFullSelectorHTML($this->page, $user['uid'], true);
+		$x['bang'] ??= '';
+		$x['visitor'] ??= 'block';
+		$x['is_owner'] ??= true;
+		$x['profile_uid'] ??= $this->session->getLocalUserId();
 
 
 		$geotag = !empty($x['allow_location']) ? Renderer::replaceMacros(Renderer::getMarkupTemplate('jot_geotag.tpl'), []) : '';
@@ -347,7 +354,7 @@ class Conversation
 				new \DateTime('now'),
 				null,
 				$this->l10n->t('Created at'),
-				'created_at'
+				'created_at',
 			);
 		} else {
 			$created_at = '';
@@ -359,7 +366,7 @@ class Conversation
 			'$new_post'            => $this->l10n->t('New Post'),
 			'$return_path'         => $this->args->getQueryString(),
 			'$action'              => 'item',
-			'$share'               => ($x['button'] ?? '') ?: $this->l10n->t('Share'),
+			'$share'               => ($x['button'] ?? '') ?: $this->l10n->t('Post'),
 			'$loading'             => $this->l10n->t('Loading...'),
 			'$upload'              => $this->l10n->t('Upload photo'),
 			'$shortupload'         => $this->l10n->t('upload photo'),
@@ -375,21 +382,24 @@ class Conversation
 			'$edimg'               => $this->l10n->t('Image'),
 			'$edurl'               => $this->l10n->t('Link'),
 			'$edattach'            => $this->l10n->t('Link or Media'),
-			'$edvideo'             => $this->l10n->t('Video'),
+			'$edembed'             => $this->l10n->t('Embed'),
 			'$setloc'              => $this->l10n->t('Set your location'),
 			'$shortsetloc'         => $this->l10n->t('set location'),
 			'$noloc'               => $this->l10n->t('Clear browser location'),
 			'$shortnoloc'          => $this->l10n->t('clear location'),
 			'$title'               => $x['title'] ?? '',
 			'$placeholdertitle'    => $this->l10n->t('Set title'),
+			'$summary'             => $x['summary'] ?? '',
+			'$placeholdersummary'  => Feature::isEnabled($this->session->getLocalUserId(), Feature::SUMMARY) ? $this->l10n->t('Set summary, abstract or spoiler text') : '',
 			'$category'            => $x['category'] ?? '',
 			'$placeholdercategory' => Feature::isEnabled($this->session->getLocalUserId(), Feature::CATEGORIES) ? $this->l10n->t("Categories \x28comma-separated list\x29") : '',
+			'$sensitive'           => ['sensitive', $this->l10n->t('Sensitive post'), $x['sensitive'] ?? false],
 			'$scheduled_at'        => Temporal::getDateTimeField(
 				new \DateTime(),
 				new \DateTime('now + 6 months'),
 				null,
 				$this->l10n->t('Scheduled at'),
-				'scheduled_at'
+				'scheduled_at',
 			),
 			'$created_at'   => $created_at,
 			'$wait'         => $this->l10n->t('Please wait'),
@@ -480,17 +490,17 @@ class Conversation
 					. "; var netargs = '" . substr($this->args->getCommand(), 8)
 					. '?f='
 					. (!empty($_GET['contactid']) ? '&contactid=' . rawurlencode($_GET['contactid']) : '')
-					. (!empty($_GET['search'])    ? '&search='    . rawurlencode($_GET['search'])    : '')
-					. (!empty($_GET['star'])      ? '&star='      . rawurlencode($_GET['star'])      : '')
-					. (!empty($_GET['order'])     ? '&order='     . rawurlencode($_GET['order'])     : '')
-					. (!empty($_GET['bmark'])     ? '&bmark='     . rawurlencode($_GET['bmark'])     : '')
-					. (!empty($_GET['liked'])     ? '&liked='     . rawurlencode($_GET['liked'])     : '')
-					. (!empty($_GET['conv'])      ? '&conv='      . rawurlencode($_GET['conv'])      : '')
-					. (!empty($_GET['nets'])      ? '&nets='      . rawurlencode($_GET['nets'])      : '')
-					. (!empty($_GET['cmin'])      ? '&cmin='      . rawurlencode($_GET['cmin'])      : '')
-					. (!empty($_GET['cmax'])      ? '&cmax='      . rawurlencode($_GET['cmax'])      : '')
-					. (!empty($_GET['file'])      ? '&file='      . rawurlencode($_GET['file'])      : '')
-					. (!empty($_GET['channel'])   ? '&channel='   . rawurlencode($_GET['channel'])   : '')
+					. (!empty($_GET['search'])    ? '&search=' . rawurlencode($_GET['search'])    : '')
+					. (!empty($_GET['star'])      ? '&star=' . rawurlencode($_GET['star'])      : '')
+					. (!empty($_GET['order'])     ? '&order=' . rawurlencode($_GET['order'])     : '')
+					. (!empty($_GET['bmark'])     ? '&bmark=' . rawurlencode($_GET['bmark'])     : '')
+					. (!empty($_GET['liked'])     ? '&liked=' . rawurlencode($_GET['liked'])     : '')
+					. (!empty($_GET['conv'])      ? '&conv=' . rawurlencode($_GET['conv'])      : '')
+					. (!empty($_GET['nets'])      ? '&nets=' . rawurlencode($_GET['nets'])      : '')
+					. (!empty($_GET['cmin'])      ? '&cmin=' . rawurlencode($_GET['cmin'])      : '')
+					. (!empty($_GET['cmax'])      ? '&cmax=' . rawurlencode($_GET['cmax'])      : '')
+					. (!empty($_GET['file'])      ? '&file=' . rawurlencode($_GET['file'])      : '')
+					. (!empty($_GET['channel'])   ? '&channel=' . rawurlencode($_GET['channel'])   : '')
 					. (!empty($_GET['no_sharer']) ? '&no_sharer=' . rawurlencode($_GET['no_sharer']) : '')
 					. (!empty($_GET['accounttype']) ? '&accounttype=' . rawurlencode($_GET['accounttype']) : '')
 					. "'; </script>\r\n";
@@ -687,10 +697,13 @@ class Conversation
 	 * @param array   $row        Post row
 	 * @param array   $activity   Contact data of the resharer
 	 * @param array   $thr_parent Thread parent row
+	 * @param string  $channel    Channel information
+	 * @param int     $uid        User ID
+	 * @param array   $channels   Available channels for the user
 	 *
 	 * @return array items with parents and comments
 	 */
-	private function addRowInformation(array $row, array $activity, array $thr_parent): array
+	private function addRowInformation(array $row, array $activity, array $thr_parent, string $channel, int $uid, array $channels): array
 	{
 		$this->profiler->startRecording('rendering');
 
@@ -708,11 +721,16 @@ class Conversation
 				$row['causer-link']   = $contact['url'];
 				$row['causer-avatar'] = $contact['thumb'];
 				$row['causer-name']   = $contact['name'];
-			} elseif (($row['gravity'] == ItemModel::GRAVITY_ACTIVITY) && ($row['verb'] == Activity::ANNOUNCE) &&
-				($row['author-id'] == $activity['causer-id'])
+			} elseif (($row['gravity'] == ItemModel::GRAVITY_ACTIVITY) && ($row['verb'] == Activity::ANNOUNCE)
+				&& ($row['author-id'] == $activity['causer-id'])
 			) {
 				return $row;
 			}
+		}
+
+		if ($channel) {
+			$row['channel']     = $channel;
+			$row['post-reason'] = ItemModel::PR_CHANNEL;
 		}
 
 		switch ($row['post-reason']) {
@@ -793,6 +811,16 @@ class Conversation
 			case ItemModel::PR_PUSHED:
 				$row['direction'] = ['direction' => 1, 'title' => $this->l10n->t('Pushed to us')];
 				break;
+			case ItemModel::PR_CHANNEL:
+				$title       = $channels[$channel]->label       ?? $channel;
+				$description = $channels[$channel]->description ?? '';
+
+				if ($description) {
+					$row['direction'] = ['direction' => 11, 'title' => $this->l10n->t('Channel "%s": %s', $title, $description)];
+				} else {
+					$row['direction'] = ['direction' => 11, 'title' => $this->l10n->t('Channel "%s"', $title)];
+				}
+				break;
 		}
 
 		$row['thr-parent-row'] = $thr_parent;
@@ -829,6 +857,7 @@ class Conversation
 		$uriids          = [];
 		$commentcounter  = [];
 		$activitycounter = [];
+		$postchannels    = [];
 
 		foreach ($parents as $parent) {
 			if (!empty($parent['thr-parent-id']) && !empty($parent['gravity']) && ($parent['gravity'] == ItemModel::GRAVITY_ACTIVITY)) {
@@ -848,6 +877,7 @@ class Conversation
 
 			$commentcounter[$uriid]  = 0;
 			$activitycounter[$uriid] = 0;
+			$postchannels[$uriid]    = $parent['channel'] ?? '';
 		}
 
 		$condition = ['parent-uri-id' => $uriids];
@@ -855,7 +885,7 @@ class Conversation
 			$condition['author-hidden'] = false;
 		}
 
-		$emojis      = $this->getEmojis($uriids);
+		$emojis      = $this->getEmojis($uriids, $uid);
 		$quoteshares = $this->getQuoteShares($uriids);
 		$counts      = $this->getCounts($uriids);
 
@@ -865,7 +895,7 @@ class Conversation
 
 		$condition = DBA::mergeConditions(
 			$condition,
-			["`uid` IN (0, ?) AND (NOT `verb` IN (?, ?, ?) OR `verb` IS NULL)", $uid, Activity::FOLLOW, Activity::VIEW, Activity::READ]
+			["`uid` IN (0, ?) AND (NOT `verb` IN (?, ?, ?) OR `verb` IS NULL)", $uid, Activity::FOLLOW, Activity::VIEW, Activity::READ],
 		);
 
 		$condition = DBA::mergeConditions($condition, ["(`uid` != ? OR `private` != ?)", 0, ItemModel::PRIVATE]);
@@ -875,8 +905,8 @@ class Conversation
 			[
 				"`visible` AND NOT `deleted` AND NOT `author-blocked` AND NOT `owner-blocked`
 			AND ((NOT `contact-pending` AND (`contact-rel` IN (?, ?))) OR `self` OR `contact-uid` = ?)",
-				Contact::SHARING, Contact::FRIEND, 0
-			]
+				Contact::SHARING, Contact::FRIEND, 0,
+			],
 		);
 
 		$thread_parents = Post::select(['uri-id', 'causer-id'], $condition, ['order' => ['uri-id' => false, 'uid']]);
@@ -891,6 +921,16 @@ class Conversation
 		$params = ['order' => ['uri-id' => true, 'uid' => true]];
 
 		$thread_items = Post::select(array_merge(ItemModel::DISPLAY_FIELDLIST, ['featured', 'contact-uid', 'gravity', 'post-type', 'post-reason']), $condition, $params);
+
+		$channels = [];
+		foreach ($this->userDefinedChannel->selectByUid($uid) as $userchannel) {
+			$channels[$userchannel->code] = $userchannel;
+		}
+
+		/** @var ChannelEntity $systemchannel */
+		foreach ($this->channel->getTimelines($uid) as $systemchannel) {
+			$channels[$systemchannel->code] = $systemchannel;
+		}
 
 		$items         = [];
 		$quote_uri_ids = [];
@@ -934,7 +974,7 @@ class Conversation
 				];
 			}
 
-			$items[$row['uri-id']] = $this->addRowInformation($row, $activities[$row['uri-id']] ?? [], $thr_parent[$row['thr-parent-id']] ?? []);
+			$items[$row['uri-id']] = $this->addRowInformation($row, $activities[$row['uri-id']] ?? [], $thr_parent[$row['thr-parent-id']] ?? [], $postchannels[$row['thr-parent-id']] ?? '', $uid, $channels);
 		}
 
 		DBA::close($thread_items);
@@ -955,7 +995,7 @@ class Conversation
 			$authors[] = $row['author-id'];
 			$authors[] = $row['owner-id'];
 
-			$items[$row['uri-id']] = $this->addRowInformation($row, [], []);
+			$items[$row['uri-id']] = $this->addRowInformation($row, [], [], $postchannels[$row['thr-parent-id']] ?? '', $uid, $channels);
 		}
 		DBA::close($quotes);
 
@@ -995,8 +1035,8 @@ class Conversation
 			$items[$key]['user-collapsed-owner']  = !$always_display && in_array($row['owner-id'], $collapses);
 
 			if (
-				in_array($mode, [self::MODE_CHANNEL, self::MODE_COMMUNITY, self::MODE_NETWORK]) &&
-				(in_array($row['author-id'], $blocks) || in_array($row['owner-id'], $blocks) || in_array($row['author-id'], $ignores) || in_array($row['owner-id'], $ignores))
+				in_array($mode, [self::MODE_CHANNEL, self::MODE_COMMUNITY, self::MODE_NETWORK])
+				&& (in_array($row['author-id'], $blocks) || in_array($row['owner-id'], $blocks) || in_array($row['author-id'], $ignores) || in_array($row['owner-id'], $ignores))
 			) {
 				unset($items[$key]);
 			}
@@ -1012,9 +1052,10 @@ class Conversation
 	 * Fetch emoji reaction from the conversation
 	 *
 	 * @param array $uriids
+	 * @param int   $uid
 	 * @return array
 	 */
-	private function getEmojis(array $uriids): array
+	private function getEmojis(array $uriids, int $uid): array
 	{
 		$emojis = [];
 
@@ -1022,6 +1063,7 @@ class Conversation
 			$emojis[$count['uri-id']][$count['reaction']]['emoji'] = $count['reaction'];
 			$emojis[$count['uri-id']][$count['reaction']]['verb']  = Verb::getByID($count['vid']);
 			$emojis[$count['uri-id']][$count['reaction']]['total'] = $count['count'];
+			$emojis[$count['uri-id']][$count['reaction']]['count'] = 0;
 			$emojis[$count['uri-id']][$count['reaction']]['title'] = [];
 		}
 
@@ -1039,9 +1081,10 @@ class Conversation
 
 		$verbs     = array_merge($activity_verbs, [Activity::EMOJIREACT, Activity::POST]);
 		$condition = DBA::mergeConditions(['parent-uri-id' => $uriids, 'gravity' => [ItemModel::GRAVITY_ACTIVITY, ItemModel::GRAVITY_COMMENT], 'verb' => $verbs], ["NOT `deleted`"]);
+		$condition = DBA::mergeConditions($condition, ["((`uid` = ? AND `global`) OR (`uid` = ? AND NOT `global`))", 0, $uid]);
 		$separator = chr(255) . chr(255) . chr(255);
 
-		$sql = "SELECT `parent-uri-id`, `thr-parent-id`, `body`, `verb`, `gravity`, GROUP_CONCAT(REPLACE(`author-name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title` FROM `post-view` WHERE " . array_shift($condition) . " GROUP BY `parent-uri-id`, `thr-parent-id`, `verb`, `body`, `gravity`";
+		$sql = "SELECT `parent-uri-id`, `thr-parent-id`, `body`, `verb`, `gravity`, `private`, GROUP_CONCAT(REPLACE(`author-name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title` FROM `post-user-view` WHERE " . array_shift($condition) . " GROUP BY `parent-uri-id`, `thr-parent-id`, `verb`, `body`, `gravity`, `private`";
 
 		$rows = DBA::p($sql, $condition);
 		while ($row = DBA::fetch($rows)) {
@@ -1052,10 +1095,37 @@ class Conversation
 			}
 
 			if (isset($emojis[$row['thr-parent-id']][$emoji]['title'])) {
-				$emojis[$row['thr-parent-id']][$emoji]['title'] = array_unique(array_merge($emojis[$row['thr-parent-id']][$emoji]['title'] ?? [], explode($separator, $row['title'])));
+				// Don't display private view activities
+				if (($emoji === Activity::VIEW) && ($row['private'] === ItemModel::PRIVATE)) {
+					continue;
+				}
+				$names = explode($separator, $row['title']);
+
+				$emojis[$row['thr-parent-id']][$emoji]['title'] = array_unique(array_merge($emojis[$row['thr-parent-id']][$emoji]['title'] ?? [], $names));
+				if ($row['private'] === ItemModel::PRIVATE) {
+					$emojis[$row['thr-parent-id']][$emoji]['total'] += count($names);
+				}
+				$emojis[$row['thr-parent-id']][$emoji]['count'] += count($names);
 			}
 		}
 		DBA::close($rows);
+
+		foreach ($emojis as $uri_id => $row) {
+			foreach ($row as $emoji => $value) {
+				/*
+				 * @todo This is a fix for old data in the post-counts table that counted not only public data
+				 * We possibly could rebuild the data in that table, then we wouldn't need this. (See the function update1544)
+				 */
+				if (($value['count'] < $value['total']) && ($value['count'] < 50)) {
+					$emojis[$uri_id][$emoji]['total'] = $value['count'];
+				}
+
+				// Don't display activities with no activity
+				if ($emojis[$uri_id][$emoji]['total'] === 0) {
+					unset($emojis[$uri_id][$emoji]);
+				}
+			}
+		}
 
 		return $emojis;
 	}
@@ -1070,7 +1140,7 @@ class Conversation
 	{
 		$counts = [];
 
-		foreach (Post\Counts::get(['parent-uri-id' => $uriids, 'verb' => Activity::POST]) as $count) {
+		foreach (Post\Counts::get(['parent-uri-id' => $uriids, 'vid' => Verb::getID(Activity::POST)]) as $count) {
 			$counts[$count['parent-uri-id']] = ($counts[$count['parent-uri-id']] ?? 0) + $count['count'];
 		}
 
@@ -1088,7 +1158,7 @@ class Conversation
 		$condition = DBA::mergeConditions(['quote-uri-id' => $uriids], ["NOT `quote-uri-id` IS NULL"]);
 		$separator = chr(255) . chr(255) . chr(255);
 
-		$sql = "SELECT `quote-uri-id`, COUNT(*) AS `total`, GROUP_CONCAT(REPLACE(`name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title` FROM `post-content` INNER JOIN `post` ON `post`.`uri-id` = `post-content`.`uri-id` INNER JOIN `contact` ON `post`.`author-id` = `contact`.`id` WHERE " . array_shift($condition) . " GROUP BY `quote-uri-id`";
+		$sql = "SELECT `quote-uri-id`, COUNT(*) AS `total`, GROUP_CONCAT(REPLACE(`name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title` FROM `post-quote` INNER JOIN `post` ON `post`.`uri-id` = `post-quote`.`uri-id` INNER JOIN `contact` ON `post`.`author-id` = `contact`.`id` WHERE " . array_shift($condition) . " GROUP BY `quote-uri-id`";
 
 		$quotes = [];
 
@@ -1292,7 +1362,7 @@ class Conversation
 		foreach ($parents as $i => $parent) {
 			$parents[$i]['children'] = array_merge(
 				$this->getItemChildren($item_array, $parent, true),
-				$this->getItemChildren($item_array, $parent, false)
+				$this->getItemChildren($item_array, $parent, false),
 			);
 		}
 
@@ -1510,12 +1580,16 @@ class Conversation
 
 			$body_html = ItemModel::prepareBody($item, true, $preview);
 
-			list($categories, $folders) = $this->item->determineCategoriesTerms($item, $this->session->getLocalUserId());
+			[$categories, $folders] = $this->item->determineCategoriesTerms($item, $this->session->getLocalUserId());
 
 			if (!empty($item['featured'])) {
 				$pinned = $this->l10n->t('Pinned item');
 			} else {
 				$pinned = '';
+			}
+
+			if ($this->item->redundantSummary($item['body'], $item['content-warning'])) {
+				$item['content-warning'] = '';
 			}
 
 			$tmp_item = [
@@ -1551,9 +1625,9 @@ class Conversation
 				'categories'           => $categories,
 				'folders'              => $folders,
 				'text'                 => strip_tags($body_html),
-				'localtime'            => DateTimeFormat::local($item['created'], 'r'),
+				'localtime'            => $this->l10n->fullDateTime($item['created']),
 				'utc'                  => DateTimeFormat::utc($item['created'], 'c'),
-				'ago'                  => (($item['app']) ? $this->l10n->t('%s from %s', Temporal::getRelativeDate($item['created']), $item['app']) : Temporal::getRelativeDate($item['created'])),
+				'ago'                  => (($item['app']) ? $this->l10n->t('%s from %s', $this->l10n->relativeDateTime($item['created']), $item['app']) : $this->l10n->relativeDateTime($item['created'])),
 				'location_html'        => $location_html,
 				'indent'               => '',
 				'owner_name'           => '',

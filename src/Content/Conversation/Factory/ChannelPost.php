@@ -9,13 +9,16 @@ declare(strict_types=1);
 
 namespace Friendica\Content\Conversation\Factory;
 
+use Friendica\Content\Conversation\Entity\UserDefinedChannel as UserDefinedChannelEntity;
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Database\Database;
 use Friendica\Model\Contact;
+use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Tag;
+use Friendica\Protocol\Activity;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -56,11 +59,12 @@ final class ChannelPost
 	 * system's channel caching is enabled and matching channels are found.
 	 *
 	 * @param array $engagement post-engagement record
+	 * @param int $gravity Gravity of the post
 	 * @param int $uid User id context.
 	 * @param int $reshare_id Optional reshare id.
 	 * @return void
 	 */
-	public function add(array $engagement, int $uid, int $reshare_id = 0): void
+	public function add(array $engagement, int $gravity, int $uid, int $reshare_id = 0): void
 	{
 		if (!$this->config->get('system', 'channel_cache')) {
 			return;
@@ -80,35 +84,43 @@ final class ChannelPost
 
 		$language = $engagement['language'] !== L10n::UNDETERMINED_LANGUAGE ? $engagement['language'] : '';
 		$tags     = array_column(Tag::getByURIId($engagement['uri-id'], [Tag::HASHTAG]), 'name');
+		$circles  = ($gravity != Item::GRAVITY_PARENT) ? [UserDefinedChannelEntity::CIRCLE_CREATION, UserDefinedChannelEntity::CIRCLE_POSTS, UserDefinedChannelEntity::CIRCLE_ACTIVITY] : [];
 
-		$channels = $this->channelRepository->getMatchingChannels($engagement['searchtext'], $language, $tags, $engagement['media-type'], $engagement['owner-id'], $reshare_id, $uids);
+		$channels = $this->channelRepository->getMatchingChannels($engagement['searchtext'], $language, $tags, $engagement['media-type'], $engagement['owner-id'], $reshare_id, $uids, $circles);
 		if (!($channels instanceof \Friendica\Content\Conversation\Collection\UserDefinedChannels) || $channels->count() === 0) {
 			$this->logger->debug('No channels found', ['uri-id' => $engagement['uri-id'], 'uids' => $uids, 'reshare_id' => $reshare_id]);
 			return;
 		}
 
 		foreach ($channels as $channel) {
-			if (in_array($channel->circle, [-3, -4, -5]) && !Post::exists(['parent-uri-id' => $engagement['uri-id'], 'uid' => $channel->uid])) {
+			$in_timeline = Post::exists(["`parent-uri-id` = ? AND `uid` = ? AND NOT `verb` IN (?, ?, ?)", $engagement['uri-id'], $channel->uid, Activity::FOLLOW, Activity::VIEW, Activity::READ]);
+
+			if ($engagement['restricted'] && !$in_timeline) {
 				continue;
 			}
 
-			if ($channel->circle === -1 && !Contact::isSharing($engagement['owner-id'], $channel->uid)) {
+			if (in_array($channel->circle, [UserDefinedChannelEntity::CIRCLE_CREATION, UserDefinedChannelEntity::CIRCLE_POSTS, UserDefinedChannelEntity::CIRCLE_ACTIVITY]) && !$in_timeline) {
 				continue;
 			}
 
-			if ($channel->circle === -2 && (!Contact::isFollower($engagement['owner-id'], $channel->uid) || Contact::isSharing($engagement['owner-id'], $channel->uid))) {
+			if ($channel->circle === UserDefinedChannelEntity::CIRCLE_FOLLOWING && !Contact::isSharing($engagement['owner-id'], $channel->uid)) {
+				continue;
+			}
+
+			if ($channel->circle === UserDefinedChannelEntity::CIRCLE_FOLLOWERS && (!Contact::isFollower($engagement['owner-id'], $channel->uid) || Contact::isSharing($engagement['owner-id'], $channel->uid))) {
 				continue;
 			}
 
 			$cache = [
-				'channel'   => (int)$channel->code,
-				'uid'       => $channel->uid,
-				'uri-id'    => $engagement['uri-id'],
-				'created'   => $post['created'],
-				'received'  => $post['received'],
-				'commented' => $post['commented'],
+				'channel'     => (int)$channel->code,
+				'uid'         => $channel->uid,
+				'uri-id'      => $engagement['uri-id'],
+				'in-timeline' => $in_timeline,
+				'created'     => $post['created'],
+				'received'    => $post['received'],
+				'commented'   => $post['commented'],
 			];
-			$ret = $this->dba->insert('channel-post', $cache, Database::INSERT_IGNORE);
+			$ret = $this->dba->insert('channel-post', $cache, Database::INSERT_UPDATE);
 			$this->logger->debug('Added channel post', ['uri-id' => $engagement['uri-id'], 'cache' => $cache, 'ret' => $ret]);
 		}
 	}

@@ -151,7 +151,7 @@ class Item
 				'url'       => $url,
 				'removeurl' => $this->userSession->getLocalUserId() == $uid ? 'filerm/' . $item['id'] . '?cat=' . rawurlencode($savedFolderName) : '',
 				'first'     => $first,
-				'last'      => false
+				'last'      => false,
 			];
 			$first = false;
 		}
@@ -167,7 +167,7 @@ class Item
 					'url'       => "#",
 					'removeurl' => $this->userSession->getLocalUserId() == $uid ? 'filerm/' . $item['id'] . '?term=' . rawurlencode($savedFolderName) : '',
 					'first'     => $first,
-					'last'      => false
+					'last'      => false,
 				];
 				$first = false;
 			}
@@ -303,7 +303,7 @@ class Item
 			if ($this->activity->match($item['verb'], Activity::TAG)) {
 				$fields = [
 					'author-id', 'author-link', 'author-name', 'author-network', 'author-link', 'author-alias',
-					'verb', 'object-type', 'resource-id', 'body', 'plink'
+					'verb', 'object-type', 'resource-id', 'body', 'plink',
 				];
 				$obj = Post::selectFirst($fields, ['uri' => $item['parent-uri']]);
 				if (!DBA::isResult($obj)) {
@@ -452,8 +452,8 @@ class Item
 
 			$menu[$this->l10n->t('Raw content')] = 'javascript:displaySearchText(' . $item['uri-id'] . ');';
 
-			if ((($cid == 0) || ($rel == Contact::FOLLOWER)) &&
-				in_array($item['network'], Protocol::FEDERATED)
+			if ((($cid == 0) || ($rel == Contact::FOLLOWER))
+				&& in_array($item['network'], Protocol::FEDERATED)
 			) {
 				$menu[$this->l10n->t('Connect/Follow')] = 'contact/follow?url=' . urlencode($item['author-link']) . '&auto=1';
 			}
@@ -496,10 +496,10 @@ class Item
 		}
 
 		// Check conditions
-		return (!($this->activity->match($item['verb'], Activity::FOLLOW) &&
-			$item['object-type'] === Activity\ObjectType::NOTE &&
-			empty($item['self']) &&
-			$item['uid'] == $this->userSession->getLocalUserId())
+		return (!($this->activity->match($item['verb'], Activity::FOLLOW)
+			&& $item['object-type'] === Activity\ObjectType::NOTE
+			&& empty($item['self'])
+			&& $item['uid'] == $this->userSession->getLocalUserId())
 		);
 	}
 
@@ -711,7 +711,7 @@ class Item
 
 		// If it is a reshared post then reformat it to avoid display problems with two share elements
 		if (!empty($shared)) {
-			if (($item['network'] != Protocol::BLUESKY) && !empty($shared['guid']) && ($encapsulated_share = $this->createSharedPostByGuid($shared['guid'], true))) {
+			if (($item['network'] != Protocol::ATPROTO) && !empty($shared['guid']) && ($encapsulated_share = $this->createSharedPostByGuid($shared['guid'], true))) {
 				if (!empty(BBCode::fetchShareAttributes($item['body']))) {
 					$item['body'] = preg_replace("/\[share.*?\](.*)\[\/share\]/ism", $encapsulated_share, $item['body']);
 				} else {
@@ -741,7 +741,7 @@ class Item
 			if (is_array($shared)) {
 				return [
 					'comment' => BBCode::removeSharedData($item['body'] ?? ''),
-					'post'    => $shared
+					'post'    => $shared,
 				];
 			}
 		}
@@ -752,7 +752,7 @@ class Item
 			if (is_array($shared)) {
 				return [
 					'comment' => $attributes['comment'],
-					'post'    => $shared
+					'post'    => $shared,
 				];
 			}
 		}
@@ -845,8 +845,8 @@ class Item
 				0 => [
 					'src'    => $attachment_img_src,
 					'width'  => $attachment_img_width,
-					'height' => $attachment_img_height
-				]
+					'height' => $attachment_img_height,
+				],
 			];
 		} else {
 			unset($attachment['images']);
@@ -940,16 +940,16 @@ class Item
 
 	public function initializePost(array $post): array
 	{
-		$post['network']    = Protocol::DFRN;
-		$post['protocol']   = Conversation::PARCEL_DIRECT;
-		$post['direction']  = Conversation::PUSH;
-		$post['received']   = DateTimeFormat::utcNow();
-		$post['origin']     = true;
-		$post['wall']       = $post['wall']       ?? true;
-		$post['guid']       = $post['guid']       ?? System::createUUID();
-		$post['verb']       = $post['verb']       ?? Activity::POST;
-		$post['uri']        = $post['uri']        ?? ItemModel::newURI($post['guid']);
-		$post['thr-parent'] = $post['thr-parent'] ?? $post['uri'];
+		$post['network']   = Protocol::DFRN;
+		$post['protocol']  = Conversation::PARCEL_DIRECT;
+		$post['direction'] = Conversation::PUSH;
+		$post['received']  = DateTimeFormat::utcNow();
+		$post['origin']    = true;
+		$post['wall'] ??= true;
+		$post['guid'] ??= System::createUUID();
+		$post['verb'] ??= Activity::POST;
+		$post['uri'] ??= ItemModel::newURI($post['guid']);
+		$post['thr-parent'] ??= $post['uri'];
 
 		if (empty($post['gravity'])) {
 			$post['gravity'] = ($post['uri'] == $post['thr-parent']) ? ItemModel::GRAVITY_PARENT : ItemModel::GRAVITY_COMMENT;
@@ -1031,7 +1031,7 @@ class Item
 		];
 
 		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, $hook_data)
+			new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, $hook_data),
 		)->getArray();
 
 		$post = $hook_data['item'] ?? $post;
@@ -1050,7 +1050,7 @@ class Item
 				$this->baseURL,
 				$post,
 				$address,
-				$author['thumb'] ?? ''
+				$author['thumb'] ?? '',
 			));
 		}
 	}
@@ -1101,14 +1101,7 @@ class Item
 	public function isTooOld(string $created, int $uid = 0): bool
 	{
 		// check for create date and expire time
-		$expire_interval = $this->config->get('system', 'dbclean-expire-days', 0);
-
-		if ($uid) {
-			$user = DBA::selectFirst('user', ['expire'], ['uid' => $uid]);
-			if (DBA::isResult($user) && ($user['expire'] > 0) && (($user['expire'] < $expire_interval) || ($expire_interval == 0))) {
-				$expire_interval = $user['expire'];
-			}
-		}
+		$expire_interval = $this->getExpirationDays($uid);
 
 		if (($expire_interval > 0) && !empty($created)) {
 			$expire_date  = time() - ($expire_interval * 86400);
@@ -1120,6 +1113,24 @@ class Item
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get the expiration days for a user
+	 *
+	 * @param integer $uid
+	 * @return integer expiration days
+	 */
+	private function getExpirationDays(int $uid = 0): int
+	{
+		$expiration = $this->config->get('system', 'dbclean-expire-days') ?? 0;
+		if ($this->pConfig->get($uid, 'expire', 'items', true)) {
+			$user = User::getById($uid, ['expire']);
+			if (isset($user['expire']) && ($user['expire'] > 0) && (($user['expire'] < $expiration) || ($expiration == 0))) {
+				$expiration = $user['expire'];
+			}
+		}
+		return $expiration;
 	}
 
 	/**
@@ -1335,7 +1346,7 @@ class Item
 			\IntlChar::BLOCK_CODE_BASIC_LATIN, \IntlChar::BLOCK_CODE_LATIN_1_SUPPLEMENT,
 			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_A, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_B,
 			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_C, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_D,
-			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_E, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_ADDITIONAL
+			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_E, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_ADDITIONAL,
 		]);
 	}
 
@@ -1363,4 +1374,61 @@ class Item
 		$used_languages = $this->l10n->t("Detected languages in this post:\n%s", $used_languages);
 		return $used_languages;
 	}
+
+	public function setViewed(int $uri_id, int $uid)
+	{
+		if (Post::exists(['thr-parent-id' => $uri_id, 'verb' => Activity::VIEW, 'uid' => $uid])) {
+			return;
+		}
+
+		$item = Post::selectFirst(['id'], ['uri-id' => $uri_id, 'gravity' => ItemModel::GRAVITY_PARENT, 'uid' => [0, $uid]], ['order' => ['uid' => true]]);
+		if (!DBA::isResult($item)) {
+			return;
+		}
+
+		$self = DBA::selectFirst('contact', ['id'], ['uid' => $uid, 'self' => true]);
+		if (!DBA::isResult($self)) {
+			return;
+		}
+
+		$this->logger->debug('Marking item as viewed.', ['uri-id' => $uri_id, 'uid' => $uid]);
+		ItemModel::performActivity($item['id'], 'view', $uid, '<' . $self['id'] . '>', '', '', '');
+	}
+
+	/**
+	 * Check if the summary is redundant to the body
+	 *
+	 * @param string $body
+	 * @param string $summary
+	 * @return boolean summary is redundant
+	 */
+	public function redundantSummary(?string $body, ?string $summary): bool
+	{
+		$normalize = function (string $text): string {
+			$text = mb_strtolower($text);
+			$text = str_replace(["\n", "\r", "\t"], ' ', $text);
+			$text = preg_replace('/\s+/', ' ', $text);
+			return trim($text);
+		};
+
+		$summary_norm = $normalize($summary ?? '');
+		if ($summary_norm === '') {
+			return false;
+		}
+
+		$body_norm = $normalize(BBCode::toPlaintext($body ?? '', false));
+
+		$len        = mb_strlen($summary_norm);
+		$body_start = mb_substr($body_norm, 0, $len);
+
+		$distance = levenshtein($body_start, $summary_norm);
+		$max_len  = max($len, mb_strlen($body_start));
+
+		if ($max_len == 0) {
+			return false;
+		}
+
+		return ($distance / $max_len) <= 0.1;
+	}
+
 }

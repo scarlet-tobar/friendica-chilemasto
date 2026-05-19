@@ -59,6 +59,13 @@
 	<h2>{{$channel_title}}</h2>
 	{{include file="field_select.tpl" field=$channel_languages}}
 
+	{{if $has_timeline_channels}}
+		{{include file="field_select.tpl" field=$timeline_channels}}
+	{{/if}}
+	{{if $has_filter_channels}}
+		{{include file="field_select.tpl" field=$filter_channels}}
+	{{/if}}
+
 	<h2>{{$calendar_title}}</h2>
 	{{include file="field_select.tpl" field=$first_day_of_week}}
 	{{include file="field_select.tpl" field=$calendar_default_view}}

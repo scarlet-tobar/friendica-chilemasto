@@ -21,7 +21,7 @@
 	{{if $tools.view}}
 		<a id="photo-edit-link" class="btn btn-primary photo-back-link" href="{{$tools.view.0}}">
 			<i class="page-action fa fa-mail-reply"></i>
-			 {{$back_to_viewing_text}}
+			 {{$back_text}}
 		</a>
 	{{/if}}
 	{{if $tools.edit}}
@@ -71,44 +71,9 @@
 		{{* The photo description *}}
 		<div id="photo-caption">{{$desc}}</div>
 
-		{{* Tags and mentions *}}
-		{{if $tags.tags}}
-		<div id="photo-tags">
-			<p><strong>{{$tags.title}}</strong></p>
-			{{foreach $tags.tags as $t}}
-			<span class="category label btn-success sm">
-				<span class="p-category">{{$t.name nofilter}}</span>
-				{{if $t.removeurl}} <a href="{{$t.removeurl}}">(X)</a> {{/if}}
-			</span>
-			{{/foreach}}
-		</div>
-		{{/if}}
-
-		{{if $tags.removeanyurl}}
-		<div id="tag-remove">
-			<a href="{{$tags.removeanyurl}}">{{$tags.removetitle}}</a>
-		</div>
-		{{/if}}
-
 		{{* The part for editing the photo - only available for the edit subpage *}}
 		{{if $edit}}{{$edit nofilter}}{{/if}}
 
-		{{if $likebuttons}}
-		<div id="photo-like-div">
-			{{$likebuttons nofilter}}
-			{{$like nofilter}}
-			{{$dislike nofilter}}
-		</div>
-		{{/if}}
 		<hr>
 	</div>
-
-{{if !$edit}}
-	{{* Insert the comments *}}
-	<div id="photo-comment-wrapper-{{$id}}" class="photo-comment-wrapper">
-		{{$comments nofilter}}
-	</div>
-
-	{{$paginate nofilter}}
-{{/if}}
 </div>

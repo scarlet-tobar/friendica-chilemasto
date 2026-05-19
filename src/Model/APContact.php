@@ -36,7 +36,7 @@ class APContact
 	private static function fetchWebfingerData(string $addr): array
 	{
 		$addr_parts = explode('@', $addr);
-		if (count($addr_parts) != 2) {
+		if (count($addr_parts) != 2 && !Network::isValidHttpUrl($addr)) {
 			return [];
 		}
 
@@ -54,12 +54,27 @@ class APContact
 			return $data;
 		}
 
-		$webfinger = Probe::getWebfingerArray($addr);
+		$webfinger = Probe::getWebfingerArray($addr, false);
 		if (empty($webfinger['webfinger']['links'])) {
 			return [];
 		}
 
-		$data['baseurl'] = $webfinger['baseurl'];
+		$data = [
+			'addr'    => '',
+			'baseurl' => $webfinger['baseurl'],
+			'url'     => '',
+		];
+
+		if (isset($webfinger['webfinger']['subject']) && !Network::isValidHttpUrl($webfinger['webfinger']['subject'])) {
+			$addr_parts = explode('@', $webfinger['webfinger']['subject']);
+			if (count($addr_parts) === 2) {
+				if (str_starts_with($webfinger['webfinger']['subject'], 'acct:')) {
+					$data['addr'] = str_replace('acct:', '', $webfinger['webfinger']['subject']);
+				} else {
+					$data['addr'] = $webfinger['webfinger']['subject'];
+				}
+			}
+		}
 
 		foreach ($webfinger['webfinger']['links'] as $link) {
 			if (empty($link['rel'])) {
@@ -90,7 +105,7 @@ class APContact
 	 * @return array profile array
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function getByURL(string $url, bool $update = null): array
+	public static function getByURL(string $url, ?bool $update = null): array
 	{
 		if (empty($url) || Network::isUrlBlocked($url)) {
 			DI::logger()->info('Domain is blocked', ['url' => $url]);
@@ -133,19 +148,18 @@ class APContact
 			}
 		}
 
-		$apcontact = [];
-
-		// Mastodon profile short-form URL https://domain.tld/@user doesn't return AP data when queried
-		// with HTTPSignature::fetchRaw, but returns the correct data when provided to WebFinger
-		// @see https://github.com/friendica/friendica/issues/13359
-		$webfinger = empty(parse_url($url, PHP_URL_SCHEME)) || strpos($url, '@') !== false;
-		if ($webfinger) {
-			$apcontact = self::fetchWebfingerData($url);
-			if (empty($apcontact['url'])) {
-				return $fetched_contact;
-			}
+		$apcontact = self::fetchWebfingerData($url);
+		if (!Network::isValidHttpUrl($url) && !isset($apcontact['url'])) {
+			return $fetched_contact;
+		} elseif (isset($apcontact['url'])) {
 			$url = $apcontact['url'];
-		} elseif (empty(parse_url($url, PHP_URL_PATH))) {
+		}
+
+		if (!isset($apcontact['addr'])) {
+			$apcontact['addr'] = '';
+		}
+
+		if (!isset($apcontact['baseurl']) && empty(parse_url($url, PHP_URL_PATH))) {
 			$apcontact['baseurl'] = $url;
 		}
 
@@ -168,7 +182,7 @@ class APContact
 			try {
 				$data        = Transmitter::getProfile($local_uid);
 				$local_owner = User::getOwnerDataById($local_uid);
-			} catch(HTTPException\NotFoundException $e) {
+			} catch (HTTPException\NotFoundException $e) {
 				$data = null;
 			}
 		}
@@ -178,8 +192,8 @@ class APContact
 
 			try {
 				$curlResult = HTTPSignature::fetchRaw($url);
-				$failed     = empty($curlResult->getBodyString()) ||
-					(!$curlResult->isSuccess() && ($curlResult->getReturnCode() != 410));
+				$failed     = empty($curlResult->getBodyString())
+					|| (!$curlResult->isSuccess() && ($curlResult->getReturnCode() != 410));
 
 				if (!$failed) {
 					$data   = json_decode($curlResult->getBodyString(), true);
@@ -207,15 +221,19 @@ class APContact
 			return $fetched_contact;
 		}
 
-		return self::compactProfile($apcontact, $compacted, $url, $fetched_contact, $webfinger, $local_owner);
+		return self::compactProfile($apcontact, $compacted, $url, $fetched_contact, $local_owner);
 	}
 
 	/**
 	 * @param array|bool $fetched_contact
 	 * @param array|bool $local_owner
 	 */
-	private static function compactProfile(array $apcontact, array $compacted, string $url, $fetched_contact, bool $webfinger, $local_owner): array
+	private static function compactProfile(array $apcontact, array $compacted, string $url, $fetched_contact, $local_owner): array
 	{
+		if ($url !== $compacted['@id']) {
+			$apcontact = array_merge($apcontact, self::fetchWebfingerData($compacted['@id']));
+		}
+
 		$apcontact['url']       = $compacted['@id'];
 		$apcontact['uuid']      = JsonLD::fetchElement($compacted, 'diaspora:guid', '@value');
 		$apcontact['type']      = str_replace('as:', '', JsonLD::fetchElement($compacted, '@type'));
@@ -290,6 +308,30 @@ class APContact
 			}
 		}
 
+		// There seem to be Mastodon versions where you can only use webfinger with the alias.
+		if (isset($apcontact['alias']) && (!isset($apcontact['addr']) || !isset($apcontact['baseurl']))) {
+			$apcontact = array_merge($apcontact, self::fetchWebfingerData($apcontact['alias']));
+		}
+
+		// If nothing is found yet, try to use the nick and the host of the profile URL to query the webfinger data.
+		if (empty($apcontact['addr']) || empty($apcontact['baseurl'])) {
+			try {
+				$apcontact = array_merge($apcontact, self::fetchWebfingerData($apcontact['nick'] . '@' . (new Uri($apcontact['url']))->getAuthority()));
+			} catch (\Throwable $e) {
+				DI::logger()->warning('Unable to coerce APContact URL into a UriInterface object', ['url' => $apcontact['url'], 'error' => $e->getMessage()]);
+			}
+		}
+
+		// The field "as:alsoKnownAs" is used by bird.gy and seems to be the only way to query the webfinger data.
+		$alsoKnownAs = JsonLD::fetchElement($compacted, 'as:alsoKnownAs', '@id');
+		if (isset($alsoKnownAs) && (empty($apcontact['addr']) || empty($apcontact['baseurl']))) {
+			try {
+				$apcontact = array_merge($apcontact, self::fetchWebfingerData($alsoKnownAs . '@' . (new Uri($apcontact['url']))->getAuthority()));
+			} catch (\Throwable $e) {
+				DI::logger()->warning('Unable to coerce APContact URL into a UriInterface object', ['url' => $apcontact['url'], 'error' => $e->getMessage()]);
+			}
+		}
+
 		// Quit if none of the basic values are set
 		if (empty($apcontact['url']) || empty($apcontact['type']) || (($apcontact['type'] != 'Tombstone') && empty($apcontact['inbox']))) {
 			return $fetched_contact;
@@ -304,17 +346,8 @@ class APContact
 			return $fetched_contact;
 		}
 
-		if (!empty($compacted['https://webfinger.net/#'])) {
+		if (!isset($apcontact['addr']) && !empty($compacted['https://webfinger.net/#'])) {
 			$apcontact['addr'] = JsonLD::fetchElement($compacted, 'https://webfinger.net/#');
-		}
-
-		if (empty($apcontact['addr']) && ($apcontact['type'] != 'Tombstone')) {
-			try {
-				$apcontact['addr'] = $apcontact['nick'] . '@' . (new Uri($apcontact['url']))->getAuthority();
-			} catch (\Throwable $e) {
-				DI::logger()->warning('Unable to coerce APContact URL into a UriInterface object', ['url' => $apcontact['url'], 'error' => $e->getMessage()]);
-				$apcontact['addr'] = '';
-			}
 		}
 
 		$apcontact['pubkey'] = null;
@@ -325,9 +358,9 @@ class APContact
 			}
 		}
 
-		$apcontact['manually-approve']   = (int)JsonLD::fetchElement($compacted, 'as:manuallyApprovesFollowers');
-		$apcontact['posting-restricted'] = (int)JsonLD::fetchElement($compacted, 'lemmy:postingRestrictedToMods');
-		$apcontact['suspended']          = (int)JsonLD::fetchElement($compacted, 'toot:suspended');
+		$apcontact['manually-approve']   = (int) JsonLD::fetchElement($compacted, 'as:manuallyApprovesFollowers');
+		$apcontact['posting-restricted'] = (int) JsonLD::fetchElement($compacted, 'lemmy:postingRestrictedToMods');
+		$apcontact['suspended']          = (int) JsonLD::fetchElement($compacted, 'toot:suspended');
 
 		if (!empty($compacted['as:generator'])) {
 			$apcontact['baseurl']   = JsonLD::fetchElement($compacted['as:generator'], 'as:url', '@id');
@@ -401,31 +434,15 @@ class APContact
 		if (strlen($apcontact['photo'] ?? '') > 383) {
 			$parts = parse_url($apcontact['photo']);
 			unset($parts['fragment']);
-			$apcontact['photo'] = (string)Uri::fromParts((array)$parts);
+			$apcontact['photo'] = (string) Uri::fromParts((array) $parts);
 
 			if (strlen($apcontact['photo']) > 383) {
 				unset($parts['query']);
-				$apcontact['photo'] = (string)Uri::fromParts((array)$parts);
+				$apcontact['photo'] = (string) Uri::fromParts((array) $parts);
 			}
 
 			if (strlen($apcontact['photo']) > 383) {
 				$apcontact['photo'] = substr($apcontact['photo'], 0, 383);
-			}
-		}
-
-		if (!$webfinger && !empty($apcontact['addr'])) {
-			$data = self::fetchWebfingerData($apcontact['addr']);
-			if (!empty($data)) {
-				$apcontact['baseurl'] = $data['baseurl'];
-
-				if (empty($apcontact['alias']) && !empty($data['alias'])) {
-					$apcontact['alias'] = $data['alias'];
-				}
-				if (!empty($data['subscribe'])) {
-					$apcontact['subscribe'] = $data['subscribe'];
-				}
-			} else {
-				$apcontact['addr'] = null;
 			}
 		}
 

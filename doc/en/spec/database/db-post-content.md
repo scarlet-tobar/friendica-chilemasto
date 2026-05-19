@@ -11,7 +11,7 @@ Content for all posts
 | content-warning |                                                                                                                           | varchar(500)   | NO   |     |         |       |
 | body            | item body content                                                                                                         | mediumtext     | YES  |     | NULL    |       |
 | raw-body        | Body without embedded media links                                                                                         | mediumtext     | YES  |     | NULL    |       |
-| quote-uri-id    | Id of the item-uri table that contains the quoted uri                                                                     | int unsigned   | YES  |     | NULL    |       |
+| quote-uri-id    | Deprecated. It is replaced by the field quote-uri-id in the table post-quote                                              | int unsigned   | YES  |     | NULL    |       |
 | location        | text location where this item originated                                                                                  | varchar(255)   | NO   |     |         |       |
 | coord           | longitude/latitude pair representing location where this item originated                                                  | varchar(255)   | NO   |     |         |       |
 | language        | Language information about this post                                                                                      | text           | YES  |     | NULL    |       |
@@ -40,6 +40,5 @@ Content for all posts
 | Field | Target Table | Target Field |
 |-------|--------------|--------------|
 | uri-id | [item-uri](help/spec/database/db-item-uri) | id |
-| quote-uri-id | [item-uri](help/spec/database/db-item-uri) | id |
 
 Return to [database documentation](help/spec/database/index)

@@ -38,19 +38,20 @@ use Friendica\Util\HTTPSignature;
 use Friendica\Util\JsonLD;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
+use Friendica\Worker\FetchMissingActivity;
 
 /**
  * ActivityPub Processor Protocol class
  */
 class Processor
 {
-	const CACHEKEY_FETCH_ACTIVITY = 'processor:fetchMissingActivity:';
-	const CACHEKEY_JUST_FETCHED   = 'processor:isJustFetched:';
+	public const CACHEKEY_FETCH_ACTIVITY = 'processor:fetchMissingActivity:';
+	public const CACHEKEY_JUST_FETCHED   = 'processor:isJustFetched:';
 
-	const FETCH_REPLIES_ALL         = 0;
-	const FETCH_REPLIES_NONE        = 1;
-	const FETCH_REPLIES_FOLLOWED    = 2;
-	const FETCH_REPLIES_INTERACTION = 3;
+	public const FETCH_REPLIES_ALL         = 0;
+	public const FETCH_REPLIES_NONE        = 1;
+	public const FETCH_REPLIES_FOLLOWED    = 2;
+	public const FETCH_REPLIES_INTERACTION = 3;
 
 	/**
 	 * Add an object id to the list of processed ids
@@ -127,8 +128,8 @@ class Processor
 				array_column($emojis, 'name'),
 				array_map(function ($emoji) {
 					return '[emoji=' . $emoji['href'] . ']' . $emoji['name'] . '[/emoji]';
-				}, $emojis)
-			)
+				}, $emojis),
+			),
 		);
 
 		// We store the emoji here to be able to avoid storing it in the media
@@ -229,7 +230,7 @@ class Processor
 	 */
 	public static function updateItem(array $activity)
 	{
-		$item = Post::selectFirst(['uri', 'uri-id', 'guid', 'thr-parent', 'gravity', 'post-type', 'private'], ['uri' => $activity['id']]);
+		$item = Post::selectFirst(['uri', 'uri-id', 'guid', 'thr-parent', 'gravity', 'post-type', 'private', 'author-id', 'owner-id', 'author-link', 'owner-link', 'parent-uri-id', 'thr-parent-id', 'replies'], ['uri' => $activity['id']]);
 		if (!DBA::isResult($item)) {
 			DI::logger()->notice('No existing item, item will be created', ['uri' => $activity['id']]);
 			$item = self::createItem($activity, false);
@@ -900,7 +901,7 @@ class Processor
 	 */
 	public static function createEvent(array $activity, array $item): int
 	{
-		$event['summary'] = HTML::toBBCode($activity['name'] ?: $activity['summary']);
+		$event['summary'] = HTML::toBBCode($activity['name'] ?: $activity['summary'] ?? '');
 		$event['desc']    = HTML::toBBCode($activity['content'] ?? '');
 		if (!empty($activity['start-time'])) {
 			$event['start'] = DateTimeFormat::utc($activity['start-time']);
@@ -972,19 +973,25 @@ class Processor
 		$content = self::addMentionLinks($content, $activity['tags']);
 
 		if (!empty($activity['quote-url'])) {
-			$id = Item::fetchByLink($activity['quote-url'], 0, ActivityPub\Receiver::COMPLETION_ASYNC);
+			$id = Item::searchByLink($activity['quote-url']);
 			if ($id) {
 				$shared_item          = Post::selectFirst(['uri-id'], ['id' => $id]);
 				$item['quote-uri-id'] = $shared_item['uri-id'];
-				DI::logger()->debug('Quote is found', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $item['quote-uri-id']]);
-			} elseif ($uri_id = ItemURI::getIdByURI($activity['quote-url'], false)) {
-				DI::logger()->info('Quote was not fetched but the uri-id existed', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $uri_id]);
-				$item['quote-uri-id'] = $uri_id;
+				DI::logger()->debug('Quoted post exists', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $item['quote-uri-id']]);
 			} elseif (Queue::exists($activity['quote-url'], 'as:Create')) {
 				$item['quote-uri-id'] = ItemURI::getIdByURI($activity['quote-url']);
-				DI::logger()->info('Quote is queued but not processed yet', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $item['quote-uri-id']]);
+				DI::logger()->info('Quoted post is queued but not processed yet', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $item['quote-uri-id']]);
+			} elseif (Fetch::hasWorker($activity['quote-url'])) {
+				$item['quote-uri-id'] = ItemURI::getIdByURI($activity['quote-url']);
+				DI::logger()->info('Quoted post will be fetched via a worker.', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $item['quote-uri-id']]);
+			} elseif ($uri_id = ItemURI::getIdByURI($activity['quote-url'], false)) {
+				DI::logger()->info('Quoted post was not fetched but the uri-id exists', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $uri_id]);
+				$item['quote-uri-id'] = $uri_id;
+				FetchMissingActivity::add(Worker::PRIORITY_HIGH, $activity['quote-url'], [], '', Receiver::COMPLETION_ASYNC);
 			} else {
-				DI::logger()->notice('Quote was not fetched', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url']]);
+				$item['quote-uri-id'] = ItemURI::getIdByURI($activity['quote-url']);
+				DI::logger()->notice('Quoted post was not fetched by now, a worker will be raised to fetch it.', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url']]);
+				FetchMissingActivity::add(Worker::PRIORITY_HIGH, $activity['quote-url'], [], '', Receiver::COMPLETION_ASYNC);
 			}
 		}
 
@@ -1088,6 +1095,11 @@ class Processor
 	 */
 	private static function isSolicitedMessage(array $activity, array $item): bool
 	{
+		if (Post\Quote::existsQuote($item['uri-id'])) {
+			DI::logger()->debug('Message is used in a quote - accepted', ['uri-id' => $item['uri-id'], 'guid' => $item['guid'], 'url' => $item['uri']]);
+			return true;
+		}
+
 		// The checks are split to improve the support when searching why a message was accepted.
 		if (count($activity['receiver']) != 1) {
 			// The message has more than one receiver, so it is wanted.
@@ -1246,7 +1258,7 @@ class Processor
 						&& in_array($activity['thread-children-type'] ?? '', Receiver::ACTIVITY_TYPES)) {
 						DI::logger()->info(
 							'Top level post from thread completion from a non sharer had been initiated via an activity, ignoring',
-							['type' => $activity['thread-children-type'], 'user' => $item['uid'], 'causer' => $item['causer-link'], 'author' => $activity['author'], 'url' => $item['uri']]
+							['type' => $activity['thread-children-type'], 'user' => $item['uid'], 'causer' => $item['causer-link'], 'author' => $activity['author'], 'url' => $item['uri']],
 						);
 						continue;
 					}
@@ -1368,7 +1380,7 @@ class Processor
 				$has_parents = true;
 			} elseif ($add_parent && Post::exists(['uri-id' => $item['parent-uri-id'], 'uid' => 0])) {
 				$stored      = Item::storeForUserByUriId($item['parent-uri-id'], $receiver, $fields);
-				$has_parents = (bool)$stored;
+				$has_parents = (bool) $stored;
 				if ($stored) {
 					DI::logger()->notice('Inserted missing parent post', ['stored' => $stored, 'uid' => $receiver, 'parent' => $item['parent-uri']]);
 				} else {
@@ -1387,7 +1399,7 @@ class Processor
 				$has_parents = true;
 			} elseif (($has_parents || $add_parent) && Post::exists(['uri-id' => $item['thr-parent-id'], 'uid' => 0])) {
 				$stored      = Item::storeForUserByUriId($item['thr-parent-id'], $receiver, $fields);
-				$has_parents = $has_parents || (bool)$stored;
+				$has_parents = $has_parents || (bool) $stored;
 				if ($stored) {
 					DI::logger()->notice('Inserted missing thread parent post', ['stored' => $stored, 'uid' => $receiver, 'thread-parent' => $item['thr-parent']]);
 				} else {
@@ -1966,7 +1978,7 @@ class Processor
 			if (is_array($reply)) {
 				$ldobject = JsonLD::compact($reply);
 				$id       = JsonLD::fetchElement($ldobject, '@id');
-				if (Processor::alreadyKnown($id, $child['id'] ?? '')) {
+				if (is_null($id) || self::alreadyKnown($id, $child['id'] ?? '')) {
 					continue;
 				}
 				if (!empty($child['children']) && in_array($id, $child['children'])) {

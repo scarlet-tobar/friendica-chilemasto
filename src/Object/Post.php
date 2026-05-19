@@ -23,7 +23,6 @@ use Friendica\Protocol\Activity;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
-use Friendica\Util\Temporal;
 use GuzzleHttp\Psr7\Uri;
 use InvalidArgumentException;
 
@@ -36,7 +35,7 @@ class Post
 	private $template            = null;
 	private $available_templates = [
 		'wall'      => 'wall_thread.tpl',
-		'wall2wall' => 'wallwall_thread.tpl'
+		'wall2wall' => 'wallwall_thread.tpl',
 	];
 	private $comment_box_template = 'comment_item.tpl';
 	private $toplevel             = false;
@@ -80,7 +79,7 @@ class Post
 			'id'      => $this->getDataValue('author-id'),
 			'network' => $this->getDataValue('author-network'),
 			'url'     => $this->getDataValue('author-link'),
-			'alias'   => $this->getDataValue('author-alias')
+			'alias'   => $this->getDataValue('author-alias'),
 		];
 		$this->redirect_url = Contact::magicLinkByContact($author);
 		if (!$this->isToplevel()) {
@@ -165,8 +164,8 @@ class Post
 		if (strtotime($item['edited']) - strtotime($item['created']) > 1) {
 			$edited = [
 				'label'    => DI::l10n()->t('This entry was edited'),
-				'date'     => DateTimeFormat::local($item['edited'], 'r'),
-				'relative' => Temporal::getRelativeDate($item['edited']),
+				'date'     => DI::l10n()->fullDateTime($item['edited']),
+				'relative' => DI::l10n()->relativeDateTime($item['edited']),
 			];
 		}
 		$sparkle = '';
@@ -195,7 +194,7 @@ class Post
 		$connector = !in_array($item['network'], Protocol::NATIVE_SUPPORT) && ($item['protocol'] != Conversation::PARCEL_JETSTREAM) ? DI::l10n()->t('Connector Message') : false;
 
 		$shareable    = in_array($conv->getProfileOwner(), [0, DI::userSession()->getLocalUserId()]) && $item['private'] != Item::PRIVATE;
-		$announceable = $shareable && in_array($item['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, Protocol::TWITTER, Protocol::TUMBLR, Protocol::BLUESKY]);
+		$announceable = $shareable && in_array($item['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, Protocol::TWITTER, Protocol::TUMBLR, Protocol::ATPROTO]);
 		$commentable  = ($item['network'] != Protocol::TUMBLR);
 		$likeable     = true;
 
@@ -223,6 +222,10 @@ class Post
 		$edpost = false;
 
 		if (DI::userSession()->getLocalUserId()) {
+			if ($commentable && Contact\User::isIsBlocked($item['author-id'], DI::userSession()->getLocalUserId())) {
+				$commentable = false;
+			}
+
 			if (Strings::compareLink(DI::session()->get('my_url'), $item['author-link'])) {
 				if ($item['event-id'] != 0) {
 					$edpost = ['calendar/event/edit/' . $item['event-id'], DI::l10n()->t('Edit')];
@@ -458,7 +461,7 @@ class Post
 
 		$body_html = Item::prepareBody($item, true);
 
-		list($categories, $folders) = DI::contentItem()->determineCategoriesTerms($item, DI::userSession()->getLocalUserId());
+		[$categories, $folders] = DI::contentItem()->determineCategoriesTerms($item, DI::userSession()->getLocalUserId());
 
 		$hide_dislike = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'hide_dislike');
 		if ($hide_dislike) {
@@ -481,8 +484,8 @@ class Post
 
 		$tags = Tag::populateFromItem($item);
 
-		$ago          = Temporal::getRelativeDate($item['created']);
-		$ago_received = Temporal::getRelativeDate($item['received']);
+		$ago          = DI::l10n()->relativeDateTime($item['created']);
+		$ago_received = DI::l10n()->relativeDateTime($item['received']);
 		if (DI::config()->get('system', 'show_received') && (abs(strtotime($item['created']) - strtotime($item['received'])) > DI::config()->get('system', 'show_received_seconds')) && ($ago != $ago_received)) {
 			$ago = DI::l10n()->t('%s (Received %s)', $ago, $ago_received);
 		}
@@ -491,7 +494,7 @@ class Post
 		if (!DI::userSession()->getLocalUserId() && ($item['network'] != Protocol::DIASPORA) && !empty(DI::session()->get('remote_comment'))) {
 			$remote_comment = [
 				DI::l10n()->t('Comment this item on your system'), DI::l10n()->t('Remote comment'),
-				str_replace('{uri}', urlencode($item['uri']), DI::session()->get('remote_comment'))
+				str_replace('{uri}', urlencode($item['uri']), DI::session()->get('remote_comment')),
 			];
 
 			// Ensure to either display the remote comment or the local activities
@@ -522,6 +525,10 @@ class Post
 		$parent_guid     = $thread_parent[$item['thr-parent-id']]['guid'] ?? '';
 		$parent_username = $thread_parent[$item['thr-parent-id']]['name'] ?? '';
 		$parent_unknown  = $parent_username ? '' : DI::l10n()->t('Unknown parent');
+
+		if (DI::contentItem()->redundantSummary($item['body'], $item['content-warning'])) {
+			$item['content-warning'] = '';
+		}
 
 		$tmp_item = [
 			'parentguid'             => $parent_guid,
@@ -563,7 +570,7 @@ class Post
 			'sparkle'                => $sparkle,
 			'title'                  => $item['title'],
 			'summary'                => $item['content-warning'],
-			'localtime'              => DateTimeFormat::local($item['created'], 'r'),
+			'localtime'              => DI::l10n()->fullDateTime($item['created']),
 			'utc'                    => DateTimeFormat::utc($item['created']),
 			'ago'                    => $item['app'] ? DI::l10n()->t('%s from %s', $ago, $item['app']) : $ago,
 			'app'                    => $item['app'],
@@ -811,8 +818,8 @@ class Post
 			DI::logger()->warning('Post object does not belong to local user', ['post' => $item, 'local_user' => DI::userSession()->getLocalUserId()]);
 			return false;
 		} elseif (
-			DI::activity()->match($item->getDataValue('verb'), Activity::LIKE) ||
-			DI::activity()->match($item->getDataValue('verb'), Activity::DISLIKE)
+			DI::activity()->match($item->getDataValue('verb'), Activity::LIKE)
+			|| DI::activity()->match($item->getDataValue('verb'), Activity::DISLIKE)
 		) {
 			DI::logger()->warning('Post objects is a like/dislike', ['post' => $item]);
 			return false;
@@ -1096,8 +1103,8 @@ class Post
 
 			$profile = Contact::getByURL($term['url'], false, ['addr', 'contact-type']);
 			if (
-				!empty($profile['addr']) && (($profile['contact-type'] ?? Contact::TYPE_UNKNOWN) != Contact::TYPE_COMMUNITY) &&
-				($profile['addr'] != $owner['addr']) && !strstr($text, $profile['addr'])
+				!empty($profile['addr']) && (($profile['contact-type'] ?? Contact::TYPE_UNKNOWN) != Contact::TYPE_COMMUNITY)
+				&& ($profile['addr'] != $owner['addr']) && !strstr($text, (string) $profile['addr'])
 			) {
 				$text .= '@' . $profile['addr'] . ' ';
 			}
@@ -1160,7 +1167,7 @@ class Post
 				'$mytitle'     => DI::l10n()->t('This is you'),
 				'$myphoto'     => DI::baseUrl()->remove($owner['thumb'] ?? ''),
 				'$comment'     => DI::l10n()->t('Comment'),
-				'$submit'      => DI::l10n()->t('Submit'),
+				'$submit'      => DI::l10n()->t('Post comment'),
 				'$loading'     => DI::l10n()->t('Loading...'),
 				'$edbold'      => DI::l10n()->t('Bold'),
 				'$editalic'    => DI::l10n()->t('Italic'),
@@ -1175,7 +1182,7 @@ class Post
 				'$prompttext'  => DI::l10n()->t('Please enter a image/video/audio/webpage URL:'),
 				'$preview'     => DI::l10n()->t('Preview'),
 				'$indent'      => $indent,
-				'$rand_num'    => Crypto::randomDigits(12)
+				'$rand_num'    => Crypto::randomDigits(12),
 			]);
 		}
 

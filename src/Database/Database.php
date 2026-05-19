@@ -31,14 +31,14 @@ use Psr\Log\NullLogger;
  */
 class Database
 {
-	const PDO    = 'pdo';
-	const MYSQLI = 'mysqli';
+	public const PDO    = 'pdo';
+	public const MYSQLI = 'mysqli';
 
-	const INSERT_DEFAULT = 0;
-	const INSERT_UPDATE  = 1;
-	const INSERT_IGNORE  = 2;
+	public const INSERT_DEFAULT = 0;
+	public const INSERT_UPDATE  = 1;
+	public const INSERT_IGNORE  = 2;
 
-	const LOCK_OPTIMIZE = 'database::optimize_tables';
+	public const LOCK_OPTIMIZE = 'database::optimize_tables';
 
 	protected $connected = false;
 
@@ -145,9 +145,9 @@ class Database
 			return false;
 		}
 
-		$persistent = (bool)$this->config->get('database', 'persistent');
+		$persistent = (bool) $this->config->get('database', 'persistent');
 
-		$this->pdo_emulate_prepares = (bool)$this->config->get('database', 'pdo_emulate_prepares');
+		$this->pdo_emulate_prepares = (bool) $this->config->get('database', 'pdo_emulate_prepares');
 
 		if (!$this->config->get('database', 'disable_pdo') && class_exists('\PDO') && in_array('mysql', PDO::getAvailableDrivers())) {
 			$this->driver = self::PDO;
@@ -340,8 +340,8 @@ class Database
 
 		while ($row = $this->fetch($r)) {
 			if ((intval($this->config->get('system', 'db_loglimit_index')) > 0)) {
-				$log = (in_array($row['key'], $watchlist) &&
-					($row['rows'] >= intval($this->config->get('system', 'db_loglimit_index'))));
+				$log = (in_array($row['key'], $watchlist)
+					&& ($row['rows'] >= intval($this->config->get('system', 'db_loglimit_index'))));
 			} else {
 				$log = false;
 			}
@@ -358,12 +358,12 @@ class Database
 				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 				@file_put_contents(
 					$this->config->get('system', 'db_log_index'),
-					DateTimeFormat::utcNow() . "\t" .
-					$row['key'] . "\t" . $row['rows'] . "\t" . $row['Extra'] . "\t" .
-					basename($backtrace[1]["file"]) . "\t" .
-					$backtrace[1]["line"] . "\t" . $backtrace[2]["function"] . "\t" .
-					substr($query, 0, 4000) . "\n",
-					FILE_APPEND
+					DateTimeFormat::utcNow() . "\t"
+					. $row['key'] . "\t" . $row['rows'] . "\t" . $row['Extra'] . "\t"
+					. basename($backtrace[1]["file"]) . "\t"
+					. $backtrace[1]["line"] . "\t" . $backtrace[2]["function"] . "\t"
+					. substr($query, 0, 4000) . "\n",
+					FILE_APPEND,
 				);
 			}
 		}
@@ -491,7 +491,7 @@ class Database
 		foreach ($params as $param) {
 			// Avoid problems with some MySQL servers and boolean values. See issue #3645
 			if (is_bool($param)) {
-				$param = (int)$param;
+				$param = (int) $param;
 			}
 			$args[++$i] = $param;
 		}
@@ -542,8 +542,8 @@ class Database
 				if (count($args) == 0) {
 					if (!$retval = $this->connection->query($this->replaceParameters($sql, $args))) {
 						$errorInfo     = $this->connection->errorInfo();
-						$this->error   = (string)$errorInfo[2];
-						$this->errorno = (int)$errorInfo[1];
+						$this->error   = (string) $errorInfo[2];
+						$this->errorno = (int) $errorInfo[1];
 						$retval        = false;
 						$is_error      = true;
 						break;
@@ -557,8 +557,8 @@ class Database
 
 				if (!$stmt) {
 					$errorInfo     = $this->connection->errorInfo();
-					$this->error   = (string)$errorInfo[2];
-					$this->errorno = (int)$errorInfo[1];
+					$this->error   = (string) $errorInfo[2];
+					$this->errorno = (int) $errorInfo[1];
 					$retval        = false;
 					$is_error      = true;
 					break;
@@ -569,7 +569,7 @@ class Database
 					if (is_int($args[$param])) {
 						$data_type = PDO::PARAM_INT;
 					} elseif ($args[$param] !== null) {
-						$args[$param] = (string)$args[$param];
+						$args[$param] = (string) $args[$param];
 					}
 
 					$stmt->bindParam($param, $args[$param], $data_type);
@@ -577,8 +577,8 @@ class Database
 
 				if (!$stmt->execute()) {
 					$errorInfo     = $stmt->errorInfo();
-					$this->error   = (string)$errorInfo[2];
-					$this->errorno = (int)$errorInfo[1];
+					$this->error   = (string) $errorInfo[2];
+					$this->errorno = (int) $errorInfo[1];
 					$retval        = false;
 					$is_error      = true;
 				} else {
@@ -596,8 +596,8 @@ class Database
 				if (!$can_be_prepared || (count($args) == 0)) {
 					$retval = $this->connection->query($this->replaceParameters($sql, $args));
 					if ($this->connection->errno) {
-						$this->error   = (string)$this->connection->error;
-						$this->errorno = (int)$this->connection->errno;
+						$this->error   = (string) $this->connection->error;
+						$this->errorno = (int) $this->connection->errno;
 						$retval        = false;
 						$is_error      = true;
 					} else {
@@ -613,8 +613,8 @@ class Database
 				$stmt = $this->connection->stmt_init();
 
 				if (!$stmt->prepare($sql)) {
-					$this->error   = (string)$stmt->error;
-					$this->errorno = (int)$stmt->errno;
+					$this->error   = (string) $stmt->error;
+					$this->errorno = (int) $stmt->errno;
 					$retval        = false;
 					$is_error      = true;
 					break;
@@ -631,7 +631,7 @@ class Database
 						$param_types .= 's';
 					} elseif (is_object($args[$param]) && method_exists($args[$param], '__toString')) {
 						$param_types .= 's';
-						$args[$param] = (string)$args[$param];
+						$args[$param] = (string) $args[$param];
 					} else {
 						$param_types .= 'b';
 					}
@@ -644,8 +644,8 @@ class Database
 				}
 
 				if (!$stmt->execute()) {
-					$this->error   = (string)$this->connection->error;
-					$this->errorno = (int)$this->connection->errno;
+					$this->error   = (string) $this->connection->error;
+					$this->errorno = (int) $this->connection->errno;
 					$retval        = false;
 					$is_error      = true;
 				} else {
@@ -711,15 +711,15 @@ class Database
 				}
 			}
 
-			$this->error   = (string)$error;
-			$this->errorno = (int)$errorno;
+			$this->error   = (string) $error;
+			$this->errorno = (int) $errorno;
 		}
 
 		$this->profiler->stopRecording();
 
 		if ($this->config->get('system', 'db_log')) {
 			$stamp2   = microtime(true);
-			$duration = (float)($stamp2 - $stamp1);
+			$duration = (float) ($stamp2 - $stamp1);
 
 			if (($duration > $this->config->get('system', 'db_loglimit'))) {
 				$duration  = round($duration, 3);
@@ -727,11 +727,11 @@ class Database
 
 				@file_put_contents(
 					$this->config->get('system', 'db_log'),
-					DateTimeFormat::utcNow() . "\t" . $duration . "\t" .
-					basename($backtrace[0]['file']) . "\t" .
-					$backtrace[0]['line'] . "\t" . $backtrace[0]['function'] . "\t" .
-					substr($this->replaceParameters($sql, $args), 0, 4000) . "\n",
-					FILE_APPEND
+					DateTimeFormat::utcNow() . "\t" . $duration . "\t"
+					. basename($backtrace[0]['file']) . "\t"
+					. $backtrace[0]['line'] . "\t" . $backtrace[0]['function'] . "\t"
+					. substr($this->replaceParameters($sql, $args), 0, 4000) . "\n",
+					FILE_APPEND,
 				);
 			}
 		}
@@ -801,6 +801,8 @@ class Database
 
 			$this->error   = $error;
 			$this->errorno = $errorno;
+		} elseif (!$retval) {
+			$this->logger->warning('Database execution was unsuccessful', ['sql' => $this->replaceParameters($sql, $params), 'timeout' => $timeout]);
 		}
 
 		$this->profiler->stopRecording();
@@ -829,9 +831,7 @@ class Database
 		if (empty($condition)) {
 			return DBStructure::existsTable($table);
 		}
-
-		reset($condition);
-		$first_key = key($condition);
+		$first_key = array_key_first($condition);
 		if (!is_int($first_key)) {
 			$fields = [$first_key];
 		}
@@ -1039,6 +1039,74 @@ class Database
 			return $result;
 		}
 
+		if ($this->affectedRows() === 0) {
+			$this->logger->info('affectedRows is 0.', ['table' => $table, 'fields' => $param, 'sql' => $this->replaceParameters($sql, $param)]);
+		}
+
+		return $this->affectedRows() != 0;
+	}
+
+	/**
+	 * Insert multiple rows into a table.
+	 *
+	 * @param string $table          Table name in format [schema.]table
+	 * @param array  $rows           Array of parameter arrays
+	 * @param int    $duplicate_mode What to do on a duplicated entry
+	 *
+	 * @return boolean was the insert successful?
+	 * @throws \Exception
+	 */
+	public function batchInsert(string $table, array $rows, int $duplicate_mode = self::INSERT_DEFAULT): bool
+	{
+		if (empty($table) || empty($rows)) {
+			$this->logger->info('Table and rows have to be set');
+			return false;
+		}
+
+		$first_row = reset($rows);
+		$fields    = array_keys($first_row);
+
+		if (empty($fields)) {
+			$this->logger->info('Fields have to be set');
+			return false;
+		}
+
+		$fields_string = implode(', ', array_map([DBA::class, 'quoteIdentifier'], $fields));
+		$table_string  = DBA::buildTableString([$table]);
+
+		$values_list = [];
+		$all_values  = [];
+
+		foreach ($rows as $row) {
+			$row = $this->castFields($table, $row);
+
+			$placeholders  = array_fill(0, count($fields), '?');
+			$values_list[] = '(' . implode(', ', $placeholders) . ')';
+
+			foreach ($fields as $field) {
+				$all_values[] = $row[$field] ?? null;
+			}
+		}
+
+		$values_string = implode(', ', $values_list);
+
+		$sql = "INSERT ";
+
+		if ($duplicate_mode == self::INSERT_IGNORE) {
+			$sql .= "IGNORE ";
+		}
+
+		$sql .= "INTO " . $table_string . " (" . $fields_string . ") VALUES " . $values_string;
+
+		$result = $this->e($sql, $all_values);
+		if (!$result || ($duplicate_mode != self::INSERT_IGNORE)) {
+			return $result;
+		}
+
+		if ($this->affectedRows() === 0) {
+			$this->logger->info('affectedRows is 0.', ['table' => $table, 'rows' => count($rows), 'sql' => $this->replaceParameters($sql, $all_values)]);
+		}
+
 		return $this->affectedRows() != 0;
 	}
 
@@ -1088,7 +1156,7 @@ class Database
 				$id = $this->connection->insert_id;
 				break;
 		}
-		return (int)$id;
+		return (int) $id;
 	}
 
 	/**
@@ -1482,6 +1550,19 @@ class Database
 			return false;
 		}
 
+		$sql = $this->getSQL($table, $fields, $condition, $params);
+		DBA::buildCondition($condition);
+		$result = $this->p($sql, $condition);
+
+		if ($this->driver == self::PDO && !empty($result)) {
+			$this->currentTable = $table;
+		}
+
+		return $result;
+	}
+
+	public function getSQL(string $table, array $fields = [], array $condition = [], array $params = []): string
+	{
 		if (count($fields) > 0) {
 			$fields        = $this->escapeFields($fields, $params);
 			$select_string = implode(', ', $fields);
@@ -1495,15 +1576,7 @@ class Database
 
 		$param_string = DBA::buildParameter($params);
 
-		$sql = "SELECT " . $select_string . " FROM " . $table_string . $condition_string . $param_string;
-
-		$result = $this->p($sql, $condition);
-
-		if ($this->driver == self::PDO && !empty($result)) {
-			$this->currentTable = $table;
-		}
-
-		return $result;
+		return "SELECT " . $select_string . " FROM " . $table_string . $condition_string . $param_string;
 	}
 
 	/**
@@ -1551,7 +1624,7 @@ class Database
 			$this->logger->notice('Invalid count.', ['table' => $table, 'row' => $row, 'expression' => $expression, 'condition' => $condition_string, 'callstack' => System::callstack()]);
 			return 0;
 		} else {
-			return (int)$row['count'];
+			return (int) $row['count'];
 		}
 	}
 
@@ -1638,13 +1711,13 @@ class Database
 				continue;
 			}
 
-			if ((substr($types[$field], 0, 7) == 'tinyint') || (substr($types[$field], 0, 8) == 'smallint') ||
-				(substr($types[$field], 0, 9) == 'mediumint') || (substr($types[$field], 0, 3) == 'int') ||
-				(substr($types[$field], 0, 6) == 'bigint') || (substr($types[$field], 0, 7) == 'boolean')) {
-				$fields[$field] = (int)$content;
+			if ((substr($types[$field], 0, 7) == 'tinyint') || (substr($types[$field], 0, 8) == 'smallint')
+				|| (substr($types[$field], 0, 9) == 'mediumint') || (substr($types[$field], 0, 3) == 'int')
+				|| (substr($types[$field], 0, 6) == 'bigint') || (substr($types[$field], 0, 7) == 'boolean')) {
+				$fields[$field] = (int) $content;
 			}
 			if ((substr($types[$field], 0, 5) == 'float') || (substr($types[$field], 0, 6) == 'double')) {
-				$fields[$field] = (float)$content;
+				$fields[$field] = (float) $content;
 			}
 		}
 
@@ -1884,7 +1957,7 @@ class Database
 		if (is_bool($value)) {
 			$value = ($value ? 'true' : 'false');
 		} elseif (is_float($value) || is_integer($value)) {
-			$value = (string)$value;
+			$value = (string) $value;
 		} else {
 			$value = "'" . $this->escape($value) . "'";
 		}

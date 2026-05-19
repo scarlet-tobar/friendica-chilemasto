@@ -23,6 +23,14 @@
 
 	{{if $account_type}}<div class="account-type">{{$account_type}}</div>{{/if}}
 	{{if $profile.network_link}}<dl class="network"><dt class="network-label">{{$network}}</dt><dd class="x-network">{{$profile.network_link nofilter}}</dd></dl>{{/if}}
+	{{if $is_owner }}
+		<div class="edit-profile-link-wrapper">
+			<a class="btn btn-primary edit-profile-link" href="{{$edit_profile_link.url}}">
+				<i class="fa fa-pencil" aria-hidden="true"></i>
+				{{$edit_profile_link.text}}
+			</a>
+		</div>
+	{{/if}}
 	{{if $location}}
 		<dl class="location" dir="auto">
 			<dt class="location-label">{{$location}}</dt>
@@ -31,6 +39,13 @@
 				{{if $profile.location}}<p class="p-location">{{$profile.location}}</p>{{/if}}
 			</dd>
 		</dl>
+	{{/if}}
+
+	{{if $member_since}}
+			<p class="member-since">
+				<strong>{{$member_since.0}}</strong>
+				<span>{{$member_since.1}}</span>
+			</p>
 	{{/if}}
 
 	{{if $profile.xmpp}}

@@ -5,10 +5,11 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 <div class="vcard h-card widget">
+
 	<div id="profile-photo-wrapper">
 		<a class="vcard-anchor" href="{{$picture_dest_url}}" style="position: relative;">
 			<img class="photo u-photo" src="{{$profile.photo}}" alt="{{$profile.name}}" />
-			{{if $change_profile_picture_text }}
+			{{if $is_owner }}
 				<div id="change-profile-picture">{{$change_profile_picture_text}}</div>
 			{{/if}}
 		</a>
@@ -32,7 +33,14 @@
 		<div class="profile-header">
 			<h3 class="fn p-name" dir="auto">{{$profile.name}}</h3>
 
-			{{if $profile.addr}}<div class="p-addr">{{include file="sub/punct_wrap.tpl" text=$profile.addr}}</div>
+			{{if $profile.addr}}<div class="p-addr">{{include file="sub/punct_wrap.tpl" text=$profile.addr}}</div>{{/if}}
+			{{if $is_owner }}
+				<div class="edit-profile-link-wrapper">
+					<a class="btn btn-primary" href="{{$edit_profile_link.url}}">
+						<i class="fa fa-pencil" aria-hidden="true"></i>
+						{{$edit_profile_link.text}}
+					</a>
+				</div>
 			{{/if}}
 
 			{{if $profile.about}}<div class="title" dir="auto">{{$profile.about nofilter}}</div>{{/if}}
@@ -131,6 +139,13 @@
 				<span class="homepage-url u-url"><a href="{{$profile.homepage}}" rel="me" target="_blank" rel="noopener noreferrer">{{include file="sub/punct_wrap.tpl" text=$profile.homepage}}</a>{{if $profile.homepage_verified}}
 					<span title="{{$homepage_verified}}">✔</span>{{/if}}</span>
 			</div>
+		{{/if}}
+
+		{{if $member_since}}
+				<p class="member-since">
+					<strong>{{$member_since.0}}</strong>
+					<span>{{$member_since.1}}</span>
+				</p>
 		{{/if}}
 
 		{{if $about}}<dl class="about" style="display:none;">

@@ -31,11 +31,11 @@ use Psr\Log\LoggerInterface;
  */
 class Form extends BaseModule
 {
-	const MODE_NEW  = 'new';
-	const MODE_EDIT = 'edit';
-	const MODE_COPY = 'copy';
+	public const MODE_NEW  = 'new';
+	public const MODE_EDIT = 'edit';
+	public const MODE_COPY = 'copy';
 
-	const ALLOWED_MODES = [
+	public const ALLOWED_MODES = [
 		self::MODE_NEW,
 		self::MODE_EDIT,
 		self::MODE_COPY,
@@ -107,14 +107,18 @@ class Form extends BaseModule
 		$share_checked  = '';
 		$share_disabled = '';
 
+		$submit = $this->t("Create event");
 		if (empty($orig_event)) {
-			$orig_event = User::getById($this->session->getLocalUserId(),
-				['allow_cid', 'allow_gid', 'deny_cid', 'deny_gid']);
+			$orig_event = User::getById(
+				$this->session->getLocalUserId(),
+				['allow_cid', 'allow_gid', 'deny_cid', 'deny_gid'],
+			);
 		} elseif ($orig_event['allow_cid'] !== '<' . $this->session->getLocalUserId() . '>'
 				   || $orig_event['allow_gid']
 				   || $orig_event['deny_cid']
 				   || $orig_event['deny_gid']) {
 			$share_checked = ' checked="checked" ';
+			$submit        = $this->t("Edit event");
 		}
 
 		// In case of an error the browser is redirected back here, with these parameters filled in with the previous values
@@ -182,7 +186,8 @@ class Form extends BaseModule
 
 		$this->page['aside'] .= CalendarExport::getHTML($this->session->getLocalUserId());
 
-		$tpl = Renderer::getMarkupTemplate('calendar/event_form.tpl');
+		$tpl   = Renderer::getMarkupTemplate('calendar/event_form.tpl');
+		$no_bb = $this->t("Can't use BBCode here");
 
 		return Renderer::replaceMacros($tpl, [
 			'$post' => 'calendar/api/create',
@@ -192,48 +197,49 @@ class Form extends BaseModule
 
 			'$title'  => $this->t('Event details'),
 			'$desc'   => $this->t('Starting date and Title are required.'),
-			'$s_text' => $this->t('Event Starts:') . ' <span class="required" title="' . $this->t('Required') . '">*</span>',
+			'$s_text' => $this->t('Event starts') . ' <span class="required" title="' . $this->t('Required') . '">*</span>',
 			'$s_dsel' => Temporal::getDateTimeField(
 				new \DateTime(),
 				\DateTime::createFromFormat('Y', intval($syear) + 5),
 				\DateTime::createFromFormat('Y-m-d H:i', "$syear-$smonth-$sday $shour:$sminute"),
-				$this->t('Event Starts:'),
+				$this->t('Event starts'),
 				'start_text',
 				true,
 				true,
 				'',
 				'',
-				true
+				true,
 			),
 
-			'$n_text'    => $this->t('Finish date/time is not known or not relevant'),
+			'$n_text'    => $this->t('End date/time is unknown or irrelevant'),
 			'$n_checked' => $n_checked,
-			'$f_text'    => $this->t('Event Finishes:'),
+			'$f_text'    => $this->t('Event ends'),
 			'$f_dsel'    => Temporal::getDateTimeField(
 				new \DateTime(),
 				\DateTime::createFromFormat('Y', intval($fyear) + 5),
 				\DateTime::createFromFormat('Y-m-d H:i', "$fyear-$fmonth-$fday $fhour:$fminute"),
-				$this->t('Event Finishes:'),
+				$this->t('Event ends'),
 				'finish_text',
 				true,
 				true,
-				'start_text'
+				'start_text',
 			),
 
-			'$t_text'      => $this->t('Title (BBCode not allowed)') . ' <span class="required" title="' . $this->t('Required') . '">*</span>',
+			'$no_bb'       => $no_bb,
+			'$t_text'      => $this->t('Title') . ' <span class="required" title="' . $this->t('Required') . '">*</span>',
 			'$t_orig'      => $t_orig,
-			'$d_text'      => $this->t('Description (BBCode allowed)'),
+			'$d_text'      => $this->t('Description'),
 			'$d_orig'      => $d_orig,
-			'$l_text'      => $this->t('Location (BBCode not allowed)'),
+			'$l_text'      => $this->t('Location'),
 			'$l_orig'      => $l_orig,
-			'$summary'     => ['summary', $this->t('Title (BBCode not allowed)'), $t_orig, '', '*'],
+			'$summary'     => ['summary', $this->t('Title'), $t_orig, $no_bb, '*'],
 			'$sh_text'     => $this->t('Share this event'),
 			'$share'       => ['share', $this->t('Share this event'), $share_checked, '', $share_disabled],
 			'$sh_checked'  => $share_checked,
-			'$nofinish'    => ['nofinish', $this->t('Finish date/time is not known or not relevant'), $n_checked],
+			'$nofinish'    => ['nofinish', $this->t('End date/time is unknown or irrelevant'), $n_checked],
 			'$preview'     => $this->t('Preview'),
 			'$acl'         => $acl,
-			'$submit'      => $this->t('Submit'),
+			'$submit'      => $submit,
 			'$basic'       => $this->t('Basic'),
 			'$advanced'    => $this->t('Advanced'),
 			'$permissions' => $this->t('Permissions'),

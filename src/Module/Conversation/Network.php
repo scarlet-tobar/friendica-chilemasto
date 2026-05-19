@@ -17,6 +17,7 @@ use Friendica\Content\Conversation;
 use Friendica\Content\Conversation\Entity\Channel;
 use Friendica\Content\Conversation\Entity\Network as NetworkEntity;
 use Friendica\Content\Conversation\Factory\Timeline as TimelineFactory;
+use Friendica\Content\Conversation\Factory\Activity as ActivityFactory;
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Content\Conversation\Factory\Channel as ChannelFactory;
 use Friendica\Content\Conversation\Factory\UserDefinedChannel as UserDefinedChannelFactory;
@@ -109,6 +110,7 @@ class Network extends Timeline
 		IManagePersonalConfigValues $pConfig,
 		IManageConfigValues $config,
 		ICanCache $cache,
+		ActivityFactory $ActivityFactory,
 		L10n $l10n,
 		BaseURL $baseUrl,
 		Arguments $args,
@@ -126,6 +128,7 @@ class Network extends Timeline
 			$pConfig,
 			$config,
 			$cache,
+			$ActivityFactory,
 			$l10n,
 			$baseUrl,
 			$args,
@@ -163,7 +166,7 @@ class Network extends Timeline
 		];
 
 		$this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_CONTENT_START, $hook_data)
+			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_CONTENT_START, $hook_data),
 		);
 
 		$o           = '';
@@ -180,7 +183,7 @@ class Network extends Timeline
 				Feature::SEARCHES,
 				Feature::FOLDERS,
 				Feature::NOSHARER,
-				Feature::TRENDING_TAGS
+				Feature::TRENDING_TAGS,
 			];
 		}
 
@@ -215,18 +218,13 @@ class Network extends Timeline
 						$this->page['aside'] .= TrendingTags::getHTML($this->selectedTab);
 						break;
 					case Feature::NOSHARER:
-						if (($this->channel->isTimeline($this->selectedTab) || $this->userDefinedChannel->isTimeline($this->selectedTab, $this->session->getLocalUserId())) &&
-							!in_array($this->selectedTab, [Channel::FOLLOWERS, Channel::FORYOU, Channel::DISCOVER])) {
+						if (($this->channel->isTimeline($this->selectedTab) || $this->userDefinedChannel->isTimeline($this->selectedTab, $this->session->getLocalUserId()))
+							&& !in_array($this->selectedTab, [Channel::FOLLOWERS, Channel::FORYOU, Channel::DISCOVER])) {
 							$this->page['aside'] .= $this->getNoSharerWidget('network');
 						}
 						break;
 				}
 			}
-		}
-
-		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true) && ($_GET['mode'] ?? '') != 'minimal') {
-			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
-			$o .= Renderer::replaceMacros($tpl, ['$reload_uri' => $this->args->getQueryString()]);
 		}
 
 		if (!$this->raw) {
@@ -277,7 +275,7 @@ class Network extends Timeline
 				}
 
 				$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
-					'$title' => $this->l10n->t('Circle: %s', $circle['name'])
+					'$title' => $this->l10n->t('Circle: %s', $circle['name']),
 				]) . $o;
 			} elseif (Profile::shouldDisplayEventList($this->session->getLocalUserId(), $this->mode)) {
 				$o .= Profile::getBirthdays($this->session->getLocalUserId());
@@ -294,7 +292,7 @@ class Network extends Timeline
 				$items = $this->getItems();
 			}
 
-			$o .= $this->conversation->render($items, Conversation::MODE_NETWORK, false, false, $this->getOrder(), $this->session->getLocalUserId());
+			$o .= $this->conversation->render($items, Conversation::MODE_NETWORK, $this->raw, false, $this->getOrder(), $this->session->getLocalUserId());
 		} catch (\Exception $e) {
 			$this->logger->error('Exception when fetching items', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
 			$o .= $this->l10n->t('Error %d (%s) while fetching the timeline.', $e->getCode(), $e->getMessage());
@@ -302,14 +300,14 @@ class Network extends Timeline
 		}
 
 		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
-			$o .= HTML::scrollLoader();
+			$o .= HTML::scrollLoader($request);
 		} else {
 			$pager = new BoundariesPager(
 				$this->l10n,
 				$this->args->getQueryString(),
-				$items[0][$this->order]                 ?? null,
-				$items[count($items) - 1][$this->order] ?? null,
-				$this->itemsPerPage
+				$items[array_key_first($items)][$this->order] ?? null,
+				$items[array_key_last($items)][$this->order]  ?? null,
+				$this->itemsPerPage,
 			);
 
 			$o .= $pager->renderMinimal(count($items));
@@ -364,7 +362,7 @@ class Network extends Timeline
 		];
 
 		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_CONTENT_TABS, $hook_data)
+			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_CONTENT_TABS, $hook_data),
 		)->getArray();
 
 		if (!empty($network_timelines)) {
@@ -388,7 +386,7 @@ class Network extends Timeline
 	{
 		parent::parseRequest($request);
 
-		$this->circleId = (int)($this->parameters['circle_id'] ?? 0);
+		$this->circleId = (int) ($this->parameters['circle_id'] ?? 0);
 
 		if (!$this->selectedTab) {
 			$this->selectedTab = $this->getTimelineOrderBySession();
@@ -427,7 +425,7 @@ class Network extends Timeline
 			$this->order = 'commented';
 		}
 
-		$this->selectedTab = $this->selectedTab ?? $this->order;
+		$this->selectedTab ??= $this->order;
 
 		// Upon updates in the background and order by last comment we order by received date,
 		// since otherwise the feed will optically jump, when some already visible thread has been updated.
@@ -468,51 +466,51 @@ class Network extends Timeline
 
 	protected function getItems()
 	{
-		$conditionFields  = ['uid' => $this->session->getLocalUserId()];
-		$conditionStrings = [];
+		$timelineCondition = [];
+		$commonCondition   = ['uid' => $this->session->getLocalUserId()];
 
 		if (!is_null($this->accountType)) {
-			$conditionFields['contact-type'] = $this->accountType;
+			$commonCondition['contact-type'] = $this->accountType;
 		}
 
 		if ($this->star) {
-			$conditionFields['starred'] = true;
+			$timelineCondition['starred'] = true;
 		}
 		if ($this->mention) {
-			$conditionFields['mention'] = true;
+			$timelineCondition['mention'] = true;
 		}
 		if ($this->network) {
-			$conditionFields['network'] = $this->network;
+			$commonCondition['network'] = $this->network;
 		}
 
 		if ($this->dateFrom) {
-			$conditionStrings = DBA::mergeConditions($conditionStrings, ["`received` <= ? ", DateTimeFormat::convert($this->dateFrom, 'UTC', $this->appHelper->getTimeZone())]);
+			$commonCondition = DBA::mergeConditions($commonCondition, ["`received` <= ? ", DateTimeFormat::convert($this->dateFrom, 'UTC', $this->appHelper->getTimeZone())]);
 		}
 		if ($this->dateTo) {
-			$conditionStrings = DBA::mergeConditions($conditionStrings, ["`received` >= ? ", DateTimeFormat::convert($this->dateTo, 'UTC', $this->appHelper->getTimeZone())]);
+			$commonCondition = DBA::mergeConditions($commonCondition, ["`received` >= ? ", DateTimeFormat::convert($this->dateTo, 'UTC', $this->appHelper->getTimeZone())]);
 		}
 
 		if ($this->circleId) {
-			$conditionStrings = DBA::mergeConditions($conditionStrings, ["`contact-id` IN (SELECT `contact-id` FROM `group_member` WHERE `gid` = ?)", $this->circleId]);
+			$commonCondition = DBA::mergeConditions($commonCondition, ["`contact-id` IN (SELECT `contact-id` FROM `group_member` WHERE `gid` = ?)", $this->circleId]);
 		}
 
 		// Currently only the order modes "received" and "commented" are in use
 		if (!empty($this->itemUriId)) {
-			$conditionStrings = DBA::mergeConditions($conditionStrings, ['uri-id' => $this->itemUriId]);
+			$commonCondition = DBA::mergeConditions($commonCondition, ['uri-id' => $this->itemUriId]);
 		} else {
 			if (isset($this->maxId)) {
 				switch ($this->order) {
 					case 'received':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`received` < ?", $this->maxId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`received` < ?", $this->maxId]);
 						break;
 					case 'commented':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`commented` < ?", $this->maxId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`commented` < ?", $this->maxId]);
 						break;
 					case 'created':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`created` < ?", $this->maxId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`created` < ?", $this->maxId]);
 						break;
 					case 'uriid':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`uri-id` < ?", $this->maxId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`uri-id` < ?", $this->maxId]);
 						break;
 				}
 			}
@@ -520,16 +518,16 @@ class Network extends Timeline
 			if (isset($this->minId)) {
 				switch ($this->order) {
 					case 'received':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`received` > ?", $this->minId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`received` > ?", $this->minId]);
 						break;
 					case 'commented':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`commented` > ?", $this->minId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`commented` > ?", $this->minId]);
 						break;
 					case 'created':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`created` > ?", $this->minId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`created` > ?", $this->minId]);
 						break;
 					case 'uriid':
-						$conditionStrings = DBA::mergeConditions($conditionStrings, ["`uri-id` > ?", $this->minId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`uri-id` > ?", $this->minId]);
 						break;
 				}
 			}
@@ -546,12 +544,64 @@ class Network extends Timeline
 			$params['order'] = [$this->order => true];
 		}
 
-		$items = $this->database->selectToArray($this->circleId ? 'network-thread-circle-view' : 'network-thread-view', [], DBA::mergeConditions($conditionFields, $conditionStrings), $params);
+		$filterchannels = $this->pConfig->get($this->session->getLocalUserId(), 'channel', 'filter_channels') ?? [];
+		if ($filterchannels) {
+			$query           = "`uri-id` NOT IN (SELECT `uri-id` FROM `channel-post-view` WHERE `uid` = ? AND `channel` IN (" . substr(str_repeat('?, ', count($filterchannels)), 0, -2) . "))";
+			$commonCondition = DBA::mergeConditions($commonCondition, array_merge([$query], [$this->session->getLocalUserId()], $filterchannels));
+		}
+
+		$fields    = ['uri-id', 'created', 'received', 'commented', 'channel', 'contact-id'];
+		$condition = DBA::mergeConditions($timelineCondition, $commonCondition);
+
+		$timeline = $this->database->getSQL($this->circleId ? 'network-thread-circle-view' : 'network-thread-view', $fields, $condition, $params);
+		array_shift($condition);
+		$sql = '(' . $timeline . ')';
+
+		$systemchannels = [];
+		$userchannels   = [];
+
+		if (!$this->mention && !$this->star) {
+			foreach ($this->pConfig->get($this->session->getLocalUserId(), 'channel', 'timeline_channels') ?? [] as $channel) {
+				if (is_numeric($channel)) {
+					$userchannels[] = (int) $channel;
+				} else {
+					$systemchannels[] = $channel;
+				}
+			}
+		}
+
+		if ($systemchannels) {
+			$channel_condition = DBA::mergeConditions(['channel' => $systemchannels, 'in-timeline' => false], $commonCondition);
+			$sql .= ' UNION ALL (' . $this->database->getSQL('system-channel-post-view', $fields, $channel_condition, $params) . ')';
+			array_shift($channel_condition);
+			$condition = array_merge($condition, $channel_condition);
+		}
+
+		if ($userchannels) {
+			$channel_condition = DBA::mergeConditions(['channel' => $userchannels, 'in-timeline' => false], $commonCondition);
+			$sql .= ' UNION ALL (' . $this->database->getSQL('channel-post-view', $fields, $channel_condition, $params) . ')';
+			array_shift($channel_condition);
+			$condition = array_merge($condition, $channel_condition);
+		}
+
+		if ($systemchannels || $userchannels) {
+			$sql .= DBA::buildParameter($params);
+		}
+
+		$result = $this->database->p($sql, $condition);
+		$items  = $this->database->toArray($result);
 
 		// min_id quirk, continued
 		if (isset($this->minId) && !isset($this->maxId)) {
 			$items = array_reverse($items);
 		}
+
+		// Avoid duplicates
+		$posts = [];
+		foreach ($items as $item) {
+			$posts[$item['uri-id']] = $item;
+		}
+		$items = $posts;
 
 		if ($this->ping || !$this->database->isResult($items)) {
 			return $items;

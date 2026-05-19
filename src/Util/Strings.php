@@ -96,17 +96,17 @@ class Strings
 			'v',
 			'w', 'wh',
 			'x',
-			'z', 'zh'
+			'z', 'zh',
 		];
 
 		$midcons = [
 			'ck', 'ct', 'gn', 'ld', 'lf', 'lm', 'lt', 'mb', 'mm', 'mn', 'mp',
-			'nd', 'ng', 'nk', 'nt', 'rn', 'rp', 'rt'
+			'nd', 'ng', 'nk', 'nt', 'rn', 'rp', 'rt',
 		];
 
 		$noend = [
 			'bl', 'br', 'cl', 'cr', 'dr', 'fl', 'fr', 'gl', 'gr',
-			'kh', 'kl', 'kr', 'mn', 'pl', 'pr', 'rh', 'tr', 'qu', 'wh', 'q'
+			'kh', 'kl', 'kr', 'mn', 'pl', 'pr', 'rh', 'tr', 'qu', 'wh', 'q',
 		];
 
 		$start = mt_rand(0, 2);
@@ -147,15 +147,16 @@ class Strings
 	 *
 	 * @param string $network Network name of the contact (e.g. dfrn, rss and so on)
 	 * @param string $url	  The contact url
+	 * @param int    $gsid    Server id
 	 *
 	 * @return string Formatted network name
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function formatNetworkName(string $network, string $url = ''): string
+	public static function formatNetworkName(string $network, string $url = '', ?int $gsid = null): string
 	{
 		if ($network != '') {
 			if ($url != '') {
-				$gsid         = ContactSelector::getServerIdForProfile($url);
+				$gsid         = $gsid ?? ContactSelector::getServerIdForProfile($url);
 				$network_name = '<a href="' . $url . '">' . ContactSelector::networkToName($network, '', $gsid) . '</a>';
 			} else {
 				$network_name = ContactSelector::networkToName($network);
@@ -444,7 +445,7 @@ class Strings
 	{
 		$string_length = mb_strlen($string);
 
-		$length = $length ?? $string_length;
+		$length ??= $string_length;
 
 		if ($start < 0) {
 			$start = max(0, $string_length + $start);
@@ -494,7 +495,7 @@ class Strings
 
 				return $return;
 			},
-			$text
+			$text,
 		);
 
 		if (is_null($return)) {
@@ -513,7 +514,7 @@ class Strings
 				}
 				return $return;
 			},
-			$text
+			$text,
 		);
 
 		return $text;
