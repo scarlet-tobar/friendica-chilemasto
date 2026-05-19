@@ -1402,7 +1402,7 @@ class Item
 	 * @param string $summary
 	 * @return boolean summary is redundant
 	 */
-	public function redundantSummary(?string $body = '', ?string $summary = ''): bool
+	public function redundantSummary(?string $body, ?string $summary): bool
 	{
 		$normalize = function (string $text): string {
 			$text = mb_strtolower($text);
@@ -1411,12 +1411,12 @@ class Item
 			return trim($text);
 		};
 
-		$summary_norm = $normalize($summary);
+		$summary_norm = $normalize($summary ?? '');
 		if ($summary_norm === '') {
 			return false;
 		}
 
-		$body_norm = $normalize(BBCode::toPlaintext($body, false));
+		$body_norm = $normalize(BBCode::toPlaintext($body ?? '', false));
 
 		$len        = mb_strlen($summary_norm);
 		$body_start = mb_substr($body_norm, 0, $len);
