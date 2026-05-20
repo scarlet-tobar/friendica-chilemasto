@@ -42,11 +42,14 @@ Version 2026.05 (unreleased)
     Improved handling of deleted posts (#14721, PR 15665) [annando]
     Improved federation with misskey (#15688, PR 15691) [annando]
     Improved handling of web-finger (#15686, PR 15693, PR 15758, PR 15766) [annando]
+    Improved handling of Json-LD documents (PR 15698) [annando]
     Improved expiration of posts (#15720, PR 15729) [annando]
     Removed deprecated themes duepuntozero, quattro, smoothly (PR 15651) [marcusxss]
-    Requirement minimal PHP version is now 8.2
+
+    This is the last release of Friendica with support for PHP version before 8.2
 
   Friendica Addons
+    Updated the translations
     bluesky
       Fixed handling of expiration date (#14439) [annando]
       Fixed issue with fetching missing postings [annando]
